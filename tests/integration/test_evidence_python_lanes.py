@@ -27,8 +27,8 @@ def run_cli(*args, cwd, env=None):
 def make_workspace(tmp_path: Path, *, complete_team=True, partial_team=True,
                    feedback_entries=0, with_index=True) -> Path:
     ws = tmp_path / "ws"
-    (ws / ".specify" / "memory" / "evidence").mkdir(parents=True)
-    fb = ws / ".specify" / "memory" / "feedback"
+    (ws / ".specify" / "evidence").mkdir(parents=True)
+    fb = ws / ".specify" / "feedback"
     fb.mkdir(parents=True)
     teams = ws / ".specify" / "teams"
     teams.mkdir(parents=True)
@@ -170,7 +170,7 @@ class TestCompareBasics:
         r1 = run_cli("--action", "collect", "--target", "project", "--lanes", "feedback", cwd=ws)
         assert r1.returncode == 0
         # add two more feedback entries to change signals
-        fb = ws / ".specify" / "memory" / "feedback"
+        fb = ws / ".specify" / "feedback"
         for i in (7, 8):
             fname = f"20260107T00000{i}Z-skill-demo.md"
             (fb / fname).write_text(

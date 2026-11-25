@@ -1,9 +1,9 @@
 # Self-Improvement Workflow（自我提升标准路径）
 
 > **Single source of truth** for the execution order of a Spec Kit Self-Improvement
-> Loop. Concepts are owned by `.specify/shared/definitions/self-improvement-definitions.md`;
-> policy by `.specify/shared/guidelines/self-improvement.md`; reusable structure by
-> `.specify/shared/patterns/self-improvement-pattern.md`. Embedding units reference this file and do
+> Loop. Concepts are owned by `shared/definitions/self-improvement-definitions.md`;
+> policy by `shared/guidelines/self-improvement.md`; reusable structure by
+> `shared/patterns/self-improvement-pattern.md`. Embedding units reference this file and do
 > not copy its steps.
 
 ## Entry Contract
@@ -53,14 +53,14 @@ The observation source resolves by subject type:
   with the engine's reason verbatim —
   `the memory engine's --source contract does not accept <unit-id>; the record is emitted but not landed` —
   and takes its observations from this unit's `kind: external` entries (the client channel) plus
-  the existing evidence lanes (owner: `.specify/shared/workflow/evidence-step.md`). Invent
+  the existing evidence lanes (owner: `shared/workflow/evidence-step.md`). Invent
   no source string to make a write succeed, forge no history, and never phrase
   "no history" as "past runs were fine". Widening the run-determination source
   contract is the engine owner's action and happens nowhere in this loop.
 
 ### SI-2 — Qualify and Freeze Evidence
 
-Execute `.specify/shared/workflow/evidence-step.md` Step A/B. Reuse fresh evidence or collect available
+Execute `shared/workflow/evidence-step.md` Step A/B. Reuse fresh evidence or collect available
 lanes, classify every finding by the canonical evidence states, and freeze the candidate list.
 
 Outcomes:
@@ -91,7 +91,7 @@ prior output is critiqued in the same form as external proposals.
 
 Output form, acceptability criteria, verdict handling, self-critique rules, and the
 failure-mode mapping are defined once in
-`.specify/shared/guidelines/critique-and-self-critique.md`; this step references that owner
+`shared/guidelines/critique-and-self-critique.md`; this step references that owner
 and MUST NOT restate its rules.
 
 ### SI-4 — Route to the Canonical Improver
@@ -109,7 +109,7 @@ normal assisted flow (`improve-docs`, direct owner workflow, or system review).
 
 ### SI-5 — Plan and Apply the Intervention
 
-Apply `.specify/shared/guidelines/confirmation-gates.md` before writes. Reversible, authorized local
+Apply `shared/guidelines/confirmation-gates.md` before writes. Reversible, authorized local
 edits may execute and be reported; destructive, external, authority-expanding, or uncertain
 changes stop for confirmation.
 
@@ -127,7 +127,7 @@ A passing check supports only: **intervention applied; outcome pending**.
 
 ### SI-7 — Record the Intervention
 
-Execute `.specify/shared/workflow/evidence-step.md` Step E. `intervention.json` ties the change to a
+Execute `shared/workflow/evidence-step.md` Step E. `intervention.json` ties the change to a
 baseline finding and expected signal. Reuse existing run reports, logs, history, and memory;
 do not create a parallel self-improvement database.
 

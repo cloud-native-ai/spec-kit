@@ -70,4 +70,4 @@ class TestTodoInContextWiring:
     def test_owner_names_command_and_park_boundary(self):
         text = GUIDELINE_SRC.read_text(encoding="utf-8")
         assert "templates/commands/todo.md" in text
-        assert ".specify/memory/todo/" in text
+        assert ".specify/todo/" in text

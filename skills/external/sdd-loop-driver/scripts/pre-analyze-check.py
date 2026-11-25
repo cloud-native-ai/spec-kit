@@ -1088,7 +1088,7 @@ def resolve_claimed_status(spec_dir, repo):
         if status is not None:
             return status
     if repo:
-        repo_registry = os.path.join(repo, ".specify", "memory", "features.md")
+        repo_registry = os.path.join(repo, ".specify", "features.md")
         if os.path.isfile(repo_registry):
             status = registry_status(repo_registry, key)
             if status is not None:

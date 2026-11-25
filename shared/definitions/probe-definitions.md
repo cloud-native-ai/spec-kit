@@ -327,7 +327,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 ## External Probe 登记契约
 
 宿主项目的外部 probe 不写入本文件,登记于项目侧
-`.specify/memory/feedback/probes/<object_id>.md`(YAML frontmatter,一文件一 probe):
+`.specify/feedback/probes/<object_id>.md`(YAML frontmatter,一文件一 probe):
 
 ```yaml
 object_id: ext-<slug>        # MUST 以 ext- 开头(内外命名空间强制隔离)

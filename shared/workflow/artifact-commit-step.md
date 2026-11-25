@@ -91,7 +91,7 @@ gets it without a new entry point.
 ### The receipt
 
 Each run writes **one receipt** — a new file, never an edit of an existing one — under
-`.specify/memory/retention/closeout/`, named by the run and its timestamp, written once. It is a
+`.specify/retention/closeout/`, named by the run and its timestamp, written once. It is a
 sibling of the retention family's other outputs (`receipts/`, `plans/`) and creates no new top-level
 store.
 

@@ -7,7 +7,7 @@ classification: internal
 
 # improve-team
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -53,7 +53,7 @@ optimizer guess:
 3. **Force the design face into `territory.forbidden`** — `requirements.md`, `tasks.md`,
    `verification.md` and `handoff.md` land in `territory.forbidden` of every seat that carries
    the expansion. The refusal is mechanical, not cooperative:
-   `python3 .specify/skills/internal/create-team/scripts/territory-check.py --team .specify/teams/<slug>/team.md --path <path>`
+   `python3 skills/internal/create-team/scripts/territory-check.py --team .specify/teams/<slug>/team.md --path <path>`
    exits non-zero and names the path and the seat.
 4. **Record one record per team** — the change report carries, for each expanded team, its slug,
    the contract path, the added `territory.write` entries and the added `territory.forbidden`
@@ -72,7 +72,7 @@ after the writeback is verified (C-64/C-67 of `contracts/handoff-contract.md`).
 | Symptom | Likely cause | Team edit |
 |---------|--------------|-----------|
 | Iteration never converges | Threshold too high or conflicting dimensions | Lower threshold / rebalance `quality_dimensions` weights |
-| Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `.specify/skills/internal/create-team/templates/`) |
+| Score oscillates | Ambiguous evaluator criteria | Tighten the evaluator rubric (via the moved stage templates in `skills/internal/create-team/templates/`) |
 | Parallel file conflicts | Overlapping territories | Repartition `territories`; move shared files to forbidden-write |
 | Serial stage stalls | Broken/missing handoff dependency | Fix `blockedBy` edges / handoff file path |
 | Serial stage 反复撞派发轮次上限,产物只覆盖目标的一小部分 | **交付粒度超预算** — stage 的 `outputs` 规模超过单次派发可承载量 | 按目录规模拆 stage,或降为目录级 + 例外清单;粒度纪律见 `../create-team/references/patterns.md` § Serial Chain |

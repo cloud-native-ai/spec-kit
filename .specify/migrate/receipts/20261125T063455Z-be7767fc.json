@@ -1,0 +1,43 @@
+{
+  "receiptVersion": 2,
+  "runId": "20261125T063455Z-be7767fc",
+  "mode": "apply",
+  "status": "completed",
+  "startedAt": "2026-11-25T06:34:55Z",
+  "finishedAt": "2026-11-25T06:34:56Z",
+  "workspace": "/storage/project/cloud-native-ai/spec-kit",
+  "resumedFrom": null,
+  "source": {
+    "stampFile": ".specify/source.json",
+    "frameworkCommit": "5d79f883c865e408ddadea83eae3303ebbe8ae4e",
+    "stampedAt": "20261124T122737Z",
+    "reason": null
+  },
+  "target": {
+    "cliVersion": "0.0.22",
+    "frameworkCommit": "45d2ffdd93fb990ad33feccf4ae8cb19ec26f7e7",
+    "origin": "git"
+  },
+  "outcome": "clean",
+  "exitCode": 0,
+  "items": [],
+  "archives": [],
+  "recover": [],
+  "storeLayout": {
+    "stores": 0,
+    "resolved": 0,
+    "refused": 0,
+    "blocked": 0,
+    "container": "absent",
+    "manifestDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "notes": [],
+  "pointers": [
+    {
+      "topic": "goal-team-archive-migration",
+      "ownerCommand": "/speckit.anchor",
+      "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+      "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+    }
+  ]
+}

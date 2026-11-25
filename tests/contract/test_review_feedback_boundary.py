@@ -157,7 +157,7 @@ CLOSING_ENGINES = {
 }
 
 #: The one legitimate feedback destination (FR-020 / C-61).
-CANONICAL_STORE = ".specify/memory/feedback/"
+CANONICAL_STORE = ".specify/feedback/"
 
 #: A code finding's locating form: a path with an extension plus a line number.
 CODE_LOCATION_RE = re.compile(r"[\w./-]+\.(?:py|sh|js|ts|md|go|rs):\d+")

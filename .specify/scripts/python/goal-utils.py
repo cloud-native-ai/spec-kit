@@ -19,8 +19,8 @@ Each definition is composed of exactly three parts: an outcome/guidance narrativ
 zero-or-more verifiable criteria, and lifecycle state. Identity is the directory
 name; timestamps are change-traceability metadata, never a fourth part.
 
-Concept authority: .specify/shared/definitions/anchor-definitions.md (Anchor layer),
-.specify/shared/definitions/goal-definitions.md (action-level Goal layer) — read-only.
+Concept authority: shared/definitions/anchor-definitions.md (Anchor layer),
+shared/definitions/goal-definitions.md (action-level Goal layer) — read-only.
 File contract:  .specify/specs/101-anchor-goal-realignment/contracts/goal-engine.contract.md
 
 Actions, grouped by whether they write:
@@ -83,11 +83,11 @@ EXIT_NOT_FOUND = 3
 EXIT_INVALID = 4
 #: 053 FR-033 — a run-precondition check judged the run blocked. The next free code: the
 #: four above keep their existing meanings byte for byte, so one code never carries two
-#: meanings across actions, and the 0/2 branches `.specify/templates/commands/team.md` already has
+#: meanings across actions, and the 0/2 branches `templates/commands/team.md` already has
 #: keep working unchanged.
 EXIT_BLOCKED = 5
 
-#: The three archive layers (owner: .specify/shared/definitions/anchor-definitions.md § Archive
+#: The three archive layers (owner: shared/definitions/anchor-definitions.md § Archive
 #: Layers). A layer is an archive row with its own store and its own definition filename.
 ARCHIVE_DIRNAME = ".specify/anchoring"
 GOALS_DIRNAME = ".specify/goals"
@@ -459,7 +459,7 @@ BINDING_MARKER = "binding:"
 #: C-3 — shape only. The grammar is owned by the state spine; this file cites that
 #: owner and never re-declares it as a second schema.
 RUN_ID_SHAPE = re.compile(r"^r\d{8}T\d{6}Z-[A-Za-z0-9][A-Za-z0-9_.\-]*$")
-STATE_SPINE_GRAMMAR_OWNER = ".specify/skills/sdd-loop-driver/references/state-awareness.md"
+STATE_SPINE_GRAMMAR_OWNER = "skills/external/sdd-loop-driver/references/state-awareness.md"
 
 #: R-06 — the closed frontmatter subset: `key: value` scalars (null / bool / int /
 #: string), inline lists, and one nested mapping level. Nothing else is guessed.
@@ -944,7 +944,7 @@ def _title_from_body(body: str) -> str:
 
 
 #: 053 FR-035 — the criterion-subject reference form. Single definition point; the literal
-#: itself is owned by .specify/shared/definitions/goal-definitions.md § 判据主体指代形 (Criterion
+#: itself is owned by shared/definitions/goal-definitions.md § 判据主体指代形 (Criterion
 #: Subject Reference), which also states the two failure tiers and the conflict rule below.
 SUBJECT_REF = re.compile(r"\[subjects:\s*([^\]]+)\]")
 #: The only machine-decidable member-enumeration marker: a brace expansion holding a comma.
@@ -3921,7 +3921,7 @@ def _load_registered_fact(repo_root: Path, slug: str):
             break
     if registration is None:
         return None, None, DEGRADED_OWNER, \
-            f"fact {slug!r} is not registered in .specify/shared/declarations/contract.yaml"
+            f"fact {slug!r} is not registered in shared/declarations/contract.yaml"
     try:
         body = reader.load_fact(str(repo_root), slug)["body"]
     except (reader.DeclarationError, OSError) as exc:
@@ -4012,7 +4012,7 @@ def command_family(repo_root: Path, command: str):
                        or not (repo_root / "templates" / "commands" / f"{name}.md").is_file()]
             if orphans:
                 problem = ("declared addition(s) without a carrier under "
-                           f".specify/templates/commands/: {', '.join(orphans)}")
+                           f"templates/commands/: {', '.join(orphans)}")
         if problem is not None:
             body, label, detail = None, DECLARATION_INVALID, problem
         else:
@@ -4399,7 +4399,7 @@ def main(argv: list[str] | None = None) -> int:
                         help="archive layer: anchor (.specify/anchoring/anchor.md), "
                              "goals (.specify/goals/goal.md), teams (.specify/teams/), "
                              "or auto (read-only single-layer resolution); the closed "
-                             "member set is owned by .specify/shared/definitions/"
+                             "member set is owned by shared/definitions/"
                              "anchor-definitions.md § Archive Layers")
     common.add_argument("--spec-dir", default=None,
                         help="the spec directory used to resolve origin and validate auto "

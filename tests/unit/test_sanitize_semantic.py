@@ -116,7 +116,7 @@ def test_evidence_pack_fragment_globs_reach_deep_paths(tmp_path):
                      "platforms/claude.mjs"), encoding="utf-8")
     candidates, _ = su.collect_semantic_candidates(tmp)
     by_material = {c["material"]: c for c in candidates}
-    pack = by_material[".specify/memory/todo/fragment-only.md"]["evidencePack"]
+    pack = by_material[".specify/todo/fragment-only.md"]["evidencePack"]
     assert any("land all five items" in line for line in pack["gitLog"]), \
         "fragment glob must reach the deep path's history"
 

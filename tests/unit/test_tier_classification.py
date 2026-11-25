@@ -7,7 +7,7 @@ CLI-form tools are the ones classified Tier 1.
 Deliberately free of count pins: ``len(_ASSISTANT_TIERS) == 6`` and
 ``len(tier1) == 4`` broke every time an assistant was legitimately added (see the
 recorded failure of ``test_tiers_has_six_entries`` in
-``.specify/memory/feedback/last-regression-failed.txt``), while catching nothing that
+``.specify/feedback/last-regression-failed.txt``), while catching nothing that
 the derived set equalities below miss. ``test_ai_tools_support_matrix.py`` owns the
 authoritative pin of the official assistant roster itself.
 """

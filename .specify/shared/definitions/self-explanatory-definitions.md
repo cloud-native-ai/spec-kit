@@ -1,10 +1,10 @@
 # 不言自明（Self-explanatory）— 概念定义
 
-> **Owner 声明**：本文件是“不言自明（Self-explanatory）”概念的单一真源。实践方法见 `.specify/shared/guidelines/self-explanatory.md`；Constitution 与 instructions 只持有指针或摘要，不复制本定义。
+> **Owner 声明**：本文件是“不言自明（Self-explanatory）”概念的单一真源。实践方法见 `shared/guidelines/self-explanatory.md`；Constitution 与 instructions 只持有指针或摘要，不复制本定义。
 >
 > **命名史**：本概念最初以“望文生义”引入；2026-11-04 按用户决定，中文规范名改为“不言自明”，英文规范名为“Self-explanatory”。旧名只作为历史记录保留，后续引用一律使用新名。
 >
-> **Status**: confirmed at exit gate — 2026-11-04. Ledger: `.specify/memory/session/interview-wangwenshengyi.md`.
+> **Status**: confirmed at exit gate — 2026-11-04. Ledger: `.specify/session/interview-wangwenshengyi.md`.
 
 ## 1. 概念
 
@@ -32,13 +32,13 @@
 - 依赖 Constitution XVIII（Grounded Naming）：名称首先由既有权威来源决定，不能为了“不言自明”绕过命名来源规则。
 - **核心判断条件**：面对一个具体结构，如果本概念能触发“把用户需要的信息维度提升为名称、路径或结构层级”的改造判断，说明它已进入框架并产生效力；不能触发则说明 Constitution X 的效力不足。goal 的 `<status>/<slug>` 布局只是本概念的一个示例，不是对所有项目强制实施的普适布局。
 - <!-- 092 handoff: D6 → 082 / 083 -->
-  与 `.specify/shared/definitions/mechanism-policy-definitions.md` 的相邻边界与**判据优先级**：一段内容先按那份文件的判据定侧（机制侧 / 运行环境侧），再在本概念下决定**这一侧内部**的名称、路径是否承载信息维度。定侧在前、命名在后；同时可读时先定侧，命名只在已定的侧内生效。
+  与 `shared/definitions/mechanism-policy-definitions.md` 的相邻边界与**判据优先级**：一段内容先按那份文件的判据定侧（机制侧 / 运行环境侧），再在本概念下决定**这一侧内部**的名称、路径是否承载信息维度。定侧在前、命名在后；同时可读时先定侧，命名只在已定的侧内生效。
 
 ## 5. 权威归属与强制力
 
-- 定义由 **shared 层**拥有：框架源为本文件 `.specify/shared/definitions/self-explanatory-definitions.md`；运行时镜像为 `.specify/shared/definitions/self-explanatory-definitions.md`。
-- **Constitution 与 instructions 是输出机制**：在客户项目中，它们把 shared 层的定义投射到该项目的 harness 配置中，只持有指针或摘要，不复制定义文本；在 framework hat 下，自优化的输出目标由执行流程决定（见 `.specify/shared/workflow/best-practice-optimization.md` §2、§6）。
-- 输出与应用映射见 `.specify/shared/workflow/best-practice-optimization.md`。
+- 定义由 **shared 层**拥有：框架源为本文件 `shared/definitions/self-explanatory-definitions.md`；运行时镜像为 `.specify/shared/definitions/self-explanatory-definitions.md`。
+- **Constitution 与 instructions 是输出机制**：在客户项目中，它们把 shared 层的定义投射到该项目的 harness 配置中，只持有指针或摘要，不复制定义文本；在 framework hat 下，自优化的输出目标由执行流程决定（见 `shared/workflow/best-practice-optimization.md` §2、§6）。
+- 输出与应用映射见 `shared/workflow/best-practice-optimization.md`。
 - 强制力为 **SHOULD**，以**最佳实践条目**的方式嵌入框架自主的优化流程。
 
 ## 6. 被编码属性的真源与投影
@@ -55,4 +55,4 @@
 2. **框架自身规则**；
 3. **每次最多只增加一个维度**（小步快跑、及时止损）。
 
-该顺序是概念层的约束；具体操作步骤见 `.specify/shared/guidelines/self-explanatory.md`。
+该顺序是概念层的约束；具体操作步骤见 `shared/guidelines/self-explanatory.md`。

@@ -34,7 +34,7 @@ Work with the project directory as your working directory; load the project cont
 1. Read the assignment brief in full.
 2. Load only the authority artifacts the brief names (summary-first).
 3. Execute the assigned slice using the declared tools.
-4. Verify your own output exists and is non-empty; when verification runs tests, every execution goes through `.specify/scripts/bash/run-tests.sh` (test paths and arguments forward to the framework) — direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry.
+4. Verify your own output exists and is non-empty; when verification runs tests, every execution goes through `scripts/bash/run-tests.sh` (test paths and arguments forward to the framework) — direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry.
 5. Return the output paths, evidence pointers, and `未发现异常` or `ANOMALY:` lines.
 
 ## Output Format
@@ -50,5 +50,5 @@ fast-fail-clause(快速失败注入子句)——执行中发现与已记录预�
 - 先问一个问题:解决它需要**纠正**还是**裁定**?纠正 = 恰有一种与已记录意图一致的读法、改动局部可逆、未证伪任何下游前提、未越过本动作声明的范围。
 - 纠正 ⇒ 就地修完,并在回传中披露。裁定(须在两种以上读法间选择,或须发明工件未记录的意图)⇒ **停在本层、回抛编排者,MUST NOT 就地修平后继续**。
 - 回传 MUST 含一条显式异常行:有异常则逐条以**行首** `ANOMALY:` 列出;无异常则明写 `未发现异常`。缺该行即回传不完整,沉默 MUST NOT 被读作干净。
-- 判据、两份封闭清单与上送件形态的唯一真源:`.specify/shared/guidelines/fast-fail.md`。
+- 判据、两份封闭清单与上送件形态的唯一真源:`shared/guidelines/fast-fail.md`。
 <!-- fast-fail-clause:end -->

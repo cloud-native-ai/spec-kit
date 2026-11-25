@@ -285,7 +285,7 @@ flowchart TD
 
 扩展模块解决的是：一次会话里发现的技能、脚本、系统命令或 MCP 工具，如何沉淀为可复用、可追踪、可跨 Agent 共享的资源。
 
-Skill 侧使用 `.specify/skills/<name>/SKILL.md` 作为主副本，Tool 侧使用 `.specify/memory/tools/<name>.md` 作为记录。资源 ID 采用 `<SKILL:path>` 和 `<TOOL:path>` 形式，由工作区相对路径构成：[scripts/python/skills-utils.py](../../scripts/python/skills-utils.py#L25-L54)。
+Skill 侧使用 `.specify/skills/<name>/SKILL.md` 作为主副本，Tool 侧使用 `.specify/tools/<name>.md` 作为记录。资源 ID 采用 `<SKILL:path>` 和 `<TOOL:path>` 形式，由工作区相对路径构成：[scripts/python/skills-utils.py](../../scripts/python/skills-utils.py#L25-L54)。
 
 #### 资源 ID 流程
 

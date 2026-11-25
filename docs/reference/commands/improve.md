@@ -21,7 +21,7 @@ The target resolves to exactly **one** Execution Subject (criteria owner: `share
 | `/speckit.<command>` | command template (pending row — no improver yet, see below) |
 | `skill:<name>` | Skill |
 | an agent artifact (role slug or `.specify/agents/...` path) | agent |
-| a tool record (name / alias / `tool_id` under `.specify/memory/tools/`) | tool record |
+| a tool record (name / alias / `tool_id` under `.specify/tools/`) | tool record |
 | a team (slug or `.specify/teams/<slug>/team.md`) | team definition |
 | `custom:<owner>/<name>` | host-project custom unit |
 

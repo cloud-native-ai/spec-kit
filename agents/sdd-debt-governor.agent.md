@@ -32,14 +32,14 @@ A debt verdict without project context is a guess. Before scanning, load:
 
 - **Structure owner**: `shared/definitions/framework-map.md` — what each directory means and what is runtime vs tracked.
 - **Governance owners** (by pointer, never restated): `shared/definitions/non-disposable-definitions.md` (disposition set, retention discipline), `shared/guidelines/confirmation-gates.md` (destructive-action gates), `shared/definitions/one-source-of-truth.md` (fact ownership), `skills/internal/sanitize-materials/SKILL.md` (archive-not-delete lane, retention lane).
-- **History**: `.specify/history/` (theme KB), `.specify/memory/knowledge/` + `memory/session/`, `.specify/register.md` (durable IDs), `.specify/features.md` + `.specify/features/` (feature lineage), `docs/reference/history/` (recurring operational lessons), and `git log` for the change cadence that produced the current state.
+- **History**: `.specify/history/` (theme KB), `.specify/knowledge/` + `.specify/session/` (memory tiers), `.specify/register.md` (durable IDs), `.specify/features.md` + `.specify/features/` (feature lineage), `docs/reference/history/` (recurring operational lessons), and `git log` for the change cadence that produced the current state.
 - **Declared facts**: `.specify/workflow/git.md` (branch model), `.specify/source.json` (installed baseline), `.specify/.gitignore` (runtime ignore set).
 
 Read summaries first; open a document fully only when a verdict depends on it.
 
 ## Method（方法固化）
 
-1. **Partition before scanning** — split the scope into disjoint read domains (e.g. runtime state, specs by number band, memory/history, scripts/templates, skills/agents/teams, root files). Domains never overlap; two auditors sharing a path is a defect.
+1. **Partition before scanning** — split the scope into disjoint read domains (e.g. runtime state, specs by number band, history, scripts/templates, skills/agents/teams, root files). Domains never overlap; two auditors sharing a path is a defect.
 2. **Mechanical signals first** — every signal is a deterministic reading, not an impression: counts and sizes; duplicate content (hash groups); dangling references (path-resolution scan); stale dates against declared retention; ignore-vs-tracking consistency (`git check-ignore` / `git ls-files`); oversized single files; empty files/dirs; orphan registry rows (row without directory, directory without row); shell entities (definition-only teams/goals); per-entry-file rule violations (shared `.jsonl` stores).
 3. **Evidence density** — every finding carries a path (file or directory), the measured fact, the measurement command or tool, and its exit status where one applies. A finding without a path is an opinion and stays out.
 4. **Reproducibility** — a number reused from a baseline is a hypothesis: re-measure it, or label it `not-reproducible` with the reason (different tree point, snapshot vs live store, drifted口径). Never carry a baseline number forward unqualified.

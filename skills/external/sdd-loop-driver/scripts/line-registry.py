@@ -72,10 +72,10 @@ DEFAULT_CONCURRENCY_CAP = 4
 DEFAULT_AGENT_CONCURRENCY_CAP = 24
 LINE_ROLES = {"root", "coordinator", "agent-write"}
 RUNTIME_RECORD_DIRS = (
-    Path(".specify") / "memory" / "feedback",
-    Path(".specify") / "memory" / "session",
-    Path(".specify") / "memory" / "knowledge",
-    Path(".specify") / "memory" / "exec-quant",
+    Path(".specify") / "feedback",
+    Path(".specify") / "session",
+    Path(".specify") / "knowledge",
+    Path(".specify") / "exec-quant",
 )
 
 ACTIONS = {

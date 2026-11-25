@@ -6,14 +6,14 @@
 > - **`loop_state` 派生映射（FR-004 的八条优先级）的唯一 owner 是 `.specify/specs/065a-state-awareness/requirements.md` FR-004（parent `#FR-004`）**。§Derived Mapping 只做镜像与指针，不拥有该表；本文件任何位置都不得声称拥有它。
 > - watch 判定（状态机、信号优先级、退出码 10–16）的唯一 owner 是 `references/watch-model.md`；本文件只描述聚合器**消费**其输出的方式。
 > - `提交齐备` 谓词与候选动作的先后次序，owner 是 `.specify/specs/065a-state-awareness/contracts/interruption-and-action.md` C-46（`IA-14`）；§恢复动作建议 只记录引擎落地读法。
-> - 运行时机器权威是 `.specify/scripts/loop-state.py`（`STAGE_ARTIFACTS` / `DERIVED_MAPPING` / 动作阶梯），本文件是它的人类可读镜像；契约测试逐项钉住两侧一致（`C-50`、`FR-004` 三向比对）。
-> - 运行时镜像 `.specify/skills/sdd-loop-driver/references/state-awareness.md` 由 `.specify/scripts/python/sync-mirrors.py` 生成，**MUST NOT 手改**。
+> - 运行时机器权威是 `scripts/loop-state.py`（`STAGE_ARTIFACTS` / `DERIVED_MAPPING` / 动作阶梯），本文件是它的人类可读镜像；契约测试逐项钉住两侧一致（`C-50`、`FR-004` 三向比对）。
+> - 运行时镜像 `.specify/skills/sdd-loop-driver/references/state-awareness.md` 由 `scripts/python/sync-mirrors.py` 生成，**MUST NOT 手改**。
 
 ---
 
 ## 入口与调用形态
 
-入口：`.specify/scripts/loop-state.py`（Python ≥ 3.8，仅标准库，无常驻进程、无网络轮询）。一次调用输出一个 `schema_version=1` 的 JSON 信封；**只读**——唯一的写路径是显式 `--out`。
+入口：`scripts/loop-state.py`（Python ≥ 3.8，仅标准库，无常驻进程、无网络轮询）。一次调用输出一个 `schema_version=1` 的 JSON 信封；**只读**——唯一的写路径是显式 `--out`。
 
 | 形态 | 命令 | 用途 |
 |------|------|------|
@@ -28,7 +28,7 @@
 
 聚合器消费五类证据源：状态脊、Line Registry、四件套（`pid-*` / `status-*` / `log-*.log` / `heartbeat-*.log`）、watchbeat 标记（`watchbeat-*`）与阶段产物 + git 提交。
 
-**四件套信封**：空格分隔的 `key=value`（首见优先，镜像 `watch-target.sh` 的读法）。阈值 `start-grace` / `deadline-grace` / `heartbeat-max-age` 的缺省值 owner 是 `.specify/scripts/watch-target.sh --help` 的 `Defaults:` 行，本引擎不内置第二套数字；发现失败时 `thresholds.value_state=unknown`，依赖该阈值的判定不触发。`retry_limit` 缺省值 owner 是 `references/stage-prompts.md` § Stall Handling。
+**四件套信封**：空格分隔的 `key=value`（首见优先，镜像 `watch-target.sh` 的读法）。阈值 `start-grace` / `deadline-grace` / `heartbeat-max-age` 的缺省值 owner 是 `scripts/watch-target.sh --help` 的 `Defaults:` 行，本引擎不内置第二套数字；发现失败时 `thresholds.value_state=unknown`，依赖该阈值的判定不触发。`retry_limit` 缺省值 owner 是 `references/stage-prompts.md` § Stall Handling。
 
 **证据源 vs 必需输入**：证据源不可读 → 记 `status=missing`、值用 `null`，仍以退出码 `0` 完成求值；必需输入（`--line-id`、显式 `--probe` 文件）缺失 / 不可解析 → 退出码 `2`，不进入求值。
 
@@ -69,9 +69,9 @@ watchbeat 是**驱动侧写入、本引擎只读消费**的观察标记，字段
 
 ## Stage Artifact Map
 
-> **取值 owner 是 `.specify/shared/declarations/facts/driver-stage-artifacts.yaml#/statement`**（`stages` / `implement_code_pathspec`），`.specify/scripts/loop-state.py` 经共享读取入口取用；下表是该声明的渲染，逐项一致由契约测试钉住（`C-50`）。改映射先改声明，本文件与引擎不得各自成为第二个来源。
+> **取值 owner 是 `shared/declarations/facts/driver-stage-artifacts.yaml#/statement`**（`stages` / `implement_code_pathspec`），`scripts/loop-state.py` 经共享读取入口取用；下表是该声明的渲染，逐项一致由契约测试钉住（`C-50`）。改映射先改声明，本文件与引擎不得各自成为第二个来源。
 
-本表镜像 `.specify/scripts/loop-state.py` 的 `STAGE_ARTIFACTS`，逐项一致由契约测试钉住。路径相对解析后的 `spec_dir`；`owned_paths[]` 是**条件产物**：存在才进入提交路径集合，缺失不判不完整。
+本表镜像 `scripts/loop-state.py` 的 `STAGE_ARTIFACTS`，逐项一致由契约测试钉住。路径相对解析后的 `spec_dir`；`owned_paths[]` 是**条件产物**：存在才进入提交路径集合，缺失不判不完整。
 
 | 阶段 | `artifacts[]` | `owned_paths[]` | `commit_required` | `no_change_allowed` |
 |------|---------------|-----------------|-------------------|---------------------|
@@ -89,7 +89,7 @@ watchbeat 是**驱动侧写入、本引擎只读消费**的观察标记，字段
 - **产物完整性**只由“文件存在且非空”判定；目录类产物要求目录存在且至少含一个非空文件；`checklist` 另要求自 `stage_base_commit` 起新增/改动的 checklist 文件。
 - `stage_base_commit` 缺失或不可解析 → `artifacts.complete=null`、`value_state=unknown`，**不判不完整**、不计入 `false_completion`；`commits.value_state=unknown` 且不回退 HEAD 猜测。
 - `analyze` 无必需文件产物 → `complete=true`（vacuous truth），`commit_required=false`，`commits.status=na`。
-- `implement` 以**代码/测试路径**的提交证据表达完整性（`src/`、`skills/`、`.specify/scripts/`、`tests/`、`.specify/templates/`、`agents/`），仅文档提交不算；`artifacts.status=na`。
+- `implement` 以**代码/测试路径**的提交证据表达完整性（`src/`、`skills/`、`scripts/`、`tests/`、`templates/`、`agents/`），仅文档提交不算；`artifacts.status=na`。
 - `stage` 未知时映射不可建立：spec 路径可读 → `status=present`/`value_state=unknown`，否则 `status=missing`/`value_state=na`；不拿别的阶段顶替。
 
 ## Derived Mapping

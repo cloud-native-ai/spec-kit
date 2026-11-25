@@ -48,7 +48,7 @@ python3 "${SKILL_HOME}/scripts/office/unpack.py" report.docx unpacked/
 python3 "${SKILL_HOME}/scripts/office/soffice.py" --headless --convert-to pdf report.docx
 ```
 
-Then use the PDF tools in `.specify/scripts/pdf/` to rasterise pages. For a single
+Then use the PDF tools in `scripts/pdf/` to rasterise pages. For a single
 first-page image, `soffice.thumbnail("report.docx", outdir="preview/")` converts
 straight to PNG.
 

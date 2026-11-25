@@ -50,8 +50,8 @@ class TestAllAssistantsInit:
             )
 
             # Core memory must exist
-            assert (project / ".specify" / "memory").is_dir(), (
-                f"[{assistant}] .specify/memory/ not created"
+            assert (project / ".specify" / "session").is_dir(), (
+                f"[{assistant}] .specify/session/ not created"
             )
 
             # Core scripts must exist

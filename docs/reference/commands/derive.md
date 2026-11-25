@@ -3,7 +3,7 @@
 Reach an architecture by **replaying the reasoning methods of authoritative sources** instead of summarizing their conclusions. Every source is grounded online first, each source's *way of arguing* is extracted as a reusable Reasoning Move, the moves are applied step by step in an auditable derivation chain, and every architecture element traces back to a chain step. Where grounded premises run out, the gap is recorded as an open question — never filled with a plausible-sounding invention.
 
 - **Source of truth**: `templates/commands/derive.md`
-- **Engine**: `scripts/python/derive-utils.py` (installed as `.specify/scripts/python/derive-utils.py`) · Tool record `.specify/memory/tools/derive-utils.py.md`
+- **Engine**: `scripts/python/derive-utils.py` (installed as `.specify/scripts/python/derive-utils.py`) · Tool record `.specify/tools/derive-utils.py.md`
 - **Concept authority**: `.specify/shared/definitions/derivation-definitions.md` — the six record schemas, the provenance grades, the chain-integrity rules C1–C7, the self-audit set A1–A16, the banned-justification set and the capability-degradation rule are defined there. This page references them and restates none of them.
 - **Feature**: 049 Derivation Command · **Requirement**: `048-derive-command`
 

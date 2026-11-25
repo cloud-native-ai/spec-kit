@@ -14,7 +14,7 @@
 # script-interface: the sourceable guard block (086) lives in script-interface.sh
 # It sits above this script's own parsing and above `source common.sh`: a shared
 # library's top-level checks would otherwise turn `--help` into a non-zero exit, and
-# the flags must win over any write. Authority: .specify/shared/definitions/
+# the flags must win over any write. Authority: shared/definitions/
 # script-interface-definitions.md section 4.
 SCRIPT_INTERFACE_LIB="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/script-interface.sh"
 if [ -f "$SCRIPT_INTERFACE_LIB" ]; then

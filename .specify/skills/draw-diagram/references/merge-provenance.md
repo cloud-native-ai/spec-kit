@@ -8,7 +8,7 @@ Re-verify (from the repository root; the record names a literal path because `${
 would resolve to *this* skill's home, not to merge-skills'):
 
 ```bash
-python3 .specify/skills/merge-skills/scripts/provenance_check.py skills/external/draw-diagram
+python3 skills/external/merge-skills/scripts/provenance_check.py skills/external/draw-diagram
 # installed-mirror equivalent:
 python3 .specify/skills/merge-skills/scripts/provenance_check.py .specify/skills/draw-diagram
 ```
@@ -71,7 +71,7 @@ the Verification column names how to check it again.
 | 2 | Dashboards with toolbox and chart linkage interaction | `references/types/echarts/references/echarts-guide.md` | toolbox/linkage guidance present | verified |
 | 3 | Mechanically verify the delivered artifact | `references/types/echarts/scripts/verify-deliverable.mjs` | `node --check references/types/echarts/scripts/verify-deliverable.mjs` | verified |
 | 4 | Mechanically check layout against the SDS boxes | `references/types/echarts/scripts/check-layout.mjs` | `node --check references/types/echarts/scripts/check-layout.mjs` | verified |
-| 5 | Vendor ECharts locally for offline self-contained HTML | `references/types/echarts/scripts/vendor-echarts.sh` | `bash -n references/types/echarts/scripts/vendor-echarts.sh`; `.specify/scripts/sync-config.mjs` passes `node --check` | verified |
+| 5 | Vendor ECharts locally for offline self-contained HTML | `references/types/echarts/scripts/vendor-echarts.sh` | `bash -n references/types/echarts/scripts/vendor-echarts.sh`; `scripts/sync-config.mjs` passes `node --check` | verified |
 | 6 | Realize the SDS geometry and weight contract in ECharts | `references/types/echarts/references/sds-realization.md` | `layout:'none'` + corner-anchor realization rules present | verified |
 
 ## Source: draw-excalidraw
@@ -87,7 +87,7 @@ the Verification column names how to check it again.
 | # | Capability (what the source could do) | Target destination | Verification | Status |
 |---|---------------------------------------|--------------------|--------------|--------|
 | 1 | Hand-drawn-style diagrams authored as Excalidraw scene JSON | `references/types/excalidraw/excalidraw.md` | scene-element authoring flow present | verified |
-| 2 | Render scene JSON to SVG/PNG through a self-hosted headless-Chromium service | `references/types/excalidraw/scripts/render-excalidraw.sh` | `bash -n references/types/excalidraw/scripts/render-excalidraw.sh`; `.specify/scripts/server/server.mjs` passes `node --check` | verified |
+| 2 | Render scene JSON to SVG/PNG through a self-hosted headless-Chromium service | `references/types/excalidraw/scripts/render-excalidraw.sh` | `bash -n references/types/excalidraw/scripts/render-excalidraw.sh`; `scripts/server/server.mjs` passes `node --check` | verified |
 | 3 | Bridge a mermaid definition into a hand-drawn rendering | `references/types/excalidraw/references/howto/01-path-selection.md` | mermaid→excalidraw path selection present | verified |
 | 4 | Scene-schema reference (elements, appState, files) | `references/types/excalidraw/references/guide/scene-schema-reference.md` | schema doc present | verified |
 | 5 | Self-deploy the excalidraw render service | `references/types/excalidraw/references/guide/server-deployment.md` | deployment doc present; port authority in `references/self-deploy-render-service.md` §0.1 | verified |

@@ -262,9 +262,9 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
 - `/speckit.*` commands are chat instructions, not terminal commands.
 - Treat Constitution as the authority for architecture and workflow constraints.
-- **Reuse a Tool before generating a script**: look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules and environment applicability outrank your training knowledge. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
+- **Reuse a Tool before generating a script**: look for an existing **Tool** under `.specify/tools/` and reuse it — its behavioral rules and environment applicability outrank your training knowledge. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
 
-> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
+> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
 
 ## AI Tool Compatibility
 - **Supported Agents**: Claude Code, opencode, Qoder, Codex CLI, Hermes Agent, GitHub Copilot
@@ -272,7 +272,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 
 ## Spec Kit Framework Map
 
-The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: `.specify/memory/`, `.specify/templates/`, `.specify/scripts/`, `.specify/skills/`, `.specify/agents/`, `.specify/teams/`, `.specify/shared/`, `.specify/specs/<ID>-<slug>/`.
+The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: `.specify/session/`, `.specify/knowledge/`, `.specify/templates/`, `.specify/scripts/`, `.specify/skills/`, `.specify/agents/`, `.specify/teams/`, `.specify/shared/`, `.specify/specs/<ID>-<slug>/`.
 
 Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution): `.specify/shared/definitions/agent-definitions.md`.
 
@@ -293,7 +293,7 @@ Under the **Spec Kit framework**, the git workflow is a **framework-level declar
 No registration tables — agents discover resources from the filesystem:
 
 - **Skills**: `.specify/skills/`, one directory per skill; guide: `.specify/skills.md`. Create/improve via the `create-skills` / `improve-skills` skills.
-- **Tools**: `.specify/memory/tools/<name>.md` records; guide: `.specify/tools.md`. Reuse before scripting (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
+- **Tools**: `.specify/tools/<name>.md` records; guide: `.specify/tools.md`. Reuse before scripting (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
 
 
 ## Agent Anti-Patterns (agent 反模式)

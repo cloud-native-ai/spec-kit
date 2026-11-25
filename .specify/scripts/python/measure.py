@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """``/speckit.measure`` engine — the read-only measurement report over the exec-quant store (087, T064).
 
-One stdlib-only script behind the thin command ``.specify/templates/commands/measure.md``. Its clauses are owned by
+One stdlib-only script behind the thin command ``templates/commands/measure.md``. Its clauses are owned by
 ``.specify/specs/088-speckit-visualization/contracts/measure-report.contract.md`` (C-53…C-62) and its store
 access is shared with the visibility surfaces through the ONE store reader
 (``efficiency-element.contract.md`` C-65): records are obtained only by importing
-``.specify/scripts/python/exec-quant.py``'s read path in process — never by re-parsing the record format, never by
+``scripts/python/exec-quant.py``'s read path in process — never by re-parsing the record format, never by
 shelling out, never by caching (C-53).
 
 Shape of a run: a half-open window (``--since`` start, ``--window`` span; neither means all records, C-54),
@@ -16,11 +16,11 @@ closed actions as projections of one computed result (C-60), byte-identical outp
 (C-61) and a strictly read-only, machinery-free delivery shape (C-62).
 
 This file names neither the record's schema version nor its field slots nor any closed vocabulary of its own:
-the declaration owner (``.specify/shared/declarations/facts/quant-record-schema.yaml``) is reached through the engine
+the declaration owner (``shared/declarations/facts/quant-record-schema.yaml``) is reached through the engine
 module at run time, and the two field-slot names it must touch are read from the engine's own source at run
 time (C-70/C-71). The store-availability render literal is likewise not spelled here: it is reached through
 ``status-digest.py``'s owner-reading entry (:func:`status-digest.efficiency_vocabulary`), whose single
-definition site is ``.specify/shared/guidelines/reporting-obligations.md`` § 9.1.
+definition site is ``shared/guidelines/reporting-obligations.md`` § 9.1.
 """
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 STORE_ENGINE = Path("scripts") / "python" / "exec-quant.py"
 
 #: The visibility surfaces' shared entry to the owner's render literals (§ 9.1 of
-#: ``.specify/shared/guidelines/reporting-obligations.md``): the store-availability literal this report prints is read
+#: ``shared/guidelines/reporting-obligations.md``): the store-availability literal this report prints is read
 #: through it, never spelled a second time here (constitution XIV / contract C-47).
 DIGEST_SCRIPT = Path("scripts") / "python" / "status-digest.py"
 
@@ -59,7 +59,7 @@ _WINDOW_UNITS = {"s": 1, "m": 60, "h": 3600, "d": 86400}
 
 #: Field slots reached through the engine, read from the engine's own source at run time: this delivered file
 #: MUST NOT re-spell the declaration owner's field slots as literals (C-70/C-71). Owners: the record schema
-#: declaration via ``.specify/scripts/python/exec-quant.py``. Both bind in :func:`bind_engine_constants`; ``None``
+#: declaration via ``scripts/python/exec-quant.py``. Both bind in :func:`bind_engine_constants`; ``None``
 #: until then, and an unresolvable slot is an unavailable input reported as such — never guessed.
 _SCHEMA_FIELD = None
 _ELAPSED_NODE = None

@@ -38,7 +38,7 @@ insert(就位插入) → perceive(其他流程感知) → collect(/speckit.todo 
 
 ## 与 Park 寄存库的边界
 
-Park(`.specify/memory/todo/`)收纳**没有代码触点的想法**;TODO-in-Context 标记收纳**有明确代码/文档触点的待办**。同一事项从想法走向落地时,路径是 park → promote → insert(寄存记录标 `promoted` 并指向目的地)。两个机制不互相替代:想法无位置可嵌,待办有位置不该寄存。
+Park(`.specify/todo/`)收纳**没有代码触点的想法**;TODO-in-Context 标记收纳**有明确代码/文档触点的待办**。同一事项从想法走向落地时,路径是 park → promote → insert(寄存记录标 `promoted` 并指向目的地)。两个机制不互相替代:想法无位置可嵌,待办有位置不该寄存。
 
 ## 与相邻纪律的关系
 

@@ -7,7 +7,7 @@ set -e
 # script-interface: the sourceable guard block (086) lives in script-interface.sh
 # It sits above this script's own parsing and above `source common.sh`: a shared
 # library's top-level checks would otherwise turn `--help` into a non-zero exit, and
-# the flags must win over any write. Authority: .specify/shared/definitions/
+# the flags must win over any write. Authority: shared/definitions/
 # script-interface-definitions.md section 4.
 SCRIPT_INTERFACE_LIB="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/script-interface.sh"
 if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
@@ -16,7 +16,7 @@ if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
     script_interface_guard entry
     script_interface_guard define name="$0" \
         usage="[--json] [--debug] [--name <name>] [--type <type>] [--action <name>]" \
-        effects="writes a tool record under .specify/memory/tools/; the flags write nothing" \
+        effects="writes a tool record under .specify/tools/; the flags write nothing" \
         codes="0 created or answered; 1 a prerequisite is missing; 2 an unrecognized option" \
         writes=--action \
         -- --json --debug --name -n --type -t --action -a
@@ -151,12 +151,12 @@ main() {
     if git rev-parse --show-toplevel >/dev/null 2>&1; then
         ROOT_DIR=$(git rev-parse --show-toplevel)
     else
-        # Fallback: assume script is in .specify/scripts/bash (depth 2)
+        # Fallback: assume script is in scripts/bash (depth 2)
         ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
     fi
 
     # Set tools memory directory
-    TOOLS_MEMORY_DIR="$ROOT_DIR/.specify/memory/tools"
+    TOOLS_MEMORY_DIR="$ROOT_DIR/.specify/tools"
 
     to_workspace_relative() {
         local path="$1"
@@ -430,7 +430,7 @@ PYTHON_SCRIPT
             return
         fi
 
-        # Templates are owned by the create-tools skill; the .specify/templates/ paths are a
+        # Templates are owned by the create-tools skill; the templates/ paths are a
         # fallback for installs predating the move.
         local candidate
         for candidate in \
@@ -637,7 +637,7 @@ PYEOF
                 fi
 
                 record_file="$TOOLS_MEMORY_DIR/${resolved_tool_name}.md"
-                canonical_path=".specify/memory/tools/${resolved_tool_name}.md"
+                canonical_path=".specify/tools/${resolved_tool_name}.md"
                 tool_id=$(format_tool_id "$canonical_path")
 
                 if [ -f "$record_file" ]; then

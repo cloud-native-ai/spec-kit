@@ -148,10 +148,10 @@ def test_runtime_archive_once_before_removal(tmp_path):
     worktree = tmp_path / "wt-arch"
     _register(reg, repo, line, worktree)
     _add_worktree(repo, worktree, line)
-    runtime = worktree / ".specify" / "memory" / "feedback"
+    runtime = worktree / ".specify" / "feedback"
     runtime.mkdir(parents=True)
     (runtime / "entry.md").write_text("feedback", encoding="utf-8")
-    evidence = worktree / ".specify" / "memory" / "evidence"
+    evidence = worktree / ".specify" / "evidence"
     evidence.mkdir(parents=True)
     (evidence / "ev.md").write_text("evidence", encoding="utf-8")
     dest = tmp_path / "integration-archive"

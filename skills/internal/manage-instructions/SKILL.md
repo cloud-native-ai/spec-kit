@@ -95,7 +95,7 @@ current state), and partial update is directed convergence.
 - **Scope zones**: `.specify/workflow/git.md` is owned by the `git-utils` skill (scope A) —
   observed but never converged here. No managed registry ranges exist in the current template:
   skills and tools are discovered via their directories (`.specify/skills/`,
-  `.specify/memory/tools/`), not registered.
+  `.specify/tools/`), not registered.
 
 When `$ARGUMENTS` is empty (full reconcile):
 
@@ -340,7 +340,7 @@ empty-of-user-content, so its sections are simply filled in.
     table is real data and MUST NOT be lost), then replace the section with the template's
     pointer paragraph.
   - Replace the registry tables with the template's `## Skills & Tools` pointer section. The
-    rows are re-derivable from `.specify/skills/` and `.specify/memory/tools/` directories, so
+    rows are re-derivable from `.specify/skills/` and `.specify/tools/` directories, so
     dropping them loses nothing; note the removal in the residual report.
   - Never delete hand-authored rows that clearly differ from machine-generated shape (e.g. a
     user-written note under `### Tools`); move such content into the owning section or report

@@ -1,13 +1,13 @@
 # Expression Gates — 文档型门禁算子集
 
-**Owner（唯一所有者）**: 本文件 `.specify/shared/workflow/expression-gates.md` 是「文档型门禁」的唯一所有者。
+**Owner（唯一所有者）**: 本文件 `shared/workflow/expression-gates.md` 是「文档型门禁」的唯一所有者。
 它拥有：**封闭六面清单（face id + owner_pointer）、逐阶段算子表、阻断级别、读者声明形态、证据等级与 as-of 语法、三项基线协议、算子去重、阶段不变量、调用点表、调用时机与降级**。
 
 **面数 = 6**（封闭集）。新增面须由后续特性修订本 owner，MUST NOT 由消费方就地扩面；六面之外 MUST NOT 出现第七面。
 
 除「证据分级与 as-of」一面由本文件新增并自持判据外，其余五面的判据句归各自 `owner_pointer`。本文件只登记指针与「在哪一阶段、由哪个入口、以什么阻断级别」执行，**不复述**这些 owner 的判据正文；命令模板与技能 MUST NOT 复制本文件的面表、算子表或调用点表。
 
-**机器键与取值**: 类别键 `flow_class`（[[STR-003]]）、两取值 `execution` / `expression` 的判据与台账唯一所有者是 `.specify/shared/definitions/flow-class-definitions.md`；本文件只登记「读取**动作**」与「归口」，不登记任何单元的类别取值。
+**机器键与取值**: 类别键 `flow_class`（[[STR-003]]）、两取值 `execution` / `expression` 的判据与台账唯一所有者是 `shared/definitions/flow-class-definitions.md`；本文件只登记「读取**动作**」与「归口」，不登记任何单元的类别取值。
 
 ## 六面（封闭集）
 
@@ -15,17 +15,17 @@
 
 | 面（中文） | face id | owner_pointer |
 | --- | --- | --- |
-| 需求清晰度 | requirements-clarity | `.specify/scripts/python/validate-requirements.py` + `.specify/shared/guidelines/requirements-guidelines.md` § Specification Quality Validation |
-| 读者/目的/边界 | reader-purpose | `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 |
-| 证据分级与 as-of | evidence-asof | `.specify/shared/workflow/expression-gates.md` § 证据分级与 as-of |
-| 结构/链接/构建 | structure-links-build | `.specify/skills/create-docs/SKILL.md` § Desired-State Baseline + `.specify/skills/create-docs/scripts/docs-utils.py` |
-| 事实一致性 | fact-consistency | `.specify/shared/guidelines/one-source-of-truth.md`（整文件即判据，无单章节锚） |
-| 评审 | review | `.specify/skills/internal/review-sdd-process/SKILL.md` § Workflow + `.specify/templates/review-template.md` |
+| 需求清晰度 | requirements-clarity | `scripts/python/validate-requirements.py` + `shared/guidelines/requirements-guidelines.md` § Specification Quality Validation |
+| 读者/目的/边界 | reader-purpose | `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 |
+| 证据分级与 as-of | evidence-asof | `shared/workflow/expression-gates.md` § 证据分级与 as-of |
+| 结构/链接/构建 | structure-links-build | `skills/external/create-docs/SKILL.md` § Desired-State Baseline + `skills/external/create-docs/scripts/docs-utils.py` |
+| 事实一致性 | fact-consistency | `shared/guidelines/one-source-of-truth.md`（整文件即判据，无单章节锚） |
+| 评审 | review | `skills/internal/review-sdd-process/SKILL.md` § Workflow + `templates/review-template.md` |
 
 **机器可读的两处取值归声明层（批 2）**：本文件的**六面行数与表内列集**是机器读得到的值，单一 owner 是
-`.specify/shared/declarations/facts/expression-gate-faces.yaml#/statement`（`section_keyword` + `expected`）与
-`.specify/shared/declarations/facts/expression-stage-operator-table.yaml#/statement`（五个列名，有序）；引擎
-`.specify/scripts/python/flow-class-check.py` 经共享读取入口读这两处，本文件保留的是**判据**——表必须落在哪个章节、哪些列必须
+`shared/declarations/facts/expression-gate-faces.yaml#/statement`（`section_keyword` + `expected`）与
+`shared/declarations/facts/expression-stage-operator-table.yaml#/statement`（五个列名，有序）；引擎
+`scripts/python/flow-class-check.py` 经共享读取入口读这两处，本文件保留的是**判据**——表必须落在哪个章节、哪些列必须
 在场、为何顺序是值的一部分——不另持一份列集副本。上面第 6 行的行数与本节表头因此是**指针化后的遗留陈述**：
 `tests/contract/test_expression_gates_doc.py` 以逐字断言钉住 `面数 = 6`，故该数字在本文件保留到该钉被其所有者复核为止，
 归属仍以声明为准。
@@ -35,13 +35,13 @@
 八个阶段各至少一行：阶段、算子 id、执行算子（可执行入口或点名的既有流程）、对应面、阻断级别。任一阶段无算子即失败；算子行不得是空表头行。
 `算子 id` 是稳定标识（`G-…`，全表唯一），供分类 owner 映射表的 `强制门禁引用` 列以 `gate:<算子 id>` 引用；id 变更即引用失效，两者 MUST 同步修订。
 
-**三处义务按可读面分派（一条义务只在一个阶段判）**：`in-scope` 的第 ① 项（`FR` 单元格可解析）在 requirements 阶段判且判为输入错误；第 ② 项（`tasks.md` 有行级引用该 FR 的必做任务行）在 tasks 阶段的 `G-tasks-fact` 判；第 ③ 项（`verification.md` 有点名该 `RS-NNN` 的联合验收行）**不在本表任何阶段行判**——`verification.md` 从不是阶段输入，它由 closure 判定（`.specify/scripts/python/closure-acceptance-check.py`）判。任一阶段 MUST NOT 把读不到的产物所承载的义务记为通过。
+**三处义务按可读面分派（一条义务只在一个阶段判）**：`in-scope` 的第 ① 项（`FR` 单元格可解析）在 requirements 阶段判且判为输入错误；第 ② 项（`tasks.md` 有行级引用该 FR 的必做任务行）在 tasks 阶段的 `G-tasks-fact` 判；第 ③ 项（`verification.md` 有点名该 `RS-NNN` 的联合验收行）**不在本表任何阶段行判**——`verification.md` 从不是阶段输入，它由 closure 判定（`scripts/python/closure-acceptance-check.py`）判。任一阶段 MUST NOT 把读不到的产物所承载的义务记为通过。
 
 **算子命令必须可调用**：本表每一行的「执行算子」列 MUST 是**可解析、可调用**的命令形态（可执行入口 + 该入口真实接受的参数形态）。守卫测试 `tests/contract/test_expression_gates_doc.py` MUST 断言两件事：(a) 每行首个命令的脚本路径存在，且其参数形态能被该脚本的 `--help` 接住（不接受 `--spec-dir` 的脚本 MUST NOT 被写成接受它）；(b) 当某行点名 `validate-requirements.py` 的检查项数时，该数字 MUST 等于脚本 `LABELS` 元组的长度（今天是 6）——计数只写在一个地方、由哨兵校验，正是本条要防的漂移。
 
 | 阶段 | 算子 id | 执行算子 | 对应面 | 阻断级别 |
 | --- | --- | --- | --- | --- |
-| requirements | `G-req-clarity` | `python3 .specify/scripts/python/validate-requirements.py <spec dir>/requirements.md`（六项结构检查：`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` / `path-marker`；位置参数是 `requirements.md` 路径，该脚本**不**接受 `--spec-dir`）+ `pre-analyze-check.py --stage requirements`（运行时行类第 1、2 条发现、`in-scope` 义务 ① 的输入错误判决、散文声明规则） | requirements-clarity | blocking |
+| requirements | `G-req-clarity` | `python3 scripts/python/validate-requirements.py <spec dir>/requirements.md`（六项结构检查：`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` / `path-marker`；位置参数是 `requirements.md` 路径，该脚本**不**接受 `--spec-dir`）+ `pre-analyze-check.py --stage requirements`（运行时行类第 1、2 条发现、`in-scope` 义务 ① 的输入错误判决、散文声明规则） | requirements-clarity | blocking |
 | requirements | `G-req-evidence` | 证据三件套语法预检（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
 | clarify | `G-clarify-clarity` | `pre-analyze-check.py --stage requirements`（仅在需求变更后重跑一次） | requirements-clarity | blocking |
 | clarify | `G-clarify-reader` | 读者声明与阅读场景补齐（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
@@ -70,7 +70,7 @@
 
 - 文档型交付物 MUST 在其**前 40 个非空行**内声明两行：`**Readers**: <目标读者>` 与 `**Reading scenario**: <阅读场景与要做的决定>`。
 - 两行任一缺失，或值为空，即 `reader-declaration-missing`（阻断）。
-- 读者判定 MUST 沿用 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 定义的基准读者；MUST NOT 新建第二套读者定义，本地覆盖按该 owner 的协议声明。
+- 读者判定 MUST 沿用 `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 定义的基准读者；MUST NOT 新建第二套读者定义，本地覆盖按该 owner 的协议声明。
 
 ## 证据分级与 as-of
 
@@ -84,7 +84,7 @@
   - 等级：标记后的第一个 token（到 `，` 或 `（` 或行尾）；不在封闭三值内 → `grade-invalid`。
   - `as-of`：写作 `as-of <YYYY-MM-DD>`；格式不符 → `as-of-malformed`；早于该文件最后一次提交日期 → `as-of-stale`。
   - 来源：写作 `source: <文本>`；缺失或空值 → `source-missing`；只有等级或只有 `as-of` → `grade-asof-unpaired`。
-- 对象边界：本面描述**文档断言**。`.specify/shared/workflow/evidence-step.md` 的七态描述机制证据，`.specify/shared/guidelines/single-run-evidence.md` 描述一次执行的记录留存——两者的取值域 MUST NOT 被本面重定义、收窄或并入。
+- 对象边界：本面描述**文档断言**。`shared/workflow/evidence-step.md` 的七态描述机制证据，`shared/guidelines/single-run-evidence.md` 描述一次执行的记录留存——两者的取值域 MUST NOT 被本面重定义、收窄或并入。
 
 ## 结构/链接/构建只是必要条件
 
@@ -134,8 +134,8 @@
 
 ## 与复杂度轴正交
 
-- 复杂度轴（复杂命令 / 简单命令）决定有没有 wrap-up 面，其 owner 是 `.specify/shared/workflow/feedback-step.md`；该文件只需一行指针指向分类 owner，MUST NOT 在该文件中复制判据或台账。
-- 本门禁集选择算子，复杂度轴决定是否有 wrap-up 面；两轴互相推导的禁令与判据归 `.specify/shared/definitions/flow-class-definitions.md` § 与复杂度轴正交，本文件只引用该节，不复述其判据句。
+- 复杂度轴（复杂命令 / 简单命令）决定有没有 wrap-up 面，其 owner 是 `shared/workflow/feedback-step.md`；该文件只需一行指针指向分类 owner，MUST NOT 在该文件中复制判据或台账。
+- 本门禁集选择算子，复杂度轴决定是否有 wrap-up 面；两轴互相推导的禁令与判据归 `shared/definitions/flow-class-definitions.md` § 与复杂度轴正交，本文件只引用该节，不复述其判据句。
 
 ## 调用点表
 
@@ -150,7 +150,7 @@
 
 ### 特性线阶段命令（`spec:` 键）
 
-**类条件追加**：特性线（一条 spec 目录）的类别经 `spec:<spec 目录名>` 键解析，声明载体与判据归 `.specify/shared/definitions/flow-class-definitions.md` § 特性线声明面（`spec:` 键）。本表只登记「哪个阶段命令在哪一时点读一次类别、随后按哪张表执行」，**不复制**算子 id、面名或阻断级别——那些只有 § 阶段算子表 一处。
+**类条件追加**：特性线（一条 spec 目录）的类别经 `spec:<spec 目录名>` 键解析，声明载体与判据归 `shared/definitions/flow-class-definitions.md` § 特性线声明面（`spec:` 键）。本表只登记「哪个阶段命令在哪一时点读一次类别、随后按哪张表执行」，**不复制**算子 id、面名或阻断级别——那些只有 § 阶段算子表 一处。
 
 | 阶段命令 | 读取时点 | 类别读取 | 执行算子 | 阻断 |
 | --- | --- | --- | --- | --- |
@@ -184,7 +184,7 @@
 
 | 主题 | 所有者 |
 | --- | --- |
-| 分类判据、两取值、判定依据、逐流程台账、类中立清单、命名空间 | `.specify/shared/definitions/flow-class-definitions.md` |
-| 复杂度轴（决定 wrap-up 面有无） | `.specify/shared/workflow/feedback-step.md`（只加一行指针，MUST NOT 复制判据） |
-| 类别解析的可执行入口（行为与退出码归该文件） | `.specify/scripts/python/flow-class-check.py` |
-| 事实一致性检查器（读者 / 证据 / 副本 / 计数四面） | `.specify/scripts/python/doc-consistency-check.py` |
+| 分类判据、两取值、判定依据、逐流程台账、类中立清单、命名空间 | `shared/definitions/flow-class-definitions.md` |
+| 复杂度轴（决定 wrap-up 面有无） | `shared/workflow/feedback-step.md`（只加一行指针，MUST NOT 复制判据） |
+| 类别解析的可执行入口（行为与退出码归该文件） | `scripts/python/flow-class-check.py` |
+| 事实一致性检查器（读者 / 证据 / 副本 / 计数四面） | `scripts/python/doc-consistency-check.py` |

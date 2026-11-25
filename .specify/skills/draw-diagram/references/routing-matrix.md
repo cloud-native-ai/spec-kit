@@ -1,6 +1,6 @@
 # Routing Matrix & Exclusivity Registry（draw-diagram 前门路由权威）
 
-> 证据源：竞技场结论账本 `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md`
+> 证据源：竞技场结论账本 `${SKILL_WORKDIR}/.specify/knowledge/visualization-skill-selection.md`
 > （viz-skill-arena 各轮 cycle 的冠军与匹配结论）。本文件只登记**路由判据**；引擎语法与渲染细节归各 draw-* 技能。
 
 ## 0. 能力轴层（Capability Axes —— 剪枝层，veto-only）

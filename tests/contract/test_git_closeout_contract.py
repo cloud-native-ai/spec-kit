@@ -478,7 +478,7 @@ def test_closeout_section_exists_after_the_commit_and_after_the_record_steps():
     body = section(text, headings[idx])
     for step in ("## Feedback", "documentation"):
         assert step in body, f"the close-out must be placed after the record-producing step {step!r}"
-    assert ".specify/memory/retention/closeout/" in body, (
+    assert ".specify/retention/closeout/" in body, (
         "the receipt directory must be named in the section that owns the receipt"
     )
     assert re.search(r"one receipt", body, re.I), "one receipt per run"
@@ -515,7 +515,7 @@ def test_receipt_points_at_the_consuming_engine_and_never_edits_a_record():
     )
     ref = read(CLOSEOUT_REF)
     assert re.search(r"closeout-lifecycle\.contract\.md` C-3", ref) or (
-        ".specify/memory/retention/closeout/" in ref or "artifact-commit-step.md" in ref
+        ".specify/retention/closeout/" in ref or "artifact-commit-step.md" in ref
     ), "the receipt contract is mirrored in the command reference"
     assert "artifact-commit-step.md" in ref, (
         "the command reference must reach the lifecycle owner by pointer"
@@ -618,7 +618,7 @@ def _seed_record(repo) -> tuple[str, ...]:
     correctly takes the artifacts-without-records fork and commits nothing, which is a
     different clause's subject.
     """
-    rel = ".specify/memory/session/091-fixture-record.md"
+    rel = ".specify/session/091-fixture-record.md"
     path = repo.repo / rel
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("run: 091 fixture\n", encoding="utf-8")

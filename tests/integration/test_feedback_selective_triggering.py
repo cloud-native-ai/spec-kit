@@ -24,7 +24,7 @@ FEEDBACK_MARKER = "feedback-utils.py"
 
 def test_trivial_flow_records_nothing(feedback_store: Path):
     # No record invoked -> the store index is never created.
-    assert not (feedback_store / ".specify/memory/feedback/index.json").exists()
+    assert not (feedback_store / ".specify/feedback/index.json").exists()
     status_ws = feedback_store
     out = feedback_utils.action_status(
         feedback_utils.argparse.Namespace(workspace_root=str(status_ws), threshold=None)

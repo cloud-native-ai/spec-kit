@@ -7,7 +7,7 @@ classification: internal
 
 # improve-agent
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -23,8 +23,8 @@ The input is a description of the agent to improve and what went wrong or could 
 - **Layer (mandatory, explicit)**: which agent layer the improvement targets — `template` / `instance` / `execution` (taxonomy: `.specify/shared/definitions/agent-definitions.md`). Never infer the layer silently; if the request does not state it and the target identifier does not imply it unambiguously, ask the user before editing anything.
 - **Target identifier**: Resolve to exactly one artifact of a supported kind (see § Target Classification):
   - `.specify/agents/templates/*.agent.md` (an installed role Template)
-  - `.specify/skills/internal/create-agent/templates/agent-capacity-*-template.md` (an abstract capacity Class)
-  - `.specify/skills/internal/create-agent/templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
+  - `skills/internal/create-agent/templates/agent-capacity-*-template.md` (an abstract capacity Class)
+  - `skills/internal/create-agent/templates/agent-supervision-delegation.md` (shared supervision snippet — edits here propagate to ALL supervisors)
   - `.specify/agents/instances/*.agent.md` (a generated custom / project-custom agent)
   - `.specify/agents/execution/configs/*.yaml` or `execution/scripts/*` (dispatch config / wrapper)
 - **Improvement direction**: What specifically needs to change — extracted from user feedback, observed failures, or behavioral drift.
@@ -49,7 +49,7 @@ If the identifier matches multiple kinds or none, ask one clarifying question. A
 ### 1. Identify the target template
 
 - Parse the user's input for a role name, slug, or artifact path, plus the declared **layer**
-- Resolve within the declared layer: `template` → `.specify/agents/templates/<slug>.agent.md` or `.specify/skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`; `instance` → `.specify/agents/instances/<slug>.agent.md`; `execution` → `.specify/agents/execution/configs/<slug>.yaml`
+- Resolve within the declared layer: `template` → `.specify/agents/templates/<slug>.agent.md` or `skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`; `instance` → `.specify/agents/instances/<slug>.agent.md`; `execution` → `.specify/agents/execution/configs/<slug>.yaml`
 - If multiple artifacts match or none match, ask one clarifying question
 - Read the current artifact content before making changes
 
@@ -140,7 +140,7 @@ If the guide exists, read it and apply the agent-specific tool mappings, best pr
 If you encounter an agent-specific obstacle during execution (e.g., a tool call is unavailable, output format doesn't match expectations, a workaround was needed), generate a feedback document at:
 
 ```
-.specify/memory/feedback/improve-agent-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+.specify/feedback/improve-agent-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
 ```
 
 The feedback document MUST contain:

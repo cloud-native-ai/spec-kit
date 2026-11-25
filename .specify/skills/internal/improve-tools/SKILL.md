@@ -7,12 +7,12 @@ classification: internal
 
 # improve-tools
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
 
-Improve **one existing tool definition record** under `.specify/memory/tools/` so the next invocation is more correct and safer: fix a wrong source identifier or parameter contract, add or sharpen behavioral rules, add aliases, rename the record, or promote it from `Draft` to `Verified`. This skill is the refinement engine invoked by `/speckit.tools` for **modify** intent. Creating a record that does not exist yet is out of scope — see `create-tools`.
+Improve **one existing tool definition record** under `.specify/tools/` so the next invocation is more correct and safer: fix a wrong source identifier or parameter contract, add or sharpen behavioral rules, add aliases, rename the record, or promote it from `Draft` to `Verified`. This skill is the refinement engine invoked by `/speckit.tools` for **modify** intent. Creating a record that does not exist yet is out of scope — see `create-tools`.
 
 Edits are **field-level**: load the record, change only what the evidence justifies, re-validate, re-persist. Never regenerate a record from a template — that discards the user's accumulated authoritative knowledge.
 
@@ -22,13 +22,13 @@ Goal anchor (Constitution Principle XIII): this skill is a Better-Harness instru
 
 The input is a description of the tool to improve. Interpret it as follows:
 
-- **Target identifier**: resolve exactly one record by tool name, alias, or `tool_id` (`<TOOL:.specify/memory/tools/<name>.md>`). If several records match (same name under different types), present all and ask which one. If none match, report "no definition found" and offer to define it via `create-tools` — do NOT create one implicitly.
+- **Target identifier**: resolve exactly one record by tool name, alias, or `tool_id` (`<TOOL:.specify/tools/<name>.md>`). If several records match (same name under different types), present all and ask which one. If none match, report "no definition found" and offer to define it via `create-tools` — do NOT create one implicitly.
 - **Improvement direction**: extract the requested change — wrong source, missing/incorrect parameters, missing behavioral rules, unsafe invocation, alias needed, rename, status promotion. If absent, infer it only from concrete evidence (a failed invocation, a user correction, a changed source).
 - **User emphasis**: treat details the user states as high-priority evidence, even when other fields also look improvable.
 
 ## Workflow
 
-1. **Load the record and identify the direction.** Read `.specify/memory/tools/<name>.md` in full before editing. Restate which single record you resolved and what will change, so a mis-resolution surfaces before any write.
+1. **Load the record and identify the direction.** Read `.specify/tools/<name>.md` in full before editing. Restate which single record you resolved and what will change, so a mis-resolution surfaces before any write.
 2. **Gather evidence.** Prefer concrete signals over impressions: a failed or wrong invocation (the command run and its actual output), a user correction, a source that moved or no longer exists, a rule that was violated because it was absent or vague, or a `Draft` record blocking invocation. Verify the current `source_identifier` still resolves (path exists / binary on `PATH` / function defined / endpoint reachable) and report the result.
 3. **Classify the improvement.** Map the change to one of these, since each has a different validation consequence:
 
@@ -43,7 +43,7 @@ The input is a description of the tool to improve. Interpret it as follows:
 
 4. **Apply the minimal field-level edit.** Change only the fields the evidence supports. Preserve every unmodified field verbatim — including `behavioral_rules`, `aliases`, `discovery_origin`, and the record's section order. Do not reorder or drop sections, and do not clear a mandatory field (`name` / `tool_type` / `source_identifier` / `description`): clearing one is an error, not an edit.
 5. **Re-validate and re-persist.** Run the same validation `create-tools` applies: canonical `tool_type`, non-empty mandatory fields, valid rule keywords, and the `Verified` ⇒ `arguments or returns` invariant. Refresh `last_updated`. If the edit invalidates the contract, demote to `Draft` and say so explicitly rather than persisting an inconsistent `Verified` record.
-6. **No registry to sync.** No registration table exists — the record file `.specify/memory/tools/<name>.md` is the single source of truth (see `.specify/tools.md`). On rename, the old record directory MUST be removed so directory discovery cannot surface two records for one tool.
+6. **No registry to sync.** No registration table exists — the record file `.specify/tools/<name>.md` is the single source of truth (see `.specify/tools.md`). On rename, the old record directory MUST be removed so directory discovery cannot surface two records for one tool.
 7. **Report.** State which record changed, the fields before → after, the resulting `status`, and any follow-up the user must do (e.g. fields still missing for `Verified`, or a stale reference to an old name).
 
 ## Constraints
@@ -103,7 +103,7 @@ If the guide exists, read it and apply the agent-specific tool mappings, best pr
 If you encounter an agent-specific obstacle during execution (e.g., a tool call is unavailable, output format doesn't match expectations, a workaround was needed), generate a feedback document at:
 
 ```
-.specify/memory/feedback/improve-tools-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+.specify/feedback/improve-tools-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
 ```
 
 The feedback document MUST contain:

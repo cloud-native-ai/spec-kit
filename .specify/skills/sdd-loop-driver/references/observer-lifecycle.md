@@ -12,18 +12,18 @@ fast-fail-clause(快速失败注入子句)——执行中发现与已记录预�
 - 先问一个问题:解决它需要**纠正**还是**裁定**?纠正 = 恰有一种与已记录意图一致的读法、改动局部可逆、未证伪任何下游前提、未越过本动作声明的范围。
 - 纠正 ⇒ 就地修完,并在回传中披露。裁定(须在两种以上读法间选择,或须发明工件未记录的意图)⇒ **停在本层、回抛编排者,MUST NOT 就地修平后继续**。
 - 回传 MUST 含一条显式异常行:有异常则逐条以**行首** `ANOMALY:` 列出;无异常则明写 `未发现异常`。缺该行即回传不完整,沉默 MUST NOT 被读作干净。
-- 判据、两份封闭清单与上送件形态的唯一真源:`.specify/shared/guidelines/fast-fail.md`。
+- 判据、两份封闭清单与上送件形态的唯一真源:`shared/guidelines/fast-fail.md`。
 <!-- fast-fail-clause:end -->
 
 ## Assignment
 - line: <line_id>（run: <run_id>）
-- spec: <NNN-slug>；journal: <spec dir>/journal.md（只经 .specify/scripts/python/journal-utils.py 追加，不手写）
+- spec: <NNN-slug>；journal: <spec dir>/journal.md（只经 scripts/python/journal-utils.py 追加，不手写）
 - spine: <state spine path>；state dir: <runner state dir>
 - execution label: <line_id>--<run_stamp>--observer（既有三段约定）；triplet 目录: <label>=<triplet dir>
 - window: 既有派发 turn budget 与阶段 deadline（不新建定时器）
 
 ## Concurrency obligation
-- 按 .specify/shared/definitions/subagent-definitions.md § The Concurrency Obligation 做一次性评估；类表 .specify/shared/declarations/facts/concurrency-class.yaml；串行理由码 .specify/shared/declarations/facts/serial-reason.yaml；读数字段 .specify/shared/declarations/facts/effective-concurrency.yaml。
+- 按 shared/definitions/subagent-definitions.md § The Concurrency Obligation 做一次性评估；类表 shared/declarations/facts/concurrency-class.yaml；串行理由码 shared/declarations/facts/serial-reason.yaml；读数字段 shared/declarations/facts/effective-concurrency.yaml。
 - 单写者义务：同一线同一时刻至多一个未结算执行；上一个 `.status` 未结算时不得派发下一个；观测职责内部串行。
 
 ## Read domain
@@ -31,7 +31,7 @@ fast-fail-clause(快速失败注入子句)——执行中发现与已记录预�
 - 排除：编排者会话上下文与阶段提示词正文（不是观测输入）。
 
 ## Write surface
-- journal（经 .specify/scripts/python/journal-utils.py）；自身执行产物（既有 `.specify/agents/execution/logs/` 布局的 triplet）。
+- journal（经 scripts/python/journal-utils.py）；自身执行产物（既有 `.specify/agents/execution/logs/` 布局的 triplet）。
 - 写状态脊、阶段产物、feature 注册表或 glossary 均为越界缺陷。
 
 ## Forbidden

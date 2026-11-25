@@ -9,7 +9,7 @@ save_record = tools_utils.save_record
 
 
 def test_record_creation_and_reuse_flow(tmp_path: Path):
-    tools_dir = tmp_path / ".specify" / "memory" / "tools"
+    tools_dir = tmp_path / ".specify" / "tools"
     record = ToolRecord(
         name="kubectl-get-pods",
         tool_type="system",
@@ -31,4 +31,4 @@ def test_record_creation_and_reuse_flow(tmp_path: Path):
     assert reused is not None
     assert reused.name == record.name
     assert reused.source_identifier == record.source_identifier
-    assert reused.tool_id == "<TOOL:.specify/memory/tools/kubectl-get-pods.md>"
+    assert reused.tool_id == "<TOOL:.specify/tools/kubectl-get-pods.md>"

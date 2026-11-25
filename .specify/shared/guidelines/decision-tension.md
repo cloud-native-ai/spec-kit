@@ -88,16 +88,16 @@ MUST NOT 在消费点就地扩展。记录以三级子节承载，子节标题�
 高爆炸半径（故障影响面超出本特性边界）、与宪法原则相关（触及任一 MUST 条）。不满足任一触发的
 决策 MUST NOT 被要求填写记录；缺失记录 MUST NOT 被判为缺陷。
 
-复杂度门控引用 `.specify/shared/guidelines/task-complexity-rubric.md` 的分级：Trivial 级任务按定义不含
+复杂度门控引用 `shared/guidelines/task-complexity-rubric.md` 的分级：Trivial 级任务按定义不含
 承重决策，因此 MUST NOT 触发记录。当复杂度分级与承重判据冲突时，MUST 按该 rubric 的 tie-break
 规则取较高一级，并以承重判据为准判定是否需要记录。
 
 ## 与相邻 owner 的边界
 
-- `.specify/shared/definitions/derivation-definitions.md` § Contradiction Handling 管两个来源冲突时不取平均；
+- `shared/definitions/derivation-definitions.md` § Contradiction Handling 管两个来源冲突时不取平均；
 - `/speckit.clarify` 与访谈账本管需求阶段的分歧与翻供；
-- `.specify/shared/guidelines/fast-fail.md` 管执行中的异常纠正与裁定；
-- `.specify/shared/guidelines/critique-and-self-critique.md` 管改进提案的证伪。
+- `shared/guidelines/fast-fail.md` 管执行中的异常纠正与裁定；
+- `shared/guidelines/critique-and-self-critique.md` 管改进提案的证伪。
 
 本纪律只承接「方向已选定之后的技术取舍」，MUST NOT 承接需求分歧；四条边界的规则正文归各
 owner，本文件不复述。
@@ -106,9 +106,9 @@ owner，本文件不复述。
 
 | 消费者 | 引用方式 |
 |--------|----------|
-| `.specify/templates/plan-template.md` | 一条指针加字段名清单，不复述判据表 |
-| `.specify/skills/internal/analyze-artifacts/references/detection-and-severity.md` | 消费校验器 verdict，按本文件判据分类 |
-| `.specify/scripts/python/validate-decision-tensions.py` | 实现机械可判的三项拒绝形态与记录形态检查 |
+| `templates/plan-template.md` | 一条指针加字段名清单，不复述判据表 |
+| `skills/internal/analyze-artifacts/references/detection-and-severity.md` | 消费校验器 verdict，按本文件判据分类 |
+| `scripts/python/validate-decision-tensions.py` | 实现机械可判的三项拒绝形态与记录形态检查 |
 | `docs/decisions/template.md` | 以 `tension_id` 指回记录，不复制字段内容 |
 | `tests/contract/test_decision_tension_contract.py` | 断言本文件存在、封闭、且以路径引用相邻 owner |
 

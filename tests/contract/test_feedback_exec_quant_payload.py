@@ -364,7 +364,7 @@ def test_include_introspection_semantics_unchanged(tmp_path, capsys):
     _write_report(ws, report_id, _report_text(report_id, [eid]))
     rc = fu.main(["--action", "introspect-register", "--workspace-root",
                   str(ws), "--report-file",
-                  str(ws / ".specify/memory/feedback/introspection"
+                  str(ws / ".specify/feedback/introspection"
                       f"/{report_id}.md")])
     assert rc == 0
     _write_record(ws, "2026-a.json", "2026-01-01T00:00:00Z")

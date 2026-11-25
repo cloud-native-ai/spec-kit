@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check every script in a repository against the script-interface contract.
 
-Owner of the *rule*: `.specify/shared/definitions/script-interface-definitions.md`. The clauses this
+Owner of the *rule*: `shared/definitions/script-interface-definitions.md`. The clauses this
 engine implements are `contracts/script-interface-criteria.contract.md` C-1 … C-13; the
 calling surface is `contracts/contract-checker-cli.contract.md` C-14 … C-22.
 
@@ -19,7 +19,7 @@ Two halves, one file (R1):
    surface C-7 … C-11, probed in a sandbox copy created outside the measured tree.
 
 Usage:
-  python3 .specify/scripts/python/script-interface-check.py [--root PATH] [--json]
+  python3 scripts/python/script-interface-check.py [--root PATH] [--json]
       [--files PATH[,PATH ...]] [--skip-probe] [--sandbox DIR]
       [--budget-seconds N] [--check-projection]
       [--emit-rule [--json]]
@@ -798,7 +798,7 @@ def _mirror_source(root: Path, path: str) -> Optional[str]:
         tail = rest[len("skills/"):]
         candidates = ("skills/external/" + tail, "skills/internal/" + tail, rest)
     else:
-        candidates = (rest, ".specify/scripts/" + rest, ".specify/shared/" + rest)
+        candidates = (rest, "scripts/" + rest, "shared/" + rest)
     for candidate in candidates:
         if (root / candidate).is_file():
             return candidate
@@ -1286,7 +1286,7 @@ def _declares_passthrough(root: Path, path: str) -> Optional[str]:
     Two spellings exist in this tree and both are declarations, not inferences:
 
       * bash — the standalone word `passthrough` inside the `script_interface_guard define`
-        call, the word the guard library documents (`.specify/scripts/bash/script-interface.sh`) and
+        call, the word the guard library documents (`scripts/bash/script-interface.sh`) and
         sets `_SCRIPT_INTERFACE_PASS_THROUGH` from;
       * python — a `passthrough = (<target>)` annotation comment, the helper's own spelling
         of the same statement (the helper's python surface has no guard-library call).
@@ -2182,7 +2182,7 @@ def _projection_declaration(root: Path) -> Tuple[dict, List[dict]]:
 
     The declaration is the owner of WHICH mirrors are projected (C-34) and of nothing else.
     A tree may legitimately carry no declaration (a downstream project has no
-    `.specify/scripts/python/` at all) — that is "no projected pair", not a finding. A tree whose
+    `scripts/python/` at all) — that is "no projected pair", not a finding. A tree whose
     declaration EXISTS but cannot be read is different: silence there would report "nothing is
     projected" about a tree whose projection is unknown, which is the counterfeit pass C-12
     forbids, so it is a `projection-mismatch` finding.
@@ -2455,7 +2455,7 @@ def _exception_register(root: Path) -> Optional[Tuple[str, str]]:
     exception — the list is empty and nothing is claimed, which is different from a row that
     fails to recompute.
     """
-    for candidate in (".specify/shared/definitions/script-interface-definitions.md",
+    for candidate in ("shared/definitions/script-interface-definitions.md",
                       ".specify/shared/definitions/script-interface-definitions.md"):
         path = root / candidate
         if not path.is_file():
@@ -3071,5 +3071,62 @@ def _emit(report: dict, as_json: bool) -> int:
     return code
 
 
+# projected mirror: source + python-version-bridge; regenerate it, never hand-edit it
+#
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
+# that exists only in the source tree: it re-derives its own version line (C-36).
+_VERSION_SOURCE = "pyproject.toml"
+_VERSION_QUOTES = chr(39) + chr(34)
+_MAX_UPWARD_LEVELS = 12
+
+
+def _bridge_version(start):
+    _here = start.resolve()
+    for _ in range(_MAX_UPWARD_LEVELS + 1):
+        if (_here / _VERSION_SOURCE).is_file() and (_here / ".git").exists():
+            try:
+                _text = (_here / _VERSION_SOURCE).read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                return "unknown"
+            _in_project = False
+            for _raw in _text.splitlines():
+                _line = _raw.strip()
+                if not _line or _line.startswith("#"):
+                    continue
+                if _line.startswith("[") and _line.endswith("]"):
+                    _in_project = _line == "[project]"
+                    continue
+                if not _in_project:
+                    continue
+                _key, _sep, _value = _line.partition("=")
+                if _sep and _key.strip() == "version":
+                    _value = _value.strip()
+                    if len(_value) >= 2 and _value[0] == _value[-1] and _value[0] in _VERSION_QUOTES:
+                        _value = _value[1:-1]
+                    return _value or "unknown"
+            return "unknown"
+        if _here.parent == _here:
+            return "unknown"
+        _here = _here.parent
+    return "unknown"
+
+def _bridge_main():
+    import sys as _bridge_sys
+    from pathlib import Path as _bridge_path
+
+    _argv = list(_bridge_sys.argv[1:])
+    if "--version" not in _argv:
+        return
+    if "--" in _argv and _argv.index("--version") > _argv.index("--"):
+        return
+    _invoked = _bridge_sys.argv[0] if _bridge_sys.argv[0] else "."
+    _name = _bridge_path(_invoked).name or "script"
+    print("%s %s" % (_name, _bridge_version(_bridge_path(_invoked).resolve().parent)))
+    raise SystemExit(0)
+
+
+_bridge_main()
+del _bridge_main
 if __name__ == "__main__":
     sys.exit(main())

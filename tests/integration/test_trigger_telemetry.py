@@ -42,8 +42,7 @@ CLARIFY_ARGS = ["--stage", "requirements-unclear", "--signal", "needs-clarificat
 
 # --- in-process engine (067 T013) -------------------------------------------
 #
-# The engine keeps ALL mutable state in workspace files (`.specify/memory/
-# trigger/`); its module level declares immutable constants only, and the
+# The engine keeps ALL mutable state in workspace files (`.specify/trigger/`); its module level declares immutable constants only, and the
 # parser is rebuilt on every `main()` call. A fresh re-exec of the module under
 # a new namespace is therefore a complete state reset — `reset_engine_state`
 # runs it whenever the runner switches workspace (i.e. at every test case
@@ -408,7 +407,7 @@ def test_telemetry_is_git_ignored_but_index_is_not(ws):
         encoding="utf-8"
     ), "telemetry ignore rule must stay .specify-scoped, not in the project root"
     proc = subprocess.run(
-        ["git", "check-ignore", "-q", ".specify/memory/trigger/index.json"],
+        ["git", "check-ignore", "-q", ".specify/trigger/index.json"],
         cwd=ws, capture_output=True, text=True,
     )
     assert proc.returncode != 0, (

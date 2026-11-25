@@ -6,9 +6,9 @@
 
 边界(引用,不复述):
 
-- 记录落点(哪类答案去哪)归 `.specify/shared/guidelines/ask-record-repeat.md` § 2。
+- 记录落点(哪类答案去哪)归 `shared/guidelines/ask-record-repeat.md` § 2。
 - 记忆层的存储/检索机制归 `docs/reference/skills/memory.md` 与 `memory-record` / `memory-recall`。
-- 事实归属归 `.specify/shared/guidelines/one-source-of-truth.md`。
+- 事实归属归 `shared/guidelines/one-source-of-truth.md`。
 
 ## 1. 记录义务
 
@@ -71,7 +71,7 @@ python3 .specify/scripts/python/memory-utils.py --action record \
 
 同一个 `key:` 的第 2 次强调(含本次)MUST 触发升格。升格 MUST 全部完成:
 
-1. 更新 owner 文档:把规则写进它所属的 `.specify/shared/guidelines/` 真源(或对应 owner)。
+1. 更新 owner 文档:把规则写进它所属的 `shared/guidelines/` 真源(或对应 owner)。
 2. 更新常驻指令章节:摘要 + 指向 owner 的路径,保持指针形态。
 3. 增加守卫:契约测试、扫描器或既有确定性检查;没有守卫的新表面是未来漂移点。
 4. 接入执行面:在命令模板、技能、脚本或门控中加入显式步骤/检查,使执行者实际会经过它。
@@ -81,10 +81,10 @@ python3 .specify/scripts/python/memory-utils.py --action record \
 
 ### 2.4 与相邻纪律的边界
 
-- `.specify/shared/guidelines/fast-fail.md`:一次用户直接纠正已足够驱动异常类清单移动;本条不削弱它,而是增加"2+ 强调必须结构升格"的额外触发。
-- `.specify/shared/guidelines/self-improvement.md`:直接用户纠正是有效辅助证据,不需要重复出现;本条同样是额外触发,不替代其证据资格。
-- `.specify/skills/improve-skills/SKILL.md`:把重复用户纠正转成显式决策分支,是技能层实现;本条是框架层义务,二者引用而不互相替换。
-- `.specify/skills/internal/code-review/SKILL.md`:"同一问题超过 2 次 → linter/checklist"是评审清单的局部规则;本条不重定义它。
+- `shared/guidelines/fast-fail.md`:一次用户直接纠正已足够驱动异常类清单移动;本条不削弱它,而是增加"2+ 强调必须结构升格"的额外触发。
+- `shared/guidelines/self-improvement.md`:直接用户纠正是有效辅助证据,不需要重复出现;本条同样是额外触发,不替代其证据资格。
+- `skills/external/improve-skills/SKILL.md`:把重复用户纠正转成显式决策分支,是技能层实现;本条是框架层义务,二者引用而不互相替换。
+- `skills/internal/code-review/SKILL.md`:"同一问题超过 2 次 → linter/checklist"是评审清单的局部规则;本条不重定义它。
 
 ## 3. 反模式
 

@@ -9,7 +9,7 @@
 // run this check before delivery.
 //
 // Usage:
-//   node .specify/scripts/check-layout.mjs <foo.config.json> [<foo.config.js> ...]
+//   node scripts/check-layout.mjs <foo.config.json> [<foo.config.js> ...]
 //
 // Checks (graph series only, nodes with numeric x/y):
 //   1. OUT_OF_BOUNDS — node bounding box outside the canvas
@@ -119,7 +119,7 @@ function main() {
     else files.push(args[i]);
   }
   if (files.length === 0) {
-    console.error('usage: node .specify/scripts/check-layout.mjs [--width N] [--height N] <config.json|config.js> [...]');
+    console.error('usage: node scripts/check-layout.mjs [--width N] [--height N] <config.json|config.js> [...]');
     process.exit(2);
   }
 

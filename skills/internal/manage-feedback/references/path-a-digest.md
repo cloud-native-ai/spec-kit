@@ -23,7 +23,7 @@ ls feedback/feedback-*.zip 2>/dev/null
   across bundles surfaces factual conflicts between reporters and yields one mechanism
   fitting every environment.
 - **Already-consumed cross-check (before any processing)**: read
-  `.specify/memory/feedback/consume-log.md` and match every pending bundle against its
+  `.specify/feedback/consume-log.md` and match every pending bundle against its
   `Bundles` column. A filename already logged was consumed once — it is a
   **re-delivered copy**, not new input: name it as such in the report, do NOT re-route
   its entries by default (that row already records their routing), and re-process it
@@ -101,7 +101,7 @@ python3 .specify/scripts/python/feedback-utils.py --action ingest-exec-quant --p
 ```
 
 The action unpacks the bundle's `exec-quant/` payload into
-`.specify/memory/exec-quant/aggregated/<source-slug>/records/` and never touches the
+`.specify/exec-quant/aggregated/<source-slug>/records/` and never touches the
 feedback store. Its report is the degradation surface — `record_count` / `ingested` /
 `duplicates_skipped` / `skipped_unreadable` / `identity_conflicts` / `groups_touched`
 / `manifest_unreadable` — and those counters MUST land in the batch's digest report,
@@ -125,7 +125,7 @@ follow-up step, do not run it inside the receive flow.
 
 1. **范围快照**:`python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --limit 0 --format json`(可按 `--slice/--kind/--since` 收窄)取条目摘要投影;零条目 → 报告"无可自省条目"并正常结束,不落空报告文件。
 2. **场景化分析**(agent 推理;适用 Token 效率纪律:程序优先、摘要优先、升级阶梯,禁止整库原文注入):逐条目调出被评单元的当前定义/源码与条目引用的上下文,给出带证据的核验结论(成立/部分成立/已过时/不成立);把同根因的条目聚类为**问题**;每个问题含齐五要素——问题陈述、根因、证据锚点(指向具体单元/文件/位置)、分流决定(`local-sink(<channel>)` 或 `upstream-bound(package-attachment)`)、具体优化方案。
-3. **报告产出**:按报告 schema 落盘 draft 报告到 `.specify/memory/feedback/introspection/<report-id>.md`(`report-id` 形如 `introspection-<YYYYmmddTHHMMSSZ>`;frontmatter 七字段 + `## Findings` + `## Excluded`),然后运行 `--action introspect-register --report-file <path>` 完成结构校验与条目关联;校验失败(exit 2)会逐条列出违规,修正后重跑。**按条目分区,不按点分区**:一个条目只归属一个问题,范围条目须被「问题成员 ∪ Excluded」恰好覆盖一次;条目含多个点时择其主根因归属,次要根因写进该问题的「具体优化方案」并标注。该约束的判据是引擎 `--action introspect-register` 的 V-1 语义校验输出(exit 2 逐条列出违规),以引擎为准——本文不复制引擎内部规则,写报告前不必先读引擎源码。
+3. **报告产出**:按报告 schema 落盘 draft 报告到 `.specify/feedback/introspection/<report-id>.md`(`report-id` 形如 `introspection-<YYYYmmddTHHMMSSZ>`;frontmatter 七字段 + `## Findings` + `## Excluded`),然后运行 `--action introspect-register --report-file <path>` 完成结构校验与条目关联;校验失败(exit 2)会逐条列出违规,修正后重跑。**按条目分区,不按点分区**:一个条目只归属一个问题,范围条目须被「问题成员 ∪ Excluded」恰好覆盖一次;条目含多个点时择其主根因归属,次要根因写进该问题的「具体优化方案」并标注。该约束的判据是引擎 `--action introspect-register` 的 V-1 语义校验输出(exit 2 逐条列出违规),以引擎为准——本文不复制引擎内部规则,写报告前不必先读引擎源码。
 4. **用户确认**:呈现报告摘要(问题清单 + 每个问题的分流决定与建议处置);用户可逐问题覆盖分流方向——覆盖写回报告该问题的 `**用户覆盖**`(原决定 → 覆盖后决定)并同步 `**分流决定**`/`**建议处置**` 行后再确认。确认后运行 `--action introspect-register --report-file <path> --confirm`:报告置 `confirmed`,`**建议处置**` 行逐条生效(等价于逐条 `--action dispose --id <entry-id> --to <state> --reason "introspection:<report-id>#F-nn" --ref <report-id>#F-nn`);报告无 `建议处置` 行时仅翻转报告状态,不动条目。
 5. **路由建议**:列出分流结果的建议去向——本地下沉项给出建议通道(直接修复 / improve-skills / improve-docs / 新需求),随包上行项提示下次打包可附报告(见 `./path-b-and-probe.md` 第 4 步);**仅建议,不自动执行任何动作**。
 
@@ -161,7 +161,7 @@ found, proposed cleanup list, and the A1/A2 identity marks per bundle (re-delive
 copy / second copy / orphan).
 
 **Write the backlog, not only the log**: every finding routed to a channel that is NOT
-executed in this run MUST gain a row in `.specify/memory/feedback/backlog.md` (routed
+executed in this run MUST gain a row in `.specify/feedback/backlog.md` (routed
 date, source, finding, channel, owner file(s), status). The consume-log row records
 where a finding was *sent*; the backlog records what is still *owed*. A routing that
 lives only in the consume-log is a dead letter — that has already happened once here.
@@ -188,7 +188,7 @@ section cites the owners and restates none of their content (contract C-27).
 Routing discipline for the three-carrier rule:
 
 - **One row per entry in the routing backlog**: each digested external entry
-  writes **exactly one backlog row** in `.specify/memory/feedback/backlog.md`
+  writes **exactly one backlog row** in `.specify/feedback/backlog.md`
   naming its unique carrier, and that row is listed in the digest report. A
   routing that lives only in the consume-log is a dead letter — the backlog is
   what is still owed.
@@ -281,7 +281,7 @@ rm feedback/feedback-<ts>.zip   # each processed bundle in this batch
   moves it and records the final location). An orphan whose preserve copy failed is
   not deleted. The consume-log Cleanup column MUST record the preserve path for every
   orphan.
-- Record the event by appending one row to `.specify/memory/feedback/consume-log.md`:
+- Record the event by appending one row to `.specify/feedback/consume-log.md`:
 
   ```markdown
   | 2026-08-15 | feedback-<ts1>.zip, feedback-<ts2>.zip | 23 | 5 direct fix, 3 improve-skills, 1 requirement | 1 (conflicting tool count) | 2 zips removed |

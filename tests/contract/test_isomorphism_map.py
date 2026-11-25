@@ -103,6 +103,9 @@ SCAN_SKIP_PATHS = {
     # discipline). Mid-run sandboxes copy distribution files, so scanning them judged a
     # throwaway copy as a second carrier; the tree is not part of the document surface.
     REPO_ROOT / ".specify" / ".tmp",
+    # `.specify/archive/` is the append/archive-only tree (documentation model): an archived
+    # copy of a live document is a record of what it said, never a second live carrier.
+    REPO_ROOT / ".specify" / "archive",
 }
 
 

@@ -57,7 +57,7 @@ The pattern introduces no new global store. Reuse existing artifacts:
 | Normalized observations | evidence `findings.json` |
 | Baseline and expected direction | evidence-run `intervention.json` |
 | Run outcome | agent logs, team run report, tool invocation record, Skill execution evidence |
-| Durable lesson | memory/history when reusable beyond the intervention |
+| Durable lesson | `.specify/history/` when reusable beyond the intervention |
 | Global Harness finding | `/better-harness` or `/speckit.review` assisted review |
 
 ## Subject Adapters

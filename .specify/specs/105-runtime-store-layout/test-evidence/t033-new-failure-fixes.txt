@@ -1,0 +1,93 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_instructions_budget_superagent_section.py::test_generated_size_stays_under_the_script_owned_budget tests/contract/test_instructions_size_budget.py::test_c17_real_tree_live_size_is_within_the_raised_budget tests/contract/test_user_facing_comprehension_pointers.py::test_c4_criteria_sections_are_verbatim_frozen tests/contract/test_script_interface_contract.py::test_t078_no_command_gate_or_second_checker_was_added tests/contract/test_decision_tension_contract.py::TestScenarioGClosedSetDelta::test_critique_delta_is_the_declared_allowed_set tests/contract/test_isomorphism_map.py tests/contract/test_migration_distribution.py tests/integration/test_evidence_python_lanes.py tests/integration/test_evidence_compare_verdict.py tests/integration/test_worktree_integration_queue.py tests/unit/test_status_digest_unit.py tests/contract/test_client_improve_loop.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 63%]
+.......................F.................                                [100%]
+=================================== FAILURES ===================================
+____________ test_t078_no_command_gate_or_second_checker_was_added _____________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_t078_no_command_gate_or_second_checker_was_added():
+        """T078: C-32's three refusals, each asserted against the artifacts that would carry them.
+    
+        The three surfaces are structural, not textual, so each is asserted where it lands:
+        a `/speckit.*` command is a file under the command roster, a driver stage gate is a
+        `gate-check.py` registry row, and a confirmation gate is an entry in the gate scan's own
+        governed list. A fourth checker is the engine count under `scripts/python/`.
+        """
+        import subprocess
+    
+        # 2026-11-11: the delta is read against this feature's base, so later features'
+        # sanctioned command templates land inside it. `templates/commands/seal.md` is
+        # Feature 099's `/speckit.seal` template; every other addition still goes red.
+        sanctioned_later_commands = {"templates/commands/seal.md"}
+        commands = sorted(set(
+            _git_paths("diff", "--name-only", "--diff-filter=A", f"{_feature_base()}...HEAD", "--",
+                       COMMAND_SURFACE)
+        ))
+        commands = [p for p in commands if p not in sanctioned_later_commands]
+        assert not [p for p in commands if p.endswith(".md")], (
+            f"C-32: no `/speckit.*` command was added; got {commands}"
+        )
+        # Driver stage gate: the verdict engine a new gate step would land in. Its SOURCE is
+        # compared against the base revision — a projection may add the flag block every consumer
+        # carries (C-34/C-36), which is a repair, not a gate; a gate step changes the engine's own
+        # source, and that is what "no driver stage gate was added" measures.
+        for engine in DRIVER_GATE_ENGINES:
+            base = subprocess.run(["git", "show", f"{_feature_base()}:{engine}"],
+                                  cwd=str(ROOT), capture_output=True, text=True, timeout=120)
+            assert base.returncode == 0, (
+                f"C-32: the driver's gate engine existed at the feature base: {engine}"
+            )
+            source = _text(ROOT / engine)
+            assert _without_flag_block(source) == _without_flag_block(base.stdout), (
+                f"C-32: the driver stage gate set is unchanged by this feature ({engine}) — a "
+                "stage-gate change lands in the engine's own code, not in the flag block every "
+                "consumer now carries"
+            )
+        # Confirmation gate: the governed list the scanner enforces, and the mechanical gate file
+        # `gate-check.py` reads. Both are compared the same way, so "unchanged" is a measurement.
+        # 2026-11-11 sanctioned amendment: Feature 097's follow-up adds the archive-first
+        # reversibility carve-out and the retention/spec-retirement row. The amendment is additive
+        # only — every base line survives and every added line must carry a sanctioned marker.
+        sanctioned_owner_additions = (
+            "**可逆动作例外（archive-first）**",
+            "| retention / spec 退役删除 |",
+        )
+    
+        def _store_layout_mapped(line: str) -> str:
+            """Feature 105's mechanical live-path rewrite: `.specify/memory/<store>/` -> `.specify/<store>/`.
+    
+            A base line whose only change is that rewrite survives the amendment: the gate
+            text and criteria are byte-identical, the store path is the current one.
+            """
+            return re.sub(r"\.specify/memory/([a-z0-9_-]+)/", r".specify/\1/", line)
+    
+        for surface in CONFIRMATION_GATE_SURFACES:
+            base = subprocess.run(["git", "show", f"{_feature_base()}:{surface}"],
+                                  cwd=str(ROOT), capture_output=True, text=True, timeout=120)
+            assert base.returncode == 0, (
+                f"C-32: the confirmation-gate owner existed at the feature base: {surface}"
+            )
+            current = _text(ROOT / surface)
+            if current == base.stdout:
+                continue
+            current_lines = current.splitlines()
+            base_lines = base.stdout.splitlines()
+            missing = [
+                line for line in base_lines
+                if line not in current_lines and _store_layout_mapped(line) not in current_lines
+            ]
+            added = [line for line in current_lines if line not in base_lines]
+>           assert not missing, (
+                f"C-32: the confirmation-gate amendment removed base lines ({surface}): {missing}"
+            )
+E           AssertionError: C-32: the confirmation-gate amendment removed base lines (.specify/shared/guidelines/confirmation-gates.md): ['框架级确认门控的唯一判据真源。原则:**与其等待用户确认,不如先按设定执行,执行完允许用户修改;只有不可撤销、具备破坏性的动作才保留前置用户确认。** 概念基础为 `.specify/shared/patterns/reconcile-pattern.md` § Tiered confirmation(安全本地写自动、外部权威源停等、破坏性停等),本文档将其推广为全框架统一约定。', '| glossary 冲突/覆盖用户条目确认 | .specify/shared/workflow/glossary.md | 覆盖用户权威数据,破坏性桶 |', '2. 门控扫描脚本 `.specify/scripts/python/scan-confirmation-gates.py`——治理后复扫若检出仍以阻塞形态存在的可逆门控(`violations` 非空且提供基线时),退出码 2。', '每个保留门控(intrinsic 除外:访谈问答/退出门、宪章不可撤销动作确认)挂一个必要性 probe(注册表 `.specify/shared/definitions/probe-definitions.md` 的 command-gate / skill-gate 类)。门控触发且用户作出决定后,执行 agent MUST 自动记录观察事实,为框架层确认设计积累证据。']
+E           assert not ['框架级确认门控的唯一判据真源。原则:**与其等待用户确认,不如先按设定执行,执行完允许用户修改;只有不可撤销、具备破坏性的动作才保留前置用户确认。** 概念基础为 `.specify/shared/patterns/reconcil...ed/definitions/probe-definitions.md` 的 command-gate / skill-gate 类)。门控触发且用户作出决定后,执行 agent MUST 自动记录观察事实,为框架层确认设计积累证据。']
+
+tests/contract/test_script_interface_contract.py:4326: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_script_interface_contract.py::test_t078_no_command_gate_or_second_checker_was_added
+1 failed, 112 passed in 7.99s

@@ -110,7 +110,7 @@ write behaviour):
 |-------------|--------------------|
 | **Target artifact** | Resolved in Workflow step 3 — required and single in Special; may be a topic-seeded record in Informal |
 | **Write behaviour** | Every round writes through before the next is asked. Special edits the one target in place and **echoes the change back**; Informal **consolidates and organizes** the round into records, splitting or adding artifacts as the space takes shape |
-| **Ledger** | In a feature context `<REQUIREMENTS_DIR>/interview-log.md`; otherwise `.specify/memory/session/interview-<topic-slug>.md`. Holds the **decision records** (ID, `dependsOn`, artifact span) that retraction propagation runs on, plus the run mode in its header |
+| **Ledger** | In a feature context `<REQUIREMENTS_DIR>/interview-log.md`; otherwise `.specify/session/interview-<topic-slug>.md`. Holds the **decision records** (ID, `dependsOn`, artifact span) that retraction propagation runs on, plus the run mode in its header |
 | **Exit gate** | Per-mode convergence criterion above → present the consolidated understanding → **explicit user confirmation**; never act before it |
 | **Round budget** | **Unbounded** in both modes. This is the escalation target for capped flows; it stops when the criterion is met or the user stops it |
 

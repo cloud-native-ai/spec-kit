@@ -122,7 +122,7 @@ def test_lookup_reference_pins_marker_only_replacement_and_single_source():
 def test_legacy_stores_are_only_referenced_as_migration_sources():
     """Legacy paths must still be detected, so an existing project can migrate."""
     text = SKILL_MD.read_text(encoding="utf-8")
-    assert ".specify/git-workflow.md" in text and ".specify/memory/git-workflow.md" in text, \
+    assert ".specify/git-workflow.md" in text and "退役容器内的 `git-workflow.md`" in text, \
         "Phase 0 must detect both legacy config locations"
     assert "docs/git-workflow.md" in text, \
         "Phase 0 must detect the previous docs/ location as a legacy source"

@@ -12,13 +12,13 @@ resolve_resource = skills_utils.resolve_resource
 
 def test_resolution_prefers_id_over_fuzzy_text(tmp_path: Path):
     workspace = tmp_path
-    tool_file = workspace / ".specify" / "memory" / "tools" / "lint.md"
+    tool_file = workspace / ".specify" / "tools" / "lint.md"
     tool_file.parent.mkdir(parents=True, exist_ok=True)
     tool_file.write_text("# lint\n", encoding="utf-8")
 
     result = resolve_resource(
         workspace_root=workspace,
-        requested_id="<TOOL:.specify/memory/tools/lint.md>",
+        requested_id="<TOOL:.specify/tools/lint.md>",
         requested_text="lint",
         expected_type="tool",
     )
@@ -29,19 +29,19 @@ def test_resolution_prefers_id_over_fuzzy_text(tmp_path: Path):
 
 def test_resolution_fallback_when_id_missing(tmp_path: Path):
     workspace = tmp_path
-    tool_file = workspace / ".specify" / "memory" / "tools" / "format.md"
+    tool_file = workspace / ".specify" / "tools" / "format.md"
     tool_file.parent.mkdir(parents=True, exist_ok=True)
     tool_file.write_text("# format\n", encoding="utf-8")
 
     result = resolve_resource(workspace_root=workspace, requested_text="format", expected_type="tool")
 
     assert result.result_type == "fallback"
-    assert result.resolved_id == "<TOOL:.specify/memory/tools/format.md>"
+    assert result.resolved_id == "<TOOL:.specify/tools/format.md>"
 
 
 def test_backfill_tool_record_id_for_historical_artifact(tmp_path: Path):
     workspace = tmp_path
-    tool_file = workspace / ".specify" / "memory" / "tools" / "legacy.md"
+    tool_file = workspace / ".specify" / "tools" / "legacy.md"
     tool_file.parent.mkdir(parents=True, exist_ok=True)
     tool_file.write_text(
         "# Tool Record: legacy\n\n**Tool Name**: legacy\n**Tool Type**: `system-binary`\n**Source Identifier**: /usr/bin/legacy\n",
@@ -51,8 +51,8 @@ def test_backfill_tool_record_id_for_historical_artifact(tmp_path: Path):
     resolved_id = backfill_resource_id(workspace, "tool", tool_file)
     content = tool_file.read_text(encoding="utf-8")
 
-    assert resolved_id == "<TOOL:.specify/memory/tools/legacy.md>"
-    assert "**Tool ID**: <TOOL:.specify/memory/tools/legacy.md>" in content
+    assert resolved_id == "<TOOL:.specify/tools/legacy.md>"
+    assert "**Tool ID**: <TOOL:.specify/tools/legacy.md>" in content
 
 
 def test_invalid_id_type_mismatch_errors(tmp_path: Path):

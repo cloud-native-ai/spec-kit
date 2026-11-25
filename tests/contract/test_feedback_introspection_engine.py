@@ -72,7 +72,7 @@ class TestRegisterLinking:
         for entry in index["entries"]:
             assert entry.get("introspection_ref") == f"{report_id}#F-01"
         # entry frontmatter mirrors the link (body untouched)
-        entry_file = feedback_store / ".specify/memory/feedback" / index["entries"][0]["file"]
+        entry_file = feedback_store / ".specify/feedback" / index["entries"][0]["file"]
         assert f'introspection_ref: "{report_id}#F-01"' in entry_file.read_text()
         assert "## Review" in entry_file.read_text()
 
@@ -139,7 +139,7 @@ class TestDisposeExtension:
         assert entry["disposition"] == "processed"
         assert not entry.get("introspection_ref")
         assert not entry.get("disposition_reason")
-        entry_file = feedback_store / ".specify/memory/feedback" / entry["file"]
+        entry_file = feedback_store / ".specify/feedback" / entry["file"]
         text = entry_file.read_text(encoding="utf-8")
         assert "introspection_ref" not in text
         assert "disposition_reason" not in text
@@ -220,7 +220,7 @@ class TestRegisterConfirm:
         write_text = path.read_text(encoding="utf-8").replace(
             'status: "confirmed"', 'status: "draft"')
         path.write_text(write_text, encoding="utf-8")
-        entry_file = feedback_store / ".specify/memory/feedback" / entry["file"]
+        entry_file = feedback_store / ".specify/feedback" / entry["file"]
         text_e = entry_file.read_text(encoding="utf-8")
         entry_file.write_text(
             text_e.replace('disposition: "processed"', 'disposition: ""'),
@@ -248,7 +248,7 @@ class TestPackageIncludeIntrospection:
 
     def _latest_zip(self, workspace: Path) -> Path:
         zips = sorted(
-            (workspace / ".specify/memory/feedback/packages").glob("*.zip"))
+            (workspace / ".specify/feedback/packages").glob("*.zip"))
         assert zips
         return zips[-1]
 
@@ -281,7 +281,7 @@ class TestPackageIncludeIntrospection:
     def test_missing_report_marked_not_fatal(self, feedback_store: Path):
         _eid, report_id = self._setup_linked(feedback_store)
         # delete the report file after linking
-        (feedback_store / ".specify/memory/feedback/introspection"
+        (feedback_store / ".specify/feedback/introspection"
          / f"{report_id}.md").unlink()
         rc = feedback_utils.main([
             "--action", "package", "--workspace-root", str(feedback_store),
@@ -300,7 +300,7 @@ class TestPackageIncludeIntrospection:
             "--action", "package", "--workspace-root", str(feedback_store),
             "--include-introspection"])
         assert rc == 0
-        zdir = feedback_store / ".specify/memory/feedback/packages"
+        zdir = feedback_store / ".specify/feedback/packages"
         if list(zdir.glob("*.zip")):
             import zipfile
             with zipfile.ZipFile(self._latest_zip(feedback_store)) as z:

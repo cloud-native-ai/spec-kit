@@ -818,10 +818,10 @@ def test_us2_triage_answers_an_empty_delta_before_any_receipt_runs(repo: ReviewG
 def test_us2_the_default_code_path_set_treats_docs_and_memory_as_non_code(repo: ReviewGitRepo):
     shapes = _standard(repo)
     repo.write("docs/notes.md", "# docs only\n")
-    repo.write(".specify/memory/knowledge/note.md", "# memory only\n")
+    repo.write(".specify/knowledge/note.md", "# memory only\n")
     docs_only = repo.commit(
         "docs: documentation and memory only",
-        ["docs/notes.md", ".specify/memory/knowledge/note.md"],
+        ["docs/notes.md", ".specify/knowledge/note.md"],
     )
     fields = _ok(
         repo.run_script(

@@ -5,7 +5,7 @@ skeletons, the derivation method and the phase boundaries.
 
 ## Execution Expectation Template
 
-Path: `.specify/memory/coaching/<run-id>/expectation.md`. Write it **before any
+Path: `.specify/coaching/<run-id>/expectation.md`. Write it **before any
 Trainee execution action**; the `started-at` field of `observation.md` § Trainee
 Execution is the ordering evidence.
 
@@ -102,7 +102,7 @@ the only allowed interaction.
 
 ## Observation Record Template
 
-Path: `.specify/memory/coaching/<run-id>/observation.md`. Write it after the single
+Path: `.specify/coaching/<run-id>/observation.md`. Write it after the single
 Trainee execution and before `deviations.md`: it records what actually happened, never what the
 expectation predicted.
 
@@ -168,7 +168,7 @@ Rules for the record:
 
 ## Deviations Template
 
-Path: `.specify/memory/coaching/<run-id>/deviations.md`. Both dimension sections are
+Path: `.specify/coaching/<run-id>/deviations.md`. Both dimension sections are
 required:
 
 ```markdown
@@ -196,7 +196,7 @@ dropped.
 
 ## Improvement Plan Template
 
-Path: `.specify/memory/coaching/<run-id>/improvement-plan.md`. Entries are
+Path: `.specify/coaching/<run-id>/improvement-plan.md`. Entries are
 priority-ordered and concrete:
 
 ```markdown

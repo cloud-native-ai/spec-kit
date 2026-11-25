@@ -13,7 +13,7 @@ covers what its sources could do.
 Re-verify with:
 
 ```bash
-python3 .specify/skills/merge-skills/scripts/provenance_check.py skills/external/git-utils
+python3 skills/external/merge-skills/scripts/provenance_check.py skills/external/git-utils
 ```
 
 The method and flow below are this skill's own; only the **responsibility** is inherited.
@@ -49,10 +49,10 @@ the Verification column names how to check it again.
 
 | # | Capability (what the source could do) | Target destination | Verification | Status |
 |---|---------------------------------------|--------------------|--------------|--------|
-| 1 | Collect a read-only normalized state record per (repo, environment) | `references/fleet-inventory-schema.md` | `python3 .specify/scripts/git_fleet.py scan --help` | verified |
-| 2 | Raise graded cross-environment hazard verdicts | `references/fleet-hazard-taxonomy.md` | `python3 .specify/scripts/git_fleet.py report --help` | verified |
-| 3 | Model the inter-repo dependency graph and order work dependency-first | `references/fleet-dependency-model.md` | `python3 .specify/scripts/git_fleet.py deps --help` | verified |
-| 4 | Plan and execute cross-environment convergence, SAFE steps only unless applied | `references/fleet-coordination-playbook.md` | `python3 .specify/scripts/git_fleet.py plan --help` then `sync --help` (dry-run default) | verified |
+| 1 | Collect a read-only normalized state record per (repo, environment) | `references/fleet-inventory-schema.md` | `python3 scripts/git_fleet.py scan --help` | verified |
+| 2 | Raise graded cross-environment hazard verdicts | `references/fleet-hazard-taxonomy.md` | `python3 scripts/git_fleet.py report --help` | verified |
+| 3 | Model the inter-repo dependency graph and order work dependency-first | `references/fleet-dependency-model.md` | `python3 scripts/git_fleet.py deps --help` | verified |
+| 4 | Plan and execute cross-environment convergence, SAFE steps only unless applied | `references/fleet-coordination-playbook.md` | `python3 scripts/git_fleet.py plan --help` then `sync --help` (dry-run default) | verified |
 | 5 | Run the fleet reconcile loop end-to-end (observe → diff → converge → verify) | `references/fleet-workflow.md` | walk the loop on a two-environment inventory | verified |
 
 ## Source: git-submodule-edit
@@ -68,7 +68,7 @@ the Verification column names how to check it again.
 |---|---------------------------------------|--------------------|--------------|--------|
 | 1 | Edit submodule code on a branch named after the parent project | `references/submodule-workflow.md` | walk the `project-<PARENT_SLUG>/*` rule and the detached-HEAD guard | verified |
 | 2 | Run the submodule edit/commit command set from the parent | `references/submodule-command-recipes.md` | each source recipe present and parent-relative | verified |
-| 3 | Record every validated gitlink bump in an auditable ledger | `.specify/scripts/record-bump.sh` | usage header + `assets/ledger-template.md`; `--status pass\|fail` annotation | verified |
+| 3 | Record every validated gitlink bump in an auditable ledger | `scripts/record-bump.sh` | usage header + `assets/ledger-template.md`; `--status pass\|fail` annotation | verified |
 
 ## Source: git-server-init
 
@@ -81,9 +81,9 @@ the Verification column names how to check it again.
 
 | # | Capability (what the source could do) | Target destination | Verification | Status |
 |---|---------------------------------------|--------------------|--------------|--------|
-| 1 | Provision a plain SSH server into a git server (desired state D1–D4) | `references/server-workflow.md` | `bash .specify/scripts/provision-git-server.sh --help`; walk D1–D4 convergence | verified |
+| 1 | Provision a plain SSH server into a git server (desired state D1–D4) | `references/server-workflow.md` | `bash scripts/provision-git-server.sh --help`; walk D1–D4 convergence | verified |
 | 2 | Create bare repos under the git home with the expected owner and HEAD | `references/server-workflow.md` | `--repo <namespace/name>` repeatable flag documented | verified |
 | 3 | Authorize local public keys, deduped by fingerprint, StrictModes-safe | `references/server-workflow.md` | `--pubkey <path>` repeatable flag documented | verified |
-| 4 | Add the matching Host entry to the local ssh config | `references/server-ssh-config-entry.md` | `python3 .specify/scripts/ssh_config_insert.py --help` | verified |
+| 4 | Add the matching Host entry to the local ssh config | `references/server-ssh-config-entry.md` | `python3 scripts/ssh_config_insert.py --help` | verified |
 | 5 | Diagnose server-side provisioning failures | `references/server-troubleshooting.md` | each source troubleshooting row present | verified |
 | 6 | Stay environment-agnostic (no hardcoded hostnames or absolute paths) | `references/server-reference-architecture.md` | grep for literal hostnames/paths — expect none | verified |

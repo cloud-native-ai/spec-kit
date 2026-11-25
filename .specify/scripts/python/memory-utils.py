@@ -7,9 +7,9 @@ files plus a lightweight local JSON index (no vector store).
 
 Layout (relative to workspace root):
 
-    .specify/memory/session/     # short-term / working memory (append-only)
-    .specify/memory/knowledge/   # long-term / distilled memory (upsert by slug)
-    .specify/memory/<scope>/<slug>.md
+    .specify/session/     # short-term / working memory (append-only)
+    .specify/knowledge/   # long-term / distilled memory (upsert by slug)
+    .specify/<scope>/<slug>.md
 
 Conflict-free store discipline (req 055): information that multiple flows
 may update concurrently never lives in one shared file. Each entry is its
@@ -60,7 +60,9 @@ def declared_sequence(slug, fallback):
 
 
 SCOPES, SCOPES_LABEL = declared_sequence(MEMORY_TYPES_FACT, SCOPES_FALLBACK)
-MEMORY_SUBDIR = Path(".specify") / "memory"
+# The two memory tiers are first-class top-level stores under `.specify/` (Feature 105): the
+# scope name IS the store root name, so `memory_root()` is the `.specify/` directory itself.
+MEMORY_ROOT = Path(".specify")
 # Legacy per-scope index (pre-055): read-only fallback, retired on first
 # mutating action.
 INDEX_NAME = "index.json"
@@ -152,7 +154,7 @@ def resolve_workspace_root(explicit: Optional[str]) -> Path:
 
 
 def memory_root(workspace_root: Path) -> Path:
-    return Path(workspace_root).resolve() / MEMORY_SUBDIR
+    return Path(workspace_root).resolve() / MEMORY_ROOT
 
 
 def scope_dir(workspace_root: Path, scope: str) -> Path:
@@ -491,7 +493,7 @@ def action_recall(args: argparse.Namespace) -> Dict[str, Any]:
                 continue
             item = dict(entry)
             item["score"] = score
-            item["path"] = (MEMORY_SUBDIR / scope / entry["file"]).as_posix()
+            item["path"] = (MEMORY_ROOT / scope / entry["file"]).as_posix()
             candidates.append(item)
 
     candidates.sort(key=lambda e: (e["score"], e.get("created", "")), reverse=True)
@@ -505,7 +507,7 @@ def action_list(args: argparse.Namespace) -> Dict[str, Any]:
     for scope in _collect_scopes(args.scope):
         for entry in load_index(workspace_root, scope)["entries"]:
             item = dict(entry)
-            item["path"] = (MEMORY_SUBDIR / scope / entry["file"]).as_posix()
+            item["path"] = (MEMORY_ROOT / scope / entry["file"]).as_posix()
             items.append(item)
     items.sort(key=lambda e: e.get("created", ""), reverse=True)
     return {"count": min(len(items), limit), "matches": items[:limit]}

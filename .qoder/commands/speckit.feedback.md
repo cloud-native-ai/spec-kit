@@ -22,7 +22,7 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 
 **Delegation (mandatory)**: load `.specify/skills/internal/manage-feedback/SKILL.md` and execute per its Routing flow and Behavior Rules, plus its two path references:
 
-- `.specify/skills/internal/manage-feedback/SKILL.md` — 路由判定真源:意图识别(`package` 短路 / 探针注入 / 存量决定)、帽子判定(根级源目录判据,术语见 `.specify/shared/definitions/dogfooding-definitions.md`)、清单盘点(探针总览 + `.specify/memory/feedback/backlog.md` 路由积压)、分类与单向内容精化、双侧非空 / 空范围 / 不可判定条款、行为规则(零网络红线、exit 2 是裁决、路由判定须呈报)。
+- `.specify/skills/internal/manage-feedback/SKILL.md` — 路由判定真源:意图识别(`package` 短路 / 探针注入 / 存量决定)、帽子判定(根级源目录判据,术语见 `.specify/shared/definitions/dogfooding-definitions.md`)、清单盘点(探针总览 + `.specify/feedback/backlog.md` 路由积压)、分类与单向内容精化、双侧非空 / 空范围 / 不可判定条款、行为规则(零网络红线、exit 2 是裁决、路由判定须呈报)。
 - `.specify/skills/internal/manage-feedback/references/path-a-digest.md` — **Path A 就地消化**:A1 入站包清点(重投 / 中断 / 孤儿识别)→ A2 抽取与大批量读纪律 + exec-quant 载荷接收(`ingest-exec-quant --package <zip>`,每包恰一次,降级计数知情;汇总至多是建议的显式后续步骤,不并入接收流程)→ A3 自省(Introspection)→ A4 对账与渠道路由(含 backlog 写入;客户条目载体指派闭集恰三——todo Park 默认 / 新需求规格 / 改进循环主体,一条目一载体、无第四载体,undecided 呈报留待下次消化、不静默丢弃;消化呈报三项事实:本次帽子与武装态(armed state)及解析方式、两侧条目数与处置、四条循环度量读数指针——只读 `--action client-metrics`,度量只读呈报、不并入清理、不构成门禁/状态转换/阈值输入;度量口径与「持续」定义(每次合格运行采集+既有非阻塞阈值提示+显式触发,无调度器/常驻/定时器)见 `docs/reference/commands/feedback.md` § Client loop metrics)→ A5 原子清理与 consume-log → A6 本地条目 dispose。
 - `.specify/skills/internal/manage-feedback/references/path-b-and-probe.md` — **Path B 打包上送**(status / 过滤汇总 / dispose / package——exec-quant 载荷随包:全量包含、引擎封顶、降级计数知情 / hat-aware 清理 / mark-submitted)与 **Probe Injection**(仅显式请求)。
 

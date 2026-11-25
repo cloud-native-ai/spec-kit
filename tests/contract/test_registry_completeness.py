@@ -3,7 +3,7 @@
 F5 remediation originally pinned the AGENTS/SKILLS/TOOLS registry tables to
 their filesystem sources. Since 2026-08-17 no registration tables exist —
 skills and tools are discovered via their directories (`.specify/skills/`,
-`.specify/memory/tools/`; see `.specify/skills.md` / `.specify/tools.md`) — so
+`.specify/tools/`; see `.specify/skills.md` / `.specify/tools.md`) — so
 c1/c2 became a regression guard that the legacy markers never come back. The
 features header-count pin (c3) is registry-independent and stays.
 """

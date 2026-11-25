@@ -91,7 +91,11 @@ FROZEN_SECTIONS = {
     # Re-frozen 2026-11-11 for the archive-first reversibility carve-out: the
     # destructive list gains the exception paragraph; the governance-kept list gains
     # the retention / spec retirement row. Deliberate, not silent.
-    "破坏性动作清单": "12ae1c76d78334a9a0926a2b9fad505cbcbd67ce2e83a8d453c7e44be009649e",
+    # Re-frozen 2026-11-25 for feature 105 (runtime store layout): the carve-out's
+    # renumber-ledger path moved from the retired container to `.specify/renumber/`
+    # (SC-006 live-reference rewrite; the gate criteria and wording are unchanged).
+    # Superseded hash: 12ae1c76d78334a9a0926a2b9fad505cbcbd67ce2e83a8d453c7e44be009649e.
+    "破坏性动作清单": "93408e4bf12b1e349357ed28edaf3e84a844fca9e2bca2acce29f6388e40725b",
     # Re-frozen 2026-10-15 for the git-workspace→git-utils skill split (the generic
     # git scopes stayed public and were renamed git-utils; the owner cell of the
     # git-workflow gate row now names git-utils). Deliberate, not silent: only the

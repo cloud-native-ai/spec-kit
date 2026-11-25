@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-feedback/SKILL.md>"
 
 # manage-feedback
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -21,7 +21,7 @@ explicitly-requested § Probe Injection capability. The owning command is
 its own wrap-up Feedback / Documentation / Handoffs steps) and delegates everything
 below to this skill.
 
-Canonical extraction source: `.specify/templates/commands/feedback.md` § Routing flow
+Canonical extraction source: `templates/commands/feedback.md` § Routing flow
 (steps 1–10), § Path A (A1–A6 + behavior rules), § Path B (steps 1–6),
 § Probe Injection, and § Behavior Rules. The routing judgment lives in this SKILL.md;
 the two execution paths and the probe capability live in `references/`. The engine
@@ -112,7 +112,7 @@ prompt MUST NOT recommend it.
    `kind`, `slice`, `disposition`, `introspection_ref`, `partial`, `created`,
    `summary`, `path` — parse that shape, never a bare array.
 
-   **Read the routing backlog** (`.specify/memory/feedback/backlog.md`) — the single
+   **Read the routing backlog** (`.specify/feedback/backlog.md`) — the single
    carrier for findings prior consume runs routed but did not execute. Report how many
    rows are `open`, `open-unverified` and `carried-by-spec-*`. An `open-unverified` row
    is **not** a to-do: its underlying defect MUST be re-measured against current
@@ -173,9 +173,9 @@ prompt MUST NOT recommend it.
   follow-up carrier** from the closed set of three (todo Park mode as the named
   default, a new requirements specification, or one subject loop of the
   improvement command — boundaries owned by
-  `.specify/shared/guidelines/todo-in-context.md`, `.specify/templates/commands/requirements.md`,
-  and `.specify/shared/workflow/self-improvement-workflow.md`, cited never restated):
-  one row per entry in `.specify/memory/feedback/backlog.md`, listed in the
+  `shared/guidelines/todo-in-context.md`, `templates/commands/requirements.md`,
+  and `shared/workflow/self-improvement-workflow.md`, cited never restated):
+  one row per entry in `.specify/feedback/backlog.md`, listed in the
   digest report; an undecidable entry is reported `undecided` and kept for the
   next digest, never silently dropped. The digest report carries this run's hat
   and armed state plus how it was resolved, the entry count and disposition of
@@ -196,7 +196,7 @@ prompt MUST NOT recommend it.
 
 - Zero network operations of any kind (red line); `mark-submitted` remains local
   bookkeeping.
-- Path A operates on both stores — the local store `.specify/memory/feedback/` and the
+- Path A operates on both stores — the local store `.specify/feedback/` and the
   `feedback/` intake directory (read-only until A5's atomic cleanup). Path B operates
   only on the local store. Never edit store files by hand.
 - Exit code 2 from the engine is a verdict — report it, do not argue around it.
@@ -206,7 +206,7 @@ prompt MUST NOT recommend it.
   and how that was determined, how many items landed on each side, whether Path B was
   selected by judgment or taken on an explicit request, and any entry whose route the
   content analysis moved away from its `kind`-based first cut.
-- **Routed ≠ done**: `.specify/memory/feedback/backlog.md` is the single carrier for
+- **Routed ≠ done**: `.specify/feedback/backlog.md` is the single carrier for
   findings routed but not executed — read at inventory, written at A4, and a row
   closes only on evidence that its named owner file changed. The consume-log is a
   batch audit trail; it does not carry work forward.

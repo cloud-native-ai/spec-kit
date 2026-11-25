@@ -12,7 +12,7 @@ unrefreshed form has no call sites at all):
   a subdirectory; ``skills/{external,internal}/*/SKILL.md`` holds exactly the
   frozen 54 skill units (51 at the 069a baseline; the dated notes above the
   roster record every sanctioned movement).
-* **C-2 zero project-side storage** — nothing under ``.specify/memory/`` is a
+* **C-2 zero project-side storage** — nothing under the `.specify/` runtime stores is a
   second classification store (no classification-named file, no ledger-style
   row, no ``flow_class`` assignment).
 * **C-3 one-package atomicity** — the four payload classes (``shared/``,
@@ -1467,7 +1467,7 @@ def test_c6_feedback_step_declares_orthogonal_axes():
 #: listed here still fails the pin — the register records drift, it does not license it.
 C6_LATER_REMOVALS = {
     "2026-11-05 Feature 084 batch 1 row 1 (C-042 / C-047 step 4 / FR-018)": (
-        "- The engine store lives at `.specify/memory/feedback/`; threshold defaults to `10`",
+        "- The engine store lives at `.specify/feedback/`; threshold defaults to `10`",
         "  (`--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`).",
     ),
 }

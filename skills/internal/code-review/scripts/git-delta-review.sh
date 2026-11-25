@@ -693,7 +693,7 @@ CODE_PATH_PATTERNS=(
 # 明确不算代码的路径: 规格、文档、记忆与评审产出
 NON_CODE_PATH_PATTERNS=(
     '*.md' '*.markdown' '*.txt' '*.rst' '*.adoc'
-    'docs/*' '.specify/specs/*' '.specify/memory/*' '.specify/history/*'
+    'docs/*' '.specify/specs/*' '.specify/session/*' '.specify/knowledge/*' '.specify/history/*'
     '.specify/templates/*' '.specify/review/*' '.specify/feedback/*'
 )
 

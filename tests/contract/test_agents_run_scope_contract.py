@@ -8,7 +8,7 @@ This module is a **containment guard** (migration/regression exception, no red-f
 the red form is a change set that carries a forbidden path, demonstrated by the synthetic
 fixture legs below. The comparison unit is the five product-surface roots of SC-005; the
 process / evidence / registry paths (`.specify/specs/104-agents-run/**`,
-`.specify/features.md`, `.specify/features/019-agents-command.md`, `.specify/memory/**`,
+`.specify/features.md`, `.specify/features/019-agents-command.md`, the runtime stores under `.specify/`,
 `.specify/state/**`) sit outside that unit and never enter the complement assertion.
 
 The live judgement runs `git diff <base>..<end>`, base = the implement-entry commit and
@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,15 @@ import pytest
 pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+sys.path.insert(0, str(REPO_ROOT / "scripts" / "python"))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+_STORE_NAMES = sorted(
+    declaration_reader.load_fact(
+        declaration_reader.find_repo(REPO_ROOT), "runtime-store-layout"
+    )["body"]["statement"]["stores"]
+)
 PRE_CHANGE_NOTE = (
     REPO_ROOT / ".specify" / "specs" / "104-agents-run" / "notes" / "pre-change-measurements.md"
 )
@@ -91,7 +101,7 @@ EXPECTED_NEW_MODULES = frozenset(
 PROCESS_EVIDENCE_REGISTRY_PREFIXES = (
     ".specify/specs/104-agents-run/",
     ".specify/features/",
-    ".specify/memory/",
+    *[f".specify/{name}/" for name in _STORE_NAMES],
     ".specify/state/",
 )
 PROCESS_EVIDENCE_REGISTRY_EXACT = frozenset(
@@ -210,7 +220,7 @@ def test_containment_exempts_flow_evidence_and_registry_paths():
         ("A", ".specify/specs/104-agents-run/test-evidence/implement.jsonl"),
         ("M", ".specify/features.md"),
         ("M", ".specify/features/019-agents-command.md"),
-        ("A", ".specify/memory/feedback/entry.md"),
+        ("A", ".specify/feedback/entry.md"),
         ("M", ".specify/state/104-agents-run.md"),
     ]
     assert judge_change_set(fixture) == []

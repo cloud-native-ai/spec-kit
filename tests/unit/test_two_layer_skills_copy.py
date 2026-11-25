@@ -64,7 +64,7 @@ def test_two_layer_layout_and_rewrite(tmp_path):
     assert "and skills/external/" not in text
     assert ".specify/skills/internal/demo-int/SKILL.md" in text
     assert ".specify/skills/demo-ext/scripts/run.py" in text
-    assert ".specify/memory/session/notes.md" in text
+    assert ".specify/session/notes.md" in text
     assert ".specify/.specify/" not in text
 
     # Nested internal layer

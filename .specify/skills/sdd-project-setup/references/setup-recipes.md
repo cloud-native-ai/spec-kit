@@ -14,17 +14,17 @@
 
 ## 机制矩阵维度定义（S1）
 
-`.specify/scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
+`scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
 
 | 维度 | 判定 | 对应机制 |
 |------|------|----------|
 | const | `.specify/constitution.md` 存在 | 合法基线 |
 | feat | `.specify/features.md` + `features/` 目录 | 特性注册表 |
 | gloss | `.specify/glossary.md` | 项目词汇锚 |
-| fb | `.specify/memory/feedback/` 目录 | 反馈库 |
+| fb | `.specify/feedback/` 目录 | 反馈库 |
 | reg | `.specify/register.md` | ID 登记 |
-| kb | `.specify/memory/knowledge/` | 长期知识库 |
-| session | `.specify/memory/session/` | 会话记忆 |
+| kb | `.specify/knowledge/` | 长期知识库 |
+| session | `.specify/session/` | 会话记忆 |
 | tools | `.specify/tools.md`（§ Helper Tools Index）+ `tools/` | 工具注册表 |
 | skills | `.specify/skills/` 非空 | 安装技能集 |
 | tmpl | `.specify/templates/` | 阶段模板 |
@@ -108,7 +108,7 @@ house-keeping H5 的**未处理清单**。**不执行** sanitize、history、res
 | 6 | `/speckit.agents` / `/speckit.team` | **按需**：用户明确需要 | 代理/团队定义；未使用则保持 `not-configured` |
 
 **Carrier**：本地每个命令的派发 MUST 缺省用 **fork 承载**（同族 `qodercli` 子进程经
-`.specify/skills/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**
+`skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**
 （该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现
 为一个选项。远端每个命令经 run-agent 在
 `<project-dir>` 下执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；subagent CLI 缺省

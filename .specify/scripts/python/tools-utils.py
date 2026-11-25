@@ -250,7 +250,7 @@ def _normalize_tool_type(tool_type: str) -> str:
 def _workspace_root_for(tools_dir: Path) -> Path:
     """Resolve the workspace root that a tool record's canonical path is relative to.
 
-    Canonical layout is ``<workspace>/.specify/memory/tools``. When no ``.specify``
+    Canonical layout is ``<workspace>/.specify/tools``. When no ``.specify``
     ancestor exists (a bare directory, as in tests), fall back to the deepest
     available ancestor instead of indexing past the end of ``parents``.
     """
@@ -270,7 +270,7 @@ def _self_improvement_contract() -> str:
         repo_root = repo_root.parent
     for candidate in (
         repo_root / ".specify/skills/internal/create-tools/templates/tool-self-improvement.md",
-        repo_root / ".specify/skills/internal/create-tools/templates/tool-self-improvement.md",
+        repo_root / "skills/internal/create-tools/templates/tool-self-improvement.md",
     ):
         if candidate.is_file():
             return candidate.read_text(encoding="utf-8").strip()

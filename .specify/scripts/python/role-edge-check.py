@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only role-edge judgement engine (Feature 095).
 
-Rule owner: ``.specify/shared/definitions/superagent-definitions.md`` ([[STR-004]]). Executable
+Rule owner: ``shared/definitions/superagent-definitions.md`` ([[STR-004]]). Executable
 interface: ``contracts/role-edge-engine.contract.md`` C-1 … C-11; the parsed carrier
 shapes and the violation predicates are owned by ``data-model.md`` § 2 / § 3 / § 5.
 
@@ -16,8 +16,7 @@ Carriers (read-only, no new store):
   ``role_edge`` object, plus the four-piece artifact set when the sidecar is absent
   (``--state-dir``);
 * ``run-agent`` dispatch record written by ``exec-quant.py --action collect-dispatch``,
-  located at the store the record shape already declares — ``<state-dir>/../memory/
-  exec-quant/records`` (``run-agent-label`` carrier); the child's artifact triplet
+  located at the store the record shape already declares — ``<state-dir>/../exec-quant/records`` (``run-agent-label`` carrier); the child's artifact triplet
   under ``--logs-dir`` confirms the dispatch took hold;
 * the line registry (``--registry-dir``) cross-checks identities only; when absent it
   is empty, never fatal.
@@ -407,7 +406,7 @@ def _parse_registry(registry_dir) -> tuple:
 
 
 def _parse_dispatch_records(state_dir: Path, triplet_labels) -> tuple:
-    store = state_dir.parent / "memory" / "exec-quant" / "records"
+    store = state_dir.parent / "exec-quant" / "records"
     rows = []
     unconfirmed = 0
     if not store.is_dir():

@@ -2,7 +2,7 @@
 """non-disposable-check.py — the read-only engine that says which remembered things are
 "stale / useless / deferred" and what may be disposed of them.
 
-Owner of the rule: `.specify/shared/definitions/non-disposable-definitions.md` — the eight-member
+Owner of the rule: `shared/definitions/non-disposable-definitions.md` — the eight-member
 closed detection-class set (§ Detection Categories), the four-value disposition set and the
 exemption expiry model (§ Disposition Set / § Exemption), the two bridge tables
 (§ Disposition Bridge), the review surface (§ Review Surface), the supersede and renumber
@@ -10,11 +10,11 @@ protocols, the report entry and its envelope (§ Report Entry / § Report Envelo
 status-readability contradiction table (§ Status Readability) and the capture rule.
 
 Owner of the review-surface members and their order: the declaration-layer fact
-`.specify/shared/declarations/facts/non-disposable-review-surface.yaml` (`kind: closed-set`), read
-here through the single read entry `.specify/scripts/python/declaration_reader.py` — never inlined.
+`shared/declarations/facts/non-disposable-review-surface.yaml` (`kind: closed-set`), read
+here through the single read entry `scripts/python/declaration_reader.py` — never inlined.
 
-Owner of the closure verdict and its reason codes: `.specify/shared/workflow/acceptance-hardening.md`
-§ Closure Verdict, realised by `.specify/scripts/python/closure-acceptance-check.py`. This engine
+Owner of the closure verdict and its reason codes: `shared/workflow/acceptance-hardening.md`
+§ Closure Verdict, realised by `scripts/python/closure-acceptance-check.py`. This engine
 **consumes** that verdict as a subprocess and never re-derives it (C-201 / C-207).
 
 Calling surface (contract `contracts/detection-engine-cli.contract.md` C-603 / C-604):
@@ -48,11 +48,11 @@ Read-only in every mode (C-602): nothing in the repository is written — not by
 modules are imported from this file's own directory, never copied.
 
 Usage:
-  python3 .specify/scripts/python/non-disposable-check.py
-  python3 .specify/scripts/python/non-disposable-check.py --json
-  python3 .specify/scripts/python/non-disposable-check.py --roots
-  python3 .specify/scripts/python/non-disposable-check.py --emit-categories
-  python3 .specify/scripts/python/non-disposable-check.py --scope s000-of-004
+  python3 scripts/python/non-disposable-check.py
+  python3 scripts/python/non-disposable-check.py --json
+  python3 scripts/python/non-disposable-check.py --roots
+  python3 scripts/python/non-disposable-check.py --emit-categories
+  python3 scripts/python/non-disposable-check.py --scope s000-of-004
 """
 from __future__ import annotations
 
@@ -108,7 +108,7 @@ CLOSURE_CHECKER = "closure-acceptance-check.py"
 FEATURES_REL = ".specify/features.md"
 
 #: The owner page — the class set is read from it, never from a literal here (C-101).
-OWNER_PAGE_REL = ".specify/shared/definitions/non-disposable-definitions.md"
+OWNER_PAGE_REL = "shared/definitions/non-disposable-definitions.md"
 
 #: The state machine's values (owner: `data-model.md` § Entry State Machine).
 STATES = ("open", "unevaluated", "unconfirmed", "disposed", "exempt")
@@ -193,7 +193,7 @@ TASK_HEADER_RE = re.compile(r"^\*\*(?:Requirement ID|Related Feature)\*\*:\s*(\d
 
 #: The roots a path token may be repo-relative to. A token outside this set is prose, not a
 #: reference, and is never judged (C-103: only a resolvable reference is a reading).
-PATH_PREFIXES = (".specify/", ".specify/shared/", ".specify/scripts/", ".specify/templates/", "skills/", "tests/",
+PATH_PREFIXES = (".specify/", "shared/", "scripts/", "templates/", "skills/", "tests/",
                  "src/", "docs/", "agents/")
 
 
@@ -253,7 +253,7 @@ def fact_path(root: Path) -> str:
         candidate = base / "facts" / ("%s.yaml" % REVIEW_SURFACE_FACT)
         if candidate.is_file():
             return _rel(root, candidate)
-    return ".specify/shared/declarations/facts/%s.yaml" % REVIEW_SURFACE_FACT
+    return "shared/declarations/facts/%s.yaml" % REVIEW_SURFACE_FACT
 
 
 # ------------------------------------------------------------------------------------------- #
@@ -453,7 +453,7 @@ def closure_verdict(root: Path, spec_dir: Path):
     """Run the checker once and read `verdict` + `reasons` out of its payload (C-201).
 
     Three carriers, tried in order: the audited tree's own copy (the checkout under audit is
-    the only source of its verdict), the shipped `.specify/scripts/python/` beside this module, and the
+    the only source of its verdict), the shipped `scripts/python/` beside this module, and the
     `.specify/scripts/python/` mirror. A fixture tree without a checker under it therefore
     reads the checkout's, never a second implementation -- the payload is always the owner's
     checker's, which is what makes the comparison a reading rather than a guess.
@@ -862,7 +862,7 @@ def class_orphan_path(root: Path, candidates):
 FEATURE_REF_ID_RE = re.compile(r"^\|\s*Feature ID\s*\|\s*(\d{3})\s*\|", re.MULTILINE)
 TEAM_NAME_RE = re.compile(r"^(?:name|slug|team_name)\s*:\s*(.+)$", re.MULTILINE)
 TEAM_ID_RE = re.compile(r"\b(\d{3})\b")
-FEATURE_REF_PATH_RE = re.compile(r"\.specify/(?:.specify/memory/)?features/(\d{3})(?:-[a-z0-9-]+)?\.md")
+FEATURE_REF_PATH_RE = re.compile(r"\.specify/(?:memory/)?features/(\d{3})(?:-[a-z0-9-]+)?\.md")
 
 
 def class_renumber_live_binding(root: Path, candidates):
@@ -1022,7 +1022,7 @@ def class_false_closed_set(root: Path, candidates):
 
 #: The verifying engine whose closed-set count a `verification.md` may quote (corpus A2).
 TRIPLE_CHECKER = "harness-triple-check.py"
-VERIFIER_REL = ".specify/scripts/python/%s" % TRIPLE_CHECKER
+VERIFIER_REL = "scripts/python/%s" % TRIPLE_CHECKER
 
 #: A quoted closed-set count: `unclassified 0`, `findings: 0`, `findings 0`.
 CLAIM_ZERO_RE = re.compile(
@@ -1119,14 +1119,14 @@ def _falsified_measurement_claims(root: Path, candidates):
 
 #: Where a numeric constant *declares* its value. A site inside one of these files owns the
 #: constant it declares; every other site states a value and must agree with the owner.
-VALUE_OWNER_RE = re.compile(r"^(?:.specify/scripts/|\.specify/scripts/|skills/[^/]+/[^/]+/scripts/)")
+VALUE_OWNER_RE = re.compile(r"^(?:scripts/|\.specify/scripts/|skills/[^/]+/[^/]+/scripts/)")
 
 
 def _volume(relpath: str) -> str:
     """The declaring volume a site belongs to: `source`, `mirror`, a skill, or `body`."""
     if relpath.startswith(".specify/scripts/"):
         return "mirror"
-    if relpath.startswith(".specify/scripts/"):
+    if relpath.startswith("scripts/"):
         return "source"
     if re.match(r"^skills/[^/]+/[^/]+/scripts/", relpath):
         return "skill"
@@ -1136,8 +1136,8 @@ def _volume(relpath: str) -> str:
 def class_stale_constant(root: Path, candidates):
     """One numeric constant with two live values where one site is not the owner (C-105).
 
-    The owner is the declaring script (a `.specify/scripts/` module, the framework source or its
-    mirror, or a skill's own `.specify/scripts/` file); a body that restates the number is a second
+    The owner is the declaring script (a `scripts/` module, the framework source or its
+    mirror, or a skill's own `scripts/` file); a body that restates the number is a second
     site, and it is a finding exactly when its value disagrees with the owner's. Two bodies
     that disagree with each other while no script declares the name are not this class --
     that is `multi-owner` (C-104's "two independent statements"), and C-102 forbids stacking
@@ -1171,8 +1171,8 @@ def class_stale_constant(root: Path, candidates):
         stated = [site for site in sites if not site[3]]
         if not owners or not stated:
             continue
-        # The owner is the *volume* the name belongs to: `.specify/scripts/` (the framework source) or
-        # `.specify/scripts/` (its generated mirror) and a skill's own `.specify/scripts/` file. When
+        # The owner is the *volume* the name belongs to: `scripts/` (the framework source) or
+        # `.specify/scripts/` (its generated mirror) and a skill's own `scripts/` file. When
         # both volumes declare the name -- the hash-pinned mirror pair does, by construction --
         # the site in the same volume as the stating site is the owner, and the source volume
         # decides otherwise. Picking alphabetically instead would make `.specify/scripts/`
@@ -1528,7 +1528,7 @@ def class_multi_owner(root: Path, candidates):
     for relpath in candidates:
         if not relpath.endswith((".md", ".py", ".sh")):
             continue
-        if relpath.startswith(".specify/scripts/python/non-disposable-check.py"):
+        if relpath.startswith("scripts/python/non-disposable-check.py"):
             continue
         text = _read(root / relpath)
         if not text:

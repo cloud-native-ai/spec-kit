@@ -8,7 +8,7 @@ bare ``Feature 0NN`` / ``requirement 0NN`` / ``req 0NN`` attributions — those
 artifacts exist only in the Spec Kit framework project and read as dead,
 confusing paths in every downstream project.
 
-Generic placeholders (``.specify/memory/features/<ID>.md``,
+Generic placeholders (``.specify/features/<ID>.md``,
 ``[FEATURE_ID]``, ``specs/<ID>-<slug>/``) refer to the CLIENT's own registry
 and are explicitly allowed.
 
@@ -31,7 +31,7 @@ BANNED_PATTERNS = [
     re.compile(r"\b(?:req|requirement)\s+\d{3}\b", re.IGNORECASE),
     re.compile(r"\bFeature\s+\d{3}\b"),
     re.compile(r"\.specify/specs/\d{3}-"),
-    re.compile(r"\.specify/memory/features/\d{3}"),
+    re.compile(r"\.specify/features/\d{3}"),
 ]
 
 KNOWN_DEBT = {

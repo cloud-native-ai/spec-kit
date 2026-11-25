@@ -5,9 +5,9 @@ Contracts: `contracts/journal-engine.contract.md` C-01…C-13 and
 `contracts/journal-format.contract.md` C-01…C-12. The spelling face (journal filename, header
 keys, entry columns, the closed event classes with their minimum persistent evidence, retention
 classes, pointer kinds, the missing placeholder and the escape rule) is read from
-`.specify/shared/declarations/facts/journal-format.yaml` through `.specify/scripts/python/declaration_reader.py`;
-valid stage names come from `.specify/shared/declarations/facts/driver-stage-sequence.yaml` and the
-completion-sentinel template from `.specify/shared/declarations/facts/driver-completion-sentinels.yaml`.
+`shared/declarations/facts/journal-format.yaml` through `scripts/python/declaration_reader.py`;
+valid stage names come from `shared/declarations/facts/driver-stage-sequence.yaml` and the
+completion-sentinel template from `shared/declarations/facts/driver-completion-sentinels.yaml`.
 This module holds no second copy of any of them.
 
 Two actions, a closed exit-code set: `append` projects carrier facts into `<spec-dir>/journal.md`

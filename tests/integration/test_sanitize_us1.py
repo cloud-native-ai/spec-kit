@@ -79,7 +79,7 @@ def test_us1_collect_record_status_flow(tmp_path):
     payload = json.loads(proc.stdout)
     candidates = payload["semanticCandidates"]
     by_material = {c["material"]: c for c in candidates}
-    backlog = by_material[".specify/memory/todo/20260812-backlog.md"]
+    backlog = by_material[".specify/todo/20260812-backlog.md"]
     assert any("land all five items" in line for line in backlog["evidencePack"]["gitLog"])
     assert any("未落地" in claim for claim in backlog["claims"])
     landing_hash = next(
@@ -87,7 +87,7 @@ def test_us1_collect_record_status_flow(tmp_path):
         if "land all five items" in line)
 
     # 2) agent verdicts: only the grounded material is judged stale-residue
-    target = ".specify/memory/todo/20260812-backlog.md"
+    target = ".specify/todo/20260812-backlog.md"
     finding = {
         "id": hashlib.sha1(f"stale-residue|{target}".encode()).hexdigest()[:12],
         "category": "stale-residue",
@@ -130,14 +130,14 @@ def test_us1_collect_record_status_flow(tmp_path):
     assert new_files == {STORE_REL.as_posix(), "verdicts.json"}, f"unexpected writes: {new_files}"
 
     # insufficient-evidence material never entered the store
-    assert all(f["target"] != ".specify/memory/todo/20260812-vague.md" for f in store["findings"])
+    assert all(f["target"] != ".specify/todo/20260812-vague.md" for f in store["findings"])
 
 
 def test_us1_record_rejects_ungrounded_semantic_finding(tmp_path):
     """A semantic verdict without commit/path evidence is schema-rejected (C-3)."""
     ws = assemble_workspace(tmp_path)
     run_engine(["--action", "collect", "--workspace-root", str(ws)], cwd=ws)
-    target = ".specify/memory/todo/20260812-backlog.md"
+    target = ".specify/todo/20260812-backlog.md"
     finding = {
         "id": hashlib.sha1(f"stale-residue|{target}".encode()).hexdigest()[:12],
         "category": "stale-residue", "target": target, "severity": "high",

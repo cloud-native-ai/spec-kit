@@ -11,26 +11,26 @@ resolve_resource = skills_utils.resolve_resource
 
 def test_resolve_by_resource_id_returns_same_artifact(tmp_path: Path):
     workspace = tmp_path
-    tool_record = workspace / ".specify" / "memory" / "tools" / "git-status.md"
+    tool_record = workspace / ".specify" / "tools" / "git-status.md"
     tool_record.parent.mkdir(parents=True, exist_ok=True)
     tool_record.write_text("# Tool Record\n", encoding="utf-8")
 
     result = resolve_resource(
         workspace_root=workspace,
-        requested_id="<TOOL:.specify/memory/tools/git-status.md>",
+        requested_id="<TOOL:.specify/tools/git-status.md>",
         expected_type="tool",
     )
 
     assert result.result_type == "resolved"
     assert result.resolved_type == "tool"
-    assert result.resolved_id == "<TOOL:.specify/memory/tools/git-status.md>"
+    assert result.resolved_id == "<TOOL:.specify/tools/git-status.md>"
 
 
 def test_resolve_stale_resource_id_returns_stale_error(tmp_path: Path):
     with pytest.raises(ResourceIdError) as exc_info:
         resolve_resource(
             workspace_root=tmp_path,
-            requested_id="<TOOL:.specify/memory/tools/missing.md>",
+            requested_id="<TOOL:.specify/tools/missing.md>",
             expected_type="tool",
         )
     assert exc_info.value.code == "stale-id"

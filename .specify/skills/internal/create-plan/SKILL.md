@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/create-plan/SKILL.md>"
 
 # create-plan
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -22,7 +22,7 @@ advanced to match. This skill owns the executable core of `/speckit.plan` — Ou
 `scripts:` block, the User Input Protocol, and the wrap-up lifecycle (Feedback /
 Documentation / Artifact Commit / Handoffs).
 
-Canonical extraction source: `.specify/templates/commands/plan.md` § Outline (steps 1–5), § Feature
+Canonical extraction source: `templates/commands/plan.md` § Outline (steps 1–5), § Feature
 Integration, § Phases (Phase 0 / Phase 1), and § Post-Generation Quality Gate. Content
 moved here verbatim in substance.
 
@@ -34,7 +34,7 @@ moved here verbatim in substance.
   fails fast on a stale or ambiguous spec).
 - **Setup variables**: FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH come from the command's
   `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `.specify/scripts/bash/create-new-plan.sh --json`, run from repo root); all paths used below are
+  `scripts/bash/create-new-plan.sh --json`, run from repo root); all paths used below are
   absolute.
 - **User parameters**: arrive already processed by the command's User Input Protocol
   (parameters for the run, never a standalone instruction overriding the workflow); this
@@ -72,7 +72,7 @@ Load the IMPL_PLAN template (already copied).
 
 - Check if `SPECS_DIR/research.md` exists. If so, read it.
 - **Crucial**: also read and analyze the project's **existing documentation**
-  (`README.md`, `docs/`) and **feature memory** (`.specify/memory/`) to ensure the plan
+  (`README.md`, `docs/`) and the **memory tiers** (`.specify/session/`, `.specify/knowledge/`) to ensure the plan
   aligns with the system's architecture and evolution.
 
 ### Step 4 — Implement plan workflow
@@ -131,11 +131,11 @@ Follow the structure in the IMPL_PLAN template to:
 
 ### Step 4.5 — Concurrency of this stage (default-concurrent)
 
-The plan stage is an execution body under the framework concurrency obligation (`.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation — the one authored text; this step references it, never restates it). Concretely:
+The plan stage is an execution body under the framework concurrency obligation (`shared/definitions/subagent-definitions.md` § The Concurrency Obligation — the one authored text; this step references it, never restates it). Concretely:
 
 - **Partition**: the stage's work is partitioned into its units (research, the design artifacts, the feature-registry update, the post-generation verification) before an execution shape is chosen; the replayable partition rule is `decompose-plan-v1`.
-- **Default concurrent**: independent units with file-level, pairwise-disjoint write domains run concurrently whenever a legal process carrier is available and the budget allows (the fork/subprocess carriers defined in the obligation's owner; the host-internal in-process path is not a carrier). A serial shape MUST name a reason code from `.specify/shared/declarations/facts/serial-reason.yaml` with its declared evidence form.
-- **Record the reading**: the stage records its own `requested` / `effective` / `effective_reason` triple in the plan's execution record (`not_evaluated` where intervals are absent). The fields, the codes and the slot/reserve values live in `.specify/shared/declarations/facts/` — read them, never restate them here.
+- **Default concurrent**: independent units with file-level, pairwise-disjoint write domains run concurrently whenever a legal process carrier is available and the budget allows (the fork/subprocess carriers defined in the obligation's owner; the host-internal in-process path is not a carrier). A serial shape MUST name a reason code from `shared/declarations/facts/serial-reason.yaml` with its declared evidence form.
+- **Record the reading**: the stage records its own `requested` / `effective` / `effective_reason` triple in the plan's execution record (`not_evaluated` where intervals are absent). The fields, the codes and the slot/reserve values live in `shared/declarations/facts/` — read them, never restate them here.
 
 ### Step 5 — Plan integrity gate + stop and report
 
@@ -242,11 +242,11 @@ linked to their corresponding entries in the project's feature index.
 
 3. **Record feature binding** → `feature-ref.md`: the bound Feature ID/name and how this
    plan maps to it (see the plan template's Project Structure —
-   `.specify/templates/plan-template.md`).
+   `templates/plan-template.md`).
 
 **Output**: data-model.md, /contracts/*, quickstart.md, feature-ref.md (records the bound
 Feature ID/name and how this plan maps to it — see the plan template's Project Structure,
-`.specify/templates/plan-template.md`)
+`templates/plan-template.md`)
 
 ## Post-Generation Quality Gate: Contract Artifact Cleanup
 
@@ -314,7 +314,7 @@ After generating all Phase 1 artifacts (especially contract documents under
   (before/after command sequencing and next-command suggestions) are command surfaces,
   not skill content.
 - **Templates and shared conventions stay pointers**: the plan template being filled is
-  referenced via IMPL_PLAN (`.specify/templates/plan-template.md`); the feature status state
+  referenced via IMPL_PLAN (`templates/plan-template.md`); the feature status state
   machine is owned by `.specify/templates/feature-details-template.md`; the mid-run
   addendum protocol by `.specify/shared/workflow/user-input-protocol.md`; the
   same-author delegation gate by `.specify/shared/workflow/objective-analysis-gate.md`;

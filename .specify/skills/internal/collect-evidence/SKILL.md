@@ -7,7 +7,7 @@ classification: internal
 
 # collect-evidence
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -16,9 +16,9 @@ classification: internal
 
 ## Path Conventions
 
-- 引擎:`.specify/scripts/python/evidence-utils.py`(镜像 `.specify/scripts/python/`)
-- 采集子集:`.specify/scripts/js/better-harness/`(镜像 `.specify/scripts/js/better-harness/`,溯源见其 `UPSTREAM.md`)
-- 证据存储:`.specify/memory/evidence/<run-id>/{findings.json,manifest.json,lanes/}`;索引不落盘,由运行目录**即读即建**(并发流程各写各的 `ev-*` 目录,不共享可写索引)
+- 引擎:`.specify/scripts/python/evidence-utils.py`(镜像 `scripts/python/`)
+- 采集子集:`scripts/js/better-harness/`(镜像 `.specify/scripts/js/better-harness/`,溯源见其 `UPSTREAM.md`)
+- 证据存储:`.specify/evidence/<run-id>/{findings.json,manifest.json,lanes/}`;索引不落盘,由运行目录**即读即建**(并发流程各写各的 `ev-*` 目录,不共享可写索引)
 - 消费约定(供 improve-* 等引用,本技能不执行):`.specify/shared/workflow/evidence-step.md`
 
 ## Workflow
@@ -28,7 +28,7 @@ classification: internal
 从用户输入解析:
 
 - **目标单元**(必填):`skill:<name>` / `/speckit.<cmd>` / `project`(整仓;缺省值)
-- **泳道**:`.specify/shared/declarations/facts/evidence-lanes.yaml#/statement` 所列泳道的子集,或 `all`(缺省 all;成员与次序由该声明单一拥有,本行不重列)
+- **泳道**:`shared/declarations/facts/evidence-lanes.yaml#/statement` 所列泳道的子集,或 `all`(缺省 all;成员与次序由该声明单一拥有,本行不重列)
 - **时间窗**:`--since/--until`(ISO 8601,可缺省)
 - **深度**:`quick|normal`(缺省 normal;normal 含依赖治理信号)
 - **平台**:`qoder|codex|claude|...`(缺省 qoder;影响 session/assets 泳道)
@@ -48,7 +48,7 @@ python3 .specify/scripts/python/evidence-utils.py --action collect \
   --target <unit-id> --lanes <lanes> [--since ... --until ...] [--depth ...] [--platform ...]
 ```
 
-呈现采集结果:run 目录路径、各泳道状态(available/partial/unavailable)、证据条数、findingsDigest,以及**按 evidenceState 分布的摘要**(每个 declared state 各多少条;状态成员由 `.specify/shared/declarations/facts/evidence-seven-states.yaml#/statement` 单一拥有,语义由 `references/evidence-discipline.md` 拥有)。单泳道失败是显式降级而非错误——manifest 中带 reason,照常继续。
+呈现采集结果:run 目录路径、各泳道状态(available/partial/unavailable)、证据条数、findingsDigest,以及**按 evidenceState 分布的摘要**(每个 declared state 各多少条;状态成员由 `shared/declarations/facts/evidence-seven-states.yaml#/statement` 单一拥有,语义由 `references/evidence-discipline.md` 拥有)。单泳道失败是显式降级而非错误——manifest 中带 reason,照常继续。
 
 复用场景:目标单元 7 天内已有证据时可先 `--action latest`;返回 `stale: true` 时必须向用户转述超龄警告,由用户决定复用或重采。
 

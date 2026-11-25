@@ -493,16 +493,16 @@ def test_c56_changed_paths_stay_on_the_declared_edit_surface():
         "templates/commands/review.md",
         # ID register is updated by review's REC-registration duty (071/063
         # obligations) — a legitimate project record, not a hand edit of
-        # framework sources. Narrow exact entry; do NOT widen .specify/memory/.
+        # framework sources. Narrow exact entry; do NOT widen the runtime-store prefixes.
         ".specify/register.md",
     }
     allowed_prefixes = (
         "docs/reference/commands/",   # command reference docs (C-56)
         ".specify/specs/072-client-self-improvement/",   # this feature's spec artifacts
         ".specify/features",    # feature registry rows (072 line + detail)
-        ".specify/memory/exec-quant/records/",   # dogfooding loop records (new entries only)
-        ".specify/memory/session/",                # dogfooding loop records (new entries only)
-        ".specify/memory/feedback/",               # dogfooding loop records (new entries only)
+        ".specify/exec-quant/records/",   # dogfooding loop records (new entries only)
+        ".specify/session/",                # dogfooding loop records (new entries only)
+        ".specify/feedback/",               # dogfooding loop records (new entries only)
         "tests/contract/", "tests/fixtures/",      # contract tests are the declared surface
         ".claude/commands/", ".github/prompts/",
         ".opencode/command/", ".qoder/commands/",  # per-tool copies (regenerated)
@@ -684,7 +684,7 @@ def test_c59_vendored_framework_source_takes_the_framework_branch(vendored_dir):
 def test_c60_no_existing_feedback_entry_or_review_report_modified():
     modified_or_deleted = git(
         "diff", "--diff-filter=MD", "--name-only", f"{BASELINE_COMMIT}..{FEATURE_HEAD}", "--",
-        ".specify/memory/feedback/", ".specify/review/",
+        ".specify/feedback/", ".specify/review/",
     )
     assert modified_or_deleted == "", (
         "C-60: no existing review report or feedback entry may be modified or "

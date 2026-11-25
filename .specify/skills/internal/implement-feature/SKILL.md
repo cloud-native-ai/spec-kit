@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/implement-feature/SKILL.md>"
 
 # implement-feature
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -20,7 +20,7 @@ loop, and the commit discipline — while the command template keeps entry, the 
 block, user-input handling, and the wrap-up lifecycle (Feature Integration / Feedback /
 Documentation / Handoffs).
 
-Canonical extraction source: `.specify/templates/commands/implement.md` § Outline (steps 1–9), §
+Canonical extraction source: `templates/commands/implement.md` § Outline (steps 1–9), §
 Mid-Run User Directives, § Optional: Long-Run Mode, the Fast Fail instance pointer, and §
 Optional: Git Commit. Content moved here verbatim in substance.
 
@@ -28,7 +28,7 @@ Optional: Git Commit. Content moved here verbatim in substance.
 
 - **Feature artifacts**: `REQUIREMENTS_DIR` and `AVAILABLE_DOCS` come from the command's
   `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`); all paths
+  `scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`); all paths
   must be absolute. `tasks.md` and `plan.md` are REQUIRED inputs (step 3).
 - **User parameters**: arrive already processed by the command's User Input Protocol —
   treated as command parameters, never as standalone instructions.
@@ -179,7 +179,7 @@ reports success. Use `;`, or append `|| true`, and confirm the chain's tail actu
 executed.
 
 **Test runs — the runner is the only entry**: every test execution in this skill MUST go through
-`.specify/scripts/bash/run-tests.sh` (its default is the parallel form `-n <effective> --dist load`; test
+`scripts/bash/run-tests.sh` (its default is the parallel form `-n <effective> --dist load`; test
 paths and further arguments are forwarded to the framework — single-test debugging included, it
 MUST NOT be used as a reason to bypass the runner). Direct interpreter-level test commands (the
 bare test CLI or its `-m` module entry) are forbidden here, and a pipeline that pipes test output
@@ -196,7 +196,7 @@ unanchored baseline produces refactor-unrelated false diffs that need a live con
 experiment to attribute.
 
 **Assert suite collection, not just totals**: when a task expects a specific suite to
-run, verify that suite's collection count (`bash .specify/scripts/bash/run-tests.sh <path> --collect-only -q`) is non-zero
+run, verify that suite's collection count (`bash scripts/bash/run-tests.sh <path> --collect-only -q`) is non-zero
 / matches intent — the test framework only collects `test_*.py` by default, so suites named otherwise
 (e.g. `contract_*.py`) are silently skipped while the total pass count stays green.
 
@@ -210,9 +210,9 @@ hard-coded `len(...) == N`) and update them in the same task.
 **Commit discipline**: wrap-up metadata fix-ups (verification stamps, mirror syncs) go
 into NEW commits — never `--amend` an already-created commit.
 
-**Command/template edits**: after editing anything under `.specify/templates/commands/`, regenerate
+**Command/template edits**: after editing anything under `templates/commands/`, regenerate
 every per-tool copy and the `.specify` mirror with
-`python3 .specify/scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync
+`python3 scripts/python/regen-command-copies.py` (verify with `--check`) — never hand-sync
 the 5 tool dirs.
 
 ### Step 7 — Progress tracking
@@ -225,7 +225,7 @@ the 5 tool dirs.
   Never leave deferred work as `[ ]`. When a `[~]` makes the Completion Gate (step 8) fail,
   that fail is an EXPECTED outcome — it MUST NOT be turned green by rewriting the task
   description or relaxing the gate criteria (the task-side disposition forms are owned by
-  `.specify/templates/tasks-template.md` § Task State Sigil).
+  `templates/tasks-template.md` § Task State Sigil).
 - **Evidence-backed closure — Gate Function (IDENTIFY→RUN→READ→VERIFY→CLAIM)**: only mark
   `[X]` for work you have actually executed and verified. Before every completion claim:
   IDENTIFY the command that proves the work (test id, build, grep, diff of the named target
@@ -265,10 +265,10 @@ All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass.
   total), and its current value is written into `verification.md` so a resumed run reads
   the real count instead of inheriting a stale one.
 - **Closure verdict re-validation** (the status-liberating judgement): re-run
-  `python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` against the
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` against the
   tree this gate is about to close, exactly as Step 9 states it. A verdict read earlier in the run
   is a measurement of an older tree, not evidence about this one — and the four conditions it
-  answers are owned by `.specify/shared/workflow/acceptance-hardening.md`, not by this step.
+  answers are owned by `shared/workflow/acceptance-hardening.md`, not by this step.
 
 - **Gate-premise decay** (named action): when a premise a gate item or DoD row rests on —
   a frozen SHA, a line number, a count — is falsified by measurement, re-reference the
@@ -329,9 +329,9 @@ narrow it to a subset (a gate or DoD row reading `pass|deferred` silently forbid
 honest `partial`).
 
 - **Closure verdict — the status-landing judgement**: before the flip, run
-  `python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` from the
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` from the
   repository root. That command is the one source of the verdict, the closed reason set and the
-  `final_path` counts; their schema owner is `.specify/shared/workflow/acceptance-hardening.md` § Closure
+  `final_path` counts; their schema owner is `shared/workflow/acceptance-hardening.md` § Closure
   Verdict, and this step calls it by path instead of restating a condition. It MUST NOT be
   replaced by a model judgement, another script, or an ad-hoc grep over the artifacts. On `block`,
   land `Blocked` — recording the emitted reasons in `verification.md` — and MUST NOT write
@@ -354,7 +354,7 @@ honest `partial`).
 
 When the user changes scope or adds a design constraint while the implementation run is
 in progress, do NOT improvise: apply the Scope Revision Protocol from
-`.specify/templates/commands/clarify.md` adapted to implement:
+`templates/commands/clarify.md` adapted to implement:
 
 1. **Upstream first**: amend `requirements.md` (FR/SC/entities/edge cases) and record the
    directive verbatim under `## Clarifications` (dated, append-only — never replace
@@ -401,7 +401,7 @@ supported agent tools as pure prompt flow (no Stop-hook required).
 
 Fallback for runs whose phase-boundary commits were declined or skipped (see the Commit
 gate's approval routing in step 8). After implementation, generate commit command using
-`.specify/templates/commit-template.md`:
+`templates/commit-template.md`:
 
 - Collect: BRANCH, REQUIREMENTS_KEY, FEATURE_TITLE, TYPE, SCOPE, SUBJECT
 - Display `git add -A && git commit -m "{msg}"` — only execute on explicit user approval
@@ -416,7 +416,7 @@ gate's approval routing in step 8). After implementation, generate commit comman
   this skill's Pre-Status-Flip Gate passes; the gate protocol itself is owned by
   `.specify/shared/workflow/feature-integration.md` (pointer, never restatement).
 - **Task-side disposition forms** (how a `[~]` is recorded and dispositioned on the task
-  side) are owned by `.specify/templates/tasks-template.md` § Task State Sigil — this skill only
+  side) are owned by `templates/tasks-template.md` § Task State Sigil — this skill only
   consumes and updates `tasks.md` rows per the rules above.
 - **Standalone scope clarification** (a clarify pass outside a running implementation)
   belongs to `/speckit.clarify`; only the mid-run adaptation above lives here.

@@ -33,15 +33,15 @@ LIVE_SURFACES = (
     ".qoder/commands/speckit.team.md",
     ".opencode/command/speckit.team.md",
     "docs/reference/commands/team.md",
-    ".specify/memory/tools/build-summary-input.py.md",
+    ".specify/tools/build-summary-input.py.md",
 )
 
 #: Prefixes whose files are history and MUST be left alone (RS-1).
 HISTORICAL_PREFIXES = (
     ".specify/specs/036-team-summary/",
     ".specify/specs/037-goal-registry/",
-    ".specify/memory/feedback/",
-    ".specify/memory/features",
+    ".specify/feedback/",
+    ".specify/features",
     # Team run workspaces (.specify/teams/.work/**) are git-ignored scratch that may
     # hold dated copies of live files (e.g. s3-sweep test snapshots); they are records,
     # not live faces — same rationale as the feedback store above.
@@ -51,7 +51,7 @@ HISTORICAL_PREFIXES = (
 #: The sanitize findings ledger (Feature 047) is a machine-generated observation
 #: cache that records dead references to renamed paths by design.
 RUNTIME_CACHE_PREFIXES = (
-    ".specify/memory/sanitize/",
+    ".specify/sanitize/",
     # 2026-11-06 Feature 085: full-suite evidence records may quote pre-existing
     # failure text that names the old path; a generated evidence cache is not a
     # live face and must not be read as one.

@@ -140,7 +140,7 @@ If the guide exists, read it and apply the agent-specific tool mappings, best pr
 If you encounter an agent-specific obstacle during execution (e.g., a tool call is unavailable, output format doesn't match expectations, a workaround was needed), generate a feedback document at:
 
 ```
-.specify/memory/feedback/improve-agent-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+.specify/feedback/improve-agent-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
 ```
 
 The feedback document MUST contain:

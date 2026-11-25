@@ -25,8 +25,8 @@ baseline.
 - Walk **upward** from the start directory and return the first ancestor `p` where:
   - `p/.specify/` is a directory, and
   - `p` is not named `.specify`, and
-  - `.specify/` looks like a Spec Kit store: it contains at least one of `memory/`,
-    `scripts/`, `templates/` (this skips a stray empty `.specify/`).
+  - `.specify/` looks like a Spec Kit store: it contains at least one of `session/`,
+    `knowledge/`, `scripts/`, `templates/` (this skips a stray empty `.specify/`).
 - **If no such ancestor is found, refuse to execute.** Report the start path searched and
   the remediation:
   - run `sdd-project-setup` in `install` mode, or

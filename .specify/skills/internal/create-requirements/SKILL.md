@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/create-requirements/SKILL.md>"
 
 # create-requirements
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -18,7 +18,7 @@ numbering space, aligned with house conventions, and validated by the determinis
 checker before anything downstream may start.
 
 Owning command: `/speckit.requirements`. Canonical extraction source:
-`.specify/templates/commands/requirements.md` § Outline 1–8 (short-name derivation, branch-number
+`templates/commands/requirements.md` § Outline 1–8 (short-name derivation, branch-number
 derivation, execution steps 5.1–5.12, quality validation) plus § Glossary, § Feature
 Integration and § Guidelines. Content moved here verbatim in substance; the command
 template keeps entry, input wiring, and lifecycle delegation only.
@@ -67,7 +67,7 @@ not been read yet".
 
 ### 4. Load the template
 
-Load `.specify/templates/requirements-template.md` for the required sections.
+Load `templates/requirements-template.md` for the required sections.
 
 ### 5. Execute spec generation
 
@@ -83,7 +83,7 @@ Load `.specify/templates/requirements-template.md` for the required sections.
 4. **Peek at house conventions (bounded, summary-first)**: sample the highest-numbered
    existing spec directory under `.specify/specs/<NNN>-<slug>/` and read its
    **`requirements.md`** — the same artifact filename this skill writes (SPEC_FILE,
-   step 3), and the same one `.specify/templates/requirements-template.md` scaffolds — with
+   step 3), and the same one `templates/requirements-template.md` scaffolds — with
    targeted excerpts: heading structure (`grep -n '^#'`), one user story, a few FR/SC
    lines, instead of reading the whole spec (see
    `.specify/shared/guidelines/token-efficiency.md`). Match its language, section
@@ -125,7 +125,7 @@ default values (`Related Feature: Need clarification`) — binding is not this r
 
 ### 7. Quality validation (checker FIRST, checklist postponed)
 
-Run the deterministic checker FIRST — `python3 .specify/scripts/python/validate-requirements.py SPEC_FILE` — and present its output **verbatim** (do not paraphrase or condense it). If
+Run the deterministic checker FIRST — `python3 scripts/python/validate-requirements.py SPEC_FILE` — and present its output **verbatim** (do not paraphrase or condense it). If
 it reports any ERROR, **STOP** and fix the spec, re-running until it exits 0: the
 checklist and the clarification loop both come after, and neither may start while an
 ERROR stands.

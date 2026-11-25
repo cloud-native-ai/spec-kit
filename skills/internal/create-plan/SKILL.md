@@ -72,7 +72,7 @@ Load the IMPL_PLAN template (already copied).
 
 - Check if `SPECS_DIR/research.md` exists. If so, read it.
 - **Crucial**: also read and analyze the project's **existing documentation**
-  (`README.md`, `docs/`) and **feature memory** (`.specify/memory/`) to ensure the plan
+  (`README.md`, `docs/`) and the **memory tiers** (`.specify/session/`, `.specify/knowledge/`) to ensure the plan
   aligns with the system's architecture and evolution.
 
 ### Step 4 — Implement plan workflow

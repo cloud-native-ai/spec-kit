@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-constitution/SKILL.md>"
 
 # manage-constitution
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -18,7 +18,7 @@ a TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME
 template precisely, and (c) propagate any amendments across dependent artifacts.
 
 Owning command: `/speckit.constitution`. Canonical extraction source:
-`.specify/templates/commands/constitution.md` § Pre-flight and execution flow steps 1–8 — including
+`templates/commands/constitution.md` § Pre-flight and execution flow steps 1–8 — including
 the `x.y.z.ddd` version-increment rules, the consistency-propagation checklist, and the Sync
 Impact Report format. Content moved here in substance; the command template keeps entry,
 user-input handling, and handoffs only.
@@ -351,7 +351,7 @@ Write the completed constitution to `/.specify/constitution.md` (overwrite).
   re-checking plans after a "Constitution Check" change (`/speckit.plan`) — is routed by the
   owning command's Handoffs, not re-invoked here.
 - User-input processing and handoff wiring stay with the command template
-  (`.specify/templates/commands/constitution.md`); this skill starts from the processed intent.
+  (`templates/commands/constitution.md`); this skill starts from the processed intent.
 
 ## Wrap-up
 

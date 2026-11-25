@@ -10,7 +10,7 @@ invocation. The allowlist is EXACTLY:
 
 1. the runner itself (``scripts/bash/run-tests.sh``);
 2. ``tests/fixtures/**`` (fixture data, not an execution instruction);
-3. dated records (``.specify/memory/{session,feedback,history,evidence}/**`` and any
+3. dated records (``.specify/{session,feedback,history,evidence}/**`` and any
    ``test-evidence/**`` path);
 4. feature spec trees (``.specify/specs/**`` — planning records, not execution
    instructions).
@@ -41,10 +41,10 @@ SCAN_EXTRA = (".specify/instructions.md",)
 RUNNER_PATH = "scripts/bash/run-tests.sh"
 ALLOWED_PREFIXES = (
     "tests/fixtures/",
-    ".specify/memory/session/",
-    ".specify/memory/feedback/",
-    ".specify/memory/history/",
-    ".specify/memory/evidence/",
+    ".specify/session/",
+    ".specify/feedback/",
+    ".specify/history/",
+    ".specify/evidence/",
     ".specify/specs/",
 )
 
@@ -96,10 +96,10 @@ def _scan(paths, root=REPO_ROOT):
 def test_allowlist_is_the_exact_closed_set():
     assert _is_allowlisted(RUNNER_PATH)
     assert _is_allowlisted("tests/fixtures/wp_fixtures.py")
-    assert _is_allowlisted(".specify/memory/session/2026-11-09-note.md")
-    assert _is_allowlisted(".specify/memory/feedback/x.md")
-    assert _is_allowlisted(".specify/memory/history/x.md")
-    assert _is_allowlisted(".specify/memory/evidence/x.jsonl")
+    assert _is_allowlisted(".specify/session/2026-11-09-note.md")
+    assert _is_allowlisted(".specify/feedback/x.md")
+    assert _is_allowlisted(".specify/history/x.md")
+    assert _is_allowlisted(".specify/evidence/x.jsonl")
     assert _is_allowlisted(".specify/specs/093-concurrency-by-default/tasks.md")
     assert not _is_allowlisted("skills/internal/implement-feature/SKILL.md")
     assert not _is_allowlisted("docs/reference/history/00-cross-cutting-lessons.md")

@@ -2055,13 +2055,28 @@ class TestScenarioGClosedSetDelta:
         removed, added = diff_lines(CRITIQUE)
         allowed_added = quartet_section_lines()
 
-        assert removed == [], (
+        def _store_layout_mapped(line: str) -> str:
+            """Feature 105's mechanical live-path rewrite: `.specify/memory/<store>/` -> `.specify/<store>/`.
+
+            A removed line whose only change is that rewrite is not a rewrite of the
+            record: the sentence survives byte-identically apart from the current path.
+            """
+            return re.sub(r"\.specify/memory/([a-z0-9_-]+)/", r".specify/\1/", line)
+
+        unmapped_removed = [line for line in removed if _store_layout_mapped(line) not in added]
+        assert unmapped_removed == [], (
             "the quartet rides BELOW the one-line falsification paragraph: zero deleted or "
-            f"rewritten lines are allowed in this file; removed {removed!r}"
+            "rewritten lines are allowed in this file (feature 105's live-path mapping is the "
+            f"only rewrite the delta may carry); removed {unmapped_removed!r}"
         )
-        assert added == allowed_added, (
-            "the only added paragraph must be the quartet subsection; outside-the-set "
-            f"additions: {[line for line in added if line not in allowed_added]!r}"
+        outside = [
+            line for line in added
+            if line not in allowed_added
+            and not any(_store_layout_mapped(old) == line for old in removed)
+        ]
+        assert outside == [], (
+            "the only added paragraph must be the quartet subsection, plus feature 105's "
+            f"mapped path lines; outside-the-set additions: {outside!r}"
         )
 
         # Structural invariants inside the delta: the four literal keys are each written once,
@@ -2075,8 +2090,13 @@ class TestScenarioGClosedSetDelta:
         baseline_parent = h2_section(git_show(CRITIQUE), QUARTET_PARENT_HEADING)
         live_parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
         parent_lines = [line for line in baseline_parent.splitlines()]
-        assert all(line in live_parent.splitlines() for line in parent_lines), (
-            "the pre-existing 「每个提案一条证伪尝试」 paragraph must survive verbatim"
+        live_parent_lines = live_parent.splitlines()
+        assert all(
+            line in live_parent_lines or _store_layout_mapped(line) in live_parent_lines
+            for line in parent_lines
+        ), (
+            "the pre-existing 「每个提案一条证伪尝试」 paragraph must survive verbatim "
+            "(feature 105's live-path mapping is the only permitted line change)"
         )
 
     # --- item counts never fall below the baseline -------------------------

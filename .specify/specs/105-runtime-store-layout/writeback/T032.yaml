@@ -1,0 +1,5 @@
+task: T032
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: [green contracts/store-layout.contract.md#C-6] guard run via run-tests.sh exit 1 / 9 passed 1 failed (test-evidence/t032-guard-run.txt) — allowlist equality both directions, per-file line rules, pinned-copy equality, tests-class confinement and mirror member set all green; the single red is test_runtime_store_layout.py::test_repo_has_no_retired_root, owned by the T033 dogfood and closed there; four L-5 mutation drills executed and restored with checksum equality and py_compile OK (test-evidence/mutation-drill.md); readings in notes/red-first-evidence.md § T032
+at: 2026-11-25T09:00:00Z

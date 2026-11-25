@@ -1,0 +1,76 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_store_layout_live_refs.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_allowlisted_files_keep_only_allowed_lines ________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_allowlisted_files_keep_only_allowed_lines():
+        """L-5 item 2: every matching line inside an allowlisted file satisfies its line rule."""
+        for relpath, rules in ALLOWLIST.items():
+            hits = _matching_lines(relpath)
+            assert hits, f"{relpath}: the allowlisted file must carry at least one occurrence"
+            off_rule = [
+                (number, line.strip()[:160])
+                for number, line in hits
+                if not any(rule.search(line) for rule in rules)
+            ]
+>           assert not off_rule, (
+                f"{relpath}: the literal escaped its allowed lines (L-5): {off_rule}"
+            )
+E           AssertionError: shared/declarations/facts/runtime-store-layout.yaml: the literal escaped its allowed lines (L-5): [(10, '# `.specify/memory/<name>/` is derived the same way by the migration engine. A second list of'), (125, 'note: "Only `session` and `knowledge` are seeded by `specify init`; every other store is created lazily by its owner, and the retired container `.specify/memory')]
+E           assert not [(10, '# `.specify/memory/<name>/` is derived the same way by the migration engine. A second list of'), (125, 'note: "...eded by `specify init`; every other store is created lazily by its owner, and the retired container `.specify/memory')]
+
+tests/contract/test_store_layout_live_refs.py:198: AssertionError
+____________ test_product_class_occurrence_sets_equal_the_allowlist ____________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_product_class_occurrence_sets_equal_the_allowlist():
+        """L-5 item 1: measured occurrence sets equal the declared allowlist, both directions."""
+        measured = _measured_product_sets()
+        for class_name in PRODUCT_CLASSES:
+            declared = {relpath for relpath in ALLOWLIST if _class_of(relpath) == class_name}
+>           assert measured[class_name] == declared, (
+                f"{class_name}: unexpected={sorted(measured[class_name] - declared)} "
+                f"missing={sorted(declared - measured[class_name])}"
+            )
+E           AssertionError: framework-source: unexpected=['shared/declarations/facts/non-disposable-review-surface.yaml', 'shared/definitions/derivation-definitions.md', 'shared/definitions/non-disposable-definitions.md', 'shared/definitions/probe-definitions.md', 'shared/definitions/self-explanatory-definitions.md', 'shared/definitions/subagent-definitions.md', 'shared/guidelines/confirmation-gates.md', 'shared/guidelines/critique-and-self-critique.md', 'shared/guidelines/reporting-obligations.md', 'shared/guidelines/todo-in-context.md', 'shared/patterns/interview-pattern.md', 'shared/workflow/acceptance-hardening.md', 'shared/workflow/agent-configuration.md', 'shared/workflow/artifact-commit-step.md', 'shared/workflow/evidence-step.md', 'shared/workflow/feedback-step.md', 'shared/workflow/runtime-mode.md', 'shared/workflow/tool-reuse-gate.md', 'skills/external/coaching-skills/SKILL.md', 'skills/external/coaching-skills/data-model.md', 'skills/external/coaching-skills/references/prompt-templates.md', 'skills/external/create-docs/SKILL.md', 'skills/external/draw-diagram/SKILL.md', 'skills/external/draw-diagram/references/routing-matrix.md', 'skills/external/git-utils/SKILL.md', 'skills/external/git-utils/references/bootstrap-commands.md', 'skills/external/git-utils/references/health-check-commands.md', 'skills/external/git-utils/references/instructions-lookup.md', 'skills/external/git-utils/references/troubleshooting.md', 'skills/external/improve-docs/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/sdd-house-keeping/SKILL.md', 'skills/external/sdd-house-keeping/references/maintenance-recipes.md', 'skills/external/sdd-project-setup/references/setup-recipes.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/code-review/scripts/git-delta-review.sh', 'skills/internal/collect-evidence/SKILL.md', 'skills/internal/collect-evidence/references/evidence-contract.md', 'skills/internal/create-agent/SKILL.md', 'skills/internal/create-plan/SKILL.md', 'skills/internal/create-team/SKILL.md', 'skills/internal/create-tools/SKILL.md', 'skills/internal/improve-agent/SKILL.md', 'skills/internal/improve-tools/SKILL.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/manage-feedback/references/path-a-digest.md', 'skills/internal/manage-feedback/references/path-b-and-probe.md', 'skills/internal/manage-history/SKILL.md', 'skills/internal/manage-instructions/SKILL.md', 'skills/internal/manage-todo/SKILL.md', 'skills/internal/run-interview/SKILL.md', 'skills/internal/sanitize-materials/SKILL.md', 'skills/internal/study-kb/SKILL.md', 'skills/internal/summarize-project/references/consistency-rules.md', 'templates/commands/feedback.md', 'templates/commands/improve.md', 'templates/commands/instructions.md', 'templates/commands/interview.md', 'templates/commands/migrate.md', 'templates/commands/review.md', 'templates/commands/sanitize.md', 'templates/commands/todo.md', 'templates/commands/tools.md', 'templates/instructions-template.md', 'templates/tools.md'] missing=[]
+E           assert {'scripts/pyt...-map.md', ...} == {'scripts/pyt...ework-map.md'}
+E             
+E             Extra items in the left set:
+E             'templates/commands/improve.md'
+E             'skills/external/coaching-skills/data-model.md'
+E             'skills/external/git-utils/references/instructions-lookup.md'
+E             'skills/internal/create-agent/SKILL.md'
+E             'skills/external/draw-diagram/references/routing-matrix.md'...
+E             
+E             ...Full output truncated (61 lines hidden), use '-vv' to show
+
+tests/contract/test_store_layout_live_refs.py:178: AssertionError
+_________________ test_tests_literal_confined_to_declared_set __________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_tests_literal_confined_to_declared_set():
+        """L-3: no test file outside the declared legacy/guard set carries the literal."""
+        measured = set()
+        for path in _iter_files("tests"):
+            if _carries_literal(path):
+                measured.add(path.relative_to(REPO_ROOT).as_posix())
+        declared = set(LEGACY_TEST_FILES) | set(GUARD_TEST_FILES)
+        outside = sorted(measured - declared)
+>       assert not outside, (
+            "test files carry the retired-root literal outside the declared legacy/guard set: "
+            f"{outside}"
+        )
+E       AssertionError: test files carry the retired-root literal outside the declared legacy/guard set: ['tests/conftest.py', 'tests/contract/helpers_introspection.py', 'tests/contract/test_agents_run_scope_contract.py', 'tests/contract/test_clarify_semantic_completeness.py', 'tests/contract/test_client_guard_sweep.py', 'tests/contract/test_client_improve_loop.py', 'tests/contract/test_client_package_exclusion.py', 'tests/contract/test_coaching_dispatch_contract.py', 'tests/contract/test_coaching_expectation_contract.py', 'tests/contract/test_coaching_observation_contract.py', 'tests/contract/test_coaching_run_contract.py', 'tests/contract/test_coaching_wiring_contract.py', 'tests/contract/test_code_review_skill_contract.py', 'tests/contract/test_dogfooding_practice.py', 'tests/contract/test_efficiency_element.py', 'tests/contract/test_exec_quant_aggregate.py', 'tests/contract/test_exec_quant_channel_boundary.py', 'tests/contract/test_expression_compatibility.py', 'tests/contract/test_fast_fail_discipline.py', 'tests/contract/test_feedback_entry_schema.py', 'tests/contract/test_feedback_exec_quant_payload.py', 'tests/contract/test_feedback_introspection_engine.py', 'tests/contract/test_gate_wiring_081.py', 'tests/contract/test_git_closeout_contract.py', 'tests/contract/test_git_workflow_instructions_block.py', 'tests/contract/test_goal_migration.py', 'tests/contract/test_measure.py', 'tests/contract/test_migration_distribution.py', 'tests/contract/test_no_organize_agents_refs.py', 'tests/contract/test_no_retired_draw_skill_refs.py', 'tests/contract/test_non_disposable_check.py', 'tests/contract/test_non_disposable_contract.py', 'tests/contract/test_record_retention_engine.py', 'tests/contract/test_registry_completeness.py', 'tests/contract/test_resource_id_generation.py', 'tests/contract/test_resource_id_resolution.py', 'tests/contract/test_review_feedback_boundary.py', 'tests/contract/test_run_determination_engine.py', 'tests/contract/test_run_determination_passive_wiring.py', 'tests/contract/test_sanitize_engine_contract.py', 'tests/contract/test_sanitize_renumber_lane.py', 'tests/contract/test_sanitize_retention_lane.py', 'tests/contract/test_sdd_compat_containment.py', 'tests/contract/test_sdd_house_keeping_skill.py', 'tests/contract/test_seal_archive_plan.py', 'tests/contract/test_shipped_surface_client_neutrality.py', 'tests/contract/test_summary_writeset.py', 'tests/contract/test_test_entry_guard.py', 'tests/contract/test_todo_in_context_wiring.py', 'tests/contract/test_tools_domain.py', 'tests/contract/test_tools_inventory_ownership.py', 'tests/contract/test_workspace_isolation_contract.py', 'tests/fixtures/client_project.py', 'tests/fixtures/non-disposable/surface.yaml', 'tests/integration/test_ai_tools_init_all_assistants.py', 'tests/integration/test_ai_tools_partial_core_repair.py', 'tests/integration/test_codex_core_preservation.py', 'tests/integration/test_dispatch_injection_paths.py', 'tests/integration/test_feedback_command_record.py', 'tests/integration/test_feedback_dedup.py', 'tests/integration/test_feedback_exec_quant_channel.py', 'tests/integration/test_feedback_partial.py', 'tests/integration/test_feedback_selective_triggering.py', 'tests/integration/test_feedback_skill_record.py', 'tests/integration/test_init_new_layout.py', 'tests/integration/test_memory_preservation.py', 'tests/integration/test_resource_id_resolution.py', 'tests/integration/test_sanitize_us1.py', 'tests/integration/test_sanitize_us3.py', 'tests/integration/test_tools_record_creation.py', 'tests/integration/test_trigger_telemetry.py', 'tests/unit/test_core_workspace_asset_preservation.py', 'tests/unit/test_memory_utils.py', 'tests/unit/test_renumber_engine.py', 'tests/unit/test_resource_id_helpers.py', 'tests/unit/test_rewrite_paths_skill_layers.py', 'tests/unit/test_sanitize_checks_index.py', 'tests/unit/test_sanitize_semantic.py', 'tests/unit/test_sanitize_store.py', 'tests/unit/test_seal_archive_classify.py', 'tests/unit/test_tier_classification.py', 'tests/unit/test_two_layer_skills_copy.py', 'tests/unit/test_workspace_root_resolution.py']
+E       assert not ['tests/conftest.py', 'tests/contract/helpers_introspection.py', 'tests/contract/test_agents_run_scope_contract.py', '...antic_completeness.py', 'tests/contract/test_client_guard_sweep.py', 'tests/contract/test_client_improve_loop.py', ...]
+
+tests/contract/test_store_layout_live_refs.py:216: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_store_layout_live_refs.py::test_allowlisted_files_keep_only_allowed_lines
+FAILED tests/contract/test_store_layout_live_refs.py::test_product_class_occurrence_sets_equal_the_allowlist
+FAILED tests/contract/test_store_layout_live_refs.py::test_tests_literal_confined_to_declared_set
+3 failed, 1 passed in 6.24s

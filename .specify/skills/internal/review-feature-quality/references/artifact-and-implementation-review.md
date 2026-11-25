@@ -1,14 +1,14 @@
 # Artifact and Implementation Review — per-dimension detail
 
-Owner: `.specify/skills/internal/review-feature-quality/SKILL.md` § Segment A / § Segment B. This file carries the
+Owner: `skills/internal/review-feature-quality/SKILL.md` § Segment A / § Segment B. This file carries the
 **detail** of those two segments — the checklists a run walks, the coverage-line shape, the finding field
 set and the smoke record's fields. It states no composition, no order and no boundary sentence: those are
-owned by `.specify/shared/workflow/acceptance-hardening.md` § Review Composition, and no sentence here restates
+owned by `shared/workflow/acceptance-hardening.md` § Review Composition, and no sentence here restates
 them.
 
-The severity tokens named below (`P0`, `P1`, `P2`) belong to `.specify/skills/internal/review-sdd-process/SKILL.md`
+The severity tokens named below (`P0`, `P1`, `P2`) belong to `skills/internal/review-sdd-process/SKILL.md`
 § Severity Vocabulary. They are cited, never redefined, and they are never converted into the six-level
-code family that `.specify/skills/internal/code-review/SKILL.md` owns.
+code family that `skills/internal/code-review/SKILL.md` owns.
 
 ## A. Artifact segment
 
@@ -119,7 +119,7 @@ finding that uses it MUST say which case it is. No field of the set is condition
 | the feature's smoke record | the smoke triple |
 | the closure checker's `final_path` record | a quotation only; never a bucket the segment re-counts |
 
-`base` and `head` come from one place: `.specify/skills/internal/code-review/scripts/git-delta-review.sh`. Its
+`base` and `head` come from one place: `skills/internal/code-review/scripts/git-delta-review.sh`. Its
 `base` step owns the ordered resolution tiers, the closed trunk order and the run-start-fixed head. The
 segment records the pair it was given and resolves nothing a second time.
 

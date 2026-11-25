@@ -1,0 +1,5 @@
+task: T028
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: current-docs class measured 0 files / 0 occurrences (test-evidence/t026-t030-rewrite-readings.txt); 19 live pages updated per R-2.3; docs/reference/skills/memory.md rewritten to the two top-level tiers (layout block shows .specify/session/ + .specify/knowledge/, no container); docs/concepts/spec-driven.md stale feature-registry claims repaired to .specify/features.md + .specify/features/; migrate.md/sanitize.md legacy-anchor wording rephrased via the tombstone row; dated trees docs/reference/history (2), docs/decisions (2), docs/archive (1), docs/static (1), docs/notes (1) measured with the literal and left byte-unchanged. Difference recorded per brief U-06: T028's row excludes docs/notes/** unconditionally while L-4 excludes only dated-snapshot notes; the single measured notes member carries dated frontmatter, so the effective excluded set is identical
+at: 2026-11-25T07:45:00Z

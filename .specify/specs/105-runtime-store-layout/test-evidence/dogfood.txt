@@ -1,0 +1,85 @@
+# Dogfood migration evidence — 105 runtime-store-layout (T033)
+# Date: 2026-11-25
+
+## Command (task row form)
+$ PYTHONPATH=src /usr/local/bin/python3 -c "from specify_cli import main; main()" migrate --workspace . --apply
+
+## Run 1 — dual-content refusals observed (the brief's anticipated case)
+Dry-run before any mutation: outcome=planned, store-layout items=13, refuse=4.
+  .specify/exec-quant  dual-content  (new-side: records/20261125T055147515842Z-d68672e9.json)
+  .specify/feedback    dual-content  (new-side: 5 entries written by the P2/P3 wrap-ups)
+  .specify/retention   dual-content  (new-side: closeout/20261125T055200Z-...-implement-p2.md)
+  .specify/session     dual-content  (new-side: 20261125T055144Z-run-determination-...md)
+ANOMALY (disclosed): the four stores were dual-content because earlier packages of THIS run wrote
+their own runtime records straight into the new roots after P1 flipped the engines. Full reading:
+  test-evidence/t033-dry-run.json
+
+## Repair — sanctioned manual merge (migrate's own repair entry: 'merge manually or reconfigure')
+Each new-side record was moved byte-identically into its legacy store (sha256 before == after),
+then the migration relocated the single-sided store. No new-side file was deleted.
+  moved .specify/session/20261125T055144Z-run-determination-skill-implement-feature-r20261125t022857z.md -> .specify/memory/session/20261125T055144Z-run-determination-skill-implement-feature-r20261125t022857z.md sha=abb269ec4bfaa61a078b73f746ab27a9558830abfb32fca2aee2653a6e6f2c0f
+  moved .specify/feedback/20261125T055151Z-skill-implement-feature.md -> .specify/memory/feedback/20261125T055151Z-skill-implement-feature.md sha=ecc3ac5b31c5e87c21a800c79e4e89359e1279692f4c67f44c294487fd41a6ae
+  moved .specify/feedback/20261125T062643Z-skill-sdd-loop-driver.md -> .specify/memory/feedback/20261125T062643Z-skill-sdd-loop-driver.md sha=3035290f5561857542b74781481a27c7b601cdca718fe6cc90863061f78fa25d
+  moved .specify/feedback/20261125T062647Z-skill-create-team.md -> .specify/memory/feedback/20261125T062647Z-skill-create-team.md sha=01d6bb41fe2ac4e3d1fc4393c5f883c34b3568dc9c344e376528745262c43e3d
+  moved .specify/feedback/20261125T062650Z-skill-sdd-loop-driver.md -> .specify/memory/feedback/20261125T062650Z-skill-sdd-loop-driver.md sha=c8d7372bcbb992c6338640525bc7d7dab034e161509402a50f5b3517b46e3f55
+  moved .specify/feedback/20261125T062654Z-skill-run-agent.md -> .specify/memory/feedback/20261125T062654Z-skill-run-agent.md sha=d49a501ab88554001ff26846e8b5014851c90546a60c68db4519fe35f87f140a
+  moved .specify/exec-quant/records/20261125T055147515842Z-d68672e9.json -> .specify/memory/exec-quant/records/20261125T055147515842Z-d68672e9.json sha=0360a897224725b0b851a615961a3e3571a10e6d94495fcbbeab7e07d7ce1a81
+  moved .specify/retention/closeout/20261125T055200Z-105-runtime-store-layout-implement-p2.md -> .specify/memory/retention/closeout/20261125T055200Z-105-runtime-store-layout-implement-p2.md sha=8382faca23f46e09525aea6dcd4634058d26d8bb7ae835d39644e43e0528f64c
+
+## Run 1 — apply (after the merge)
+$ ... migrate --workspace . --apply
+  outcome=blocked (exit 3) for the mirror dimension; store-layout resolved fully.
+  receipt: .specify/migrate/receipts/20261125T063252Z-85acd362.json  receiptVersion=2  status=completed  outcome=blocked
+  storeLayout: {"blocked": 0, "container": "removed", "manifestDigest": "dbe6bf1984709f4a2d2af0515e51748cfe9fd1d2f8b08b24335f3f34fc092994", "refused": 0, "resolved": 12, "stores": 12}
+  store-layout items: 13  |  pre-move manifest entries: 3009  |  recover paths: 3383
+    .specify/coaching      legacy-content -> relocated          [archive]
+    .specify/evidence      legacy-content -> relocated          [archive]
+    .specify/exec-quant    legacy-content -> relocated          [archive]
+    .specify/feedback      legacy-content -> relocated          [archive]
+    .specify/housekeeping  legacy-content -> relocated          [archive]
+    .specify/knowledge     legacy-content -> relocated          [archive]
+    .specify/memory        empty-residue  -> container-absent   [archive]
+    .specify/renumber      legacy-content -> relocated          [archive]
+    .specify/retention     legacy-content -> relocated          [archive]
+    .specify/session       legacy-content -> relocated          [archive]
+    .specify/todo          legacy-content -> relocated          [archive]
+    .specify/tools         legacy-content -> relocated          [archive]
+    .specify/trigger       legacy-content -> relocated          [archive]
+
+  Per-store outcome tokens: coaching=done, evidence=done, exec-quant=done, feedback=done, housekeeping=done, knowledge=done, memory=done, renumber=done, retention=done, session=done, todo=done, tools=done, trigger=done
+
+ANOMALY (disclosed, undetermined root cause): the mirror dimension's internal
+  sync-mirrors.py --write returned exit 2 inside the migrate run after it had archived the 3374
+  drifted mirrors (archive-first), so 375 mirror items were recorded 'failed' and stayed missing.
+  Re-running the SAME engine with the plan's exact 375 --only prefixes returned exit 0 and
+  recreated every mirror (log: .specify/.tmp/p4-mirror-write-repair.txt). The rc-2 cause did not
+  reproduce; the end state was verified instead (check rc 0, zero drift, zero deletions).
+
+## Repair — mirror regeneration + verification
+$ python3 scripts/python/sync-mirrors.py --check  -> rc 0
+  drift members: 0 (zero)
+$ python3 scripts/python/regen-command-copies.py --check  -> rc 0
+
+## Run 2 — second apply (idempotence)
+$ ... migrate --workspace . --apply   -> outcome=clean (exit 0), items=0, zero moves
+  receipt: .specify/migrate/receipts/20261125T063455Z-be7767fc.json  receiptVersion=2  status=completed  outcome=clean  storeLayout={"blocked": 0, "container": "absent", "manifestDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", "refused": 0, "resolved": 0, "stores": 0}
+  one receipt per run: 2 receipts, distinct run ids ['20261125T063252Z-85acd362', '20261125T063455Z-be7767fc']
+
+## Post-migration assertions
+$ test ! -e .specify/memory   -> ABSENT
+$ find .specify -maxdepth 1 -mindepth 1 | sort   -> the 14 store roots; no memory/
+  coaching/ (26 entries)
+  evidence/ (146 entries)
+  exec-quant/ (1640 entries)
+  feedback/ (580 entries)
+  housekeeping/ (2 entries)
+  knowledge/ (10 entries)
+  migrate/ (2 entries)
+  renumber/ (4 entries)
+  retention/ (53 entries)
+  session/ (534 entries)
+  todo/ (3 entries)
+  tools/ (13 entries)
+  trigger/ (1 entries)
+$ tracked-entry mapping: 2999 tracked paths removed at the retired root, 0 missing at the new roots
+$ git log --follow <a moved record>   -> recorded in the close-out commit (needs the package commit first)

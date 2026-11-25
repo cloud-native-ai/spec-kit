@@ -1358,7 +1358,7 @@ class TestNoNewStore:
 
 class TestOI2PersistenceIsolation:
     """OI-2 (the record's durable landing point) is open and blocks S3, not S2.
-    Option (a) — through ``memory-utils.py`` into ``.specify/memory/session/`` —
+    Option (a) — through ``memory-utils.py`` into ``.specify/session/`` —
     sits behind one adapter seam so S3 can resolve it without touching the axes."""
 
     def test_the_adapter_seam_is_a_single_site(self, engine_source):

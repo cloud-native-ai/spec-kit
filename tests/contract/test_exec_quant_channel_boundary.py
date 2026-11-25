@@ -224,8 +224,8 @@ def test_three_legs_run_with_zero_network_timer_prompt_or_thread_surface(
     # stores (the feedback store's packages/ for the zip, aggregated/ for the
     # received layer)
     new_paths = sorted(_tree(tmp_path) - tree_before)
-    allowed = ("source-ws/.specify/memory/feedback/packages/",
-               "target-ws/.specify/memory/exec-quant/aggregated/")
+    allowed = ("source-ws/.specify/feedback/packages/",
+               "target-ws/.specify/exec-quant/aggregated/")
     outside = [p for p in new_paths if not p.startswith(allowed)]
     assert not outside, f"channel legs wrote outside their stores: {outside}"
 

@@ -1359,7 +1359,7 @@ def main() -> int:
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -1415,8 +1415,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -1428,7 +1428,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/internal/summarize-project/scripts/project-db.py'
+_SIG_SCRIPT = 'skills/internal/summarize-project/scripts/project-db.py'
 _SIG_DECLARED = ('--baseline', '--check', '--db', '--export-json', '--init', '--json', '--list-queries', '--load', '--print-ddl', '--query', '--sql', '--update')
 _SIG_HELP = (
     'usage: project-db.py [options]\n'

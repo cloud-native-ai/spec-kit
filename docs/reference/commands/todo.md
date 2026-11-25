@@ -9,7 +9,7 @@ The `/speckit.todo` command embeds todos **at the code or document location they
 - **List mode** (default, no arguments or `--list`): read-only enumeration of every TODO item — workspace `SPECKIT TODO` blocks and parked ideas — then stop.
 - **Collection mode** (`--collect`): scan blocks, group them with recalled context into a reviewable plan, execute it in bounded batches, and remove completed blocks.
 - **Insertion mode** (`--insert`): insert a conforming TODO block into a target file at a specified location.
-- **Park mode** (`--park`): store a free-floating idea (no code touchpoint) in `.specify/memory/todo/` without committing to it.
+- **Park mode** (`--park`): store a free-floating idea (no code touchpoint) in `.specify/todo/` without committing to it.
 
 The underlying discipline — context-completed interpretation, early perception by other workflows, and the insert → perceive → collect → execute → remove lifecycle — is owned by [TODO-in-Context](../../concepts/todo-in-context.md).
 
@@ -48,7 +48,7 @@ The command validates that the target file exists and is writable before inserti
 /speckit.todo --park <idea>
 ```
 
-Free-floating ideas — worth remembering, no code touchpoint yet — are stored verbatim in `.specify/memory/todo/` as one file per idea with status `parked`. Later runs promote them (into an inserted block or a requirement spec), retire them after the destination lands, or drop them on explicit veto.
+Free-floating ideas — worth remembering, no code touchpoint yet — are stored verbatim in `.specify/todo/` as one file per idea with status `parked`. Later runs promote them (into an inserted block or a requirement spec), retire them after the destination lands, or drop them on explicit veto.
 
 ## Output Formats
 

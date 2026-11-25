@@ -32,9 +32,40 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+
+# The declaration layer's single read entry (Feature 105): the store set is read from
+# `shared/declarations/facts/runtime-store-layout.yaml`, never re-spelled here (C-6).
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:  # the reader ships beside the engine; a sandbox copy without it still runs
+    import declaration_reader
+except ImportError:  # pragma: no cover - defensive
+    declaration_reader = None
+
+STORE_LAYOUT_FACT = "runtime-store-layout"
+
+
+def _runtime_stores():
+    """`(stores, label)`; a degraded read is labelled, never defaulted (C-6)."""
+    if declaration_reader is None:
+        return {}, "declaration-absent: " + STORE_LAYOUT_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), STORE_LAYOUT_FACT)["body"]
+    except declaration_reader.DeclarationError:
+        return {}, declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    statement = body.get("statement")
+    stores = statement.get("stores") if isinstance(statement, dict) else None
+    if not isinstance(stores, dict) or not stores:
+        return {}, declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    return stores, None
+
+
+STORES, STORE_LAYOUT_LABEL = _runtime_stores()
+
 KIND = "speckit.renumber"
 SCHEMA_VERSION = 1
-RENUMBER_REL = Path(".specify") / "memory" / "renumber"
+RENUMBER_REL = Path(".specify") / "renumber"
 
 ACTIONS = ("scan", "plan", "apply", "status", "dismiss", "args-manifest")
 
@@ -49,7 +80,6 @@ STATUS_DISMISSED = "dismissed"
 SCAN_ROOTS = (".specify", "scripts", "templates", "skills", "agents", "shared",
               "src", "docs", "tests")
 SPECS_REL = ".specify/specs"
-MEMORY_REL = ".specify/memory"
 REGISTER_REL = ".specify/register.md"
 FEATURES_REL = ".specify/features.md"
 
@@ -59,11 +89,8 @@ EXCLUDED_PREFIXES = (
     ".specify/specs/.archive/",
 )
 # Machine-generated stores name old identifiers by design; never rewrite them.
-MACHINE_PREFIXES = (
-    ".specify/memory/sanitize/",
-    ".specify/memory/retention/",
-    ".specify/memory/renumber/",
-)
+MACHINE_PREFIXES = tuple(
+    ".specify/%s/" % name for name in ("sanitize", "retention", "renumber") if name in STORES)
 DATED_RE = re.compile(r"(\d{4}-\d{2}-\d{2}|\d{8})")
 # Evidence logs record what happened under the old identity; rewriting them would
 # falsify the record. They are excluded like date-named records.

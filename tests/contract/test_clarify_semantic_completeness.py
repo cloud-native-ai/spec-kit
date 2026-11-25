@@ -1,7 +1,7 @@
 """Contract tests: clarify Mode A's semantic-completeness surface.
 
 Subject: ``shared/constants/clarify-taxonomy.md`` § Mode A, driven by the confirmed
-introspection finding F-07 (``.specify/memory/feedback/introspection/``). Mode A's
+introspection finding F-07 (``.specify/feedback/introspection/``). Mode A's
 mechanical verification asserted an ID *set* and a ``- Q:`` row count; neither reads
 the artifact's Assumptions, and neither notices that a renumbering falsified a derived
 count in the quality checklist. Three obligations close that:

@@ -56,7 +56,7 @@ All arguments are optional. Naming a path or artifact pins the target; naming a 
 
 3. **Writability probe** — Verifies the target and its directory are writable *before* generating questions, so a permissions problem cannot cost you a session's answers.
 
-4. **Resolve the ledger and resume** — In a feature context `<REQUIREMENTS_DIR>/interview-log.md`, otherwise `.specify/memory/session/interview-<topic-slug>.md`. An existing ledger's header conventions are read and never renegotiated; already-settled branches are reported rather than re-asked.
+4. **Resolve the ledger and resume** — In a feature context `<REQUIREMENTS_DIR>/interview-log.md`, otherwise `.specify/session/interview-<topic-slug>.md`. An existing ledger's header conventions are read and never renegotiated; already-settled branches are reported rather than re-asked.
 
 5. **Run the loop** (`I0`–`I6` of the pattern):
    - Seed the **design tree** from the target artifact, the surrounding context, and your input, then **plan branch isolation** — independent branches first, and the most widely-depended-on questions asked earliest

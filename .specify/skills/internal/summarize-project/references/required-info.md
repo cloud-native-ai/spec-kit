@@ -7,14 +7,14 @@
 本技能不靠"挖 git repo"获取项目信息：项目管理信息本来就**不在代码仓库里**（一个项目常横跨多个 repo，且真正的排期/负责人/里程碑活在项目管理程序里）。因此输入模型是**必要信息表 + 上下文摄取 + 装载校验 + 表单补填**：
 
 1. **上下文摄取**：先从当前对话上下文与用户提供的外部材料（管理系统导出、需求/任务/进度文档、Excel/Word/PDF、看板导出）中，按本表的**规范字段名**归集成表单；
-2. **装载进数据库（约束即校验）**：`.specify/scripts/project-db.py --load` 把表单装载进 `data/project.db`；数据库拒绝任何违反约束的行，并给出可读的违规原因；
+2. **装载进数据库（约束即校验）**：`scripts/project-db.py --load` 把表单装载进 `data/project.db`；数据库拒绝任何违反约束的行，并给出可读的违规原因；
 3. **表单补填**：R 档缺失（或数据库拒绝了某行）则**阻断**，只把真正需要人补的内容做成表单交给用户。
 
 工作流三段式见 [../SKILL.md](../SKILL.md) 「Step 1」；记录层与呈现映射见 [data-model.md](data-model.md)；**repo 取材是完全 opt-in 的可选补充源**，规程见 [source-tiers.md](source-tiers.md)；字段缺失后的降级形态见 [degradation.md](degradation.md)。
 
 **边界（四条）**：
 1. **字段定义的权威在 DDL**（`../schema/project.sql`）：类型、取值域、非空、唯一、外键、条件必填组合都在那里，由数据库强制。本文档与 DDL 有分歧时**以 DDL 为准**。
-2. 本文档只定义**业务语义层**：字段的含义、必填档位、缺失后果、呈现用途。**日期与进度的一切计算**在 `.specify/scripts/progress-engine.py`（从数据库读、用 SQL 算），本文档不含算式（见 [consistency-rules.md](consistency-rules.md) §0.1）。
+2. 本文档只定义**业务语义层**：字段的含义、必填档位、缺失后果、呈现用途。**日期与进度的一切计算**在 `scripts/progress-engine.py`（从数据库读、用 SQL 算），本文档不含算式（见 [consistency-rules.md](consistency-rules.md) §0.1）。
 3. 字段名是**规范命名**：snake_case ASCII 标识符，既是数据库列名、也是 YAML/JSON 表单的属性名，也是实体间关联的键。**四处一致**——DDL ⇄ 本表 ⇄ 引擎输出字段 ⇄ 各文档引用。自证命令见第 5 节。
 4. 本技能**只读表单、不改表单**：表单内容由用户（或用户授权的摄取结果）维护；数据库是**派生物**（默认每次运行重建），技能读它、查它、据它出报告，绝不自作主张改写用户填写的字段值（只读呈现定位）。
 
@@ -186,7 +186,7 @@
 ## 5. 装载、校验、查询与导出（脚本是唯一执行者）
 
 ```bash
-# ① 空白表单模板（交给用户填）；已填样例见 .specify/templates/project-input.example.yaml
+# ① 空白表单模板（交给用户填）；已填样例见 templates/project-input.example.yaml
 python3 ${SKILL_HOME}/scripts/validate-project-input.py --blank-form > <交付目录>/data/project-input.yaml
 
 # ② R 档齐备性检查（跨表业务必填组合 + I/O 档缺口清单，人读结论）
@@ -251,8 +251,8 @@ python3 ${SKILL_HOME}/scripts/project-db.py --db <库> --query work-items    # �
 | [degradation.md](degradation.md) | 字段缺失后**章节与图怎么退化、怎么声明** | 缺失分级按本文档的 R/I/O 三档 |
 | [source-tiers.md](source-tiers.md) | **opt-in** repo 补充源的定向取材规程 | 仅服务于 `derive_fields` 声明过的字段 |
 | [consistency-rules.md](consistency-rules.md) | 判定语义（状态映射、聚合、覆盖门禁）与落盘门禁 | 输入侧的**语义**门禁以本文档为准，**机械**门禁在数据库约束里 |
-| `.specify/scripts/project-db.py` | 表单装载、约束校验、SQL 查询、导出、更新模式 | 本文档第 5 节的执行者 |
-| `.specify/scripts/progress-engine.py` | 一切日期与进度计算（从数据库读、用 SQL 算） | 字段名 **等于** DDL 列名 |
+| `scripts/project-db.py` | 表单装载、约束校验、SQL 查询、导出、更新模式 | 本文档第 5 节的执行者 |
+| `scripts/progress-engine.py` | 一切日期与进度计算（从数据库读、用 SQL 算） | 字段名 **等于** DDL 列名 |
 
 ---
 

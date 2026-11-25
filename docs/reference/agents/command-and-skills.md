@@ -130,7 +130,7 @@ Every agent `create-agent` can produce has one of two lifecycles; choose it befo
   else is rejected at validation time.
 - Each skill runs an **Agent-Specific Configuration** step: it identifies the executing agent
   from detection signals, optionally loads a `references/<agent-slug>-guide.md`, and captures
-  execution feedback to `.specify/memory/feedback/` when a genuine agent-specific obstacle
+  execution feedback to `.specify/feedback/` when a genuine agent-specific obstacle
   occurs.
 - **Frontmatter baseline** for generated agents:
 

@@ -43,7 +43,7 @@ Consult the project glossary (`.specify/glossary.md`, ambient via the Documentat
 - **List** — read-only digest: workspace-block table + parked-ideas table; execute nothing.
 - **Collection** — grouped execution plans (FR-013 batching when >10 blocks), auto-executed with in-step block removal; failed tasks stop the batch.
 - **Insertion** — a conforming block (fence form for markdown-family targets, comment form for source files) at the exact location it refers to; never creates files.
-- **Park** — a parked record under `.specify/memory/todo/` (capture, not commitment) plus its later lifecycle transitions (promoted / retired / dropped).
+- **Park** — a parked record under `.specify/todo/` (capture, not commitment) plus its later lifecycle transitions (promoted / retired / dropped).
 
 **Output class (list)**: echo — in a superagent session the list product is printed verbatim as this session's own message inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` at a presentation boundary; a tool result is not user-facing presentation. The other modes are not echo commands.
 
@@ -68,7 +68,7 @@ Run the skill's mode workflows as written.
 
 **Before running this command**:
 - Embed `SPECKIT TODO` blocks in your project files where work is needed.
-- Or raise a free-floating idea (`--park` or a plain description) to store it in `.specify/memory/todo/` without committing to it.
+- Or raise a free-floating idea (`--park` or a plain description) to store it in `.specify/todo/` without committing to it.
 - Invoke `memory-recall` to surface prior TODO-run outcomes and conventions (the skill's Collection Step 3 does this by default).
 
 **After running this command**:

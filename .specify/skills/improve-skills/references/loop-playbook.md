@@ -17,7 +17,7 @@ keep/change/drop 决策有据可依。
 - `SKILL.md` 全文——frontmatter(description 触发面)、Goal、Input Contract、Workflow 每步、
   Hard Constraints、Resources 表;
 - `references/` 每个文件——哪些被 SKILL.md 指针引用、哪些是孤儿;
-- `.specify/scripts/` 每个脚本——`--help` 或注释头,确认声明的输入输出与 SKILL.md 的描述一致;
+- `scripts/` 每个脚本——`--help` 或注释头,确认声明的输入输出与 SKILL.md 的描述一致;
 - `assets/`(如存在)——模板/样例是否仍被引用;
 - 客观形状:`python3 ${SKILL_HOME}/scripts/skill-shape.py <SKILL.md>` 的判定与发现。
 
@@ -47,7 +47,7 @@ When collected findings are effectively identical project-level output for every
 defects from them. Restrict the candidate list to:
 
 - the standing sanctioned checks (Feedback-section conformance, legacy path idioms), plus
-- **filesystem ground truth** — dead links, missing referenced .specify/scripts/files.
+- **filesystem ground truth** — dead links, missing referenced scripts/files.
 
 State the evidence limitation explicitly in the final report.
 

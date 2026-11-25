@@ -294,7 +294,7 @@ def test_c3_run_id_shape_directory_and_fail_closed_on_existing_directory():
     assert "YYYYMMDDTHHMMSSZ-<trainee-slug>" in body
     assert "UTC timestamp" in body
     assert "lowercase kebab slug" in body
-    assert ".specify/memory/coaching/<run-id>/" in body
+    assert ".specify/coaching/<run-id>/" in body
     assert re.search(r"already exists.*fails closed naming the existing path", body, re.IGNORECASE | re.DOTALL)
     assert re.search(r"MUST NOT append\s+a suffix", body)
     assert re.search(r"no artifact path escapes it", body, re.IGNORECASE)

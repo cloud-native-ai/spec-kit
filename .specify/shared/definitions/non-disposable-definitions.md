@@ -29,7 +29,7 @@
 | 17 | 与宪法的关系（未新增原则的裁定与理由；与 One Source of Truth / Fast Fail / Directory Governance / Re-Anchoring 的四条分界） | `## Relation to the Constitution` |
 
 其他任何位置——命令模板、技能、指令面、契约、守卫、检查器——MUST 以「摘要 + 路径」引用本文档，MUST NOT
-复制本文档的封闭集成员、矛盾表格子或处置映射表。检出引擎 `.specify/scripts/python/non-disposable-check.py` 的
+复制本文档的封闭集成员、矛盾表格子或处置映射表。检出引擎 `scripts/python/non-disposable-check.py` 的
 `--emit-categories` 输出与本文档 § Detection Categories MUST 双向一致；不一致是缺陷，不是可选配法。
 
 **不在本文档（只给指针，不复述）**：
@@ -37,22 +37,22 @@
 | 主题 | 所有者 |
 |------|--------|
 | 条目的字段集、状态机、豁免字段形状、证据文件形状 | `.specify/specs/092-non-disposable/data-model.md`（E-1…E-9） |
-| 闭环裁决、reason code、验证词表、smoke 记录 | `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict / § Verification Vocabulary |
-| 材料卫生的类别 / 处置 / 状态 / 判定主体四个封闭集 | `.specify/scripts/python/sanitize-utils.py` 的 `CATEGORIES` / `DISPOSITIONS` / `STATES` / `DETECTIONS`（契约 `045-sanitize-command`） |
-| 活绑定 / 历史记录的路径判据 | `.specify/scripts/python/renumber-utils.py` 的 `EXCLUDED_PREFIXES` / `MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` / `DATED_RE` |
-| 特性注册表状态值的状态机 | `.specify/shared/workflow/feature-integration.md` § Status State Machine + `.specify/templates/feature-details-template.md` § Canonical Status State Machine |
-| 决定张力记录的形态与判据 | `.specify/shared/guidelines/decision-tension.md` + `.specify/scripts/python/validate-decision-tensions.py` |
-| `**Path**:` 标记的位置与取值域 | `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict（`### Input contract — the Path marker`） |
-| 声明层的读取入口与 YAML 子集 | `.specify/scripts/python/declaration_reader.py` |
-| 一条条款的语法与引用组 | `.specify/shared/definitions/contract-clause-definitions.md` |
+| 闭环裁决、reason code、验证词表、smoke 记录 | `shared/workflow/acceptance-hardening.md` § Closure Verdict / § Verification Vocabulary |
+| 材料卫生的类别 / 处置 / 状态 / 判定主体四个封闭集 | `scripts/python/sanitize-utils.py` 的 `CATEGORIES` / `DISPOSITIONS` / `STATES` / `DETECTIONS`（契约 `045-sanitize-command`） |
+| 活绑定 / 历史记录的路径判据 | `scripts/python/renumber-utils.py` 的 `EXCLUDED_PREFIXES` / `MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` / `DATED_RE` |
+| 特性注册表状态值的状态机 | `shared/workflow/feature-integration.md` § Status State Machine + `templates/feature-details-template.md` § Canonical Status State Machine |
+| 决定张力记录的形态与判据 | `shared/guidelines/decision-tension.md` + `scripts/python/validate-decision-tensions.py` |
+| `**Path**:` 标记的位置与取值域 | `shared/workflow/acceptance-hardening.md` § Closure Verdict（`### Input contract — the Path marker`） |
+| 声明层的读取入口与 YAML 子集 | `scripts/python/declaration_reader.py` |
+| 一条条款的语法与引用组 | `shared/definitions/contract-clause-definitions.md` |
 | 档 II 移交的**行**（语料编号 → 承接特性 → 落地面） | `.specify/specs/092-non-disposable/plan.md` § Shift List |
 
-**权威次序**：代码 > 生成物 > 撰写物。本文档与 `.specify/scripts/python/non-disposable-check.py` 的常量冲突时，
-代码赢，本文档 MUST 被修订（宪法 VIII）。本文档与 `.specify/shared/declarations/facts/non-disposable-review-surface.yaml`
+**权威次序**：代码 > 生成物 > 撰写物。本文档与 `scripts/python/non-disposable-check.py` 的常量冲突时，
+代码赢，本文档 MUST 被修订（宪法 VIII）。本文档与 `shared/declarations/facts/non-disposable-review-surface.yaml`
 在回顾面成员上冲突时，声明层赢（`data-model.md` E-8）。
 
-**框架源与运行时投影**：框架源为本文件 `.specify/shared/definitions/non-disposable-definitions.md`；运行时镜像为
-`.specify/shared/definitions/non-disposable-definitions.md`，由 `.specify/scripts/python/sync-mirrors.py` 生成，
+**框架源与运行时投影**：框架源为本文件 `shared/definitions/non-disposable-definitions.md`；运行时镜像为
+`.specify/shared/definitions/non-disposable-definitions.md`，由 `scripts/python/sync-mirrors.py` 生成，
 MUST NOT 手改。
 
 ---
@@ -126,7 +126,7 @@ MUST 报一条 `unknown-class` 条目，MUST NOT 把它当作一个额外的类�
 |------|----------------------|---------|
 | `status-unreadable` | 见 § Status Readability：四个可读对象之一为红 | 条目 MUST 点名特性 id 与缺失 / 矛盾的字段名，而非只写"不可读" |
 | `false-closed-set` | 一处被声明的封闭集恒等式（例如 `applicable + exempt == candidates`）两侧可复算而不相等 | 条目 MUST 同条给出**两侧读数**；"声明了闭集但从未有人复算"本身是一条发现 |
-| `stale-constant` | 同一常量两处当前值不同，且其中一处不是值 owner（值 owner 在 `.specify/scripts/python/` 的模块常量或声明层） | 条目 MUST 点名两处、两个值与 owner |
+| `stale-constant` | 同一常量两处当前值不同，且其中一处不是值 owner（值 owner 在 `scripts/python/` 的模块常量或声明层） | 条目 MUST 点名两处、两个值与 owner |
 | `deferral-marker` | 一处留存声明的字面（"暂时保留"／"留待下轮"／"以后再处理"及其英文对应），且该行没有任何到期字段 | 条目 MUST 点名 path:line 并引用该标记的原文 |
 
 ### `deferral-marker` 没有语料行，必须由构造证明（C-106）
@@ -162,18 +162,13 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 
 ## Review Surface
 
-**回顾面恰为当前 `git HEAD` 工作树里 `.specify/` 下的十一个历史根**（FR-036）：
+**回顾面恰为当前 `git HEAD` 工作树里 `.specify/` 下的封闭根集**（FR-036）。
 
-```text
-.specify/anchoring  .specify/archive  .specify/derive  .specify/goals  .specify/history
-.specify/memory  .specify/project  .specify/review  .specify/specs  .specify/state
-.specify/teams
-```
-
-成员与次序由 `.specify/shared/declarations/facts/non-disposable-review-surface.yaml#/statement` 拥有
-（`kind: closed-set`），引擎经 `.specify/scripts/python/declaration_reader.py` 读出；本节**不复述**那十一个字符串作为
+成员与次序由 `shared/declarations/facts/non-disposable-review-surface.yaml#/statement` 拥有
+（`kind: closed-set`），引擎经 `scripts/python/declaration_reader.py` 读出；本节**不复述**那些字符串作为
 第二个定义点，只负责说明它们的语义与边界。`.specify/goal`（单数）是已退役成员：项目级锚点存于
-`.specify/anchoring`、行动级指导存于 `.specify/goals`，退役理由记录在声明文件的 `note` 中。
+`.specify/anchoring`、行动级指导存于 `.specify/goals`；退役的存储容器同样是已退役成员——它的十四个顶层存储
+现各自成根（墓碑行：`shared/definitions/framework-map.md`），退役理由记录在声明文件的 `note` 中。
 
 **边界一：回顾不读 git 历史。** 不看 commit、不 blame、不 diff 旧版本。只在 git 历史里存在的旧措辞 MUST
 产生零条目（SC-002）。理由：本文档要管的是"树上现在有什么"，而不是"曾经有什么"；把 git 历史纳入回顾面，
@@ -195,11 +190,11 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 
 | 读的是谁的域 | 所有者 |
 |-------------|--------|
-| 注册表状态值域（`Draft` / `Planned` / `Implemented` / `Blocked` / `Ready for Review` / `Sealed` / `Completed` / `Relocated`） | `.specify/shared/workflow/feature-integration.md` § Status State Machine；载体声明在 `.specify/templates/feature-details-template.md` § Canonical Status State Machine |
-| 闭环裁决（`accept` / `block`）与 7 个 reason code | `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict；实现于 `.specify/scripts/python/closure-acceptance-check.py` 的 `ARC_VERDICTS` / `REASON_CODES` |
-| 验证词表与 smoke 字段名（`SC-NNN_status=` / `smoke_command` / `smoke_exit_code` / `smoke_evidence_path`） | `.specify/shared/workflow/acceptance-hardening.md` § Verification Vocabulary |
-| 决定张力记录的六字段形态 | `.specify/shared/guidelines/decision-tension.md`；判据于 `.specify/scripts/python/validate-decision-tensions.py` |
-| `**Path**:` 标记的位置与取值域 | `.specify/shared/workflow/acceptance-hardening.md` § Measurement Sources；判据于 `.specify/scripts/python/validate-requirements.py` 的 `path-marker` |
+| 注册表状态值域（`Draft` / `Planned` / `Implemented` / `Blocked` / `Ready for Review` / `Sealed` / `Completed` / `Relocated`） | `shared/workflow/feature-integration.md` § Status State Machine；载体声明在 `templates/feature-details-template.md` § Canonical Status State Machine |
+| 闭环裁决（`accept` / `block`）与 7 个 reason code | `shared/workflow/acceptance-hardening.md` § Closure Verdict；实现于 `scripts/python/closure-acceptance-check.py` 的 `ARC_VERDICTS` / `REASON_CODES` |
+| 验证词表与 smoke 字段名（`SC-NNN_status=` / `smoke_command` / `smoke_exit_code` / `smoke_evidence_path`） | `shared/workflow/acceptance-hardening.md` § Verification Vocabulary |
+| 决定张力记录的六字段形态 | `shared/guidelines/decision-tension.md`；判据于 `scripts/python/validate-decision-tensions.py` |
+| `**Path**:` 标记的位置与取值域 | `shared/workflow/acceptance-hardening.md` § Measurement Sources；判据于 `scripts/python/validate-requirements.py` 的 `path-marker` |
 
 ### 四个可读对象（C-801）
 
@@ -332,7 +327,7 @@ MUST NOT 被读作分片归档。四值集合不变：本次只原地扩展 `arc
 
 ## Disposition Bridge
 
-Non-Disposable 的处置集（本节上面的四值）与材料卫生的处置集（`.specify/scripts/python/sanitize-utils.py` 的
+Non-Disposable 的处置集（本节上面的四值）与材料卫生的处置集（`scripts/python/sanitize-utils.py` 的
 `DISPOSITIONS`，五值：`delete` / `archive` / `repair` / `delegate` / `dismiss`）**是两个各自封闭、互不合并的
 集合**（FR-012 / FR-013 / D-1 / OI-2）。它们之间只有三件东西：一张逐值映射表、一张不可映射项表、一条裁决
 规则。
@@ -480,11 +475,11 @@ N 个互相无关的载体"的通道。
 一条历史记录**记录的是当时发生的事**；把它改写成新编号，会让"当时"这件事消失。判据面分成两条**具名腿**，
 因为它们的成员被两种不同的方式寻址：
 
-**腿一 — 按路径寻址的记录。** 取自 `.specify/scripts/python/renumber-utils.py` 的既有谓词，MUST NOT 新造一个
+**腿一 — 按路径寻址的记录。** 取自 `scripts/python/renumber-utils.py` 的既有谓词，MUST NOT 新造一个
 "看起来像历史"的启发式：
 
 - `EXCLUDED_PREFIXES` — `.specify/history/`、`.specify/archive/`、`.specify/specs/.archive/`
-- `MACHINE_PREFIXES` — `.specify/memory/sanitize/`、`.specify/memory/retention/`、`.specify/memory/renumber/`
+- `MACHINE_PREFIXES` — `.specify/sanitize/`、`.specify/retention/`、`.specify/renumber/`（由存储声明的 store 集合派生）
 - `EVIDENCE_SEGMENTS` — `test-evidence`
 - `DATED_RE` — 日期命名的文件
 
@@ -498,7 +493,7 @@ N 个互相无关的载体"的通道。
 
 ### 一份判据实现，两侧引用（FR-024 / C-506）
 
-引擎 MUST 从 `.specify/scripts/python/renumber-utils.py` 消费上面四个谓词（import 或记录在案的 subprocess），
+引擎 MUST 从 `scripts/python/renumber-utils.py` 消费上面四个谓词（import 或记录在案的 subprocess），
 MUST NOT 携带 `EXCLUDED_PREFIXES` / `MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` / `DATED_RE` 的第二份字面。
 守卫 MUST 断言引擎模块内没有这四个字面的副本；一条变异腿改动判据模块，并期望引擎的分类随之移动。
 
@@ -551,13 +546,13 @@ MUST NOT 携带 `EXCLUDED_PREFIXES` / `MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` /
 
 ## Engine Contract
 
-引擎是 `.specify/scripts/python/non-disposable-check.py`，`.specify/scripts/python/` 下一族只读引擎的兄弟
+引擎是 `scripts/python/non-disposable-check.py`，`scripts/python/` 下一族只读引擎的兄弟
 （`sanitize-utils.py`、`closure-acceptance-check.py`、`renumber-utils.py` 的形态）：单文件、stdlib、
 `main(argv=None) -> int`。
 
 ### 根集合只从声明层读（C-605 / C-608）
 
-引擎 MUST 经 `.specify/scripts/python/declaration_reader.py` 读出十个根、它们的次序与计数，MUST NOT 内联一份目录
+引擎 MUST 经 `scripts/python/declaration_reader.py` 读出十个根、它们的次序与计数，MUST NOT 内联一份目录
 字面表。声明缺失 → 退出 `2` 并点名缺失路径（绝不是"零候选因此全绿"）；声明的 `kind` 或必填键无效 → 退出 `2`
 并点名冒犯的键；一次降级读取复用 `STR-014` 标签，MUST NOT 新造标签。
 
@@ -621,7 +616,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 引擎在任何模式下 MUST NOT 在仓库内写盘——含 `--json`、`--scope`、`--help` 与每条错误路径。唯一允许的写入
 位置（若将来某个模式需要暂存）是 `.specify/.tmp/`（已 git-ignored）并在退出时清除；今天没有任何模式需要它。
 经 `.specify/scripts/python/` 镜像调用时，引擎 MUST 把仓库根解析为 `.specify` 的父目录，永不是 `.specify` 本身。
-`.specify/scripts/python/non-disposable-check.py` 由 `.specify/scripts/python/sync-mirrors.py` 生成、MUST NOT 手改。
+`.specify/scripts/python/non-disposable-check.py` 由 `scripts/python/sync-mirrors.py` 生成、MUST NOT 手改。
 
 ## Capture Rule
 
@@ -631,7 +626,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 
 | # | 读数 | 命令 | 它挡住什么 |
 |---|------|------|-----------|
-| 1 | 镜像基线 | `python3 .specify/scripts/python/sync-mirrors.py --check` | 改动后若把镜像漂移报成"新发现"，其实是改动前就有 |
+| 1 | 镜像基线 | `python3 scripts/python/sync-mirrors.py --check` | 改动后若把镜像漂移报成"新发现"，其实是改动前就有 |
 | 2 | 指令面字节数 | `wc -c .specify/instructions.md` | 预算读数必须在改动前后同一把尺子下比较 |
 | 3 | 两处宪法计数 pin | `grep -c '^### ' .specify/constitution.md` 与 `.specify/templates/constitution-template.md` | 本次不新增原则；两个数若不等于改动前，说明洞开了未授权范围 |
 | 4 | 工作树形态 | `git status --porcelain` | 既有脏文件不算本特性的产出，MUST NOT 被提交或还原 |
@@ -680,7 +675,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 
 | | 材料卫生（sanitize，`045-sanitize-command`） | 本特性（non-disposable） |
 |---|---|---|
-| 类别集 owner | `.specify/scripts/python/sanitize-utils.py` 的 `CATEGORIES`（6 值） | 本节所属文档 § Detection Categories（8 值 + `unknown-class` 报告形） |
+| 类别集 owner | `scripts/python/sanitize-utils.py` 的 `CATEGORIES`（6 值） | 本节所属文档 § Detection Categories（8 值 + `unknown-class` 报告形） |
 | 处置集 owner | 同文件的 `DISPOSITIONS`（`delete` / `archive` / `repair` / `delegate` / `dismiss`，5 值） | 本节所属文档 § Disposition Set（4 值） |
 | 状态集 | 同文件的 `STATES` | `data-model.md` E-1 的条目状态机 |
 | 判定主体 | 同文件的 `DETECTIONS` | 本节所属文档 § Detection Subject（同名同义，按指针引用） |
@@ -693,7 +688,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 
 **与 history 的边界**：本特性把 `/speckit.history` 从"把会话蒸馏成主题文档"升级为四段
 「回顾 → 设计（方案）→ 用户确认 → 执行」，但**四段的形态**由 `contracts/four-stage-command.contract.md` 与
-`.specify/skills/internal/manage-history/SKILL.md` 拥有，本节不复述；执行段落下的产物仍是那份历史蒸馏，本特性不新建
+`skills/internal/manage-history/SKILL.md` 拥有，本节不复述；执行段落下的产物仍是那份历史蒸馏，本特性不新建
 第二个历史存储、第二个 `/speckit.history` 入口、第二套并发机制（FR-046 / FR-050 / FR-051 为 process-grade，
 见 `contracts/acceptance-readability.contract.md` C-806）。
 
@@ -718,7 +713,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 权威次序都在同一方向上）。
 
 因此本特性的落点是**七面**（FR-063）：本文档（owner，新）、声明层（新）、术语表四条、特性注册表行与详情、
-既有守卫（`bash .specify/scripts/bash/run-tests.sh -m contract`）、三份历史面的**指针行**（只加一行，MUST NOT 新增常驻顶级 `##` 章节，否则
+既有守卫（`bash scripts/bash/run-tests.sh -m contract`）、三份历史面的**指针行**（只加一行，MUST NOT 新增常驻顶级 `##` 章节，否则
 宪法模板 35 / 现网 36 的计数 pin 抖动）、`register.md` 决定条目。两条宪法计数 pin **保持原值**。
 
 本特性与既有原则是**承接**关系，不是新原则：
@@ -730,7 +725,7 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 | XI Dogfooding | A–H 首轮修复正是本机制在本仓的第一次真实使用，而不是一份清理清单。 |
 | XVI Fast Fail | 不可判定降级为 `unevaluated` 而非"干净"；"我看过了，没有"与"我没能看" MUST 分开报。 |
 | XIX Self-Explanatory Structure | 类别的三件套（可观察定义 + 判定主体 + 降级形态）让每个类别名本身说明它要什么。 |
-| 目录治理（XVII） | 新文件 MUST 在 `.specify/shared/definitions/framework-map.md` 的登记表可见；不新建目录。规则真源为 `.specify/shared/guidelines/directory-governance.md`（见下表首行）。 |
+| 目录治理（XVII） | 新文件 MUST 在 `shared/definitions/framework-map.md` 的登记表可见；不新建目录。规则真源为 `shared/guidelines/directory-governance.md`（见下表首行）。 |
 
 **四条相邻纪律的边界（本节只说边界，规则按指针引用）**：这四条纪律各自已有 owner，本节 MUST NOT 复述其规则，
 也 MUST NOT 被读成它们的第二定义点。下表的「分界」一列是本节的唯一新增内容：它回答「同一件事被两条纪律同时
@@ -738,10 +733,10 @@ assignment: sorted_paths[i] -> index (i mod n) 的 shard_id
 
 | 纪律 | 规则 owner（指针） | 分界（本文档管哪一半） |
 |---|---|---|
-| One Source of Truth（宪法 XIV） | `.specify/shared/guidelines/one-source-of-truth.md` | owner 纪律管**每一件事实**的唯一定义点；本文档只拥有 Non-Disposable 的那几件事实（表格前 16 行），并因此是 `multi-owner` / `stale-constant` 两类的**检出者**——检出别人违反 owner 纪律，不使本文档成为该纪律的 owner。 |
-| Fast Fail（宪法 XVI） | `.specify/shared/guidelines/fast-fail.md` | Fast Fail 管**一次运行中**的异常分流（纠正 vs 裁定）；本文档管**运行之间留在树上的**残留载体。二者的共面只有一处：不可判定 MUST 降级为 `unevaluated` 而不是「干净」——判据归本文档，披露义务归 Fast Fail。 |
-| Directory Governance（宪法 XVII） | `.specify/shared/guidelines/directory-governance.md` | 目录治理管**目录**能否存在（命名、登记、临时目录的忽略规则）；本文档管**文件与正文**是否过期、无用或延期，且不拥有「新文件要登记」这条规则——它只承接该规则的后果（`orphan-path` 类点名一处指向不存在路径的引用）。 |
-| Re-Anchoring（宪法 XXII） | `.specify/shared/definitions/re-anchoring-definitions.md`（执行步骤 owner 为 `sdd-loop-driver/references/checkpoint-protocol.md` § Direction audit） | Re-Anchoring 管 agent **在本轮内**是否仍忠于初始任务与规则；本文档管**本轮结束后**留在树上的载体。分界的判别：一个载体若只需重新读一遍就能被正确对待，那是 Re-Anchoring；若它需要一次**处置**（四个封闭值之一）才能不再误导下一位读者，那是本文档。 |
+| One Source of Truth（宪法 XIV） | `shared/guidelines/one-source-of-truth.md` | owner 纪律管**每一件事实**的唯一定义点；本文档只拥有 Non-Disposable 的那几件事实（表格前 16 行），并因此是 `multi-owner` / `stale-constant` 两类的**检出者**——检出别人违反 owner 纪律，不使本文档成为该纪律的 owner。 |
+| Fast Fail（宪法 XVI） | `shared/guidelines/fast-fail.md` | Fast Fail 管**一次运行中**的异常分流（纠正 vs 裁定）；本文档管**运行之间留在树上的**残留载体。二者的共面只有一处：不可判定 MUST 降级为 `unevaluated` 而不是「干净」——判据归本文档，披露义务归 Fast Fail。 |
+| Directory Governance（宪法 XVII） | `shared/guidelines/directory-governance.md` | 目录治理管**目录**能否存在（命名、登记、临时目录的忽略规则）；本文档管**文件与正文**是否过期、无用或延期，且不拥有「新文件要登记」这条规则——它只承接该规则的后果（`orphan-path` 类点名一处指向不存在路径的引用）。 |
+| Re-Anchoring（宪法 XXII） | `shared/definitions/re-anchoring-definitions.md`（执行步骤 owner 为 `sdd-loop-driver/references/checkpoint-protocol.md` § Direction audit） | Re-Anchoring 管 agent **在本轮内**是否仍忠于初始任务与规则；本文档管**本轮结束后**留在树上的载体。分界的判别：一个载体若只需重新读一遍就能被正确对待，那是 Re-Anchoring；若它需要一次**处置**（四个封闭值之一）才能不再误导下一位读者，那是本文档。 |
 
 **这四条都不构成新原则**：上表四行全部是宪法**既有**条目的承接关系，本特性没有新增一条，也不因此改动任何
 条目的正文或计数 pin（D-2 / OI-4）。

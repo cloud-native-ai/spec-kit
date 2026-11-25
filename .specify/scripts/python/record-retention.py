@@ -29,7 +29,7 @@ import declaration_reader  # noqa: E402  (import follows the sys.path entry abov
 
 KIND = "speckit.record-retention"
 SCHEMA_VERSION = 1
-RETENTION_REL = Path(".specify") / "memory" / "retention"
+RETENTION_REL = Path(".specify") / "retention"
 
 #: Feature 084, batch 3 (C-045): the default grace window and the store roster are one
 #: declaration-layer fact. The two `_FALLBACK` values below are the **FR-012 compatibility value** for

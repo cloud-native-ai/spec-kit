@@ -273,6 +273,88 @@ RETIRED root created=False
   appears); every injected/list-injected memory reference resolves under the two memory roots; the
   retired container is never created.
 
+## T025 — `tests/contract/test_store_layout_live_refs.py` (red)
+
+- Date: 2026-11-25
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_store_layout_live_refs.py -q`
+- Exit code: **1** — `3 failed, 1 passed in 6.24s` (full log `test-evidence/t025-red-run.txt`)
+- Output (decisive excerpt):
+
+```text
+FAILED tests/contract/test_store_layout_live_refs.py::test_product_class_occurrence_sets_equal_the_allowlist
+E  AssertionError: framework-source: unexpected=['shared/declarations/facts/non-disposable-review-surface.yaml', ...,
+   'templates/instructions-template.md', 'templates/tools.md'] missing=[]
+FAILED tests/contract/test_store_layout_live_refs.py::test_allowlisted_files_keep_only_allowed_lines
+FAILED tests/contract/test_store_layout_live_refs.py::test_tests_literal_confined_to_declared_set
+```
+
+- Reading: the pinned-copy function is green (the in-test allowlist equals the contract L-5 table);
+  the occurrence set is red with 90 measured carriers — 69 framework-source files (the 4 allowlisted
+  files plus 65 live carriers), 2 runtime-guide files and 19 current-docs files — exactly the live
+  surface US5 rewrites; the line-rule function is red because the declaration's prose note and
+  header comment still spell the literal outside the `retired_container` key; the tests-class
+  function is red with 83 live carriers (91 measured files minus the declared legacy/guard set of
+  8). Fix side: T026–T031 (subjects), never the assertions.
+
+## T032 — guard closure (C-6) and the four L-5 mutation drills
+
+- Date: 2026-11-25
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_store_layout_live_refs.py tests/contract/test_runtime_store_layout.py -v`
+- Exit code: **1** — `1 failed, 9 passed in 6.62s` (full log `test-evidence/t032-guard-run.txt`)
+- Per-function results:
+
+```text
+PASSED test_store_layout_live_refs.py::test_allowlist_pinned_copy_equals_the_contract_table
+PASSED test_store_layout_live_refs.py::test_product_class_occurrence_sets_equal_the_allowlist
+PASSED test_store_layout_live_refs.py::test_allowlisted_files_keep_only_allowed_lines
+PASSED test_store_layout_live_refs.py::test_tests_literal_confined_to_declared_set
+PASSED test_runtime_store_layout.py::test_inventory_is_closed
+PASSED test_runtime_store_layout.py::test_declaration_equals_inventory_and_consumer_sets
+PASSED test_runtime_store_layout.py::test_framework_map_rows_and_tombstone
+PASSED test_runtime_store_layout.py::test_two_writers_distinct_paths
+PASSED test_runtime_store_layout.py::test_mirror_member_set
+FAILED test_runtime_store_layout.py::test_repo_has_no_retired_root
+```
+
+- Reading: allowlist equality holds both directions (framework-source measured set == the four
+  declared files; runtime-guide and current-docs empty); every allowlisted line satisfies its rule
+  (tombstone row and `retired_container` key exactly once); the tests-class set equals the declared
+  legacy/guard set of 12 carriers; the mirror member set carries **no new member** vs the 450-DIFF
+  baseline (current 369 members / 75 cured, `test-evidence/p4-sync-mirrors-check.txt`). The one red
+  is `test_repo_has_no_retired_root` — the dogfood guard T033 closes; recorded, not suppressed.
+- Mutation drills D1–D4 executed and restored (readings: `test-evidence/mutation-drill.md`); each
+  mutation turned exactly its named function red, each restore returned green with checksum
+  equality.
+
+## T029 — tests live-reference classification and update
+
+- Date: 2026-11-25
+- Re-measured inventory: `grep -rl '\.specify/memory' tests/` (literal form) = 90 files / 219
+  hits at P4 start; the tree reading is not a contract (R-2.5) and the fragment-built old-root
+  fixtures were found and fixed in the same pass (Path joins and `"memory"` segments are
+  invisible to the literal grep).
+- Classification (L-3 / R-2.5), final measured carrier set = 12 files:
+  - legacy-fixture (kept, 6): `tests/fixtures/migrate-097/builders.py`,
+    `tests/integration/test_migrate_us1_converge.py`, `tests/integration/test_migrate_us2_safety.py`,
+    `tests/integration/test_store_layout_migration_us1_us2.py`, `tests/unit/test_migrate_planner.py`,
+    `tests/unit/test_sanitize_checks_migration.py` (sanitize legacy-residue check);
+  - guard set (6): `tests/contract/test_runtime_store_layout.py`,
+    `tests/contract/test_store_layout_live_refs.py`, `tests/contract/test_tools_domain.py`,
+    `tests/integration/test_dispatch_injection_paths.py`, `tests/integration/test_init_new_layout.py`,
+    `tests/integration/test_memory_preservation.py`;
+  - live-target rewrites across 76 modules; stale repairs for `.specify/memory/features…` and
+    anchor paths; non-disposable corpora renamed `.specify/memory` → `.specify/session` (fixture
+    data only), `tests/fixtures/client_project.py` feedback_dir → `.specify/feedback`.
+- Batch gate: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh <76 touched
+  modules> -q` → **224 failed, 1138 passed, 1 skipped, 4 pre-existing setup errors** (full log
+  `test-evidence/p4-t029-batch-run.txt`).
+- Name-level delta vs the P3 baseline (`p3-final-failed.txt`): **3 new names, all dogfood-ordered
+  transients** — `test_coaching_wiring_contract.py::test_c6…[.specify/feedback/probe-map.md]`,
+  `test_goal_migration.py::…[.specify/tools/build-summary-input.py.md]`,
+  `test_no_retired_draw_skill_refs.py::test_the_superseded_knowledge_ledger_carries_its_banner` —
+  each reads a real repo artifact that still sits under the retired root until T033 moves it. The
+  4 setup errors are byte-identical to the P1/P3-disclosed set.
+
 ## T021 — `tests/contract/test_tools_domain.py` + `tests/contract/test_specify_gitignore_template.py` (red)
 
 - Date: 2026-11-25

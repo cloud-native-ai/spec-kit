@@ -72,10 +72,10 @@ DEFAULT_CONCURRENCY_CAP = 4
 DEFAULT_AGENT_CONCURRENCY_CAP = 24
 LINE_ROLES = {"root", "coordinator", "agent-write"}
 RUNTIME_RECORD_DIRS = (
-    Path(".specify") / "memory" / "feedback",
-    Path(".specify") / "memory" / "session",
-    Path(".specify") / "memory" / "knowledge",
-    Path(".specify") / "memory" / "exec-quant",
+    Path(".specify") / "feedback",
+    Path(".specify") / "session",
+    Path(".specify") / "knowledge",
+    Path(".specify") / "exec-quant",
 )
 
 ACTIONS = {
@@ -2627,7 +2627,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -2683,8 +2683,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -2696,7 +2696,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/sdd-loop-driver/scripts/line-registry.py'
+_SIG_SCRIPT = 'skills/external/sdd-loop-driver/scripts/line-registry.py'
 _SIG_DECLARED = ('--action', '--active', '--all', '--at', '--base-sha', '--block-size', '--branch', '--cap', '--clarified', '--cli', '--cli-pid', '--cli-start-token', '--commit', '--dest', '--driver-session', '--evidence-ref', '--format', '--heartbeat-path', '--holder-line-id', '--host', '--label', '--last-event', '--line-id', '--line-role', '--log-path', '--manifest', '--mark', '--merge-ready', '--message', '--meta-json', '--override', '--owned-paths', '--parent-line-id', '--pid', '--port-range-start', '--probe-json', '--project-dir', '--prompt-path', '--queued-at', '--ready-for-merge-at', '--reason', '--remote', '--repo-root', '--resources', '--result', '--run-id', '--runner-pid', '--runner-start-token', '--session', '--spine', '--stage', '--start-token', '--state', '--status-path', '--ttl', '--waiting-reason', '--worktree', '--worktree-path', '--worktree-retained', '--write-line')
 _SIG_HELP = (
     'usage: line-registry.py [options]\n'

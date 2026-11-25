@@ -4009,7 +4009,11 @@ COMMAND_SURFACE = "templates/commands"
 #: guidelines page the scanner enforces and in the mechanical gate file `gate-check.py` reads.
 DRIVER_GATE_ENGINES = ("scripts/python/gate-check.py",)
 CONFIRMATION_GATE_SURFACES = (
-    ".specify/shared/guidelines/confirmation-gates.md",
+    # The governed owner is compared at its canonical source: the `.specify/shared/` copy is a
+    # generated mirror (L-6: regenerated, never hand-edited), and at this feature's merge base
+    # it still carried pre-existing drift that feature 105's regeneration cured — comparing the
+    # base-era mirror would measure the old drift instead of the gate text.
+    "shared/guidelines/confirmation-gates.md",
     ".specify/gate.yaml",
 )
 
@@ -4298,6 +4302,15 @@ def test_t078_no_command_gate_or_second_checker_was_added():
         "**可逆动作例外（archive-first）**",
         "| retention / spec 退役删除 |",
     )
+
+    def _store_layout_mapped(line: str) -> str:
+        """Feature 105's mechanical live-path rewrite: `.specify/memory/<store>/` -> `.specify/<store>/`.
+
+        A base line whose only change is that rewrite survives the amendment: the gate
+        text and criteria are byte-identical, the store path is the current one.
+        """
+        return re.sub(r"\.specify/memory/([a-z0-9_-]+)/", r".specify/\1/", line)
+
     for surface in CONFIRMATION_GATE_SURFACES:
         base = subprocess.run(["git", "show", f"{_feature_base()}:{surface}"],
                               cwd=str(ROOT), capture_output=True, text=True, timeout=120)
@@ -4309,13 +4322,18 @@ def test_t078_no_command_gate_or_second_checker_was_added():
             continue
         current_lines = current.splitlines()
         base_lines = base.stdout.splitlines()
-        missing = [line for line in base_lines if line not in current_lines]
+        missing = [
+            line for line in base_lines
+            if line not in current_lines and _store_layout_mapped(line) not in current_lines
+        ]
         added = [line for line in current_lines if line not in base_lines]
         assert not missing, (
             f"C-32: the confirmation-gate amendment removed base lines ({surface}): {missing}"
         )
         assert added and all(
-            any(marker in line for marker in sanctioned_owner_additions) for line in added
+            any(marker in line for marker in sanctioned_owner_additions)
+            or _store_layout_mapped(line) in base_lines
+            for line in added
         ), (
             f"C-32: the confirmation-gate amendment is not the sanctioned additive one "
             f"({surface}); added={added}"

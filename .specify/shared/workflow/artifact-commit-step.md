@@ -91,7 +91,7 @@ gets it without a new entry point.
 ### The receipt
 
 Each run writes **one receipt** — a new file, never an edit of an existing one — under
-`.specify/memory/retention/closeout/`, named by the run and its timestamp, written once. It is a
+`.specify/retention/closeout/`, named by the run and its timestamp, written once. It is a
 sibling of the retention family's other outputs (`receipts/`, `plans/`) and creates no new top-level
 store.
 
@@ -144,7 +144,7 @@ form. It never stashes, resets or cleans a path it does not own.
   derived sequence and nothing else. A **destructive or governance-kept** step stops and presents
   before it runs: the close-out does not execute it, does not treat the strategy as covering it, and
   hands the decision back with the exact command. The gate list is owned by
-  `.specify/shared/guidelines/confirmation-gates.md` and is reached **by pointer** — never restated here.
+  `shared/guidelines/confirmation-gates.md` and is reached **by pointer** — never restated here.
 - **It fails at the first failure.** A failing stage stops the run, is recorded where the run's state
   is kept, and is printed with its exact command. There is no automatic retry, no `--force`, and no
   `--force-with-lease` outside that action's own confirmation.

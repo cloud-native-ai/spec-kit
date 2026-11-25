@@ -1,0 +1,52 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_store_layout_live_refs.py tests/contract/test_runtime_store_layout.py -v
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [10 items]
+
+scheduling tests via LoadScheduling
+
+tests/contract/test_store_layout_live_refs.py::test_allowlist_pinned_copy_equals_the_contract_table 
+tests/contract/test_store_layout_live_refs.py::test_product_class_occurrence_sets_equal_the_allowlist 
+tests/contract/test_store_layout_live_refs.py::test_allowlisted_files_keep_only_allowed_lines 
+tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root 
+tests/contract/test_runtime_store_layout.py::test_two_writers_distinct_paths 
+tests/contract/test_runtime_store_layout.py::test_mirror_member_set 
+tests/contract/test_store_layout_live_refs.py::test_tests_literal_confined_to_declared_set 
+tests/contract/test_runtime_store_layout.py::test_inventory_is_closed 
+tests/contract/test_runtime_store_layout.py::test_declaration_equals_inventory_and_consumer_sets 
+tests/contract/test_runtime_store_layout.py::test_framework_map_rows_and_tombstone 
+[gw2] [ 10%] PASSED tests/contract/test_store_layout_live_refs.py::test_allowlisted_files_keep_only_allowed_lines 
+[gw0] [ 20%] PASSED tests/contract/test_store_layout_live_refs.py::test_allowlist_pinned_copy_equals_the_contract_table 
+[gw6] [ 30%] PASSED tests/contract/test_runtime_store_layout.py::test_framework_map_rows_and_tombstone 
+[gw4] [ 40%] PASSED tests/contract/test_runtime_store_layout.py::test_inventory_is_closed 
+[gw9] [ 50%] PASSED tests/contract/test_runtime_store_layout.py::test_two_writers_distinct_paths 
+[gw7] [ 60%] FAILED tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root 
+[gw5] [ 70%] PASSED tests/contract/test_runtime_store_layout.py::test_declaration_equals_inventory_and_consumer_sets 
+[gw1] [ 80%] PASSED tests/contract/test_store_layout_live_refs.py::test_product_class_occurrence_sets_equal_the_allowlist 
+[gw3] [ 90%] PASSED tests/contract/test_store_layout_live_refs.py::test_tests_literal_confined_to_declared_set 
+[gw8] [100%] PASSED tests/contract/test_runtime_store_layout.py::test_mirror_member_set 
+
+=================================== FAILURES ===================================
+________________________ test_repo_has_no_retired_root _________________________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_repo_has_no_retired_root():
+>       assert not (REPO_ROOT / RETIRED_ROOT).exists(), (
+            f"{RETIRED_ROOT} is a retired store root; the dogfood migration (US5) must remove it"
+        )
+E       AssertionError: .specify/memory is a retired store root; the dogfood migration (US5) must remove it
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = (PosixPath('/storage/project/cloud-native-ai/spec-kit') / '.specify/memory').exists
+
+tests/contract/test_runtime_store_layout.py:302: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root
+========================= 1 failed, 9 passed in 6.62s ==========================

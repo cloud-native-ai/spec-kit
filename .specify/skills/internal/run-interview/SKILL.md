@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-interview/SKILL.md>"
 
 # run-interview
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -24,7 +24,7 @@ once in `.specify/shared/patterns/interview-pattern.md`. **Read that document an
 follow it; never restate or re-derive its rules here.** This skill owns only the
 *invocation*.
 
-Canonical extraction source: `.specify/templates/commands/interview.md` § Run Modes, § Mode
+Canonical extraction source: `templates/commands/interview.md` § Run Modes, § Mode
 resolution, § Interview Mode, § Outline, § Report, and § Behavior Rules (plus §
 Glossary). Content moved here verbatim in substance; the command template keeps entry,
 wiring, and lifecycle delegation only.
@@ -37,7 +37,7 @@ wiring, and lifecycle delegation only.
   a `resume` request continues an existing ledger — its header conventions and recorded
   mode then win (see Mode resolution, level 2).
 - **Context script**: run the command's declared prerequisite script — the `{SCRIPT}`
-  slot, `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once;
+  slot, `scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once;
   parse JSON for `REPO_ROOT`, `BRANCH`, `REQUIREMENT_ID`, `REQUIREMENTS_DIR`,
   `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`. A non-feature branch is not an error — it
   selects the non-feature ledger location.
@@ -110,7 +110,7 @@ write behaviour):
 |-------------|--------------------|
 | **Target artifact** | Resolved in Workflow step 3 — required and single in Special; may be a topic-seeded record in Informal |
 | **Write behaviour** | Every round writes through before the next is asked. Special edits the one target in place and **echoes the change back**; Informal **consolidates and organizes** the round into records, splitting or adding artifacts as the space takes shape |
-| **Ledger** | In a feature context `<REQUIREMENTS_DIR>/interview-log.md`; otherwise `.specify/memory/session/interview-<topic-slug>.md`. Holds the **decision records** (ID, `dependsOn`, artifact span) that retraction propagation runs on, plus the run mode in its header |
+| **Ledger** | In a feature context `<REQUIREMENTS_DIR>/interview-log.md`; otherwise `.specify/session/interview-<topic-slug>.md`. Holds the **decision records** (ID, `dependsOn`, artifact span) that retraction propagation runs on, plus the run mode in its header |
 | **Exit gate** | Per-mode convergence criterion above → present the consolidated understanding → **explicit user confirmation**; never act before it |
 | **Round budget** | **Unbounded** in both modes. This is the escalation target for capped flows; it stops when the criterion is met or the user stops it |
 
@@ -181,7 +181,7 @@ write behaviour):
    section for the full judgment.
 
    **Drive the graph through the engine, never by reasoning about it in prose** —
-   `.specify/scripts/python/interview-utils.py` owns frontier computation, ordering, cycle
+   `scripts/python/interview-utils.py` owns frontier computation, ordering, cycle
    rejection, descendant walks, and retraction propagation (see the pattern's Engine
    section for the full contract and the strict division of labour):
 

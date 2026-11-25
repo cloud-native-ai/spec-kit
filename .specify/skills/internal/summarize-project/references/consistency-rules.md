@@ -6,7 +6,7 @@
 
 **适用纪律**：本文档的规则是**判定的唯一依据**。层参考文档与规则冲突时以本文档为准；本文档未覆盖的判定视为规则缺口 → 按第 9 节「规则缺口处理」办，**不得**由执行者临场自造判定并静默落笔。
 
-**计算下沉纪律（本轮新增，见 §0.1）**：本文档定义**语义与呈现契约**，而**日期与进度的计算由 `.specify/scripts/progress-engine.py` 独家执行**——Markdown（本文档、其他层参考文档、报告正文）里出现"比较两个日期""算天数差""算百分比""求平均"这类**可执行算式或判定步骤**本身即缺陷，应改写为"取引擎 `<字段>`"。
+**计算下沉纪律（本轮新增，见 §0.1）**：本文档定义**语义与呈现契约**，而**日期与进度的计算由 `scripts/progress-engine.py` 独家执行**——Markdown（本文档、其他层参考文档、报告正文）里出现"比较两个日期""算天数差""算百分比""求平均"这类**可执行算式或判定步骤**本身即缺陷，应改写为"取引擎 `<字段>`"。
 
 ---
 
@@ -46,7 +46,7 @@ python3 ${SKILL_HOME}/scripts/progress-engine.py --print-schema   # 字段契约
 本文档定义的一切判定都作用在**已装载进数据库的关系模型**（`data/project.db`）的列上：状态映射的输入是 `work_items.status` / `features.status` 的原文字面量，勾选计数是 `checks_*` 四列，日期是 `planned_*`/`actual_*`/`planned_date`，层级是 `phase_id`，依赖是 `work_item_deps` 联结表。
 
 - **字段类型、取值域、关联完整性的唯一权威是 `schema/project.sql`（DDL，由数据库约束强制）**；字段的业务含义与三档必填性 R/I/O 见 [required-info.md](required-info.md)。本文档不重复定义字段。
-- **输入侧门禁分两段**：① **机械约束**（外键断裂 / ID 重号 / 日期非法 / 枚举越界 / 无出处数字）由**数据库在装载时拒绝**（`project-db.py --load`，退出码 3，报可读原因）；② **R 档业务必填组合**（`project_name` / `baseline_date` / `work_items` 与 `milestones` 至少一组非空）由 `.specify/scripts/validate-project-input.py` 检查（同为退出码 3 阻断）。任一段不过，都不进入本文档的任何判定。
+- **输入侧门禁分两段**：① **机械约束**（外键断裂 / ID 重号 / 日期非法 / 枚举越界 / 无出处数字）由**数据库在装载时拒绝**（`project-db.py --load`，退出码 3，报可读原因）；② **R 档业务必填组合**（`project_name` / `baseline_date` / `work_items` 与 `milestones` 至少一组非空）由 `scripts/validate-project-input.py` 检查（同为退出码 3 阻断）。任一段不过，都不进入本文档的任何判定。
 - **§4、§7、§11 中出现的 `specs/*/tasks.md`、`features.md` 等仓库工件命令，只适用于 repo opt-in 且相应字段被 `derive_fields` 授权的情形**（规程见 [source-tiers.md](source-tiers.md)）——它们**不是**默认路径。未 opt-in 时，工作项单元恒为 `work_items` 表（必要时叠加 `features` 表），候选全集 `C` 亦以库中数据为准。
 
 ---
@@ -458,7 +458,7 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径> --strict   # WAR
 
 > **正文（prose）口径**：数字 / 日期 / 编号 / 覆盖类检查一律在**正文**上做——正文 = 报告去掉全部 ```` ``` ```` 围栏代码块与内联 `<svg>…</svg>` 后的文本。这样残留源码里的 `is N% complete`、内联 SVG 的 `width="100%"` 与路径坐标数字**不再**被误报为裸百分比/裸编号。**图元 / 图例类检查读 `assets/*.puml` 图源文件**（源码已移出正文，图源即文件；`assets/` 无 `.puml` 时才退回读取正文残留的围栏块，兼容旧形态）；目录自包含类检查用报告全文 + `assets/` 目录列表。
 >
-> **数据侧几何校验另有其人**：本脚本只查"报告文本自洽"。"甘特条形起止是否等于记录层日期""里程碑菱形是否落在锚定日"这类**需要项目日期做真值**的图元几何校验由 `.specify/scripts/verify-chart-data.py` 承担；长宽比 / 有效字号 / 标签溢出等**通用版面量测**由 draw-diagram 的 `measure-svg-layout.py` 承担（见 SKILL.md「脚本清单」）。三者职责不重叠。
+> **数据侧几何校验另有其人**：本脚本只查"报告文本自洽"。"甘特条形起止是否等于记录层日期""里程碑菱形是否落在锚定日"这类**需要项目日期做真值**的图元几何校验由 `scripts/verify-chart-data.py` 承担；长宽比 / 有效字号 / 标签溢出等**通用版面量测**由 draw-diagram 的 `measure-svg-layout.py` 承担（见 SKILL.md「脚本清单」）。三者职责不重叠。
 
 **CG-2 的处置有确定性裁决规则（不是"二选一"）**：
 
@@ -523,7 +523,7 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径> --strict   # WAR
 ### 10.1 冲突陈述
 
 - 核心原则说「**绝不修改** `.specify/`、需求文档、任务清单等任何源工件」；
-- 而 `## Feedback` 步骤要求把技能自省记录写入 `.specify/memory/feedback/`。
+- 而 `## Feedback` 步骤要求把技能自省记录写入 `.specify/feedback/`。
 
 字面读来二者互斥，执行器面对矛盾指令只能跳过其中之一（实测三个执行器全部跳过了 Feedback 步骤）。本节给出**明文裁决**。
 
@@ -533,7 +533,7 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径> --strict   # WAR
 
 > **一个路径是否是本次的输入来源（项目输入表单、用户提供的外部材料，或 opt-in 授权后的仓库路径）、是否会成为任何呈现层的取材来源。是 → 绝对只读（含表单本身：技能读它、不改它）；否 → 根本不该被访问。**
 
-`.specify/memory/feedback/` **不是**任何呈现层的取材来源（不在信息源映射表的任何一格里），写入它不会改变项目概览、特性、工作项、里程碑、进度中的任何一个结论。因此：
+`.specify/feedback/` **不是**任何呈现层的取材来源（不在信息源映射表的任何一格里），写入它不会改变项目概览、特性、工作项、里程碑、进度中的任何一个结论。因此：
 
 **`## Feedback` 步骤照常执行；只读红线不覆盖 feedback 目录。二者不构成真实冲突。**
 
@@ -542,18 +542,18 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径> --strict   # WAR
 | # | 允许写入的路径 | 写入方式 | 说明 |
 |---|----------------|----------|------|
 | W-1 | 交付目录本身（`.specify/project/summary/` / `docs/project-summary/` / 用户指定）：`summary.md` + `assets/` + `data/` | 本技能落盘 | 技能的唯一交付物（**整个目录**），重复运行整体刷新 |
-| W-2 | `${SKILL_WORKDIR}/.specify/memory/feedback/` | **只经** `feedback-utils.py` 引擎（不手写文件） | 技能自省通道，宿主框架资产 |
+| W-2 | `${SKILL_WORKDIR}/.specify/feedback/` | **只经** `feedback-utils.py` 引擎（不手写文件） | 技能自省通道，宿主框架资产 |
 | W-3 | 图源与渲染产物、计算/校验中间产物（图源 `*.puml` 与渲染出的 `*.svg` / `*.png` 同名落 `assets/`；**项目数据库 `project.db`、引擎输出 `engine-out.json`**、可选导出 `progress-data.json`、`expect.json`、门禁结果落 `data/`） | draw-diagram 渲染流程 / `project-db.py` / `progress-engine.py` / 校验脚本 | 一律落**交付目录内**（`assets/` 或 `data/`，默认每次运行从事实源重建、随目录整体刷新，作为交付物一部分保留）；**绝不写入目标项目管理工件区**（目标项目 ≠ 宿主时交付目录外零写入） |
 
-**白名单之外一律只读**，明确包括：`.specify/specs/**`（requirements / plan / tasks / verification / checklists）、`.specify/features.md` 与 `features/**`、`.specify/constitution.md`、`.specify/instructions.md`、`.specify/skills/**`、`.specify/agents/**`、`.specify/templates/**`、`.specify/history/**`、`.specify/memory/session|knowledge/**`、README/docs、源代码、git 仓库（不 commit、不 tag、不改 ref）。
+**白名单之外一律只读**，明确包括：`.specify/specs/**`（requirements / plan / tasks / verification / checklists）、`.specify/features.md` 与 `features/**`、`.specify/constitution.md`、`.specify/instructions.md`、`.specify/skills/**`、`.specify/agents/**`、`.specify/templates/**`、`.specify/history/**`、`.specify/session|knowledge/**`、README/docs、源代码、git 仓库（不 commit、不 tag、不改 ref）。
 
 ### 10.4 优先级与目标≠宿主的处理
 
 1. **优先级**：白名单（W-1~W-3）> 只读红线 > 其他。红线不得被用来跳过 `## Feedback`；反之 Feedback 也不得被用来写红线内的任何路径。
-2. **写入方向固定为宿主**：feedback 一律写**运行本技能的宿主工作区** `${SKILL_WORKDIR}/.specify/memory/feedback/`。当 `--target` 指向的目标项目 ≠ 宿主工作区时，**绝不**向目标项目写任何字节（含 feedback）。
+2. **写入方向固定为宿主**：feedback 一律写**运行本技能的宿主工作区** `${SKILL_WORKDIR}/.specify/feedback/`。当 `--target` 指向的目标项目 ≠ 宿主工作区时，**绝不**向目标项目写任何字节（含 feedback）。
 3. **standalone 模式**：`${SKILL_WORKDIR}/.specify/` 不存在（非 Spec Kit 部署）→ 整个 Feedback 步骤跳过，不调引擎、不建目录。
 4. **自总结场景的透明化**：目标项目 == 宿主工作区（即用本技能总结承载本技能的那个项目自身）时仍照常记录，但必须在 `## 元信息` 加一行声明：
-   「本次运行向宿主 `.specify/memory/feedback/` 追加了 1 条技能自省记录（框架自省通道，非目标项目事实源，不影响本报告任何结论）。」
+   「本次运行向宿主 `.specify/feedback/` 追加了 1 条技能自省记录（框架自省通道，非目标项目事实源，不影响本报告任何结论）。」
 5. **落盘检查项**：「未对任何信息源工件产生写入」的核对口径 = 白名单之外零写入。可用下式自证（在目标项目根执行，`<D0>` 为基准日）：
 
 ```bash
@@ -666,5 +666,5 @@ python3 ${SKILL_HOME}/scripts/check-coherence.py <报告路径>
 | 进度百分比分母 | 分母集合 = 分解树覆盖范围并逐字声明（照抄 `coverage.progress_denominator_set`） | §11.3 |
 | 含 WBS 却没写覆盖声明 | check-coherence 直接 FAIL CG-COVERAGE | §11.4 |
 | 未提供 `checks_*`/`progress_pct` | 工作项取 `work_items` ∪ `features` 两张表；引擎给 `progress_pct=null`，只报状态计数 | §0.3 / §4 默认口径 / §5.1 / §7.2 / §11.5 |
-| 落盘前 | 先 `.specify/scripts/project-db.py --load` 装载（约束即校验），再跑 `.specify/scripts/progress-engine.py --db` 得全部数字，再跑 `.specify/scripts/check-coherence.py <报告>`，FAIL=0 才允许写 | §0.1 §8.1 |
+| 落盘前 | 先 `scripts/project-db.py --load` 装载（约束即校验），再跑 `scripts/progress-engine.py --db` 得全部数字，再跑 `scripts/check-coherence.py <报告>`，FAIL=0 才允许写 | §0.1 §8.1 |
 | 遇到没规则的情形 | 类推+登记 / 澄清 / `unknown`，不静默自造 | §9.3 |

@@ -77,9 +77,9 @@ passwords.
 
 | Entry point | First location | Second location |
 |-------------|----------------|-----------------|
-| `.specify/scripts/query.py` | `<skill>/connections.json` | `~/.config/claude/db-connections.json` |
-| `.specify/scripts/query_mysql.py` | `<skill>/connections.json` | `~/.config/claude/mysql-connections.json` |
-| `.specify/scripts/query_postgres.py` | `<skill>/connections.json` | `~/.config/claude/postgres-connections.json` |
+| `scripts/query.py` | `<skill>/connections.json` | `~/.config/claude/db-connections.json` |
+| `scripts/query_mysql.py` | `<skill>/connections.json` | `~/.config/claude/mysql-connections.json` |
+| `scripts/query_postgres.py` | `<skill>/connections.json` | `~/.config/claude/postgres-connections.json` |
 
 The first existing file wins. `--config <path>` overrides the search entirely, which is how a
 temporary or per-project registry is used without touching the skill directory.
@@ -113,20 +113,20 @@ recommendation.
 
 ```bash
 # 1. What can I reach?
-python3 .specify/scripts/query.py --list
+python3 scripts/query.py --list
 
 # 2. What is in it?
-python3 .specify/scripts/query.py --db shop-mysql --tables
+python3 scripts/query.py --db shop-mysql --tables
 
 # 3. What do the columns look like?
-python3 .specify/scripts/query.py --db shop-mysql --schema
+python3 scripts/query.py --db shop-mysql --schema
 
 # 4. Ask the question, with a cap.
-python3 .specify/scripts/query.py --db shop-mysql \
+python3 scripts/query.py --db shop-mysql \
   --query "SELECT status, COUNT(*) AS n FROM orders GROUP BY status" --limit 50
 
 # 5. The same question on the other family.
-python3 .specify/scripts/query.py --db metrics-pg \
+python3 scripts/query.py --db metrics-pg \
   --query "SELECT day, signups FROM daily ORDER BY day DESC" --limit 30
 ```
 
@@ -144,8 +144,8 @@ The dispatcher is the normal path. The handlers are callable on their own when t
 already known, which skips routing:
 
 ```bash
-python3 .specify/scripts/query_mysql.py --db shop-mysql --tables
-python3 .specify/scripts/query_postgres.py --db metrics-pg --schema
+python3 scripts/query_mysql.py --db shop-mysql --tables
+python3 scripts/query_postgres.py --db metrics-pg --schema
 ```
 
 They accept the same options and enforce the same read-only rules. Their `--list` output omits the

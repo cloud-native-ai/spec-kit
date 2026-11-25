@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/create-checklist/SKILL.md>"
 
 # create-checklist
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -17,7 +17,7 @@ tests the *specification*, not the implementation. Every item is a question abou
 something is defined, specified, bounded or quantified — so that answering it is a
 judgement about the requirement text, never a run of the product.
 
-Canonical extraction source: `.specify/templates/commands/checklist.md` — the command template
+Canonical extraction source: `templates/commands/checklist.md` — the command template
 keeps entry + delegation only; the executable content (Checklist Purpose, Execution
 Steps) lives in this skill.
 
@@ -115,7 +115,7 @@ implementation behaviour.
 
 ### 6. Structure
 
-Follow `.specify/templates/checklist-template.md` for the canonical format. If it is unavailable: an
+Follow `templates/checklist-template.md` for the canonical format. If it is unavailable: an
 H1 title, a purpose/meta block, `##` category sections, and `- [ ] CHK### <item>` lines.
 
 ### 7. Report

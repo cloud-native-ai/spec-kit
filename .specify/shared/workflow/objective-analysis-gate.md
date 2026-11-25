@@ -2,7 +2,7 @@
 
 **Canonical convention.** When the artifacts a command analyzes were written by the agent now analyzing them, detection MUST be delegated to fresh-context read-only subagents. This file is the single source of truth for that gate; commands link here rather than restating it.
 
-The evidence-state vocabulary this gate borrows (`Unobserved`, configured ≠ used) is owned by `.specify/shared/guidelines/better-harness.md` § 证据纪律. Read that for evidence discipline generally; this file is the staffing rule for one specific audit shape.
+The evidence-state vocabulary this gate borrows (`Unobserved`, configured ≠ used) is owned by `shared/guidelines/better-harness.md` § 证据纪律. Read that for evidence discipline generally; this file is the staffing rule for one specific audit shape.
 
 ## Why the gate exists
 
@@ -33,10 +33,10 @@ Rule 3 states the cap as "the command's own mid tier" and deliberately carries n
 
 ## Binding set is owned by the test
 
-The authoritative roster of commands carrying this gate is `tests/contract/test_objective_analysis_gate.py`, not a list restated here — per the owner-selection order in `.specify/shared/guidelines/one-source-of-truth.md`, code outranks an authored document for a fact a program can derive. Discover the live set with:
+The authoritative roster of commands carrying this gate is `tests/contract/test_objective_analysis_gate.py`, not a list restated here — per the owner-selection order in `shared/guidelines/one-source-of-truth.md`, code outranks an authored document for a fact a program can derive. Discover the live set with:
 
 ```bash
-grep -rl 'objective-analysis-gate.md' .specify/templates/commands/
+grep -rl 'objective-analysis-gate.md' templates/commands/
 ```
 
 ## Scope limits
@@ -46,4 +46,4 @@ Keep the gate cheap — it is a staffing decision, not a subsystem (Principle IX
 - **Applies to**: commands that produce findings, severities, or verdicts about artifacts.
 - **Does NOT apply to**: deterministic program validators (`validate-tasks.py`, `scan-confirmation-gates.py`, mirror `--check`) — a program has no authorship bias, and this is why the house prefers program-first for fixed rules; measurement steps that RUN a command and READ its output (`/speckit.implement`'s gate function); explicit self-reflection (`/speckit.feedback` Mode 5 自省), where the same-author condition is the point rather than an obstacle; verification of external sources (`/speckit.research`, `/speckit.derive`), whose subject was not authored here.
 - **A trivial or no-op run skips it.** Do not dispatch subagents to audit a run that produced nothing.
-- **Reach of the ambient pointer**: the Documentation Map row for this file is added to `.specify/templates/instructions-template.md`, and `generate-instructions.sh` reconciles only at top-level `## ` section granularity — so that row reaches freshly-initialized projects and this repo's live instructions file, but is NOT injected into an already-initialized downstream project. The command pointers are the surface that actually reaches every project, because a command template is read in full at invocation.
+- **Reach of the ambient pointer**: the Documentation Map row for this file is added to `templates/instructions-template.md`, and `generate-instructions.sh` reconciles only at top-level `## ` section granularity — so that row reaches freshly-initialized projects and this repo's live instructions file, but is NOT injected into an already-initialized downstream project. The command pointers are the surface that actually reaches every project, because a command template is read in full at invocation.

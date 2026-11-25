@@ -38,7 +38,7 @@ def normalize_workspace_path(path: str | Path, workspace_root: str | Path) -> st
 
 
 def infer_resource_type_from_path(canonical_path: str) -> Optional[str]:
-    if canonical_path.startswith(".specify/memory/tools/") and canonical_path.endswith(".md"):
+    if canonical_path.startswith(".specify/tools/") and canonical_path.endswith(".md"):
         return "tool"
     if canonical_path.startswith(".specify/skills/") and canonical_path.endswith("/SKILL.md"):
         return "skill"
@@ -251,7 +251,7 @@ def _discover_by_text(
     matches = []
 
     if expected_type in (None, "tool"):
-        tools_dir = workspace_root / ".specify" / "memory" / "tools"
+        tools_dir = workspace_root / ".specify" / "tools"
         if tools_dir.exists():
             for file in tools_dir.glob("*.md"):
                 if text in file.stem.lower():

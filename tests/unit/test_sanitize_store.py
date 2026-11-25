@@ -26,7 +26,7 @@ def sid(category: str, target: str) -> str:
 def finding(**overrides) -> dict:
     base = {
         "category": "dead-reference",
-        "target": ".specify/memory/todo/x.md",
+        "target": ".specify/todo/x.md",
         "severity": "medium",
         "summary": "references missing scripts/python/nope.py",
         "evidenceRefs": [{"kind": "path", "ref": "scripts/python/nope.py"}],
@@ -213,7 +213,7 @@ def test_probe_roots_missing_root_is_empty_not_error(tmp_path):
 
 def test_is_material_target_whitelist(tmp_path):
     make_ws(tmp_path)
-    assert su.is_material_target(tmp_path, ".specify/memory/todo/a.md")
+    assert su.is_material_target(tmp_path, ".specify/todo/a.md")
     assert su.is_material_target(tmp_path, "docs/reference/x.md")
     assert not su.is_material_target(tmp_path, "src/app.py")
     assert not su.is_material_target(tmp_path, "tests/unit/test_x.py")

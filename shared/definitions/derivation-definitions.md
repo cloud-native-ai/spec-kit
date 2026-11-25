@@ -144,7 +144,7 @@ An `applies_when` without an over-application guard is incomplete: an unguarded 
 
 - **One table file, not one file per move.** A run must see the whole library as a single projection at start; N files means N reads or a generated index — new machinery for no gain.
 - **At the `.specify/derive/` root, not inside `<topic-slug>/`.** The library is cross-topic by design: a domain-level derivation and a later feature-level one must draw on the same moves.
-- **Not under `.specify/memory/`.** That root holds generic project state. Moves are the derivation domain's own accumulated instrument, consumed only by `/speckit.derive` — exactly as `.specify/goal/` holds only goal-domain state. Splitting the library and the archive across two roots would give one concept two homes.
+- **Not under a runtime store.** Runtime stores hold generic project state. Moves are the derivation domain's own accumulated instrument, consumed only by `/speckit.derive` — exactly as `.specify/goal/` holds only goal-domain state. Splitting the library and the archive across two roots would give one concept two homes.
 - **Tracked, never ignored.** Unlike re-derivable caches, moves are **not re-derivable** — losing them loses accumulated reasoning capital.
 
 ### Projection, Not Copy

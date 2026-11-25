@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/derive-architecture/SKILL.md>"
 
 # derive-architecture
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -19,7 +19,7 @@ to a step. This skill is the executable core of `/speckit.derive`.
 
 方法的核心区别：读来源不是为了知道它**主张什么**，而是为了知道它**怎么从前提走到结论**。产物是一条可被独立读者重放核查的推导链，以及每个元素都回指链上某一步的架构。
 
-Canonical extraction source: `.specify/templates/commands/derive.md` § Stage 1–9 (Preflight /
+Canonical extraction source: `templates/commands/derive.md` § Stage 1–9 (Preflight /
 online grounding / operator extraction / chain construction / two-pass self-review /
 report) plus its Behavior Rules and the `/speckit.derive` vs `/speckit.research`
 boundary. Content moved here verbatim in substance; the command template keeps entry,

@@ -10,7 +10,7 @@ per-document decision order, the two record schemas and their clause codes (`C-0
 framework repository's `contracts/diagram-obligation.contract.md`, which does **not** ship and is therefore cited
 here by name, never by a link. Where this page and that contract disagree about a **value**, the contract wins and
 this page is the defect; where this page and **the engine** disagree, the engine wins
-(`.specify/scripts/docs-utils.py --action obligation --help` and its JSON payload are authoritative for anything this page
+(`scripts/docs-utils.py --action obligation --help` and its JSON payload are authoritative for anything this page
 summarises).
 
 The obligation's **requirement** (which documents must carry a diagram, and how a named exemption replaces one) is
@@ -20,7 +20,7 @@ why; it adds no rule of its own.
 The **five** verdicts below (`satisfied` / `missing` / `stale` / `recorded-exemption` / `not-evaluated`) are the
 checker's vocabulary. They are a different set from the **six** statuses the framework's verification log uses for
 a success criterion (`pass` / `partial` / `fail` / `blocked` / `deferred` / `unknown`), owned by the framework's
-`.specify/shared/workflow/acceptance-hardening.md` § Verification Vocabulary: five document verdicts here, six criterion
+`shared/workflow/acceptance-hardening.md` § Verification Vocabulary: five document verdicts here, six criterion
 statuses there, and the two are not interchangeable.
 
 ---

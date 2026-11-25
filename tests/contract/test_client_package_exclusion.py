@@ -302,7 +302,7 @@ def test_c27_carrier_sections_cite_owners_without_restatement():
         )
     # The Park store location is owner content of the todo-in-context
     # guideline — the digest reference cites the owner and must not copy it.
-    assert ".specify/memory/todo/" not in text, (
+    assert ".specify/todo/" not in text, (
         "C-27: the Park store path is owned by shared/guidelines/"
         "todo-in-context.md — the digest reference cites, never restates"
     )
@@ -371,7 +371,7 @@ def test_c29_digest_report_carries_the_three_facts():
 def test_c30_routing_backlog_one_named_carrier_row_per_entry():
     text = PATH_A.read_text(encoding="utf-8")
     assert "backlog.md" in text, (
-        "C-30: the routing backlog (`.specify/memory/feedback/backlog.md`) "
+        "C-30: the routing backlog (`.specify/feedback/backlog.md`) "
         "carries the carrier assignment"
     )
     assert re.search(r"exactly one (row|backlog row)", text), (

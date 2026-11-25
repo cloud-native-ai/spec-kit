@@ -134,11 +134,10 @@ def check_goals(project: Path):
 
 def check_advisory(project: Path):
     spec = project / ".specify"
-    mem = spec / "memory"
     out = {}
     for key, path in (("glossary", spec / "glossary.md"),
                       ("register", spec / "register.md"),
-                      ("knowledge", mem / "knowledge")):
+                      ("knowledge", spec / "knowledge")):
         out[key] = {"status": OK if path.exists() else GAP,
                     "detail": rel(project, path) if path.exists() else "absent"}
     return out

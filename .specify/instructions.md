@@ -22,7 +22,7 @@ This project documentation is distributed across several key files. You MUST ref
 | **Upstream** | `docs/concepts/upstream.md` | github/spec-kit relationship | Divergence points and sync model |
 | **Security** | `docs/concepts/security.md` | Security | Threat surface and handling guidance |
 | **Memory System** | `docs/reference/skills/memory.md` | Memory-as-files layer | session/ + knowledge/ stores, `memory-utils.py`, record/recall skills, Spec-Kit-only boundary |
-| **Feedback System** | `docs/reference/skills/feedback.md` | Local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py`, threshold-triggered non-blocking notice (never auto-transmits); inbound bundles land in root `feedback/` |
+| **Feedback System** | `docs/reference/skills/feedback.md` | Local-scope feedback layer | `.specify/feedback/` store, `feedback-utils.py`, threshold-triggered non-blocking notice (never auto-transmits); inbound bundles land in root `feedback/` |
 | **Probe System** | `docs/reference/skills/probe.md` | Probe infrastructure (056) | Probe Class × Object/Handler/Binding, `shared/definitions/probe-definitions.md`, `probe-utils.py`, compiled `## Wrap-up` faces, host read-only boundary |
 | **Better Harness** | `docs/concepts/better-harness.md` + `.specify/shared/guidelines/better-harness.md` | Shared goal of improvement mechanisms | Harness, feedforward/feedback loop, five work-loop dimensions, evidence discipline, Bootstrap/Operationalize/Optimize |
 | **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Gate governance criteria | Two-level taxonomy, destructive list, governance-kept list, doubtful-strict rule; enforced by `scan-confirmation-gates.py` |
@@ -267,7 +267,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
   - `scripts/bash/`, `scripts/python/`: workflow scripts mirrored from `.specify/scripts/`; never call `/speckit.*` as a shell command.
   - `skills/`, `agents/`: installed skills and agent definitions, mirrored to `.specify/`.
   - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`, `fixtures/` (declarative fixture sets, one directory per feature — e.g. `fixtures/acceptance-hardening/`).
-  - `memory/`: default in-package memory; canonical memory is `.specify/memory/`.
+  - `seed/`: packaged default memory seed; canonical memory is `.specify/session/` + `.specify/knowledge/`.
   - `docs/`: this project's development docs, not shipped (boundary above).
   - `feedback/`: inbound `feedback-*.zip` bundles for `/speckit.feedback`.
   - `.specify/`: project runtime (instructions, memory, skills, agents, scripts, specs, templates); ignore nested `.specify/` dirs.
@@ -279,9 +279,9 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
 - `/speckit.*` commands are chat instructions, not terminal commands.
 - Treat Constitution as the authority for architecture and workflow constraints.
-- **Reuse a Tool before generating a script**: look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules and environment applicability outrank your training knowledge. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
+- **Reuse a Tool before generating a script**: look for an existing **Tool** under `.specify/tools/` and reuse it — its behavioral rules and environment applicability outrank your training knowledge. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
 
-> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
+> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
 
 ## AI Tool Compatibility
 - **Supported Agents**: the canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` (`src/specify_cli/__init__.py`); per-tool config and CLI arguments: `docs/reference/cli/supported-agent-tools.md` — never guess flags or config keys.
@@ -289,7 +289,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 
 ## Spec Kit Framework Map
 
-The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: `.specify/memory/`, `.specify/templates/`, `.specify/scripts/`, `.specify/skills/`, `.specify/agents/`, `.specify/teams/`, `.specify/shared/`, `.specify/specs/<ID>-<slug>/`.
+The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: `.specify/session/`, `.specify/knowledge/`, `.specify/templates/`, `.specify/scripts/`, `.specify/skills/`, `.specify/agents/`, `.specify/teams/`, `.specify/shared/`, `.specify/specs/<ID>-<slug>/`.
 
 Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution): `.specify/shared/definitions/agent-definitions.md`.
 
@@ -315,7 +315,7 @@ Under the **Spec Kit framework**, the git workflow is a **framework-level declar
 No registration tables — agents discover resources from the filesystem:
 
 - **Skills**: `.specify/skills/`, one directory per skill; guide: `.specify/skills.md`. Create/improve via the `create-skills` / `improve-skills` skills.
-- **Tools**: `.specify/memory/tools/<name>.md` records; guide: `.specify/tools.md`. Reuse before scripting (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
+- **Tools**: `.specify/tools/<name>.md` records; guide: `.specify/tools.md`. Reuse before scripting (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
 
 ## Agent Anti-Patterns (agent 反模式)
 

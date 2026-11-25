@@ -22,10 +22,10 @@ def test_reinit_codex_preserves_core_files(
     project = tmp_path / "preserve"
     copy_local_templates(project, "codex", "sh")
 
-    marker = project / ".specify" / "memory" / "user-data.md"
+    marker = project / ".specify" / "session" / "user-data.md"
     marker.write_text("# User data", encoding="utf-8")
 
     copy_local_templates(project, "codex", "sh", is_current_dir=True)
 
-    assert marker.exists(), ".specify/memory/user-data.md was overwritten"
+    assert marker.exists(), ".specify/session/user-data.md was overwritten"
     assert marker.read_text(encoding="utf-8") == "# User data"

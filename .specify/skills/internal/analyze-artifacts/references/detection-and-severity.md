@@ -1,7 +1,7 @@
 # Detection passes, severity, and the noise floor
 
 Owns §4 (detection), §5 (severity) and the do-not-flag list of the analysis skill. Extracted
-from `.specify/templates/commands/analyze.md`; content preserved, form re-expressed.
+from `templates/commands/analyze.md`; content preserved, form re-expressed.
 
 ## Same-author detection delegation (applies before any pass)
 
@@ -94,7 +94,7 @@ plans written before this channel existed are NOT exempt — a missing section i
 the remedy is to add it.
 
 Record shape, admissibility criteria, rejection forms and the load-bearing threshold are owned by
-`.specify/shared/guidelines/decision-tension.md` — read that owner; do not restate its tables here.
+`shared/guidelines/decision-tension.md` — read that owner; do not restate its tables here.
 
 Three defect classes, each **HIGH**, plus the two record-level validator labels — the section anchor
 and the identifier shape — which carry the same severity, so the table below covers all six labels
@@ -120,7 +120,7 @@ verdict. Every finding names its propagation surface as its FIRST field, namely 
 into tasks and implementation (`计划 → 任务 / 实现`).
 
 Deterministic verdicts: every mechanically decidable part — field presence, enumerated values,
-reference resolution — is printed by `.specify/scripts/python/validate-decision-tensions.py`, whose
+reference resolution — is printed by `scripts/python/validate-decision-tensions.py`, whose
 `--json` `checks` array carries the per-label counts. Consume that verdict; MUST NOT re-score the
 record semantically, and MUST NOT turn a label count into a percentage or a maturity score.
 

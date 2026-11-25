@@ -29,7 +29,7 @@ writing two different subjects does not block itself.
 **Location**: `<coaching-root>/.claims/<subject-slug>.claim`
 
 - `<coaching-root>` is the directory that contains the run directories (Spec Kit
-  deployments: `.specify/memory/coaching/`; standalone: the directory in which the run
+  deployments: `.specify/coaching/`; standalone: the directory in which the run
   directory was created).
 - `<subject-slug>` is the lowercase kebab slug of the resolved **subject** name (the skill
   being written); the Trainee slug is carried in the content instead of the filename.

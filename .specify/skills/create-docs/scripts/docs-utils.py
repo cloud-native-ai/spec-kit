@@ -400,7 +400,7 @@ EXEMPTIONS_DIR = Path("docs") / ".speckit" / "exemptions"
 TRACE_REQUIRED = ("document", "engine", "engine_reason", "ldm_summary", "delivery", "source", "rendered")
 
 # C-010 — the recognisable-diagram suffix set. The extension table is owned by
-# `.specify/skills/draw-diagram/references/delivery-contract.md` § D1/D2; this tuple is a projection of
+# `skills/external/draw-diagram/references/delivery-contract.md` § D1/D2; this tuple is a projection of
 # that table and MUST NOT invent an extension the contract does not carry. Read, in the delivery contract's own
 # terms: D1's `.html` entry page; D2's editable sources and the renders it allows beside them; plus the graphviz
 # family the delivery path already reached. No engine is named here: this set says which FILE a reader may
@@ -886,7 +886,7 @@ def main() -> int:
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -942,8 +942,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -956,7 +956,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/create-docs/scripts/docs-utils.py'
+_SIG_SCRIPT = 'skills/external/create-docs/scripts/docs-utils.py'
 _SIG_DECLARED = ('--action', '--allow-special', '--apply', '--items-file', '--json',
                  '--moves', '--only', '--record', '--root', '--scope', '--summary', '--yes')
 _SIG_HELP = (

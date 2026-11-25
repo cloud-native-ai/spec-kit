@@ -1,6 +1,6 @@
 # 团队 → 项目管理概念映射(summary 机制的单一事实源)
 
-> **定位**:本文件是 `036-team-summary` 机制中「团队词汇 → `summarize-project` 项目管理实体」映射的**单一事实源**(FR-001)。表单生成器 `.specify/scripts/build-summary-input.py` 按本文件实现;报告与契约引用本文件而不各自重述。
+> **定位**:本文件是 `036-team-summary` 机制中「团队词汇 → `summarize-project` 项目管理实体」映射的**单一事实源**(FR-001)。表单生成器 `scripts/build-summary-input.py` 按本文件实现;报告与契约引用本文件而不各自重述。
 >
 > **边界**:`summarize-project` 保持不变(只读呈现工具、输入面仍是表单),适配责任全在团队侧(FR-024)。字段定义与约束的权威是该技能的 `schema/project.sql`(DDL),本文件不复写 schema。
 

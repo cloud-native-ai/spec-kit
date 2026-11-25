@@ -48,7 +48,7 @@ insert (placed at the element it refers to)
 A completed block is removed in the same step that lands the work — a stale
 marker would send the next collection run re-planning finished work. Ideas
 with no code touchpoint belong in the park store
-(`.specify/memory/todo/`) instead; the two mechanisms meet when a parked
+(`.specify/todo/`) instead; the two mechanisms meet when a parked
 idea is promoted into an inserted block.
 
 ## Where each rule lives

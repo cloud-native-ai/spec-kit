@@ -27,7 +27,7 @@ def test_skill_record_writes_local_skill_entry(feedback_store: Path):
     assert rc == 0
 
     files = [
-        f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")
+        f for f in (feedback_store / ".specify/feedback").glob("*.md")
     ]
     assert len(files) == 1
     meta, body = feedback_utils.parse_frontmatter(files[0].read_text(encoding="utf-8"))

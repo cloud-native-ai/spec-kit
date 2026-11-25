@@ -157,7 +157,7 @@ def test_carrier_kind_uses_the_closed_roster(eng):
     assert eng.archive_carrier_kind(".specify/features.md", PARENT, SLUGS) == "dated"
     assert eng.archive_carrier_kind(
         ".specify/features/100-fixture-parent.md", PARENT, SLUGS) == "mixed"
-    assert eng.archive_carrier_kind(".specify/memory/session/e.md", PARENT,
+    assert eng.archive_carrier_kind(".specify/session/e.md", PARENT,
                                     SLUGS) == "dated"
     assert eng.archive_carrier_kind(".specify/history/t.md", PARENT, SLUGS) == "dated"
     assert eng.archive_carrier_kind("shared/definitions/x.md", PARENT, SLUGS) == "live"

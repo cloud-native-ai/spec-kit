@@ -1,0 +1,110 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_store_layout_live_refs.py tests/contract/test_runtime_store_layout.py tests/contract/test_coaching_wiring_contract.py tests/contract/test_goal_migration.py tests/contract/test_no_retired_draw_skill_refs.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.............s...........................F..FF..F                        [100%]
+=================================== FAILURES ===================================
+___ TestLiveSurfacesAreMigrated.test_no_live_face_file_retains_the_old_path ____
+[gw40] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_goal_migration.TestLiveSurfacesAreMigrated object at 0x7f66e4f91d50>
+
+    def test_no_live_face_file_retains_the_old_path(self):
+        """Catches live surfaces the explicit list above does not enumerate."""
+        offenders = [
+            p for p in _tracked_files_containing(OLD_PATH_NEEDLE)
+            if not _is_historical(p) and not _is_guard(p) and not _is_ignored_log(p)
+            and not _is_test_evidence_log(p)
+        ]
+>       assert offenders == [], (
+            "live-face files still reference the pre-migration path "
+            f"(historical faces, the {len(GUARD_FILES)} migration guards and "
+            "git-ignored *.log run scratch and test-evidence run logs are excluded by design):\n  "
+            + "\n  ".join(offenders)
+        )
+E       AssertionError: live-face files still reference the pre-migration path (historical faces, the 4 migration guards and git-ignored *.log run scratch and test-evidence run logs are excluded by design):
+E           .specify/specs/094-goal-team-parallel/test-evidence/plan-baseline-46.out
+E           .specify/specs/094-goal-team-parallel/test-evidence/plan-baseline-run.out
+E           .specify/specs/094-goal-team-parallel/test-evidence/wp05-contract-entry.out
+E           .specify/specs/094-goal-team-parallel/test-evidence/wp07-closure-suite.out
+E           .specify/state/raw-runtime-store-layout-implement-p4.jsonl
+E       assert ['.specify/sp...ent-p4.jsonl'] == []
+E         
+E         Left contains 5 more items, first extra item: '.specify/specs/094-goal-team-parallel/test-evidence/plan-baseline-46.out'
+E         Use -v to get more diff
+
+tests/contract/test_goal_migration.py:178: AssertionError
+__________________ test_c3_probe_compiled_face_is_zero_drift ___________________
+[gw20] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c3_probe_compiled_face_is_zero_drift():
+        # Stale-pin update (2026-11-06, Feature 087 second slice /speckit.measure): 78 -> 79
+        # units — the new `speckit-measure-wrapup` registry row
+        # (`shared/definitions/probe-definitions.md`, added by 70df8130) compiles one more
+        # Wrap-up embed into the face, because `templates/commands/measure.md` carries a
+        # compiled `## Wrap-up`. This is the new command's expected increment, not drift: the
+        # same run reports `zero drift`, and the registry row is the truth source that produced
+        # it (the first slice's `status.md` registered no Object, so 78 stands from that slice).
+        # Stale-pin update (2026-11-06, Feature 087 /speckit.status): 77 -> 78 units —
+        # the new thin command's Wrap-up embed joins the compiled face.
+        # Stale-pin update (2026-11-05, improve-skills ssh-utils): 76 -> 77 units —
+        # the ssh-utils Wrap-up embed joins the compiled face.
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 75 -> 76 units — the
+        # review-feature-quality skill's own Wrap-up embed joins the compiled face.
+        proc = _run("scripts/python/probe-utils.py", "--action", "compile-embeds", "--check")
+        assert proc.returncode == 0, proc.stdout + proc.stderr
+>       assert "79 units, zero drift" in proc.stdout
+E       AssertionError: assert '79 units, zero drift' in 'compile-embeds --check: 86 units, zero drift\n'
+E        +  where 'compile-embeds --check: 86 units, zero drift\n' = CompletedProcess(args=['/usr/local/bin/python3', 'scripts/python/probe-utils.py', '--action', 'compile-embeds', '--check'], returncode=0, stdout='compile-embeds --check: 86 units, zero drift\n', stderr='').stdout
+
+tests/contract/test_coaching_wiring_contract.py:362: AssertionError
+_________________ test_c1_eight_identity_coordinates_all_hold __________________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c1_eight_identity_coordinates_all_hold():
+        verdicts = _coordinate_verdicts()
+        assert len(verdicts) == 8, f"coordinate count drifted: {len(verdicts)}"
+        failing = {name: detail for name, (ok, detail) in verdicts.items() if not ok}
+>       assert not failing, "failing identity coordinates: " + repr(failing)
+E       AssertionError: failing identity coordinates: {'8-description-triggers': 'missing=[] call-form=False'}
+E       assert not {'8-description-triggers': 'missing=[] call-form=False'}
+
+tests/contract/test_coaching_wiring_contract.py:276: AssertionError
+_________________ test_c8_the_verification_surface_runs_green __________________
+[gw26] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c8_the_verification_surface_runs_green():
+        checks = {
+            "flow-class check": _run("scripts/python/flow-class-check.py", "--action", "check"),
+            "probe registry": _run("scripts/python/probe-utils.py", "--action", "probes", "--validate"),
+            "probe compile": _run(
+                "scripts/python/probe-utils.py", "--action", "compile-embeds", "--check"
+            ),
+            "mirrors": _run("scripts/python/sync-mirrors.py", "--check"),
+            "command copies": _run("scripts/python/regen-command-copies.py", "--check"),
+            "gate summary": _run("scripts/python/scan-confirmation-gates.py", "--summary"),
+        }
+        failing = {name: proc.returncode for name, proc in checks.items() if proc.returncode != 0}
+        assert not failing, f"verification surface not green: {failing}"
+        # Stale-pin update (2026-11-06, Feature 087 second slice /speckit.measure):
+        # matched=82 -> 83 — the /speckit.measure registration grows the ledger and inventory
+        # together. The feature's two slices moved the command census 27 -> 29 (status.md by
+        # c0fd01ac, measure.md by 70df8130); the ledger_rows=83 reading is the measured sum.
+        # Stale-pin update (2026-11-06, Feature 087 /speckit.status): matched=81 -> 82 —
+        # the /speckit.status registration grows the ledger and inventory together.
+        # Stale-pin update (2026-11-05, improve-skills ssh-utils): matched=80 -> 81 —
+        # the ssh-utils registration grows the ledger and inventory together.
+        # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): matched=79 -> 80 — the
+        # review-feature-quality registration grows the ledger and inventory together.
+>       assert "matched=83" in checks["flow-class check"].stdout
+E       AssertionError: assert 'matched=83' in 'flow-class check: 92 unit(s) scanned, 0 finding(s) [matched=92 inventory_units=92, clean]\ncoverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39\n'
+E        +  where 'flow-class check: 92 unit(s) scanned, 0 finding(s) [matched=92 inventory_units=92, clean]\ncoverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39\n' = CompletedProcess(args=['/usr/local/bin/python3', 'scripts/python/flow-class-check.py', '--action', 'check'], returncod..._units=92, clean]\ncoverage: ledger_rows=92 matched=92 inventory_units=92 gaps=0 parse_errors=0 floor=39\n', stderr='').stdout
+
+tests/contract/test_coaching_wiring_contract.py:456: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c3_probe_compiled_face_is_zero_drift
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green
+4 failed, 44 passed, 1 skipped in 7.69s

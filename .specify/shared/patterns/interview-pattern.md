@@ -169,7 +169,7 @@ The **ledger** is the durable state that lets one interview span sessions, days,
 | Context | Ledger location |
 |---------|-----------------|
 | Inside a feature / spec workflow | `.specify/specs/<feature>/interview-log.md` |
-| No feature context | `.specify/memory/session/` (per the memory-as-files layer) |
+| No feature context | `.specify/session/` (per the memory-as-files layer) |
 | The host defines its own ledger | Use it — never open a second parallel ledger |
 
 Rows are **structured columns**, not free text — and they are what makes conflict handling and retraction mechanical rather than a guess:
@@ -199,7 +199,7 @@ Rows are **structured columns**, not free text — and they are what makes confl
 
 #### Engine (程序优先)
 
-Graph reachability, ordering, and cycle detection are **fixed-rule computations**, so they belong to a program — never re-derived in prose by the model (Principle XII / token-efficiency Program-First). The engine is `.specify/scripts/python/interview-utils.py` (`<TOOL:.specify/memory/tools/interview-utils.py.md>`), backed by a JSON sidecar beside the markdown ledger (`interview-log.md` → `interview-log.dag.json`):
+Graph reachability, ordering, and cycle detection are **fixed-rule computations**, so they belong to a program — never re-derived in prose by the model (Principle XII / token-efficiency Program-First). The engine is `scripts/python/interview-utils.py` (`<TOOL:.specify/tools/interview-utils.py.md>`), backed by a JSON sidecar beside the markdown ledger (`interview-log.md` → `interview-log.dag.json`):
 
 ```bash
 E=.specify/scripts/python/interview-utils.py; L=<ledger>.md

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Provenance: mirrored from .specify/skills/sdd-project-setup/scripts/logical-framework.py
+# Provenance: mirrored from skills/external/sdd-project-setup/scripts/logical-framework.py
 # so this external skill stays independently runnable. Parity is enforced by
 # tests/contract/test_sdd_house_keeping_skill.py (the three provenance lines are ignored).
 """Logical-framework inventory for a Spec Kit project (read-only).
@@ -134,11 +134,10 @@ def check_goals(project: Path):
 
 def check_advisory(project: Path):
     spec = project / ".specify"
-    mem = spec / "memory"
     out = {}
     for key, path in (("glossary", spec / "glossary.md"),
                       ("register", spec / "register.md"),
-                      ("knowledge", mem / "knowledge")):
+                      ("knowledge", spec / "knowledge")):
         out[key] = {"status": OK if path.exists() else GAP,
                     "detail": rel(project, path) if path.exists() else "absent"}
     return out
@@ -158,7 +157,7 @@ def check_conditional(project: Path):
         "teams": {"status": OK if team_dirs else NOT_CONFIGURED,
                   "detail": f"{len(team_dirs)} teams" if team_dirs else "no .specify/teams entries"},
         "agents": {"status": OK if agent_files else NOT_CONFIGURED,
-                   "detail": f"{len(agent_files)} agent definitions" if agent_files else "no .specify/templates/instances"},
+                   "detail": f"{len(agent_files)} agent definitions" if agent_files else "no templates/instances"},
     }
 
 
@@ -222,7 +221,7 @@ def main():
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -278,8 +277,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -291,7 +290,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/sdd-house-keeping/scripts/logical-framework.py'
+_SIG_SCRIPT = 'skills/external/sdd-house-keeping/scripts/logical-framework.py'
 _SIG_DECLARED = ('--json', '--project', '--strict')
 _SIG_HELP = (
     'usage: logical-framework.py [options]\n'

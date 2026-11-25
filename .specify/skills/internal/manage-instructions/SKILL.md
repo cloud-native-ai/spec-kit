@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-instructions/SKILL.md>"
 
 # manage-instructions
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -19,15 +19,15 @@ compatibility symlinks (`CLAUDE.md`, `QODER.md`, `AGENTS.md`, `.github/copilot-i
 converge non-destructively.
 
 Owning command: `/speckit.instructions`. Canonical extraction source:
-`.specify/templates/commands/instructions.md` § Overview content guidelines, § Update Strategy,
+`templates/commands/instructions.md` § Overview content guidelines, § Update Strategy,
 § Glossary Initialization, § Error Handling, and § Actions 1–8. Content moved here in
 substance; the command template keeps entry, user-input handling, the frontmatter `scripts:`
 wiring, and the wrap-up lifecycle steps only.
 
 **Existing delegations (not absorbed)**: the memory face is already delegated and stays at
 command level — prior-memory recall (touched by Action 4) lives in the native `memory-recall`
-skill (`.specify/skills/internal/memory-recall/SKILL.md`), and run-outcome recording (Action 8) lives
-in the native `memory-record` skill (`.specify/skills/internal/memory-record/SKILL.md`). This skill
+skill (`skills/internal/memory-recall/SKILL.md`), and run-outcome recording (Action 8) lives
+in the native `memory-record` skill (`skills/internal/memory-record/SKILL.md`). This skill
 references them where its workflow touches them; it does not restate their rules.
 
 ## Input Contract
@@ -49,7 +49,7 @@ Content guidelines for `.specify/instructions.md` — what the convergence pass 
 - **Map, not manual (地图而非手册)**: the file's job is to answer *what exists* and *where it
   lives*, then point to the owning document — never to teach *how*. Operational detail
   (workflows, step sequences, invocation rules) belongs in the documents the map points to
-  (constitution, `docs/`, `.specify/shared/` definitions, skill/command files); when tempted to explain
+  (constitution, `docs/`, `shared/` definitions, skill/command files); when tempted to explain
   a procedure here, replace it with a pointer to the canonical doc that owns it.
 - If `.specify/instructions.md` already exists, merge intelligently: preserve valuable content
   and update only what is outdated.
@@ -95,7 +95,7 @@ current state), and partial update is directed convergence.
 - **Scope zones**: `.specify/workflow/git.md` is owned by the `git-utils` skill (scope A) —
   observed but never converged here. No managed registry ranges exist in the current template:
   skills and tools are discovered via their directories (`.specify/skills/`,
-  `.specify/memory/tools/`), not registered.
+  `.specify/tools/`), not registered.
 
 When `$ARGUMENTS` is empty (full reconcile):
 
@@ -152,7 +152,7 @@ Fallback behavior:
 
 ### Action 1 — Setup
 
-Run `{SCRIPT}` (`.specify/scripts/bash/generate-instructions.sh`, mirrored at
+Run `{SCRIPT}` (`scripts/bash/generate-instructions.sh`, mirrored at
 `.specify/scripts/bash/generate-instructions.sh`) to ensure the basic directory structure,
 `.copilotignore`, and template `.specify/instructions.md` exist.
 
@@ -241,7 +241,7 @@ projects damaged before the non-destructive fix.)
 - Check `.specify/constitution.md` (if exists) to identify any mandated project rules.
 - Check `.specify/features.md` (if exists) for feature status reference.
 - **Recall face — existing delegation**: prior project memory is retrieved by the native
-  `memory-recall` skill (`.specify/skills/internal/memory-recall/SKILL.md`), which stays at command
+  `memory-recall` skill (`skills/internal/memory-recall/SKILL.md`), which stays at command
   level and is not restated here. Its recalled conventions, user preferences, durable
   decisions, and prior-run outcomes are treated in this workflow as hand-authored /
   non-derivable inputs to Action 5 — must-keep knowledge on par with content recovered from
@@ -340,7 +340,7 @@ empty-of-user-content, so its sections are simply filled in.
     table is real data and MUST NOT be lost), then replace the section with the template's
     pointer paragraph.
   - Replace the registry tables with the template's `## Skills & Tools` pointer section. The
-    rows are re-derivable from `.specify/skills/` and `.specify/memory/tools/` directories, so
+    rows are re-derivable from `.specify/skills/` and `.specify/tools/` directories, so
     dropping them loses nothing; note the removal in the residual report.
   - Never delete hand-authored rows that clearly differ from machine-generated shape (e.g. a
     user-written note under `### Tools`); move such content into the owning section or report
@@ -400,7 +400,7 @@ empty-of-user-content, so its sections are simply filled in.
 
 **Record face — existing delegation** (stays at command level; the memory skill's rules are
 not restated here): the native `memory-record` skill
-(`.specify/skills/internal/memory-record/SKILL.md`) persists this run's outcome — skipped for trivial
+(`skills/internal/memory-record/SKILL.md`) persists this run's outcome — skipped for trivial
 no-op runs where all sections were within tolerance and the arguments were empty. What this
 workflow hands it:
 
@@ -415,7 +415,7 @@ workflow hands it:
 
 - User-input processing, the frontmatter `scripts:` wiring, and the wrap-up lifecycle steps
   (Artifact Commit, Feedback, Documentation) stay with the command template
-  `.specify/templates/commands/instructions.md`; this skill starts from the processed intent and ends
+  `templates/commands/instructions.md`; this skill starts from the processed intent and ends
   before the wrap-up wiring.
 - The memory face stays with the existing `memory-recall` / `memory-record` skills (Action 4 /
   Action 8) — this skill neither duplicates nor replaces them.

@@ -1,0 +1,3 @@
+migrate plan — mode=apply, workspace-kind=framework-source, items=0
+outcome: clean (exit 0)
+pointer: goal/team archive migration stays with /speckit.anchor migrate-archive

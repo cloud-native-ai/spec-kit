@@ -23,7 +23,7 @@ required artifacts / owned-only paths / commit obligation mapping (contract
 C-50); the reference section of the same name is its human-readable mirror.
 
 Thresholds: start-grace / deadline-grace / heartbeat-max-age defaults are owned
-by .specify/scripts/watch-target.sh (--help "Defaults:" line). This engine never embeds
+by scripts/watch-target.sh (--help "Defaults:" line). This engine never embeds
 a second set of numbers; when discovery fails the value stays unknown and the
 dependent checks do not fire. retry_limit default is owned by
 references/stage-prompts.md § Stall Handling.
@@ -31,7 +31,7 @@ references/stage-prompts.md § Stall Handling.
 Thresholds and evidence semantics mirror `watch-target.sh` (R-03/R-05): the
 four-piece files are space envelopes, the sentinel is the last non-empty log
 line == the render of the declaration-layer fact `driver-completion-sentinels`
-(`.specify/shared/declarations/facts/driver-completion-sentinels.yaml#/statement`), and
+(`shared/declarations/facts/driver-completion-sentinels.yaml#/statement`), and
 watcher verdict codes (10-16) are data recorded in watch_verdict.exit_code,
 never reused as this CLI's code.
 
@@ -88,11 +88,11 @@ FORMS_065A = [
 #
 # Four values this engine used to spell inline are declaration-layer facts:
 #
-#   driver-stage-sequence       .specify/shared/declarations/facts/driver-stage-sequence.yaml#/statement
-#   driver-stage-artifacts      .specify/shared/declarations/facts/driver-stage-artifacts.yaml#/statement
-#   driver-completion-sentinels .specify/shared/declarations/facts/driver-completion-sentinels.yaml#/statement
+#   driver-stage-sequence       shared/declarations/facts/driver-stage-sequence.yaml#/statement
+#   driver-stage-artifacts      shared/declarations/facts/driver-stage-artifacts.yaml#/statement
+#   driver-completion-sentinels shared/declarations/facts/driver-completion-sentinels.yaml#/statement
 #
-# All three are read through the one shared entry (`.specify/scripts/python/declaration_reader.py`), so editing
+# All three are read through the one shared entry (`scripts/python/declaration_reader.py`), so editing
 # a declaration changes this engine's behaviour with no edit here, and a second copy of any of these
 # values in this file is the defect the layer exists to make impossible (`C-047` steps 3–5).
 #
@@ -113,7 +113,7 @@ def declaration_entry():
 
     The engine exists in three physical copies — the framework source, this repository's mirror and a
     client project's `.specify/` — so the walk resolves each copy to its **own** layer: the nearest
-    ancestor carrying `.specify/scripts/python/declaration_reader.py` is the layer that invocation belongs to,
+    ancestor carrying `scripts/python/declaration_reader.py` is the layer that invocation belongs to,
     and a nested tree cannot misdirect it. Read-only: nothing is written, and the import happens only
     once, at module load.
     """
@@ -205,7 +205,7 @@ SENTINEL_TRANSFORM = str(SENTINEL_SHAPE.get("transform") or "").strip().lower()
 # ---------------------------------------------------------------------------
 
 IMPLEMENT_CODE_PATHSPEC = [
-    "src/", "skills/", ".specify/scripts/", "tests/", ".specify/templates/", "agents/",
+    "src/", "skills/", "scripts/", "tests/", "templates/", "agents/",
 ]
 
 STAGE_ARTIFACTS = {
@@ -3137,7 +3137,7 @@ def main(argv=None):
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -3193,8 +3193,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -3206,7 +3206,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/sdd-loop-driver/scripts/loop-state.py'
+_SIG_SCRIPT = 'skills/external/sdd-loop-driver/scripts/loop-state.py'
 _SIG_DECLARED = ('--action', '--deadline-grace', '--heartbeat-max-age', '--line-id', '--out', '--probe', '--repo', '--retry-limit', '--self-test', '--spec-dir', '--spine', '--stage', '--start-grace', '--state-dir', '--watch-script')
 _SIG_HELP = (
     'usage: loop-state.py [options]\n'

@@ -13,13 +13,13 @@ validate_resource_id = skills_utils.validate_resource_id
 
 def test_normalize_workspace_path_returns_posix_relative(tmp_path: Path):
     workspace = tmp_path
-    target = workspace / ".specify" / "memory" / "tools" / "demo.md"
+    target = workspace / ".specify" / "tools" / "demo.md"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text("# demo\n", encoding="utf-8")
 
     normalized = normalize_workspace_path(target, workspace)
 
-    assert normalized == ".specify/memory/tools/demo.md"
+    assert normalized == ".specify/tools/demo.md"
 
 
 def test_normalize_workspace_path_rejects_outside_workspace(tmp_path: Path):

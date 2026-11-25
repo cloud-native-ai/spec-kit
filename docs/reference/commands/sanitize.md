@@ -14,7 +14,7 @@ Framework material hygiene: detects stale/residual and redundant materials (sema
 
 **Renumber lane (`--lane renumber`)** — sequence-number collision repair for concurrent/parallel lines: Preflight → Scan → Plan/Present → Confirm → Apply. Four families: spec directory numbers (`.specify/specs/NNN-slug`), register IDs (`REC-<prefix>-NN`, `OI-<prefix>-NN`, `OI-N`, `T-NNN`), REC/OI prefix-follow for a renamed spec, and feature-local `T`/`CHK` duplicates. Repair is **duplicate-only**: a freed number is never reused and gaps are never compacted.
 
-**Layout lane (`--lane layout`)** — anchor-layout convergence for projects initialized under an older generation: Preflight → Detect → Present → Apply → Verify. The legacy anchors (`.specify/memory/{features,constitution,glossary,register,tools}.md`) converge to the `.specify/` root, and `memory/features/<NNN>.md` details become `.specify/features/<NNN>-<slug>.md`. The engine is archive-first: a placeholder target is replaced by the legacy real content; two real contents are merged (feature-registry table union or append marker) with both originals archived; a duplicate is archived. Only an unmergeable structural target (non-empty directory, broken link, unreadable content) is refused and left in place. The engine never rewrites the project's documents — it prints the reference paths the caller must update. Decision gate: functional × autonomous → repair and disclose, not stop-and-ask.
+**Layout lane (`--lane layout`)** — anchor-layout convergence for projects initialized under an older generation: Preflight → Detect → Present → Apply → Verify. The legacy anchors (`{features,constitution,glossary,register,tools}.md` kept inside the retired store container — see the framework-map tombstone row) converge to the `.specify/` root, and the container's `features/<NNN>.md` details become `.specify/features/<NNN>-<slug>.md`. The engine is archive-first: a placeholder target is replaced by the legacy real content; two real contents are merged (feature-registry table union or append marker) with both originals archived; a duplicate is archived. Only an unmergeable structural target (non-empty directory, broken link, unreadable content) is refused and left in place. The engine never rewrites the project's documents — it prints the reference paths the caller must update. Decision gate: functional × autonomous → repair and disclose, not stop-and-ask.
 
 ### Engine Calls
 
@@ -22,7 +22,7 @@ Framework material hygiene: detects stale/residual and redundant materials (sema
 python3 .specify/scripts/python/sanitize-utils.py --action collect --workspace-root . --format json
 python3 .specify/scripts/python/sanitize-utils.py --action record --file <verdicts.json> --workspace-root . --format json
 python3 .specify/scripts/python/sanitize-utils.py --action status --workspace-root . --format json
-python3 .specify/scripts/python/sanitize-utils.py --action apply --plan .specify/memory/sanitize/cleanup-plan.json --workspace-root . --format json
+python3 .specify/scripts/python/sanitize-utils.py --action apply --plan .specify/sanitize/cleanup-plan.json --workspace-root . --format json
 ```
 
 ### Retention Engine Calls
@@ -36,7 +36,7 @@ python3 .specify/scripts/python/record-retention.py --action apply --plan <plan.
 
 The lane's store roster and its default grace are machine facts owned by `shared/declarations/facts/memory-retention-thresholds.yaml#/statement` and read by `scripts/python/record-retention.py`; this page states the lane's judgement, not the values. A raw record is deleted only when a retention receipt covers it and the declared grace has elapsed. Never retired: open feedback, unsettled run-determination records, unreadable exec-quant records, and session notes without a promotion/ephemeral decision.
 
-Retention artifacts are durable evidence under `.specify/memory/retention/`:
+Retention artifacts are durable evidence under `.specify/retention/`:
 
 | Path | Content |
 |------|---------|
@@ -60,11 +60,11 @@ python3 .specify/scripts/python/renumber-utils.py --action status --workspace-ro
 Stage semantics:
 
 - **Scan** is read-only and reports per-family counts, the collision groups, and informational notes (non-conforming spec prefixes such as `065a-`, register codes with no machine allocation rule).
-- **Plan** writes `confirmed: false` under `.specify/memory/renumber/plans/`. Each group names the kept owner with its evidence, the old → new token, the full reference inventory (file × hit count), branch-name guards, ambiguous-reference counts and cross-group dependencies. Next-free allocation counts archived spec numbers and never reuses a freed number.
+- **Plan** writes `confirmed: false` under `.specify/renumber/plans/`. Each group names the kept owner with its evidence, the old → new token, the full reference inventory (file × hit count), branch-name guards, ambiguous-reference counts and cross-group dependencies. Next-free allocation counts archived spec numbers and never reuses a freed number.
 - **Confirm** is the same single front-loaded destructive batch as the cleanup plan — no second gate — unless `--auto-confirm` proves the plan reversible: duplicate-only, no ambiguous references, every mapping still valid, and every target path git-clean. The engine then writes `confirmed: true` itself and reports `autoConfirmed: true`; otherwise the plan stays `confirmed: false` for the batch. A group with ambiguous references is `needs-decision` and is never guessed: a duplicated identifier cannot say which definition a mention means. `--adopt-ambiguous-refs` exists only for the user-stated reading that every mention refers to the kept definition.
 - **Apply** requires `confirmed: true` and a git workspace (a directory rename outside git loses its history). It re-checks the mapping, the git-clean state of every target and the branch guard, executes renames plus rewrites, re-scans, and writes one ledger per batch. Rewrites cover framework-owned materials; `.specify/history/`, archives, `test-evidence/` logs and date-named files keep the old identity and are reported as `excluded_hits` (not a failure). Branch renames are printed as `git branch -m` commands, never executed.
 
-Renumber artifacts under `.specify/memory/renumber/` are durable evidence, one file per entry (concurrent writers never share a path):
+Renumber artifacts under `.specify/renumber/` are durable evidence, one file per entry (concurrent writers never share a path):
 
 | Path | Content |
 |------|---------|
@@ -74,7 +74,7 @@ Renumber artifacts under `.specify/memory/renumber/` are durable evidence, one f
 
 ## Findings Store
 
-`.specify/memory/sanitize/findings.json` — a cumulative ledger keyed by stable IDs (`sha1(category|target)[:12]`). Lifecycle: `pending` → `resolved` (disposition executed) or `dismissed` (user rejects); findings not re-detected on a full scan auto-resolve (external fixes converge naturally); re-detection after resolution reopens the finding (regression signal).
+`.specify/sanitize/findings.json` — a cumulative ledger keyed by stable IDs (`sha1(category|target)[:12]`). Lifecycle: `pending` → `resolved` (disposition executed) or `dismissed` (user rejects); findings not re-detected on a full scan auto-resolve (external fixes converge naturally); re-detection after resolution reopens the finding (regression signal).
 
 ## Detection Categories
 
@@ -105,4 +105,4 @@ Checks and cleanup target **framework-owned materials only** (memory layer, spec
 - [Docs Command](docs.md) — delegated docs content reconciliation
 - [Memory System](../skills/memory.md) — session/knowledge layout and retention lane
 - [Feedback System](../skills/feedback.md) — feedback store lifecycle and retirement
-- Tool record: `.specify/memory/tools/sanitize-utils.py.md`
+- Tool record: `.specify/tools/sanitize-utils.py.md`

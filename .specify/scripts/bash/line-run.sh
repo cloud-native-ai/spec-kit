@@ -4,7 +4,7 @@
 # Semantics and the exit-status table are owned by the contract
 # `.specify/specs/102-line-registry-registration/contracts/line-run.contract.md` (C-01…C-19).
 # The registration criterion — when a long task MUST use this wrapper — is owned by
-# `.specify/shared/guidelines/reporting-obligations.md` § 九; this file implements the carrier only.
+# `shared/guidelines/reporting-obligations.md` § 九; this file implements the carrier only.
 #
 # Registry writes go only through the engine `line-registry.py`. This wrapper writes no state
 # itself, keeps no heartbeat file and installs no signal trap: it emits exactly two engine
@@ -27,7 +27,7 @@ SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # script-interface: the sourceable guard block (086) lives in script-interface.sh and sits
 # above this file's own parsing and above every read and write, which is what keeps `-h`,
 # `--help` and `--version` free of side effects.
-# Authority: .specify/shared/definitions/script-interface-definitions.md section 4.
+# Authority: shared/definitions/script-interface-definitions.md section 4.
 SCRIPT_INTERFACE_LIB="$SCRIPT_DIR/script-interface.sh"
 if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
     # shellcheck source=/dev/null

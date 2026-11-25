@@ -240,15 +240,16 @@ def detect(target: Path) -> dict:
     }
     feature_rows = 0
     if specify.is_dir():
-        memory = specify / "memory"
-        constitution = memory / "constitution.md"
+        # The project anchors live at the `.specify/` root (anchor-layout move); the
+        # `memory` tier below is the report's output vocabulary, never a path.
+        constitution = specify / "constitution.md"
         if constitution.is_file():
             artifacts["constitution"] = str(constitution.relative_to(target))
-        features_index = memory / "features.md"
+        features_index = specify / "features.md"
         if features_index.is_file():
             artifacts["features_index"] = str(features_index.relative_to(target))
             feature_rows = count_feature_rows(features_index)
-        features_dir = memory / "features"
+        features_dir = specify / "features"
         if features_dir.is_dir():
             artifacts["feature_files"] = len(list(features_dir.glob("*.md")))
         specs_dir = specify / "specs"

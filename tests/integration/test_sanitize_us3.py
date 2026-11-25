@@ -42,7 +42,7 @@ def assemble(tmp_path: Path) -> Path:
 
 
 def record_stale_finding(ws: Path) -> dict:
-    target = ".specify/memory/todo/20260812-backlog.md"
+    target = ".specify/todo/20260812-backlog.md"
     finding = {
         "id": sid("stale-residue", target),
         "category": "stale-residue", "target": target, "severity": "high",

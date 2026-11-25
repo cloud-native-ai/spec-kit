@@ -148,7 +148,7 @@ def codex_minimal_resource_path(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def feedback_store(tmp_path: Path) -> Path:
-    """Isolated feedback store workspace containing .specify/memory/feedback/."""
+    """Isolated feedback store workspace containing .specify/feedback/."""
     store_dir = tmp_path / ".specify" / "memory" / "feedback"
     store_dir.mkdir(parents=True, exist_ok=True)
     (store_dir / ".gitkeep").touch()

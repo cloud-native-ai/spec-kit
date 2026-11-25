@@ -1,12 +1,12 @@
 # Dispatch Recipes — 五大执行机制命令形态（sdd-loop-driver）
 
-> 本文件是宿主 agent 驱动阶段子代理的**操作手册**：本地拓扑用 **fork 承载**（同族 `qodercli` 子进程经 `.specify/scripts/stage-runner.sh`；异构 agent 用 subprocess 承载），远端拓扑用外部 agent CLI；全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
+> 本文件是宿主 agent 驱动阶段子代理的**操作手册**：本地拓扑用 **fork 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`；异构 agent 用 subprocess 承载），远端拓扑用外部 agent CLI；全部命令形态自包含可用，不依赖任何框架文档（对撰写底稿的引用仅为溯源注解）。所有路径、用户名、别名均为入口参数占位——机制零硬编码。
 >
 > **委派化声明（2026-10-16 裁定）**：与配方真源 `.specify/shared/workflow/external-dispatch-recipes.md` 同型的机制段已坍缩为引用；本文件保留 **loop-driver 特有差异面**（心跳机制、脱离形态权威落点、阶段链与收尾编排）与对真源的引用——单一事实落点，重复即漂移。
 
 ## Preflight — 前置检查（引用 run-agent 公用承载；U0 与 U1 之间）
 
-> 五族前置检查表与失败处置链已上收至 `.specify/skills/internal/run-agent/references/dispatch-preflight.md`（2026-10-16 上收，本表唯一权威落点在彼处）——检查先于 U1 派发；结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。⑤ fail（`.specify/` 缺失/退化）handoff sdd-project-setup（缺失=install、退化=refresh）的软协同语义随表迁移；①②③ fail 停线上送、④ uncertain 列待补清单的处置链同见该文件。
+> 五族前置检查表与失败处置链已上收至 `skills/internal/run-agent/references/dispatch-preflight.md`（2026-10-16 上收，本表唯一权威落点在彼处）——检查先于 U1 派发；结论（逐项 ok / fail / uncertain）以**每项 ≤3 行摘要**写入该线状态脊的前置检查段。⑤ fail（`.specify/` 缺失/退化）handoff sdd-project-setup（缺失=install、退化=refresh）的软协同语义随表迁移；①②③ fail 停线上送、④ uncertain 列待补清单的处置链同见该文件。
 
 ## Recipe 0 — 断点探测（Breakpoint Probe）
 
@@ -20,7 +20,7 @@
 
 **并发承载（FR-035 / C-094）**：并发的承载 MUST 是**独立子进程**，且仅有两类合法形态；宿主内建 Agent 扇出（in-process subagent）路径 **BANNED**（既不是缺省、也不是降级选项）：
 
-- **FORK 承载（同族缺省）**：每个并发单元/阶段是一个**独立的 `qodercli` 子进程**，经 `.specify/scripts/stage-runner.sh` 启动——prompt 经 stdin 传入、输出以 `--output-format stream-json` 流式落盘、完成以阶段哨兵判定。进程池上限取宿主 `nproc` 的**运行期读数**（MUST NOT 写成常量）；请求并发度取阶段/运行声明；实际进程数 = min(请求值, nproc 读数, 槽位上限)。命令形态见本文件 Recipe 2（本地与远端同构）。
+- **FORK 承载（同族缺省）**：每个并发单元/阶段是一个**独立的 `qodercli` 子进程**，经 `scripts/stage-runner.sh` 启动——prompt 经 stdin 传入、输出以 `--output-format stream-json` 流式落盘、完成以阶段哨兵判定。进程池上限取宿主 `nproc` 的**运行期读数**（MUST NOT 写成常量）；请求并发度取阶段/运行声明；实际进程数 = min(请求值, nproc 读数, 槽位上限)。命令形态见本文件 Recipe 2（本地与远端同构）。
 - **SUBPROCESS 承载（异构 agent）**：当并发单元由与 `qodercli` 不同族的 agent CLI 执行时，由**该 agent 自身 CLI 的独立子进程**承载，并与 FORK 承载满足同一判据：独立进程、逐单元派发/返回区间（最大重叠数即 effective）、完成以哨兵或退出记录判定；MUST NOT 因族差异回落到宿主内建扇出。
 - **in-process 路径不是承载**：同一进程内的 subagent 共享一个进程与一个 CPU 核，扇出只会把单核跑满；该路径 MUST NOT 被计为满足「并行派发」条件，也 MUST NOT 在派发记录中被写成并发机制。无进程承载能力时，登记串行并给出具名理由码（`host-no-parallel`，证据为该次运行的能力探针读数），MUST NOT 声称并行。
 
@@ -40,9 +40,9 @@
 
 ## 阶段子代理预算与分段（Stage Subagent Budget & Bounded Dispatch）
 
-- **测试入口（FR-036）**：任何测试执行 MUST 经 `.specify/scripts/bash/run-tests.sh`（缺省 xdist 形态；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
+- **测试入口（FR-036）**：任何测试执行 MUST 经 `scripts/bash/run-tests.sh`（缺省 xdist 形态；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
 - **默认预算**：阶段执行子代理的 `run-turn-budget` 统一为 **500**（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-10-22 由 40 上调至 120，2026-11-05 在 1M-context 运行档下由 120 上调至 400，2026-11-06 统一为 500）。预算变更属 source change，必须同步 agent 模板、`.specify/agents/templates/` 镜像与各工具 render。
-- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并发上限取运行期槽位上限（读 `.specify/shared/declarations/facts/concurrency-slot-and-reserve.yaml` 的 `slot_cap_default` 并与天花板取 min；本文件不写数字）；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
+- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并发上限取运行期槽位上限（读 `shared/declarations/facts/concurrency-slot-and-reserve.yaml` 的 `slot_cap_default` 并与天花板取 min；本文件不写数字）；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
 - **输出纪律**：子派发 brief MUST 要求执行者用工具**分段写文件**（每次 Write/Edit 一部分），禁止在一个回复里输出整段实现或整份测试；每段回传改动清单、测试计数、提交哈希。这样同时规避 output-token 上限。
 - **状态字段**：状态脊记录 `turn_budget`、`sub_dispatch`、`part_scope`、`checkpoint`；预算耗尽/输出上限属 U5 预算触顶，按卡死处置上报，不得伪完成。
 
@@ -50,13 +50,13 @@
 
 每阶段把完整指令经 heredoc 写为远端文件（不内联进命令行）。落盘命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 2——本配方坍缩为引用。
 
-两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`.specify/skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
+两条本技能纪律保留：提示词三段骨架（背景与权威文档 / 执行要求 / 完成尾标与回传契约）见 `stage-prompts.md`——骨架内容是本技能的编排本体；反嵌套红线义务真源在 run-agent 派发治理（`skills/internal/run-agent/SKILL.md`），派发前自检涵盖本配方。
 
 ## Recipe 2 — Runner 脚本与派生（Runner & Derivation）——**正证据四件套差异面**
 
 > **使用面（FR-035 / C-094）**：`stage-runner.sh` 不只是远端机制——**本地缺省阶段派发同样以它作为 FORK 承载**（同族 `qodercli` 子进程；prompt 经 stdin、`--output-format stream-json`、完成以阶段哨兵判定；进程池上限取运行期 `nproc` 读数，不固化）。宿主内建 in-process subagent 路径 BANNED，不作为并发承载；异构 agent 走 SUBPROCESS 承载（该 agent 自身 CLI 的独立子进程）。
 
-基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `.specify/scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
+基础 runner 形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 3。**2026-10-20 起，逐阶段 `sed` 派生旧形态被 `scripts/stage-runner.sh` 取代**（单点可测试、消除每阶段副本漂移）：runner 是参数化单阶段进程，不自行 detach，由 Recipe 3 的 `nohup` 形态启动。旧 `sed` 形态仅作历史注记，MUST NOT 再用于新派发。本技能差异面——**pid / status / log / heartbeat 正证据四件套**（无人值守长跑的完成判定与存活判定都依赖它们；模型见 `watch-model.md` §2）以及 stream 证据对：
 
 ```bash
 bash <skill-dir>/scripts/stage-runner.sh \
@@ -94,7 +94,7 @@ HOOK_EVENT_DIR="$dir" HOOK_STAGE="$stage" HOOK_FIFO="$dir/hook-done-$line-$stage
 ```
 
 - hook 事件只产生 `hook=observed`；退出记录/哨兵仍是权威。正常完成时 hook 缩短等待，API 崩溃时 Stop 不触发、由 status/exit 记录判 FAILED。
-- 模板：`.specify/scripts/hook-stop.sh`；本地/远端模型与故障矩阵见 `watch-model.md` §11–§12。
+- 模板：`scripts/hook-stop.sh`；本地/远端模型与故障矩阵见 `watch-model.md` §11–§12。
 
 ## Recipe 3 — 脱离模式派发 + 统一监听（Detached Dispatch & Unified Watch，远端缺省形态）——**nohup 权威落点**
 
@@ -170,7 +170,7 @@ ssh -o BatchMode=yes <alias> \
 
 - 阶段链固定顺序：`requirements → clarify → plan → tasks → checklist → analyze → implement → review`（2026-10-17 修订：纳入 checklist/analyze 质量门——无人值守循环执行完整版流程，日常手动开发常省略的非必须命令一律必经）；每阶段完成哨兵 = 大写阶段名 + `-DONE`（如 `PLAN-DONE`、`CHECKLIST-DONE`、`ANALYZE-DONE`）。尾标是完成的必要条件，充分条件由独立校验补齐。
 - **U3→U4 接线**：U3 的终止判定决定去向——`DONE` / `INCOMPLETE` 进 U4 独立校验（`INCOMPLETE` 按伪完成处理）；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` 直接进 U5。U4 通过后才派发下一阶段。
-- **快车道裁决点（tasks U4 之后、checklist 派发之前）**：入口携带字面量 `fast-lane=opt-in` 时，驱动在该点调用 `.specify/scripts/admission-check.py`（七判据与接口 owner：`references/efficiency-model.md` §1.2），把 E1 准入记录写入状态脊后再决定下一派发：
+- **快车道裁决点（tasks U4 之后、checklist 派发之前）**：入口携带字面量 `fast-lane=opt-in` 时，驱动在该点调用 `scripts/admission-check.py`（七判据与接口 owner：`references/efficiency-model.md` §1.2），把 E1 准入记录写入状态脊后再决定下一派发：
   - `decision=fast-lane` → 跳过 `checklist`，在状态脊与收尾标记 `checklist=skipped(fast-lane)`，随后派发 `analyze`（快车道保留 analyze 与 review，见 efficiency-model §1.6）；下游 implement/review 提示词携带 `references/stage-prompts.md` 的快车道条件块。
   - `decision=full-chain`（含任一判据 fail 或无法证明）→ 照常派发 `checklist`，完整链不变。
   - **回退序列**：录取后判据失效或后续阶段发现新事实时，写状态脊 `reversion{trigger,evidence,at}` → 回退完整链 → 在适用位置补派 `checklist` → 若 `analyze` 已通过，补派后重过 `analyze` 一次 → 继续完整链；回退不得静默（efficiency-model §1.5）。
@@ -199,7 +199,7 @@ ssh -o BatchMode=yes <alias> \
 
 ## Recipe 5 — 本地拓扑与远端 runner 变体
 
-> **SDD local default**：本地拓扑的缺省承载是 **FORK 承载**（同族 `qodercli` 子进程经 `.specify/scripts/stage-runner.sh`，见本文件 `## 本地原生拓扑`）；异构 agent 用 **SUBPROCESS 承载**（该 agent 自身 CLI 的独立子进程）。宿主内建 in-process subagent 路径 **BANNED**。下面的脱离/统一监听形态在本地与远端同构（本地缺省即 fork 子进程 + 窗口监听；远端为 ssh 下的同形 runner）。
+> **SDD local default**：本地拓扑的缺省承载是 **FORK 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`，见本文件 `## 本地原生拓扑`）；异构 agent 用 **SUBPROCESS 承载**（该 agent 自身 CLI 的独立子进程）。宿主内建 in-process subagent 路径 **BANNED**。下面的脱离/统一监听形态在本地与远端同构（本地缺省即 fork 子进程 + 窗口监听；远端为 ssh 下的同形 runner）。
 
 - **本地 fork 缺省**：项目在本机时省略 ssh/su；需求上下文先写简报文件（`<repo>/.specify/.tmp/sdd-loop/tmp/<line_id>/brief-<topic>.md`，HR11 唯一落点；shared Recipe 5 的 `~/tmp` 示例不适用于本技能），阶段提示词经 `stage-runner.sh` 的 stdio/文件形态传入；监听按 `watch-model.md`（fork 子进程与远端 runner 同规）。命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5 与本节 runner 形态。
 - **远端 runner（缺省形态，与远端同构）**：`setsid` 可用时优先，本机 macOS 无 `setsid` 时用 `nohup + disown`；stdin 接 `/dev/null`，stdout/stderr 重定向到 runner-log：
@@ -240,7 +240,7 @@ ssh -o BatchMode=yes <alias> \
 
 ## Recipe 6 — 线路登记、归属信封与消息入口（064）
 
-**环境级 Line Registry**：同一 OS 用户一份，缺省 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`，`SPECIFY_LINE_REGISTRY_DIR` 可覆盖；每线一个 `<line_id>.json`，同线更新以 `<line_id>.lock` 排他锁串行化，写入为临时文件 + `fsync` + `os.replace` 原子替换。引擎无框架依赖：`.specify/scripts/line-registry.py`（Python 3 stdlib-only）。
+**环境级 Line Registry**：同一 OS 用户一份，缺省 `${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`，`SPECIFY_LINE_REGISTRY_DIR` 可覆盖；每线一个 `<line_id>.json`，同线更新以 `<line_id>.lock` 排他锁串行化，写入为临时文件 + `fsync` + `os.replace` 原子替换。引擎无框架依赖：`scripts/line-registry.py`（Python 3 stdlib-only）。
 
 **U0.5 注册（首次派发前）**：
 
@@ -320,17 +320,17 @@ python3 <skill-dir>/scripts/line-registry.py --action ownership-check \
 ### Integration Protocol（单一协调者）
 
 1. `integration-plan`：输入 `state=completed` 且 `merge_ready=true` 的条目 + 各线 `integration_depends_on`；拓扑分层，同层按 `(ready_for_merge_at, line_id)`，重放逐字相同；环 → 显式拒绝。
-2. 逐线序列由可执行执行器完成（`.specify/scripts/integrate-lines.py`；stdout 输出 JSON 摘要，含每线状态与 `archive_calls`/`mirror_calls` 计数）：
+2. 逐线序列由可执行执行器完成（`scripts/integrate-lines.py`；stdout 输出 JSON 摘要，含每线状态与 `archive_calls`/`mirror_calls` 计数）：
 
    ```bash
    python3 <skill-dir>/scripts/integrate-lines.py \
      --repo <repo> --trunk <trunk> --registry <registry> --archive <archive-dir> \
-     [--gate-cmd "<完整质量门命令>"] [--mirror-cmd "python3 .specify/scripts/python/sync-mirrors.py --write ..."] \
+     [--gate-cmd "<完整质量门命令>"] [--mirror-cmd "python3 scripts/python/sync-mirrors.py --write ..."] \
      [--lines <line>[,<line>...]]
    ```
 
    执行器按顺序执行：`git -C <worktree> rebase <trunk>` → 质量门 → `git -C <repo> merge --ff-only <rebased-sha>` → `integration-record --result merged --commit` → `archive-runtime`（移除 worktree 之前，冲突保留双方） → `git worktree remove <worktree>`（仅 merged，**无 `--force`**）。仓库必须已检出 trunk；执行器**不切换分支**，不满足时显式失败。
-   质量门**缺省即 closure 判定**：执行器从该线 `branch` 的前三位特性号 + 该线 worktree 内 `.specify/features.md` 对应行的 `Spec Path` 解析出 spec 目录，在该线**闭合**处运行 `.specify/scripts/python/closure-acceptance-check.py`（判定时点是特性线闭合，不是每个切片合并；切片合并由 review 门判定）；`block` 先在 `completed` 态记录 `integration-record --result failed --reason closure-blocked`，随后把该线标 `blocked`——线不是也不得再是 `completed`。`--gate-cmd` 仍可覆盖命令，被覆盖的门失败记其原有 `quality-gate` 原因。输入错误（分支无三位特性号 / 注册表无该行 / `Spec Path` 空 `-` / 解析目录不存在）记 `closure-input-error`、线状态不变并拒绝合并。封闭原因集、退出码与 `final_path` 形态的真源：`.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict（按路径 + 章节锚引用，本文件不复述）。
+   质量门**缺省即 closure 判定**：执行器从该线 `branch` 的前三位特性号 + 该线 worktree 内 `.specify/features.md` 对应行的 `Spec Path` 解析出 spec 目录，在该线**闭合**处运行 `scripts/python/closure-acceptance-check.py`（判定时点是特性线闭合，不是每个切片合并；切片合并由 review 门判定）；`block` 先在 `completed` 态记录 `integration-record --result failed --reason closure-blocked`，随后把该线标 `blocked`——线不是也不得再是 `completed`。`--gate-cmd` 仍可覆盖命令，被覆盖的门失败记其原有 `quality-gate` 原因。输入错误（分支无三位特性号 / 注册表无该行 / `Spec Path` 空 `-` / 解析目录不存在）记 `closure-input-error`、线状态不变并拒绝合并。封闭原因集、退出码与 `final_path` 形态的真源：`shared/workflow/acceptance-hardening.md` § Closure Verdict（按路径 + 章节锚引用，本文件不复述）。
 3. 任一步失败：`integration-record --result failed --reason …`，**保留 worktree 与证据**，继续下一条；该 line 的 U6 不自动执行。
 4. **每批一次**：全部条目处置后执行器调用一次 `--mirror-cmd`（`sync-mirrors.py` 与命令副本再生成）；镜像/命令副本不在逐线序列中，**不得每 line 执行**。
 5. 不 force push、不绕过确认门；push 仍是显式授权动作。MUST NOT force push。
@@ -393,7 +393,7 @@ fi
 
 ## Recipe 8 — Split 收尾派发（Split Closure via /speckit.seal）
 
-**何时**：U6 收尾前判定为 split 线（`merge.status=merged` 的合并清单或分片目录存在）。**派发什么**：恰好一次有界执行，提示词 = 「读取并遵循 `.specify/skills/internal/seal-artifact/SKILL.md`，对 `<spec-dir>` 运行 `/speckit.seal` 的完整动作序列（merge-plan → merge-apply（如未合并）→ archive-plan → archive-apply → seal），stdout 逐字回报引擎输出」。承载与阶段派发同规（fork / subprocess；in-process BANNED），哨兵 `SEAL-DONE`。
+**何时**：U6 收尾前判定为 split 线（`merge.status=merged` 的合并清单或分片目录存在）。**派发什么**：恰好一次有界执行，提示词 = 「读取并遵循 `skills/internal/seal-artifact/SKILL.md`，对 `<spec-dir>` 运行 `/speckit.seal` 的完整动作序列（merge-plan → merge-apply（如未合并）→ archive-plan → archive-apply → seal），stdout 逐字回报引擎输出」。承载与阶段派发同规（fork / subprocess；in-process BANNED），哨兵 `SEAL-DONE`。
 
 **U4 判据**（全齐才收尾）：① `seal.md` 存在于父 spec 目录；② `archive-manifest.json` 与引用台账齐备（split 线归档已执行或具名 `already-archived`）；③ 终态裁决逐字回报且未被改写——`Sealed` 或逐条具名阻断均合法；④ 引擎退出码与其输出一致。**失败处理**：拒绝/错误 → 按引擎输出逐条上送（U5 四要素），MUST NOT 手工改状态面、MUST NOT 以 review 结论代替 seal 裁决；重复执行须在 evidence 中注明幂等读数。
 

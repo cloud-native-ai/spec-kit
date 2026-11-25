@@ -4,7 +4,7 @@ Canonical definition of a **Tool**, plus the behavioral-rules format, type seman
 
 ## What a Tool Is
 
-A **Tool** is a **named, pre-verified, reusable definition of one concrete capability** — persisted as a record at `.specify/memory/tools/<name>.md` — that an agent invokes *instead of* working out how to perform that action on the fly.
+A **Tool** is a **named, pre-verified, reusable definition of one concrete capability** — persisted as a record at `.specify/tools/<name>.md` — that an agent invokes *instead of* working out how to perform that action on the fly.
 
 An agent executing a task normally reaches straight for whatever it can call. That default has two failure modes, and a Tool exists to remove both:
 
@@ -27,13 +27,13 @@ The word is overloaded in this project. Keep them distinct:
 
 | Term | Meaning | Where it lives |
 |------|---------|----------------|
-| **Tool** / **Tool record** (this document) | A pre-verified reusable capability definition, owned by `/speckit.tools` | `.specify/memory/tools/<name>.md`; ID form `<TOOL:...>` |
+| **Tool** / **Tool record** (this document) | A pre-verified reusable capability definition, owned by `/speckit.tools` | `.specify/tools/<name>.md`; ID form `<TOOL:...>` |
 | **AI agent CLI tool** | A supported coding agent — Claude Code, Codex CLI, Qoder CLI, Copilot, opencode, Hermes | `AGENT_CONFIG` in `src/specify_cli/`; `docs/reference/cli/` |
 | **Agent tool-call list** | The `tools:` frontmatter key on an agent (`Read`, `Grep`, `Bash`, …) — the LLM's callable surface | `.specify/agents/{templates,instances}/<slug>.agent.md` frontmatter |
 
 Unqualified "Tool" in the tools domain always means the first. The second is best written "AI agent CLI" / "agent tool"; the third, "tool-call list".
 
-Note also: the **discovery inventories** are `.specify/tools/{system,shell,project}.json` — machine-generated, never hand-edited. They are written by `.specify/scripts/bash/generate-instructions.sh`, which redirects `refresh-tools.sh --system|--shell|--project --json` into those three files; `refresh-tools.sh` itself writes nothing and requires one of those source flags (a bare `--json` prints usage and exits 1). `.specify/memory/tools/` (directory) holds the **definition records** and is the only authoritative surface for what a tool is.
+Note also: the **discovery inventories** are `.specify/tools/{system,shell,project}.json` — machine-generated, never hand-edited. They are written by `scripts/bash/generate-instructions.sh`, which redirects `refresh-tools.sh --system|--shell|--project --json` into those three files; `refresh-tools.sh` itself writes nothing and requires one of those source flags (a bare `--json` prints usage and exits 1). `.specify/tools/` (directory) holds the **definition records** and is the only authoritative surface for what a tool is.
 
 `.specify/tools.md` § Helper Tools Index (the singular file, merged 2026-11-10 with the Tools System Guide) is a **separate, hand-maintained index of MCP servers**. Despite its name and its `## System Binaries` / `## Shell Environment` / `## Project Scripts` headings, nothing regenerates it and those three sections carry only a one-line description each, never an enumeration — this has been true since the revision that added the file. Do not treat it as the tools inventory, and do not cite it as a generated artifact.
 
@@ -41,7 +41,7 @@ Note also: the **discovery inventories** are `.specify/tools/{system,shell,proje
 
 | Type | Scope | Description | Source Identifier |
 |------|-------|-------------|-------------------|
-| `project-script` | Project-level | Scripts bundled with the current project (e.g., `.specify/scripts/bash/*.sh`). Available only within the project workspace. | Path relative to project root |
+| `project-script` | Project-level | Scripts bundled with the current project (e.g., `scripts/bash/*.sh`). Available only within the project workspace. | Path relative to project root |
 | `system-binary` | System-level | Executables installed system-wide via package manager or `PATH`. Available to all users/sessions. | Absolute binary path |
 | `shell-function` | Shell-session | Functions loaded via `source` from dotfiles or activation scripts. Available only in current shell session. | Function name |
 | `webhook` | Network-level | Remote operations triggered by HTTP request to a web endpoint. Available wherever HTTP connectivity and credentials exist. | URL endpoint |
@@ -70,7 +70,7 @@ Rules:
 
 This is the cross-cutting discipline that makes a Tool worth defining. **Before generating script code to perform a complex or repeatable action**, any skill or command MUST:
 
-1. **Look for an existing Tool** — scan `.specify/memory/tools/` (including aliases) for a record covering the capability.
+1. **Look for an existing Tool** — scan `.specify/tools/` (including aliases) for a record covering the capability.
 2. **Reuse it when one exists** — invoke it per its record, treating its `## Behavioral Rules` as authoritative over training knowledge, and honoring its Environment Applicability fields. Do not re-derive an invocation the record already pins, and do not rewrite it as inline script code.
 3. **Otherwise proceed normally** — when no Tool covers the capability, write the code needed for the task. This is expected; the gate is a lookup, not a blocker.
 4. **Promote what recurs** — if the capability is non-trivial and likely to be needed again, offer to define it as a Tool via `/speckit.tools` so the next run reuses instead of regenerating.
@@ -128,11 +128,11 @@ Prompt: `Proceed with execution? (yes/no)`
 
 ## Self-Improvement Boundary
 
-A persisted Tool record qualifies as an Execution Subject; the external binary/function/webhook does not. Created records carry the compact contract composed from `.specify/skills/internal/create-tools/templates/tool-self-improvement.md` and route evidence-backed changes through `improve-tools`. Concept and execution semantics live in `self-improvement-definitions.md` and `../workflow/self-improvement-workflow.md`; this file does not duplicate them.
+A persisted Tool record qualifies as an Execution Subject; the external binary/function/webhook does not. Created records carry the compact contract composed from `skills/internal/create-tools/templates/tool-self-improvement.md` and route evidence-backed changes through `improve-tools`. Concept and execution semantics live in `self-improvement-definitions.md` and `../workflow/self-improvement-workflow.md`; this file does not duplicate them.
 
 ## Output Requirements
 
-- Tool records stored in `.specify/memory/tools/` as `.md` files
+- Tool records stored in `.specify/tools/` as `.md` files
 - Command output must include `tool_id` and canonical path
 - Execution never happens before user confirmation via preview gate
 - Existing complete records should be reused (avoid repeated discovery)

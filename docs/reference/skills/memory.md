@@ -13,7 +13,8 @@ keyword/tag scoring.
 ## Terminology (ADR-0003)
 
 **"Memory system" is the umbrella name for this entire layer** — the engine, the two
-skills, and the `.specify/memory/` store. It is never the name of one tier. The two
+skills, and the two top-level tier stores (`.specify/session/`, `.specify/knowledge/`).
+It is never the name of one tier, and it is never a directory name. The two
 archive tiers are always referred to by their scope names:
 
 - **session — short-term memory**: working context (progress, in-flight state). The
@@ -40,13 +41,15 @@ engine enforces the boundary: every `record` must carry a `--source` of the form
 ## Layout
 
 ```
-.specify/memory/
+.specify/
   session/            # short-term / working memory (append-only)
     <UTC-ts>-<slug>.md
   knowledge/          # long-term / distilled memory (upsert by slug)
     <slug>.md
-  state/              # none — the memory store has no scalar state (req 055)
 ```
+
+Each tier is a first-class top-level store under `.specify/` (feature 105); the memory
+system has no shared container directory and no scalar state (req 055).
 
 - **session** — ephemeral working context of a current effort (progress, in-flight state).
   Safe to prune.
@@ -124,4 +127,5 @@ Two skills wrap the engine for agent use:
   relevant entries and fold them into working context.
 
 Both reference the engine as `${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py` and
-operate on the memory store under `${SKILL_WORKDIR}/.specify/memory/`.
+operate on the two memory tiers under `${SKILL_WORKDIR}/.specify/session/` and
+`${SKILL_WORKDIR}/.specify/knowledge/`.

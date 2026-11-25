@@ -354,7 +354,7 @@ def test_reference_matrix_classifies_live_and_dated_carriers(tmp_path):
     dated_carriers = {
         SPEC_REL + "/notes/note.md", SPEC_REL + "/test-evidence/evidence.txt",
         SPEC_REL + "/checklists/checklist.md", ".specify/features.md",
-        ".specify/memory/session/entry.md", ".specify/history/topic.md",
+        ".specify/session/entry.md", ".specify/history/topic.md",
         ".specify/specs/%s/notes.md" % ALPHA, ".specify/specs/%s/notes.md" % BETA,
     }
     for carrier in dated_carriers:

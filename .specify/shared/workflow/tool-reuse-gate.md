@@ -12,7 +12,7 @@ A Tool record is the verified answer. Reusing it buys **stability** (same behavi
 
 ## The gate
 
-1. **Look** — scan `.specify/memory/tools/` (including aliases) for a record covering the capability you are about to script.
+1. **Look** — scan `.specify/tools/` (including aliases) for a record covering the capability you are about to script.
 2. **Reuse when found** — invoke it per its record. Treat its `## Behavioral Rules` as authoritative **over your own training knowledge**, and honor its `## Environment Applicability` fields (verified version, version differences, platform, architecture, fallback, preflight check). Do not re-derive an invocation the record already pins, and do not inline it as fresh script code.
 3. **Otherwise proceed** — when no Tool covers the capability, write the code the task needs. A miss is a normal outcome; the gate is a lookup, not a blocker.
 4. **Promote what recurs** — if the capability is non-trivial and likely needed again, offer to define it as a Tool via `/speckit.tools` so the next run reuses instead of regenerating. Offer; do not create one unprompted.

@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/debt-audit/SKILL.md>"
 
 # debt-audit
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Goal
 
@@ -17,21 +17,21 @@ This skill never executes cleanup: data reclamation is `/speckit.sanitize`, mech
 
 ## Input Contract
 
-- **Scope**: the directory set named by `$ARGUMENTS`, else the framework-owned surfaces under `.specify/` (runtime state, specs, .specify/memory/history, .specify/scripts/templates, skills/agents/teams, root anchors).
+- **Scope**: the directory set named by `$ARGUMENTS`, else the framework-owned surfaces under `.specify/` (runtime state, specs, history, scripts/templates, skills/agents/teams, root anchors).
 - **Output**: the report directory named by `$ARGUMENTS`, else `.specify/studies/debt-audit-<YYYY-MM-DD>/` (`report.md` plus one `d-<n>-<domain>.md` per domain).
 - **Reuse baseline**: an optional previous register; every reused finding MUST be re-verified and re-classified (`resolved` / `still` / `changed` / `new`) — never copied forward as a fact.
-- **Dispatch carrier**: the local fork carrier (`.specify/scripts/bash/stage-runner.sh`) for same-family agents, the subprocess carrier for heterogeneous ones. The host-internal in-process subagent path is BANNED as a concurrency carrier.
+- **Dispatch carrier**: the local fork carrier (`scripts/bash/stage-runner.sh`) for same-family agents, the subprocess carrier for heterogeneous ones. The host-internal in-process subagent path is BANNED as a concurrency carrier.
 - **Agent availability**: the template must resolve at one of its two faces; absence is a hard failure reported as such — never a reason to substitute a general-purpose role.
 
 ## Workflow
 
 ### 1. Load context (before any scan)
 
-Read, by pointer: `.specify/shared/definitions/framework-map.md` (directory semantics), `.specify/shared/definitions/non-disposable-definitions.md` (disposition set and retention), `.specify/shared/guidelines/confirmation-gates.md` (destructive gates), `.specify/shared/definitions/one-source-of-truth.md` (fact ownership). Load the project's history knowledge (`history/`, `.specify/memory/knowledge/`, `register.md`, `features.md`). The agent repeats this load in each execution; this step exists so the partition is informed.
+Read, by pointer: `shared/definitions/framework-map.md` (directory semantics), `shared/definitions/non-disposable-definitions.md` (disposition set and retention), `shared/guidelines/confirmation-gates.md` (destructive gates), `shared/definitions/one-source-of-truth.md` (fact ownership). Load the project's history knowledge (`history/`, `knowledge/`, `register.md`, `features.md`). The agent repeats this load in each execution; this step exists so the partition is informed.
 
 ### 2. Partition into disjoint read domains
 
-Split the scope into domains whose read sets never intersect (e.g. runtime state + scratch, specs by number band, .specify/memory/history/register, code surfaces). Declare each domain's paths before dispatch. A path assigned to two domains is a dispatch defect.
+Split the scope into domains whose read sets never intersect (e.g. runtime state + scratch, specs by number band, history/register, code surfaces). Declare each domain's paths before dispatch. A path assigned to two domains is a dispatch defect.
 
 ### 3. Dispatch one sdd-debt-governor execution per domain
 
@@ -62,7 +62,7 @@ On user authorization: data reclamation goes to `/speckit.sanitize` (its lanes a
 - **Reuse is re-verification.** A baseline finding is a candidate, not a conclusion; carry its status class explicitly, and label non-reproducible readings as such.
 - **Foreign owners are blockers, not deletions.** Scratch this run created may be reclaimed by the execution that made it; root- or foreign-owned artifacts are reported as blockers with counts — never deleted, moved or chmod-ed.
 - **No destructive action, ever.** No delete, move, archive, rewrite or git write outside the declared report directory.
-- **Surface anomalies at the point they appear** (`.specify/shared/guidelines/fast-fail.md`); an incomplete domain is named, never smoothed into the synthesis.
+- **Surface anomalies at the point they appear** (`shared/guidelines/fast-fail.md`); an incomplete domain is named, never smoothed into the synthesis.
 
 ## Boundaries
 

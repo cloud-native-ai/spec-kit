@@ -21,7 +21,7 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 
 `/speckit.migrate` 是薄投影：探测、计划与处置全部由已安装 CLI 的 `specify migrate` 子命令完成；模板不实现任何检查、残留清单、路径改写或处置判断，也不自带第二份计划。命令把新旧混杂的工作区收敛到当前安装版本的期望态，逐项给出「当前态 → 期望态 + 拟处置 + 依据路径」。
 
-计划的维度闭集为 `templates-generated`、`anchor-layout`、`compat-links`、`mirror-consistency`、`migration-residue`、`store-layout`。第六维 `store-layout` 把旧 `.specify/memory/<store>/` 的每个已声明存储逐条搬到顶层 `.specify/<store>/`：搬迁以回执中的 `entries[]` manifest 为归档记录、逐字节 move、不向归档根复制字节；旧新两侧同时存在权威内容（`dual-content`）或同一相对路径两侧并存（`path-collision`）时拒绝并点名两侧路径与修复入口；退役容器只在无剩余路径时移除，未认领残留逐个列出并原样保留（结局 `blocked`，退出 3）。
+计划的维度闭集为 `templates-generated`、`anchor-layout`、`compat-links`、`mirror-consistency`、`migration-residue`、`store-layout`。第六维 `store-layout` 把退役容器（`shared/declarations/facts/runtime-store-layout.yaml` 的 `retired_container` 声明）下的每个已声明存储逐条搬到顶层 `.specify/<store>/`：搬迁以回执中的 `entries[]` manifest 为归档记录、逐字节 move、不向归档根复制字节；旧新两侧同时存在权威内容（`dual-content`）或同一相对路径两侧并存（`path-collision`）时拒绝并点名两侧路径与修复入口；退役容器只在无剩余路径时移除，未认领残留逐个列出并原样保留（结局 `blocked`，退出 3）。
 
 1. **Dry-run first.** 运行 `specify migrate`（人读计划）或 `specify migrate --format json`（机器可读包络；模板原样转述，不解析键集），并逐项向用户转述计划：
 

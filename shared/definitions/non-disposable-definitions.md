@@ -162,18 +162,13 @@ path:line；再加一条反向腿（把副本树修好，断言转绿）。只�
 
 ## Review Surface
 
-**回顾面恰为当前 `git HEAD` 工作树里 `.specify/` 下的十一个历史根**（FR-036）：
-
-```text
-.specify/anchoring  .specify/archive  .specify/derive  .specify/goals  .specify/history
-.specify/memory  .specify/project  .specify/review  .specify/specs  .specify/state
-.specify/teams
-```
+**回顾面恰为当前 `git HEAD` 工作树里 `.specify/` 下的封闭根集**（FR-036）。
 
 成员与次序由 `shared/declarations/facts/non-disposable-review-surface.yaml#/statement` 拥有
-（`kind: closed-set`），引擎经 `scripts/python/declaration_reader.py` 读出；本节**不复述**那十一个字符串作为
+（`kind: closed-set`），引擎经 `scripts/python/declaration_reader.py` 读出；本节**不复述**那些字符串作为
 第二个定义点，只负责说明它们的语义与边界。`.specify/goal`（单数）是已退役成员：项目级锚点存于
-`.specify/anchoring`、行动级指导存于 `.specify/goals`，退役理由记录在声明文件的 `note` 中。
+`.specify/anchoring`、行动级指导存于 `.specify/goals`；退役的存储容器同样是已退役成员——它的十四个顶层存储
+现各自成根（墓碑行：`shared/definitions/framework-map.md`），退役理由记录在声明文件的 `note` 中。
 
 **边界一：回顾不读 git 历史。** 不看 commit、不 blame、不 diff 旧版本。只在 git 历史里存在的旧措辞 MUST
 产生零条目（SC-002）。理由：本文档要管的是"树上现在有什么"，而不是"曾经有什么"；把 git 历史纳入回顾面，
@@ -484,7 +479,7 @@ N 个互相无关的载体"的通道。
 "看起来像历史"的启发式：
 
 - `EXCLUDED_PREFIXES` — `.specify/history/`、`.specify/archive/`、`.specify/specs/.archive/`
-- `MACHINE_PREFIXES` — `.specify/memory/sanitize/`、`.specify/memory/retention/`、`.specify/memory/renumber/`
+- `MACHINE_PREFIXES` — `.specify/sanitize/`、`.specify/retention/`、`.specify/renumber/`（由存储声明的 store 集合派生）
 - `EVIDENCE_SEGMENTS` — `test-evidence`
 - `DATED_RE` — 日期命名的文件
 

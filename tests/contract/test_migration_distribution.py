@@ -19,9 +19,8 @@ that ``tasks.md`` T010 names:
   copies ``shared/`` into the project's ``.specify/shared``;
 * C-3  the new actions are not call sites: neither templates nor skills invoke
   them (the gate owner's call-point table is left to its own owner);
-* C-4  zero project-side storage and zero project-side read points: nothing under
-  ``.specify/memory/`` stores a unit→class mapping, and the engine never reads
-  that tree;
+* C-4  zero project-side storage and zero project-side read points: no runtime store
+  holds a unit→class mapping, and the engine never reads a runtime store;
 * C-6  the three SC-002 samples are frozen with all declared fields (project,
   HEAD, branch, dirty-file count, 069a payload status, suite command);
 * C-7/C-8 the name-level outcome of each snapshot is recorded in
@@ -53,11 +52,27 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+sys.path.insert(0, str(REPO_ROOT / "scripts" / "python"))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+_STORE_NAMES = sorted(
+    declaration_reader.load_fact(
+        declaration_reader.find_repo(REPO_ROOT), "runtime-store-layout"
+    )["body"]["statement"]["stores"]
+)
+RUNTIME_STORE_DIRS = tuple(
+    REPO_ROOT / ".specify" / name
+    for name in _STORE_NAMES
+    if (REPO_ROOT / ".specify" / name).is_dir()
+)
+EXEC_QUANT_STORE = REPO_ROOT / ".specify" / "exec-quant"  # Feature 068 recording-only telemetry
 OWNER = REPO_ROOT / "shared" / "definitions" / "flow-class-definitions.md"
 ENGINE = REPO_ROOT / "scripts" / "python" / "flow-class-check.py"
 COMMANDS_DIR = REPO_ROOT / "templates" / "commands"
@@ -65,8 +80,6 @@ SKILLS_DIR = REPO_ROOT / "skills"
 PYPROJECT = REPO_ROOT / "pyproject.toml"
 INIT_PY = REPO_ROOT / "src" / "specify_cli" / "__init__.py"
 HATCH_BUILD = REPO_ROOT / "src" / "hatch_build.py"
-MEMORY_DIR = REPO_ROOT / ".specify" / "memory"
-EXEC_QUANT_STORE = MEMORY_DIR / "exec-quant"  # Feature 068 recording-only telemetry
 SPEC_DIR = REPO_ROOT / ".specify" / "archive" / "specs" / "069b-isomorphism-migration-metrics"
 SAMPLES = SPEC_DIR / "notes" / "migration-samples.md"
 QUICKSTART = SPEC_DIR / "notes" / "quickstart-run.md"
@@ -149,7 +162,7 @@ FORCE_INCLUDE_EXPECTED = {
     "templates": "specify_cli/templates",
 }
 
-# Contract C-4: shapes that would make ``.specify/memory/`` a category store.
+# Contract C-4: shapes that would make a runtime store a category store.
 LEDGER_HEADER = "| unit_id | flow_class |"
 LEDGER_ROW_RE = re.compile(
     r"^\|\s*(?:/speckit\.[a-z0-9][a-z0-9-]*|skill:[a-z0-9][a-z0-9-]*)"
@@ -372,12 +385,18 @@ def _has_flow_class_key(node: object) -> bool:
 
 def test_memory_tree_stores_no_unit_to_class_mapping() -> None:
     offenders: list[str] = []
-    for path in sorted(MEMORY_DIR.rglob("*")):
+    paths = [path for store in RUNTIME_STORE_DIRS for path in sorted(store.rglob("*"))]
+    for path in paths:
         if not path.is_file():
             continue
         rel = path.relative_to(REPO_ROOT).as_posix()
         if re.search(r"flow[-_]class", path.name):
             offenders.append(f"{rel} (category-store file name)")
+            continue
+        # Feature 068's aggregated layer is the receiving area for an inbound client bundle:
+        # its records are another project's telemetry (a dated record of that project's
+        # measurements), never a project-side category store of this one.
+        if EXEC_QUANT_STORE in path.parents and "aggregated" in path.relative_to(EXEC_QUANT_STORE).parts:
             continue
         # C-4 governs a unit→class mapping store. The exec-quant tree is Feature 068's
         # recording-only telemetry: a client dispatch brief quoted inside a record may
@@ -403,16 +422,17 @@ def test_memory_tree_stores_no_unit_to_class_mapping() -> None:
         if LEDGER_HEADER in text or LEDGER_ROW_RE.search(text):
             offenders.append(f"{rel} (ledger-shaped rows)")
     assert not offenders, (
-        "a project-side category store appeared under .specify/memory/ "
+        "a project-side category store appeared under a runtime store "
         f"(contract C-4): {offenders}"
     )
 
 
 def test_engine_reads_no_project_side_memory() -> None:
     text = _read(ENGINE, "scripts/python/flow-class-check.py")
-    assert ".specify/memory" not in text, (
-        "the engine must not read project-side memory (contract C-4); "
-        "the only lookup path is the framework owner"
+    offenders = [name for name in _STORE_NAMES if f".specify/{name}" in text]
+    assert not offenders, (
+        "the engine must not read project-side runtime stores (contract C-4); "
+        f"found {offenders}; the only lookup path is the framework owner"
     )
 
 

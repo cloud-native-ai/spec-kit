@@ -72,7 +72,7 @@ decision for the corrected trunk is executed on every declared remote, and publi
 verified — never assumed.** Every other branch fact is reached by pointer and never restated here: the
 declaration rows (`Trunk`, `Feature branch convention`, `Closeout`, `Closeout remotes`, `Remote roles`) live in
 `.specify/workflow/git.md`; the command surface that derives and executes the push lives in
-`.specify/skills/git-utils/references/closeout-commands.md`; the executor's stop-on-first-failure and no-force
+`skills/external/git-utils/references/closeout-commands.md`; the executor's stop-on-first-failure and no-force
 rules live in the feature-091 close-out executor contract.
 
 **Firing condition (decidable, closed).** Any checkpoint whose part 5 records `correction-applied` for a branch
@@ -155,7 +155,7 @@ one thing an "everything closed" closure sentence is not allowed to hide.
 - **Direction audit is mandatory**: every checkpoint carries part 5; a checkpoint without it is a defect. Its reload tier and verdict are recorded in the checkpoint, not only in the conversation.
 - **Published state is verified, never assumed**: a checkpoint whose part 5 records `correction-applied` for a branch correction MUST carry part 5b, and `closure.md` MUST carry the terminal check. A correction recorded without a published-state reading — converged SHAs or a residue row with its `unblock` — fails the checkpoint, and a residue left open at closure is named there.
 - **No approval request**: a checkpoint's outcome is a statement; asking the user to continue violates HR1 and is itself a drift signal.
-- **Workspace signature (2026-11-08 RCA)**: a stage that runs probes, tests or subagents MUST record the measured repository's signature before them and compare it after: `python3 .specify/scripts/python/workspace-guard.py --snapshot <spec-dir>/test-evidence/workspace-<stage>.json --repo <repo>` then `--check`. A difference in branch, refs or `.specify/specs` fails the checkpoint — it means a probe or agent resolved its repository root outside its sandbox (the 2026-11-07 incident created 40 branches and spec dirs).
+- **Workspace signature (2026-11-08 RCA)**: a stage that runs probes, tests or subagents MUST record the measured repository's signature before them and compare it after: `python3 scripts/python/workspace-guard.py --snapshot <spec-dir>/test-evidence/workspace-<stage>.json --repo <repo>` then `--check`. A difference in branch, refs or `.specify/specs` fails the checkpoint — it means a probe or agent resolved its repository root outside its sandbox (the 2026-11-07 incident created 40 branches and spec dirs).
 
 ## Minimal shape
 

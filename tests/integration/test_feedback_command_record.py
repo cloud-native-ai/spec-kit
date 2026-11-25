@@ -39,7 +39,7 @@ def test_complex_command_records_command_scoped_entry(feedback_store: Path):
     assert entry["unit_type"] == "command"
     assert entry["unit_id"] == "/speckit.plan"
 
-    files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
+    files = [f for f in (feedback_store / ".specify/feedback").glob("*.md")]
     meta, _ = feedback_utils.parse_frontmatter(files[0].read_text(encoding="utf-8"))
     assert meta["scope"] == "local"
 
@@ -52,5 +52,5 @@ def test_simple_commands_never_invoke_record():
 
 def test_store_empty_when_no_record_called(feedback_store: Path):
     # A simple command runs but never calls the engine -> store stays empty.
-    index_file = feedback_store / ".specify/memory/feedback/index.json"
+    index_file = feedback_store / ".specify/feedback/index.json"
     assert not index_file.exists()

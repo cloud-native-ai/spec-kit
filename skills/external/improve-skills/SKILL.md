@@ -124,7 +124,7 @@ If you identified your agent in Step 1, check if a guide exists at `${SKILL_HOME
 
 ### Step 3: Capture Execution Feedback
 
-On a genuine agent-specific obstacle (tool call unavailable, unexpected output format, workaround needed), in a Spec Kit project write a feedback document to `.specify/memory/feedback/improve-skills-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md` (standalone deployments instead report the obstacle in the run report) carrying fields `**Source**: improve-skills`, `**Agent**`, `**Timestamp**` (ISO-8601), `**Outcome**` (`success-with-workaround | partial-failure | full-failure`) and sections `## Obstacle` / `## Workaround Applied` / `## Suggested Improvement`. Only generate feedback for a genuine obstacle.
+On a genuine agent-specific obstacle (tool call unavailable, unexpected output format, workaround needed), in a Spec Kit project write a feedback document to `.specify/feedback/improve-skills-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md` (standalone deployments instead report the obstacle in the run report) carrying fields `**Source**: improve-skills`, `**Agent**`, `**Timestamp**` (ISO-8601), `**Outcome**` (`success-with-workaround | partial-failure | full-failure`) and sections `## Obstacle` / `## Workaround Applied` / `## Suggested Improvement`. Only generate feedback for a genuine obstacle.
 
 ## Resources
 

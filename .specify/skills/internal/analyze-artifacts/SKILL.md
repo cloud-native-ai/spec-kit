@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/analyze-artifacts/SKILL.md>"
 
 # analyze-artifacts
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -21,7 +21,7 @@ The skill is **strictly read-only on artifacts**: it modifies no artifact. (The 
 sanctioned exception is the wrap-up engine entries — Run Determination / Exec Quant /
 Feedback Record — local bookkeeping, not an artifact modification.)
 
-Canonical extraction source: `.specify/templates/commands/analyze.md` — the command template
+Canonical extraction source: `templates/commands/analyze.md` — the command template
 keeps entry + delegation only; the executable content (Execution Steps, Operating
 Principles, do-not-flag list) lives in this skill.
 
@@ -106,7 +106,7 @@ Load only the minimal necessary context — never the whole artifacts:
 Run the clause/FR coverage accountant once and surface its verdict in the report:
 
 ```
-python3 .specify/scripts/python/account-clause-coverage.py --spec <spec-dir>
+python3 scripts/python/account-clause-coverage.py --spec <spec-dir>
 ```
 
 This step MUST NOT pass `--freeze` — freezing the baseline is `/speckit.tasks`'s duty

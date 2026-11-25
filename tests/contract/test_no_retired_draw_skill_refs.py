@@ -35,7 +35,7 @@ TEAM_NAME = re.compile(r"\bdraw-plantuml-optimizer\b")
 
 LIVE_ROOTS = ("skills", "templates", "shared", "docs", "src")
 LIVE_FILES = (".specify/instructions.md", ".specify/shared",
-              ".specify/memory/knowledge", ".specify/glossary.md")
+              ".specify/knowledge", ".specify/glossary.md")
 
 # Dated records and generated artifacts: true statements about their own time, or
 # machine-owned output that is regenerated rather than edited.
@@ -58,7 +58,7 @@ EXCLUDED_SUFFIXES = (".baseline.txt",)
 # Whole-file exemption, kept to exactly one entry and asserted narrow below: the arena
 # benchmark ledger. Its data is a dated measurement that must not be rewritten, and it
 # carries a superseded banner (asserted by its own test) naming the current authority.
-BANNER_REQUIRED = ".specify/memory/knowledge/visualization-skill-selection.md"
+BANNER_REQUIRED = ".specify/knowledge/visualization-skill-selection.md"
 EXEMPT_WITH_BANNER = {BANNER_REQUIRED}
 
 
@@ -70,8 +70,8 @@ def _is_exempt(path: Path) -> bool:
         return True
     if rel.endswith(EXCLUDED_SUFFIXES) or rel in EXEMPT_WITH_BANNER:
         return True
-    return rel.startswith(".specify/memory/feedback/") or rel.startswith(
-        ".specify/memory/evidence/") or rel.startswith(".specify/memory/session/")
+    return rel.startswith(".specify/feedback/") or rel.startswith(
+        ".specify/evidence/") or rel.startswith(".specify/session/")
 
 
 def _live_candidates():
@@ -134,7 +134,7 @@ def test_the_exemptions_are_narrow():
     assert EXCLUDED_FILES == {"merge-provenance.md", "__init__.py"}
     assert EXCLUDED_SUFFIXES == (".baseline.txt",)
     assert EXEMPT_WITH_BANNER == {
-        ".specify/memory/knowledge/visualization-skill-selection.md"}
+        ".specify/knowledge/visualization-skill-selection.md"}
     # the provenance record really does name all six, i.e. the exemption is load-bearing
     record = ROOT / "skills/external/draw-diagram/references/merge-provenance.md"
     assert record.is_file(), "sentinel: the capability-inheritance record is missing"

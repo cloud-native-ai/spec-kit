@@ -176,7 +176,7 @@ whatever the declared value says.
 
 The value→authority table is reached by pointer (`closeout-executor.contract.md` C-8). No surface of
 this feature restates the confirmation-gate lists; the owner is
-`.specify/shared/guidelines/confirmation-gates.md` and § 8 reaches it by that path.
+`shared/guidelines/confirmation-gates.md` and § 8 reaches it by that path.
 
 ## Short-lived branches
 
@@ -213,7 +213,7 @@ push** (protected branch / hook / lease). On any of them the operation:
 - It performs **no `--force`**.
 - `--force-with-lease` is the **only** forced form this reference contains, and it runs only for that
   specific action **behind its own confirmation** (the destructive class owned by
-  `.specify/shared/guidelines/confirmation-gates.md`). It is never a retry mechanism.
+  `shared/guidelines/confirmation-gates.md`). It is never a retry mechanism.
 
 ```bash
 git merge --no-ff <src>          # a conflict stops here

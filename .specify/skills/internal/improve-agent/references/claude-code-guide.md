@@ -4,11 +4,11 @@
 
 | Operation | Claude Code Tool/Method |
 |-----------|------------------------|
-| Read agent template | `Read` tool on `.specify/templates/agent-capacity-<slug>-template.md` |
-| Analyze template issues | `Bash`: `grep -n '<pattern>' .specify/templates/agent-capacity-*.md` for evidence gathering |
+| Read agent template | `Read` tool on `templates/agent-capacity-<slug>-template.md` |
+| Analyze template issues | `Bash`: `grep -n '<pattern>' templates/agent-capacity-*.md` for evidence gathering |
 | Apply targeted fixes | `Edit` tool with precise `old_string` matching on template files |
-| Validate template structure | `Bash`: `grep -c '## Identity' .specify/templates/agent-capacity-<slug>-template.md` |
-| Check placeholder usage | `Bash`: `grep -oE '\{\{[A-Z_]+\}\}' .specify/templates/agent-capacity-<slug>-template.md` |
+| Validate template structure | `Bash`: `grep -c '## Identity' templates/agent-capacity-<slug>-template.md` |
+| Check placeholder usage | `Bash`: `grep -oE '\{\{[A-Z_]+\}\}' templates/agent-capacity-<slug>-template.md` |
 | Compare with other roles | `Read` tool on related role templates for consistency checks |
 
 ## Best Practices
@@ -24,7 +24,7 @@
 - **Context window limits**: Large templates (100+ lines) may cause context issues. Focus `Read` on specific line ranges when needed
 - **Placeholder drift**: Verify that `{{PLACEHOLDER}}` variables used in the template match the approved list from `/speckit.agents` command
 - **Edit precision**: `old_string` must match exactly including whitespace. Read the file first to get exact content
-- **Layer routing**: the declared layer decides the editable surface — `template` → `.specify/agents/templates/` or `.specify/skills/internal/create-agent/templates/`; `instance` → `.specify/agents/instances/`; `execution` → `.specify/agents/execution/{configs,scripts}/`. Editing the wrong layer leads to lost changes
+- **Layer routing**: the declared layer decides the editable surface — `template` → `.specify/agents/templates/` or `skills/internal/create-agent/templates/`; `instance` → `.specify/agents/instances/`; `execution` → `.specify/agents/execution/{configs,scripts}/`. Editing the wrong layer leads to lost changes
 
 ## Capability Notes
 

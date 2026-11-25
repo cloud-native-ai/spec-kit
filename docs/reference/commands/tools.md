@@ -4,7 +4,7 @@ Define, modify, view, or invoke reusable **Tools** — pre-verified capability r
 
 ## What a Tool Is
 
-A **Tool** is a named, pre-verified, reusable definition of one concrete capability, persisted at `.specify/memory/tools/<name>.md`, that an agent invokes *instead of* working out how to perform that action on the fly. It is an **abstraction layer between an agent's intent and the environment's reality**.
+A **Tool** is a named, pre-verified, reusable definition of one concrete capability, persisted at `.specify/tools/<name>.md`, that an agent invokes *instead of* working out how to perform that action on the fly. It is an **abstraction layer between an agent's intent and the environment's reality**.
 
 It exists to remove two failure modes of the unmediated default:
 
@@ -96,7 +96,7 @@ A record can state **where its invocation is verified to hold** and **how it dif
    - `MUST NOT` — absolute prohibition
    - `SHOULD` / `SHOULD NOT` — recommended/discouraged practices
 
-3. **Persist record** at `.specify/memory/tools/<tool-name>.md` with a deterministic `tool_id`.
+3. **Persist record** at `.specify/tools/<tool-name>.md` with a deterministic `tool_id`.
 
 4. **Report** — the record persisted in step 3 is the single source of truth; there is no registry (discovery explained in `.specify/tools.md`).
 
@@ -132,7 +132,7 @@ Rules are **authoritative** — when a tool has a definition record, the AI agen
 
 | Artifact | Location |
 |----------|----------|
-| Tool definition | `.specify/memory/tools/<tool-name>.md` |
+| Tool definition | `.specify/tools/<tool-name>.md` |
 | Discovery doc | `.specify/tools.md` (explanatory; created if absent by `/speckit.instructions`) |
 
 ## Tool Statuses
@@ -158,7 +158,7 @@ Rules are **authoritative** — when a tool has a definition record, the AI agen
 
 The four type templates live inside the owning skill at `.specify/skills/internal/create-tools/templates/` (`tool-project-script-template.md`, `tool-system-binary-template.md`, `tool-shell-function-template.md`, `tool-webhook-template.md`). Shared type semantics, the rules format, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md`.
 
-**Dogfooding**: Spec Kit manages its own core scripts through this command — see the records under `.specify/memory/tools/` and the discovery notes in `.specify/tools.md`.
+**Dogfooding**: Spec Kit manages its own core scripts through this command — see the records under `.specify/tools/` and the discovery notes in `.specify/tools.md`.
 
 ## Prerequisites
 

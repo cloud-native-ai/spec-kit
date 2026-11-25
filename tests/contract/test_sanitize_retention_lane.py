@@ -40,7 +40,7 @@ def test_skill_declares_lane_and_receipt_gate():
     assert "Receipt red line" in text
     assert "No receipt means no deletion" in text
     assert "30 days" in text or "30-day" in text
-    assert ".specify/memory/retention/" in text
+    assert ".specify/retention/" in text
     assert "settled_at" in text
     assert "needs-promotion" in text
 
@@ -50,7 +50,7 @@ def test_template_declares_lane_and_engine():
     assert "--lane materials|retention|renumber|layout|all" in text
     assert "record-retention.py" in text
     assert "retention lane" in text
-    assert ".specify/memory/retention/" in text
+    assert ".specify/retention/" in text
 
 
 def test_generated_copies_carry_the_lane():

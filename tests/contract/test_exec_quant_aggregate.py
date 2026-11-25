@@ -728,9 +728,9 @@ def test_aggregate_writes_only_under_aggregated(tmp_path):
     # original prefixes compared against the bare dir name "aggregated", which
     # is unsatisfiable for paths under the engine store — the file's own
     # ``_agg`` helper and C-19/C-22 pin the layer at
-    # ``.specify/memory/exec-quant/aggregated``. The guard's intent — every
+    # ``.specify/exec-quant/aggregated``. The guard's intent — every
     # change inside the aggregated layer, exactly one product — is unchanged.)
-    store_rel = ".specify/memory/exec-quant/aggregated"
+    store_rel = ".specify/exec-quant/aggregated"
     ws = tmp_path
     _seed_store(ws)
     before = _snapshot(ws)

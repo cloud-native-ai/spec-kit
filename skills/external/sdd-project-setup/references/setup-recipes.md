@@ -21,10 +21,10 @@
 | const | `.specify/constitution.md` 存在 | 合法基线 |
 | feat | `.specify/features.md` + `features/` 目录 | 特性注册表 |
 | gloss | `.specify/glossary.md` | 项目词汇锚 |
-| fb | `.specify/memory/feedback/` 目录 | 反馈库 |
+| fb | `.specify/feedback/` 目录 | 反馈库 |
 | reg | `.specify/register.md` | ID 登记 |
-| kb | `.specify/memory/knowledge/` | 长期知识库 |
-| session | `.specify/memory/session/` | 会话记忆 |
+| kb | `.specify/knowledge/` | 长期知识库 |
+| session | `.specify/session/` | 会话记忆 |
 | tools | `.specify/tools.md`（§ Helper Tools Index）+ `tools/` | 工具注册表 |
 | skills | `.specify/skills/` 非空 | 安装技能集 |
 | tmpl | `.specify/templates/` | 阶段模板 |

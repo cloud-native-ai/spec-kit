@@ -1,0 +1,5 @@
+task: T030
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: templates/instructions-template.md mirror synced first (sync-mirrors --write --only), then bash scripts/bash/generate-instructions.sh exit 0 (timestamped backup .specify/instructions.md-2026-11-25-142251 created, section table emitted, tool manifests refreshed, symlinks updated); the six stale template-owned lines converged (Feedback System row, seed/ key-directory row, Tool reuse + Terminology, Framework Map highlights, Skills & Tools tools path); .specify/glossary.md seven entries updated (Memory Layer two top-level roots, Session(消歧) .specify/session/, 三捕获机制 todo, 自省报告 feedback/introspection, Evaluation Form feedback, Renumber Lane renumber, Coaching Run coaching) with no Runtime Store entry added (A-16); runtime-guide class zero occurrences; guard tests/contract/test_store_layout_live_refs.py = 4 passed
+at: 2026-11-25T08:45:00Z

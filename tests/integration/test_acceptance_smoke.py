@@ -74,16 +74,30 @@ def _specify_bin():
     A missing console script is an **environment** failure, not a skip: a smoke test that skips is
     indistinguishable from a smoke test that passed, which is the defect this feature exists to
     close (Constitution XVI — a green check is a claim, not evidence).
+
+    The probe also checks the binary's identity: environments may carry a deprecated
+    alias of another product under the same name (e.g. an `ai-harness` alias answering
+    `--version` as `ai-harness-cli`), and driving that binary would record another tool's
+    behaviour as this framework's smoke evidence.
     """
+    def is_specify(path: str) -> bool:
+        proc = _run([path, "--version"], ROOT)
+        return proc.returncode == 0 and "specify-cli" in (proc.stdout + proc.stderr)
+
     candidate = Path(sys.executable).parent / "specify"
-    if candidate.is_file():
+    if candidate.is_file() and is_specify(str(candidate)):
         return str(candidate)
     found = shutil.which("specify")
+    if found and is_specify(found):
+        return found
     assert found, (
         "no `specify` console script next to %s nor on PATH — the smoke test cannot drive the "
         "capability the feature claims to deliver (RS-004)" % sys.executable
     )
-    return found
+    assert False, (
+        "%s answers `--version` without naming `specify-cli` — a foreign product's alias is "
+        "installed under the name; install the framework's own CLI (RS-004)" % found
+    )
 
 
 def _truncate(text, limit=800):

@@ -7,8 +7,8 @@
 # consumer whose read degrades prints the reader's `absent_label` instead of inventing a roster.
 #
 # Paths are projections: `.specify/<name>/` is derived from `name`, and the legacy source
-# `.specify/memory/<name>/` is derived the same way by the migration engine. A second list of
-# roots anywhere is a defect (contract C-6).
+# `.specify/<retired_container>/<name>/` is derived the same way by the migration engine. A second
+# list of roots anywhere is a defect (contract C-6).
 #
 # Store membership and dispositions are owned by `requirements.md` § Store Inventory (human) and
 # this file (machine); the framework map's human rows are guarded against this declaration by
@@ -122,4 +122,4 @@ former_carriers:
   - shared/declarations/facts/non-disposable-review-surface.yaml
   - shared/definitions/framework-map.md
   - shared/definitions/non-disposable-definitions.md
-note: "Only `session` and `knowledge` are seeded by `specify init`; every other store is created lazily by its owner, and the retired container `.specify/memory` has no live reader outside the four declared legacy contexts (tombstone row, this declaration, anchor-layout-migrate.py, sanitize-utils.py's legacy-residue scanner). The init seeder reads the fact for the retired container and the seeded tiers; the migrate planner joins `consumers` when its reader lands, and until then this list is exactly the code files that read the fact."
+note: "Only `session` and `knowledge` are seeded by `specify init`; every other store is created lazily by its owner, and the retired container named by `retired_container` above has no live reader outside the four declared legacy contexts (tombstone row, this declaration, anchor-layout-migrate.py, sanitize-utils.py's legacy-residue scanner). The init seeder reads the fact for the retired container and the seeded tiers; the migrate planner joins `consumers` when its reader lands, and until then this list is exactly the code files that read the fact."

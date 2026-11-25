@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/research-feature/SKILL.md>"
 
 # research-feature
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -22,7 +22,7 @@ alternatives / impact) in the feature's `research.md`. This skill owns the SDD m
 template keeps entry, mode routing, the `scripts:` block, the User Input Protocol, and the
 wrap-up lifecycle (Feedback / Documentation / Handoffs).
 
-Canonical extraction source: `.specify/templates/commands/research.md` § Outline (steps 1–5) and §
+Canonical extraction source: `templates/commands/research.md` § Outline (steps 1–5) and §
 Research Output Structure. Content moved here verbatim in substance; the command template
 keeps entry + lifecycle only.
 
@@ -30,7 +30,7 @@ keeps entry + lifecycle only.
 
 - **Setup variables**: FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH, and AVAILABLE_DOCS come
   from the command's `{SCRIPT}` prerequisite run (its `scripts:` entry resolves to
-  `.specify/scripts/bash/research-project.sh --json`, run from repo root); all paths used below are
+  `scripts/bash/research-project.sh --json`, run from repo root); all paths used below are
   absolute. `research.md` lives in `SPECS_DIR`.
 - **User parameters**: `$ARGUMENTS` arrive already processed by the command's User Input
   Protocol (parameters for the run, never a standalone instruction overriding the workflow);

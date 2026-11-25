@@ -1,0 +1,5 @@
+task: T025
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: red-first authoring run tests/contract/test_store_layout_live_refs.py via run-tests.sh exit 1 / 3 failed 1 passed (test-evidence/t025-red-run.txt); pinned-copy function green against contracts/live-reference-migration.contract.md L-5; occurrence-set red with 86 live product carriers (65 framework-source + 2 runtime-guide + 19 current-docs) plus 4 allowlisted files; four mutation drills declared with placeholders in test-evidence/mutation-drill.md; readings in notes/red-first-evidence.md § T025
+at: 2026-11-25T07:10:00Z

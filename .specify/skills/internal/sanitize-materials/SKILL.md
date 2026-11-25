@@ -1,13 +1,13 @@
 ---
 name: sanitize-materials
-description: Framework material hygiene governance for the Spec Kit workspace — scan framework-owned materials (parked ideas, drafts, indexes, mirrors, compatibility links, the docs tree) for stale residue and redundancy, run deterministic correctness checks (dead references, index consistency, symlinks, mirror drift, init migration residue), persist findings in a ledger with pending state, and after explicit user confirmation clean up per the two-level criteria (destructive delete/archive behind a single front-loaded batch confirmation, reversible repairs auto-execute), closing with a three-element execution report. Also the wrap-up step after a cross-generation `specify init` migration, the record-retention lane for consumed exec-quant / feedback / session records (consume → receipt → retire; no receipt means no deletion; 30-day grace), the renumber lane that repairs sequence-number collisions left by concurrent/parallel lines (duplicate-only, spec directories / register IDs / REC-OI prefix-follow / feature-local T-CHK, single front-loaded confirmation, verification by re-scan), and the layout lane that converges a legacy anchor layout (`.specify/memory/` anchors, `.specify/features/<NNN>.md` details) to the current one (anchors at the `.specify/` root, details as `<NNN>-<slug>.md`) through a rename-only migration engine that refuses existing targets and never deletes. Never evaluates, modifies, or reports user source code, product scripts, or test cases. Internal Spec Kit skill; it depends on the .specify/ structure. Use this when the user mentions ["sanitize", "资料卫生", "过期残留", "清理过期资料", "框架资料清理", "stale residue", "死引用", "dead reference", "镜像漂移", "mirror drift", "台账清理", "索引不一致", "init 迁移收尾", "迁移残留", "记录回收", "retention", "consume-then-retire", "序号重排", "编号冲突", "duplicate number", "renumber", "speckit.sanitize"].
+description: Framework material hygiene governance for the Spec Kit workspace — scan framework-owned materials (parked ideas, drafts, indexes, mirrors, compatibility links, the docs tree) for stale residue and redundancy, run deterministic correctness checks (dead references, index consistency, symlinks, mirror drift, init migration residue), persist findings in a ledger with pending state, and after explicit user confirmation clean up per the two-level criteria (destructive delete/archive behind a single front-loaded batch confirmation, reversible repairs auto-execute), closing with a three-element execution report. Also the wrap-up step after a cross-generation `specify init` migration, the record-retention lane for consumed exec-quant / feedback / session records (consume → receipt → retire; no receipt means no deletion; 30-day grace), the renumber lane that repairs sequence-number collisions left by concurrent/parallel lines (duplicate-only, spec directories / register IDs / REC-OI prefix-follow / feature-local T-CHK, single front-loaded confirmation, verification by re-scan), and the layout lane that converges a legacy anchor layout (anchors kept inside the retired store container — see the framework-map tombstone row — and feature details under its `features/` subpath) to the current one (anchors at the `.specify/` root, details as `<NNN>-<slug>.md`) through a rename-only migration engine that refuses existing targets and never deletes. Never evaluates, modifies, or reports user source code, product scripts, or test cases. Internal Spec Kit skill; it depends on the .specify/ structure. Use this when the user mentions ["sanitize", "资料卫生", "过期残留", "清理过期资料", "框架资料清理", "stale residue", "死引用", "dead reference", "镜像漂移", "mirror drift", "台账清理", "索引不一致", "init 迁移收尾", "迁移残留", "记录回收", "retention", "consume-then-retire", "序号重排", "编号冲突", "duplicate number", "renumber", "speckit.sanitize"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/sanitize-materials/SKILL.md>"
 ---
 
 # sanitize-materials
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -26,15 +26,15 @@ seven-stage flow.
 The skill also owns a **record-retention lane** (`--lane retention`): a separate
 consume → receipt → retire lifecycle for the per-run record stores. It is not part of the
 prose-hygiene findings ledger; it uses its own plan, receipts and retirement ledger under
-`.specify/memory/retention/`. A raw record is deleted only when a durable receipt covers
+`.specify/retention/`. A raw record is deleted only when a durable receipt covers
 it and the 30-day grace period has elapsed.
 
 A third **renumber lane** (`--lane renumber`) repairs sequence-number collisions: when
 concurrent or parallel lines each allocate the "next" number from the same base, a merge
 can leave two artifacts owning one number. It is duplicate-only, confirmation-gated, and
-records its plans and ledgers under `.specify/memory/renumber/`.
+records its plans and ledgers under `.specify/renumber/`.
 
-Canonical extraction source: `.specify/templates/commands/sanitize.md` § Outline, § Stage 1–7
+Canonical extraction source: `templates/commands/sanitize.md` § Outline, § Stage 1–7
 (Preflight / Collect / Judge / Present / Confirm / Apply / Wrap-up), and § Behavior Rules.
 Content moved here verbatim in substance; the command keeps entry + lifecycle only.
 
@@ -81,7 +81,7 @@ python3 .specify/scripts/python/sanitize-utils.py --action record --file <verdic
 python3 .specify/scripts/python/sanitize-utils.py --action status --workspace-root . --format json
 
 # Stage 6 — mechanically execute the confirmed cleanup plan
-python3 .specify/scripts/python/sanitize-utils.py --action apply --plan .specify/memory/sanitize/cleanup-plan.json --workspace-root . --format json
+python3 .specify/scripts/python/sanitize-utils.py --action apply --plan .specify/sanitize/cleanup-plan.json --workspace-root . --format json
 ```
 
 **Exit-code semantics (non-negotiable)**:
@@ -99,8 +99,8 @@ python3 .specify/scripts/python/sanitize-utils.py --action apply --plan .specify
 digest plus target-path lists — never paste raw evidence full text into the conversation
 (contract C-18, summary-first discipline).
 
-`**Stores**: findings persist in `.specify/memory/sanitize/findings.json`; the cleanup
-plan lives at `.specify/memory/sanitize/cleanup-plan.json`. Physical layout and the
+`**Stores**: findings persist in `.specify/sanitize/findings.json`; the cleanup
+plan lives at `.specify/sanitize/cleanup-plan.json`. Physical layout and the
 cross-run merge state machine are owned by the sanitize findings contract in the
 framework spec set (enforced by the engine) — point at it, never restate it.
 
@@ -122,7 +122,7 @@ python3 .specify/scripts/python/record-retention.py --action apply --plan <plan.
 ```
 
 The retention engine never writes the sanitize findings ledger. Its stores are
-`.specify/memory/retention/{summaries,receipts,plans,ledger}/`.
+`.specify/retention/{summaries,receipts,plans,ledger}/`.
 
 **Renumber lane engine**: a third sibling engine, with the same `--workspace-root .`
 and `--format json` discipline:
@@ -145,7 +145,7 @@ python3 .specify/scripts/python/renumber-utils.py --action status --workspace-ro
 Exit codes follow the same ladder: `0` success, `1` usage/IO, `2` refusal with zero
 side effects (unconfirmed plan, stale mapping, dirty target, branch-name conflict,
 non-git workspace). The engine writes only `plans/`, `dismissals/` and `ledger/` under
-`.specify/memory/renumber/`; it never writes the materials ledger.
+`.specify/renumber/`; it never writes the materials ledger.
 
 ## Workflow (seven stages)
 
@@ -210,7 +210,7 @@ remain in the ledger for the next run to converge.
 
 ### Stage 5 — Confirm (destructive front-loaded confirmation)
 
-Classify the plan by reversibility first (owner: `.specify/shared/guidelines/confirmation-gates.md`
+Classify the plan by reversibility first (owner: `shared/guidelines/confirmation-gates.md`
 § 可逆动作例外):
 
 - `repair` / `dismiss` / `archive` are reversible: `archive` moves the object under
@@ -219,7 +219,7 @@ Classify the plan by reversibility first (owner: `.specify/shared/guidelines/con
   auto plan with `confirmed: true`, run apply, and report per the execution-report rule).
 - `delete` is a true deletion (no archive copy; recovery is git history only) and stays
   in the destructive bucket. Merge only the `delete` items into ONE cleanup plan written
-  to `.specify/memory/sanitize/cleanup-plan.json` (`confirmed: false`) and present it to
+  to `.specify/sanitize/cleanup-plan.json` (`confirmed: false`) and present it to
   the user **in a single batch**; wait
   for user confirmation before any execution (the engine refuses apply with
   `confirmed != true` at exit 2, zero execution).
@@ -400,18 +400,18 @@ and never re-proposed (`--reopen` restores it); the dismissal persists the reaso
 Runs when `--lane layout` or `--lane all`. The anchor layout — `features.md`, `constitution.md`,
 `glossary.md`, `register.md`, `tools.md` at the `.specify/` root and feature details at
 `.specify/features/<NNN>-<slug>.md` — is the convergence target for older projects. The mechanism is owned by
-`.specify/scripts/python/anchor-layout-migrate.py` (deterministic; archive-first, and the script never rewrites project
+`scripts/python/anchor-layout-migrate.py` (deterministic; archive-first, and the script never rewrites project
 documents).
 
 - **L1 detect** — `python3 .specify/scripts/python/anchor-layout-migrate.py --action check --json`; exit 0
   clean, 1 findings (the plan).
 - **L2 present** — the plan's moves, placeholder replacements, merges, dedupes, every refused structural
   target (never overwritten), and the reference paths the project must update. Decision gate: functional ×
-  autonomous → fix + disclose (`.specify/shared/guidelines/confirmation-gates.md` § Decision gate).
+  autonomous → fix + disclose (`shared/guidelines/confirmation-gates.md` § Decision gate).
 - **L3 apply** — `--action apply --archive-root <root>`: the five anchors converge to the `.specify/` root;
   a placeholder is replaced by the legacy real content; a real/real pair is merged (registry table union or
-  append marker) with both originals archived; `.specify/features/<NNN>.md` becomes
-  `.specify/features/<NNN>-<slug>.md`. Every original is copied into the archive before the target changes;
+  append marker) with both originals archived; a legacy feature-detail file under the retired container's
+  `features/` subpath becomes `.specify/features/<NNN>-<slug>.md`. Every original is copied into the archive before the target changes;
   a move whose target already exists is reported `skipped` and left in place (never forced).
 - **L4 verify** — `--action check` clean; report the reference-update list and every merge/archive location
   (the project's own documents carry the old paths; the script reports them, the lane does not rewrite them).
@@ -442,8 +442,8 @@ documents).
   unrelated work.
 - **Lane separation**: the retention lane never writes the sanitize findings ledger or
   merges its candidates into it; receipts/summaries/ledger live under
-  `.specify/memory/retention/`. The renumber lane writes only its own store under
-  `.specify/memory/renumber/`.
+  `.specify/retention/`. The renumber lane writes only its own store under
+  `.specify/renumber/`.
 - **Duplicate-only red line (只消解重复)**: the renumber lane repairs collisions only. It
   never reuses a freed number, never compacts gaps, and never re-labels an identifier
   that collides with nothing.
@@ -467,10 +467,10 @@ documents).
   confirmation; reversible → auto-execute + execution report) is owned by
   `.specify/shared/guidelines/confirmation-gates.md` — this skill applies it at Stage 5/6
   and in the retention lane's R4/R5; never copy or restate its rule text here.
-- **Retention store ownership**: `.specify/memory/retention/` is owned by
+- **Retention store ownership**: `.specify/retention/` is owned by
   `record-retention.py`; summaries, receipts, plans and ledgers are append-only durable
   evidence and are never deleted by the retention lane itself.
-- **Renumber store ownership**: `.specify/memory/renumber/` is owned by
+- **Renumber store ownership**: `.specify/renumber/` is owned by
   `renumber-utils.py`; plans, dismissals and ledgers are one file per entry (timestamped)
   so concurrent writers never share a path, and there is no mutable index to merge.
 - **Number-family owners**: spec numbering rules and pitfalls belong to

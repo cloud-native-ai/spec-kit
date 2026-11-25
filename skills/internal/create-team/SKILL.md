@@ -239,7 +239,7 @@ If the guide exists, apply agent-specific tool mappings for orchestration (e.g.,
 If you encounter an agent-specific obstacle, generate feedback at:
 
 ```
-.specify/memory/feedback/create-team-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+.specify/feedback/create-team-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
 ```
 
 ```markdown

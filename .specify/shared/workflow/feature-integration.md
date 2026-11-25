@@ -34,9 +34,9 @@ Each command owns exactly one transition:
 | `/speckit.plan` | `Draft → Planned` | MUST NOT land `Implemented` |
 | `/speckit.tasks` | Maintain `Planned` | Status unchanged |
 | `/speckit.implement` | `Planned → Implemented` | Requires Pre-Status-Flip Gate |
-| `/speckit.checklist` | `Implemented → Ready for Review` | Conditional initiator — applies only when the checklist runs after `/speckit.implement`: after implement it initiates the transition and cites the same owner criterion; before implement it initiates nothing, MUST NOT error for the absence of a code-segment conclusion, and MUST NOT manufacture one. Criteria are owned by `.specify/templates/feature-details-template.md` § Canonical Status State Machine and are not restated here |
-| `/speckit.review` | `Implemented → Ready for Review` | Unconditional initiator. Criteria are owned by `.specify/templates/feature-details-template.md` § Canonical Status State Machine and are not restated here; this gate is a property of the transition, not of this one command |
-| `/speckit.seal` | `Ready for Review → Sealed` | Unconditional initiator once its conjunctive conditions hold. Criteria are owned by `.specify/shared/workflow/acceptance-hardening.md` § Feature Status and are not restated here; `Sealed` is the terminal status for new work |
+| `/speckit.checklist` | `Implemented → Ready for Review` | Conditional initiator — applies only when the checklist runs after `/speckit.implement`: after implement it initiates the transition and cites the same owner criterion; before implement it initiates nothing, MUST NOT error for the absence of a code-segment conclusion, and MUST NOT manufacture one. Criteria are owned by `templates/feature-details-template.md` § Canonical Status State Machine and are not restated here |
+| `/speckit.review` | `Implemented → Ready for Review` | Unconditional initiator. Criteria are owned by `templates/feature-details-template.md` § Canonical Status State Machine and are not restated here; this gate is a property of the transition, not of this one command |
+| `/speckit.seal` | `Ready for Review → Sealed` | Unconditional initiator once its conjunctive conditions hold. Criteria are owned by `shared/workflow/acceptance-hardening.md` § Feature Status and are not restated here; `Sealed` is the terminal status for new work |
 
 `Ready for Review → Completed` is **closed for new work**: `Completed` survives only as a legacy record value
 for rows written before `Sealed` existed (no retroactive rewrite, no downgrade), and new work reaches its
@@ -51,9 +51,9 @@ Before advancing to `Implemented`:
 2. Zero open-task check: `grep -cE '^\- \[ \]' tasks.md` must return 0
 3. Verification log completeness: every `SC-NNN` has a status row
 4. Deferred task registry: `deferred_tasks=` in `verification.md` lists all `[~]` IDs
-5. Closure verdict: run `python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <spec-dir>` before
+5. Closure verdict: run `python3 scripts/python/closure-acceptance-check.py --spec-dir <spec-dir>` before
    the flip. It is the single source of the verdict, the closed reason set and the `final_path` counts; the
-   schema owner of all three is `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict, and this gate
+   schema owner of all three is `shared/workflow/acceptance-hardening.md` § Closure Verdict, and this gate
    calls that judgement instead of restating a condition. It MUST NOT be re-decided by a model judgement,
    another script, or an ad-hoc grep over the artifacts. On `block`, record the emitted reasons in
    `verification.md`, land `Blocked`, and MUST NOT write `Implemented`. Exit `2` is an input defect in the
@@ -62,7 +62,7 @@ Before advancing to `Implemented`:
 7. Void DoD rows and Completion Gate items: a DoD row OR a `## Completion Gate` item whose premise is measurably
    false is **void**, not unmet. It does not block the flip, but it MUST carry cited measurement, an inline annotation
    on the `DoD Status` line (or on the gate item), and prominent surfacing in the wrap-up report. Record the correction
-   where the false premise lives (see `.specify/templates/tasks-template.md` DoD Status). Never report the Definition of Done as
+   where the false premise lives (see `templates/tasks-template.md` DoD Status). Never report the Definition of Done as
    plainly "met" while a void row is folded silently into it
 
 ## Feature Binding Rules (clarify checkpoint)

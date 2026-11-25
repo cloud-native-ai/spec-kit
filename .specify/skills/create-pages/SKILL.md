@@ -21,7 +21,7 @@ classification: external
 
 # Create Pages — doc library → Hugo site → pages service
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Overview
 
@@ -46,7 +46,7 @@ Stage 3 targets — pick one, ask when the input does not say:
 |--------|-----------|--------|
 | `local` | A web server on this machine (`hugo serve`), for preview | works wherever `hugo` is installed |
 | `aoneci` | The Alibaba-internal, GitLab-like hosting platform's pages service | implemented (`--platform aoneci`) |
-| `github` | GitHub Actions + GitHub Pages (`gh-pages`) | **not implemented** — writes nothing and warns; contract in `.specify/scripts/ci-templates/github/README.md` |
+| `github` | GitHub Actions + GitHub Pages (`gh-pages`) | **not implemented** — writes nothing and warns; contract in `scripts/ci-templates/github/README.md` |
 
 `gitlab` means the open-source GitLab project and its hosting service. It is
 **not** a target here — do not treat `aoneci` as "gitlab", and do not accept

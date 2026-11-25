@@ -57,6 +57,16 @@ SCANNER = REPO_ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
 WIRING_HEADING_PREFIX = "## Run Determination"
 AMBIENT_HEADING = "## Run Determination"
 
+sys.path.insert(0, str(REPO_ROOT / "scripts" / "python"))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+#: The declared runtime store names (the path-set candidate domain).
+DECLARED_STORES = frozenset(
+    declaration_reader.load_fact(
+        declaration_reader.find_repo(REPO_ROOT), "runtime-store-layout"
+    )["body"]["statement"]["stores"]
+)
+
 #: The drift trap named by the S1 contract § 14.1 and by this team's ceiling note:
 #: step 6's verb is ``run``. The scanner's pattern tuple carries a nearby form
 #: differing only in verb and object, and the gate budget's margin is zero.
@@ -269,7 +279,7 @@ class TestOwnerSurfaces:
         text = _text(TODO_CMD)
         assert "--park" in text, "todo.md no longer documents Park Mode's flag"
         assert "Park Mode" in text, "todo.md no longer names Park Mode"
-        assert ".specify/memory/todo/" in text, "the park store path is gone"
+        assert ".specify/todo/" in text, "the park store path is gone"
         assert "/speckit.requirements" in text, "the promote route into a spec is gone"
 
     def test_step6_safe_wording_survives_and_the_trap_form_is_absent(self, blocking_re):
@@ -497,8 +507,12 @@ class TestPersistenceLanding:
 
         Positive control: the probe does see a directory literal when one is present.
         """
-        found = set(re.findall(r"\.specify/memory/([a-z0-9_-]+)/", wiring))
-        assert found, "sentinel: the probe found no memory path at all"
+        found = {
+            name
+            for name in re.findall(r"\.specify/([a-z0-9_-]+)/", wiring)
+            if name in DECLARED_STORES
+        }
+        assert found, "sentinel: the probe found no store path at all"
         assert found <= OWNED_MEMORY_DIRS, (
             f"the wiring introduces a memory directory with no owner: "
             f"{sorted(found - OWNED_MEMORY_DIRS)}"
@@ -577,7 +591,7 @@ class TestPassiveNonExhaustiveness:
 class TestSensorNotLedger:
     def test_the_record_carries_no_mutation_authority(self, wiring_flat):
         assert "no disposition, no threshold and no mutation authority" in wiring_flat
-        assert "never written under `.specify/memory/feedback/`" in wiring_flat
+        assert "never written under `.specify/feedback/`" in wiring_flat
 
     def test_the_ledger_is_fed_not_duplicated(self, wiring_flat):
         assert "intervention.json" in wiring_flat

@@ -2,7 +2,7 @@
 
 Bug: when the agent's CWD sat inside a skill directory (e.g.
 ``.specify/skills/<name>/``), the engines fell back to bare CWD and created a
-nested ``.specify/memory/`` store inside the skill dir, splitting project
+nested ``.specify/`` store inside the skill dir, splitting project
 state. The fix resolves the root by priority: explicit CLI arg > script
 self-location (an engine installed under ``*/.specify/scripts/`` anchors its
 parent project) > nearest CWD ancestor containing ``.specify/`` > CWD.

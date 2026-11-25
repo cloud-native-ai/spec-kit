@@ -259,7 +259,7 @@ def test_c34_engine_fail_closed_for_custom_subject_is_observable_in_client():
             "C-34: a fail-closed determination must not write into the "
             "client project"
         )
-        session_dir = project.path / ".specify" / "memory" / "session"
+        session_dir = project.path / ".specify" / "session"
         landed = list(session_dir.glob("*run-determination*")) if session_dir.is_dir() else []
         assert landed == [], (
             f"C-34: the fail-closed record must not land in the session "
@@ -353,14 +353,14 @@ def test_c36_engine_source_contract_not_widened_and_no_second_observer():
         f"C-36: no client history/observation engine may be created; "
         f"found {new_engines!r}"
     )
-    # No parallel history store directory materialised in the runtime memory.
-    memory = FRAMEWORK_ROOT / ".specify" / "memory"
+    # No parallel history store directory materialised in the runtime stores.
+    runtime_root = FRAMEWORK_ROOT / ".specify"
     parallel_stores = [
-        d.name for d in memory.iterdir() if d.is_dir()
+        d.name for d in runtime_root.iterdir() if d.is_dir()
         and re.search(r"history|observ", d.name) and d.name != "history"
     ]
     assert parallel_stores == [], (
-        f"C-36: no parallel history store may exist under .specify/memory/; "
+        f"C-36: no parallel history store may exist under the runtime stores; "
         f"found {parallel_stores!r}"
     )
     # The skill keeps its "no second store" constraint verbatim.

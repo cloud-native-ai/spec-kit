@@ -21,7 +21,7 @@ def run_cli(*args, cwd):
 
 
 def write_feedback(ws: Path, count: int, start: int = 0):
-    fb = ws / ".specify" / "memory" / "feedback"
+    fb = ws / ".specify" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
     for i in range(start, start + count):
         fname = f"20260101T0000{i:02d}Z-skill-demo.md"
@@ -34,7 +34,7 @@ def write_feedback(ws: Path, count: int, start: int = 0):
 
 def make_two_runs(tmp_path: Path, extra_entries: int = 2):
     ws = tmp_path / "ws"
-    (ws / ".specify" / "memory" / "evidence").mkdir(parents=True)
+    (ws / ".specify" / "evidence").mkdir(parents=True)
     write_feedback(ws, 2)
     r1 = run_cli("--action", "collect", "--target", "project", "--lanes", "feedback", cwd=ws)
     assert r1.returncode == 0, r1.stderr
@@ -50,7 +50,7 @@ def make_two_runs(tmp_path: Path, extra_entries: int = 2):
 
 def baseline_finding_id(ws: Path, baseline_id: str) -> str:
     findings = json.loads(
-        (ws / ".specify" / "memory" / "evidence" / baseline_id / "findings.json")
+        (ws / ".specify" / "evidence" / baseline_id / "findings.json")
         .read_text(encoding="utf-8"))
     return findings["evidence"][0]["id"]
 
@@ -64,7 +64,7 @@ def write_intervention(ws: Path, baseline_id: str, *, target=None, signal_key="e
         "baselineRunId": baseline_id,
         "expectedSignal": {"signalKey": signal_key, "direction": direction},
     }
-    path = ws / ".specify" / "memory" / "evidence" / baseline_id / "intervention.json"
+    path = ws / ".specify" / "evidence" / baseline_id / "intervention.json"
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return path
 

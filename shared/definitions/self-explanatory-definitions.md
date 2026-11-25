@@ -4,7 +4,7 @@
 >
 > **命名史**：本概念最初以“望文生义”引入；2026-11-04 按用户决定，中文规范名改为“不言自明”，英文规范名为“Self-explanatory”。旧名只作为历史记录保留，后续引用一律使用新名。
 >
-> **Status**: confirmed at exit gate — 2026-11-04. Ledger: `.specify/memory/session/interview-wangwenshengyi.md`.
+> **Status**: confirmed at exit gate — 2026-11-04. Ledger: `.specify/session/interview-wangwenshengyi.md`.
 
 ## 1. 概念
 

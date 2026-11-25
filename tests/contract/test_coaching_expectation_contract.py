@@ -218,7 +218,7 @@ def test_c1_template_carries_every_mandatory_heading_in_order():
 
 def test_c1_expectation_path_and_dispatch_ordering_are_declared():
     text = re.sub(r"\s+", " ", _text(SKILL) + "\n" + _text(TEMPLATES))
-    assert ".specify/memory/coaching/<run-id>/expectation.md" in text
+    assert ".specify/coaching/<run-id>/expectation.md" in text
     assert re.search(r"before any dispatch action", text, re.IGNORECASE)
     assert re.search(r"`dispatched-at`", text)
     assert re.search(r"ordering evidence", text, re.IGNORECASE)

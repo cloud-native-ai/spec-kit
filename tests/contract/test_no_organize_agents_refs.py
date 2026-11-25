@@ -5,9 +5,9 @@ not appear anywhere in the authoritative source tree after the rename to `create
 
 Scope of the literal scan (the "active, non-archived" source SC-004 governs —
 "documentation, registries, skill bodies, symlinks"):
-  skills/, templates/, docs/, agents/, src/, memory/, top-level *.md,
+  skills/, templates/, docs/, agents/, src/, seed/, top-level *.md,
   tests/scenarios/ (structural routing data, NOT test code), and the canonical
-  runtime memory .specify/memory/ (minus the append-only historical records below).
+  runtime stores under .specify/ (minus the append-only historical records below).
 
 Deliberately excluded (with rationale, so the certified scope matches SC-004):
   - tests/ EXCEPT tests/scenarios/ — test *modules* reference the literal in
@@ -15,8 +15,8 @@ Deliberately excluded (with rationale, so the certified scope matches SC-004):
     IS scanned because it encodes live routing tables.
   - Append-only HISTORICAL RECORDS, analogous to the "historical spec archives"
     SC-004 explicitly excludes: .specify/specs/*, .specify/features.md,
-    .specify/features/**, .specify/memory/session/**,
-    .specify/memory/knowledge/**. These legitimately describe the rename as
+    .specify/features/**, .specify/session/**,
+    .specify/knowledge/**. These legitimately describe the rename as
     provenance ("create-team (renamed from organize-agents)").
   - The .specify/skills/ runtime mirror — covered instead by the dedicated
     parity test below (a stale mirror is a structural, not a textual, defect).
@@ -34,12 +34,24 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 LEGACY_TOKEN = "organize-agents"
 
 # Source-of-truth directories scanned in full.
-ACTIVE_DIRS = ["skills", "templates", "docs", "agents", "src", "memory"]
+ACTIVE_DIRS = ["skills", "templates", "docs", "agents", "src", "seed"]
 
 # Additional active surfaces the previous scope missed (F1/F4):
 #   - tests/scenarios: structural routing scenarios (live pointers, not test code)
-#   - .specify/memory: the CANONICAL runtime memory (not the shipped default memory/)
-EXTRA_DIRS = ["tests/scenarios", ".specify/memory"]
+#   - the runtime record stores that used to sit under the retired container (the
+#     package seed directory is the shipped default, not runtime state)
+EXTRA_DIRS = [
+    "tests/scenarios",
+    ".specify/todo",
+    ".specify/tools",
+    ".specify/feedback",
+    ".specify/coaching",
+    ".specify/housekeeping",
+    ".specify/retention",
+    ".specify/evidence",
+    ".specify/exec-quant",
+    ".specify/trigger",
+]
 
 # Append-only historical records (relative-path prefixes, POSIX form). Excluded for
 # the same reason SC-004 excludes historical spec archives.
@@ -47,8 +59,8 @@ HISTORICAL_RECORD_PREFIXES = (
     ".specify/specs/",
     ".specify/features.md",
     ".specify/features/",
-    ".specify/memory/session/",
-    ".specify/memory/knowledge/",
+    ".specify/session/",
+    ".specify/knowledge/",
 )
 
 # The sanitize findings ledger and the renumber plans/ledgers (Feature 047 / the
@@ -56,8 +68,8 @@ HISTORICAL_RECORD_PREFIXES = (
 # dead references to renamed assets — every entry names an old identifier by
 # design, so the literal scan must skip them.
 RUNTIME_CACHE_PREFIXES = (
-    ".specify/memory/sanitize/",
-    ".specify/memory/renumber/",
+    ".specify/sanitize/",
+    ".specify/renumber/",
 )
 
 

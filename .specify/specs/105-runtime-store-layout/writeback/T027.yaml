@@ -1,0 +1,5 @@
+task: T027
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: templates/commands/{feedback,improve,instructions,interview,migrate,review,sanitize,todo,tools}.md + templates/instructions-template.md + templates/tools.md updated per L-1; migrate.md keeps the sixth-dimension and receipt wording and now names the retired container through the declaration's retired_container; sanitize.md layout-lane parenthetical rephrased by the tombstone concept; zero template hits remain (test-evidence/t026-t030-rewrite-readings.txt framework-source = 4 allowlisted files only); per-tool copies untouched by hand (regenerated in T031)
+at: 2026-11-25T07:42:00Z

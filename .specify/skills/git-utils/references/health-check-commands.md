@@ -75,7 +75,7 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/git-workflow-observe.py" --
 ### Git Workflow 块一致性
 - `.specify/workflow/git.md` 托管块（分支名与实际一致）: ✅ / ❌ 问题描述
 - START/END 标记成对存在: ✅ / ❌
-- 无遗留第二数据源（.specify/git-workflow.md、.specify/memory/git-workflow.md、旧版 instructions.md 内联 `## Git Workflow` 块）: ✅ / ⚠️ 冗余待处理（路径）
+- 无遗留第二数据源（.specify/git-workflow.md、退役容器内的 git-workflow.md、旧版 instructions.md 内联 `## Git Workflow` 块）: ✅ / ⚠️ 冗余待处理（路径）
 
 ### 建议操作
 - （列出需要执行的操作，如有）

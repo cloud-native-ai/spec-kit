@@ -1,0 +1,17 @@
+== live-reference readings after T026/T027/T028 rewrites (before T030 regeneration)
+framework-source: 4 files / 9 occurrences
+    3 scripts/python/anchor-layout-migrate.py
+    4 scripts/python/sanitize-utils.py
+    1 shared/declarations/facts/runtime-store-layout.yaml
+    1 shared/definitions/framework-map.md
+runtime-guide: 2 files / 12 occurrences
+    6 .specify/glossary.md
+    6 .specify/instructions.md
+current-docs: 0 files / 0 occurrences
+
+== dated-record exclusion probes (zero rewrites required)
+docs/reference/history/: files_with_literal=2
+docs/decisions/: files_with_literal=2
+docs/archive/: files_with_literal=1
+docs/static/: files_with_literal=1
+docs/notes/: files_with_literal=1

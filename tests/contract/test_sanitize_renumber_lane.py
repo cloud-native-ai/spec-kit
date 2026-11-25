@@ -42,7 +42,7 @@ def test_template_declares_lane_engine_and_store():
     assert "--lane materials|retention|renumber|layout|all" in text
     assert "renumber-utils.py" in text
     assert "序号重排" in text
-    assert ".specify/memory/renumber/" in text
+    assert ".specify/renumber/" in text
     assert "git branch -m" in text, "branch renames must be reported, never executed"
 
 
@@ -58,7 +58,7 @@ def test_skill_declares_lane_families_and_red_lines():
     assert "Dated-record red line" in text
     assert "Sanctioned writer" in text
     assert "excluded_hits" in text
-    assert ".specify/memory/renumber/" in text
+    assert ".specify/renumber/" in text
     assert "renumber-utils.py" in text
 
 
@@ -83,7 +83,7 @@ def test_docs_describe_the_lane():
     assert "Renumber lane" in text
     assert "renumber-utils.py" in text
     assert "duplicate-only" in text or "Duplicate-only" in text
-    assert ".specify/memory/renumber/" in text
+    assert ".specify/renumber/" in text
 
 
 def test_engine_cli_contract():

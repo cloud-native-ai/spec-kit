@@ -3,7 +3,7 @@
 ## 1. 渲染
 
 ```bash
-.specify/skills/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh figure-01-order-flow.mmd figures/ figure-01-order-flow
+skills/external/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh figure-01-order-flow.mmd figures/ figure-01-order-flow
 ```
 
 - 同时产出 `figure-01-order-flow.svg` 与 `.png`（源 `.mmd` 一并保存）；

@@ -20,7 +20,7 @@ here is expected to fail on the pre-implementation tree — each assertion first
 asserts the element's presence, so red is "the element is missing", never an import error.
 
 **Fixture posture**: every store, registry and workspace is built from scratch under ``tmp_path``; no test reads or
-writes the real ``.specify/memory/exec-quant/`` store or the real line registry.
+writes the real ``.specify/exec-quant/`` store or the real line registry.
 """
 from __future__ import annotations
 

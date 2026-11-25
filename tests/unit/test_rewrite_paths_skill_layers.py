@@ -102,8 +102,10 @@ class TestDelimiterContexts:
 
 
 class TestExistingSegmentsUnaffected:
-    def test_four_segments_still_rewrite(self):
-        assert rewrite_paths("memory/x") == ".specify/memory/x"
+    def test_three_segments_still_rewrite_and_memory_is_never_rewritten(self):
+        # C-7: the installer no longer rewrites a `memory` segment — packaged sources
+        # carry .specify/<store>/ paths, so a bare `memory/` reference stays untouched.
+        assert rewrite_paths("memory/x") == "memory/x"
         assert rewrite_paths("scripts/x") == ".specify/scripts/x"
         assert rewrite_paths("templates/x") == ".specify/templates/x"
         assert rewrite_paths("shared/x") == ".specify/shared/x"

@@ -7,9 +7,9 @@
 | 主题 | 所有者 |
 |------|--------|
 | 阶段名册、状态脊格式、哨兵、U0–U6、卡死处置 | `../SKILL.md` § The Loop 与 `stage-prompts.md` |
-| Goal / Target 的身份、状态机与绑定校验 | `.specify/shared/definitions/goal-definitions.md` 与 `.specify/scripts/python/goal-utils.py` |
-| 授权谓词的两半（Agent 能力 AND 席位策略） | `.specify/skills/internal/run-agent/SKILL.md`、`.specify/skills/internal/create-team/references/create-mode.md` |
-| line registry、worktree-per-write-line、ownership、集成队列 | 既有机制（`.specify/scripts/line-registry.py` 与其 references）；本文件只引用，MUST NOT 重述其语义 |
+| Goal / Target 的身份、状态机与绑定校验 | `shared/definitions/goal-definitions.md` 与 `scripts/python/goal-utils.py` |
+| 授权谓词的两半（Agent 能力 AND 席位策略） | `skills/internal/run-agent/SKILL.md`、`skills/internal/create-team/references/create-mode.md` |
+| line registry、worktree-per-write-line、ownership、集成队列 | 既有机制（`scripts/line-registry.py` 与其 references）；本文件只引用，MUST NOT 重述其语义 |
 | 工作包模型（包执行者、集成队列的包侧语义） | 既有契约；本文件不涉及 |
 
 **调用边界一句话**: 一条已获有效授权的团队成员职责 → **恰好一次**有界嵌套 SDD 运行 → 止于 review → 一份字段集封闭的 handoff。SDD 运行是从属执行路径：它 MUST NOT 创建、重绑、改范围或终止 Goal、Target、Team 或 roster。
@@ -58,7 +58,7 @@
 
 ## Line registration（写线登记）
 
-- 嵌套运行**就是一条写线**：启动时按既有 line registry（`.specify/scripts/line-registry.py`）登记，事件携带 `(line_id, run_id)` 信封，结束（成功、失败或卡死交回）后 deregister；line 身份来自该 registry，不新开。
+- 嵌套运行**就是一条写线**：启动时按既有 line registry（`scripts/line-registry.py`）登记，事件携带 `(line_id, run_id)` 信封，结束（成功、失败或卡死交回）后 deregister；line 身份来自该 registry，不新开。
 - **worktree-per-write-line** 与 ownership manifest 沿用既有机制。两个嵌套运行的 territory 重叠时，**由该机制串行化或拒绝**——本文件不引入第二套并发原语，「同一成员同时只承载一次运行」的硬上限也由该机制落实。
 - MUST NOT 新建第二套 line registry / ownership 模型 / integration queue / 状态脊（state spine）：本运行的全部记录解析到既有 line 条目与既有 state spine，不新增第二份存储。
 - 每次嵌套运行结束后，worktree 的移除与分支保留按既有 line 机制的收尾规则处置；handoff 只**点名**工作所在，不移动它。

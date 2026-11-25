@@ -13,7 +13,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 
 `/speckit.tools` is the **single entry point** for every **tool** operation — the tool-domain analogue of `/speckit.agents` and `/speckit.team`. It recognizes intent, then routes to the owning tool skill. It delegates to skills and does **NOT** render templates inline.
 
-A **tool** is a named, pre-verified, reusable **definition of one concrete capability** — persisted at `.specify/memory/tools/<name>.md` — that an agent invokes *instead of* improvising the action per run (it absorbs environment variance and replaces throwaway generated scripts). The full concept, its rationale (stability / efficiency / authority), the definition-first discipline, the four canonical types, type semantics, the RFC 2119 behavioral-rules format, the optional `## Environment Applicability` block, the two-state lifecycle (`Draft` → `Verified`; only `Verified` records may be invoked), the edge cases, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md` — reference it, do not restate it. The reuse-before-generating operating rule for every other skill/command is `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII). The authoring templates live inside the owning skill at `.specify/skills/internal/create-tools/templates/`.
+A **tool** is a named, pre-verified, reusable **definition of one concrete capability** — persisted at `.specify/tools/<name>.md` — that an agent invokes *instead of* improvising the action per run (it absorbs environment variance and replaces throwaway generated scripts). The full concept, its rationale (stability / efficiency / authority), the definition-first discipline, the four canonical types, type semantics, the RFC 2119 behavioral-rules format, the optional `## Environment Applicability` block, the two-state lifecycle (`Draft` → `Verified`; only `Verified` records may be invoked), the edge cases, and the invocation preview contract are defined once in `.specify/shared/definitions/tool-definitions.md` — reference it, do not restate it. The reuse-before-generating operating rule for every other skill/command is `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII). The authoring templates live inside the owning skill at `.specify/skills/internal/create-tools/templates/`.
 
 > **Terminology**: unqualified "tool" here means the record above. A supported coding agent (Claude Code, Codex CLI, …) is an **AI agent CLI**; the `tools:` frontmatter key on an agent is its **tool-call list**.
 
@@ -32,7 +32,7 @@ A **tool** is a named, pre-verified, reusable **definition of one concrete capab
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `define`, `modify`, `view`, `list`, or `invoke`.
-2. **Resolve the record** — check `.specify/memory/tools/<tool-name>.md` and alias matches. When the same name exists under different types, require explicit user disambiguation and present all matching records.
+2. **Resolve the record** — check `.specify/tools/<tool-name>.md` and alias matches. When the same name exists under different types, require explicit user disambiguation and present all matching records.
 3. **define** → `create-tools`: collect the mandatory fields **from the user** (never auto-populate a tool's contract from built-in knowledge), author the record from the matching type template, validate, and persist it with a generated `tool_id` — the record file is the single source of truth (no registry). If the record already exists, inform the user and offer `modify` or `view` instead.
 4. **modify** → `improve-tools`: load the existing record and apply **field-level** edits only — source/contract correction, rule hardening, alias/rename, or `Draft` → `Verified` promotion. Preserve every unmodified field; re-validate and re-persist. If the record does not exist, report "no definition found" and offer to `define` it.
 5. **view / list** → read-only display; never mutate a record (see View / List Mode below).
@@ -45,7 +45,7 @@ A **tool** is a named, pre-verified, reusable **definition of one concrete capab
 
 When `$ARGUMENTS` is empty, the command MUST execute the following sequence instead of routing to a mode:
 
-1. **List all registered tools** — scan `.specify/memory/tools/*.md` and present a summary table with each tool's `name`, `tool_type`, `source_identifier`, and `status`. If no records exist, state "No tools found" explicitly.
+1. **List all registered tools** — scan `.specify/tools/*.md` and present a summary table with each tool's `name`, `tool_type`, `source_identifier`, and `status`. If no records exist, state "No tools found" explicitly.
 2. **Give contextual suggestions** — based on the current conversation, recent repo activity, and the listed records, recommend the most relevant next action. Examples: a `Draft` record blocking use → suggest `modify` to complete it; a script the conversation keeps invoking by hand → suggest `define` it; a `Verified` record matching the current task → suggest `invoke`. Suggestions MUST be grounded in observable context, NOT fabricated.
 3. **Show capability summary** — briefly list the five modes so the user knows what operations are available.
 
@@ -68,7 +68,7 @@ Read-only, never mutating:
 **Output class (view, list)**: echo — in a superagent session the view/list product is printed verbatim as this session's own message inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` at a presentation boundary; a tool result is not user-facing presentation. The other modes are not echo commands.
 
 - **view** — load the record and display its full definition: fields, parameters, returns, behavioral rules, aliases, `status`, `discovery_origin`, and `tool_id`. If no record exists, report "no definition found" and offer to `define` it.
-- **list** — display a summary table of all records under `.specify/memory/tools/`. Distinguish `Draft` from `Verified` so incomplete records are visible.
+- **list** — display a summary table of all records under `.specify/tools/`. Distinguish `Draft` from `Verified` so incomplete records are visible.
 
 ### Invoke Mode (preview → confirm → execute)
 > Gate probe: gate-tools-invoke-mode — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
@@ -85,7 +85,7 @@ Invocation is gated. The command MUST NOT execute a tool before explicit user co
 
 ### Persistence
 
-Definition records: `.specify/memory/tools/<name>.md`; `tool_id` is the canonical form `<TOOL:.specify/memory/tools/<name>.md>`; the record file is the single source of truth — no registry. Discovery inventories, the `.specify/tools.md` § Helper Tools Index trap, and store ownership: `.specify/shared/definitions/tool-definitions.md`. Agent-specific detection, guidance, and execution-feedback capture follow the routed skill's own Agent-Specific Configuration section (`create-tools` / `improve-tools`); for shared operational guidance, see `.specify/shared/workflow/agent-configuration.md`.
+Definition records: `.specify/tools/<name>.md`; `tool_id` is the canonical form `<TOOL:.specify/tools/<name>.md>`; the record file is the single source of truth — no registry. Discovery inventories, the `.specify/tools.md` § Helper Tools Index trap, and store ownership: `.specify/shared/definitions/tool-definitions.md`. Agent-specific detection, guidance, and execution-feedback capture follow the routed skill's own Agent-Specific Configuration section (`create-tools` / `improve-tools`); for shared operational guidance, see `.specify/shared/workflow/agent-configuration.md`.
 
 ## Wrap-up
 

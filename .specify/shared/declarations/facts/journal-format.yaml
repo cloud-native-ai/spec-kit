@@ -3,11 +3,11 @@
 # The one machine-read copy of the sdd-observer journal's spelling face: the journal filename, the
 # title template, the five header keys, the nine entry columns in order, the sixteen closed event
 # classes with their minimum persistent evidence, the two retention classes, the ten pointer kinds,
-# the missing-value placeholder and the escaping rule. The engine `.specify/scripts/python/journal-utils.py`
-# reads it through `.specify/scripts/python/declaration_reader.py`; the carrier reaches it by
-# `.specify/shared/declarations/facts/journal-format.yaml#/statement`.
+# the missing-value placeholder and the escaping rule. The engine `scripts/python/journal-utils.py`
+# reads it through `scripts/python/declaration_reader.py`; the carrier reaches it by
+# `shared/declarations/facts/journal-format.yaml#/statement`.
 #
-# Deliberately NOT registered in `.specify/shared/declarations/contract.yaml` (plan R-05): the 094 C-86
+# Deliberately NOT registered in `shared/declarations/contract.yaml` (plan R-05): the 094 C-86
 # closed-set pin stays intact and the fact is read by file through the declaration reader.
 #
 # Written in the allowed YAML subset (contracts/declaration-schema.contract.md C-008): block
@@ -86,6 +86,6 @@ statement:
     pipe_escape: '\|'
     newline_replacement: ' '
 consumers:
-  - .specify/scripts/python/journal-utils.py
+  - scripts/python/journal-utils.py
 former_carriers: []
 note: "Every sequence here is ordered: header_keys is the header's key order, entry_columns is the nine-column table order, event_classes is the closed set E-6 declares, and pointer_kinds is the closed kind set E-7 declares. Growth of the event set or the pointer kinds is a revision of this file, never an inline invention by a consumer. The escaping block fixes C-11: a literal pipe inside a value is written as pipe_escape, and newlines or carriage returns collapse to newline_replacement."

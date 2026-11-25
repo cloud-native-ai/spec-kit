@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 # run-skills — 运行未注册技能的统一入口
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -16,7 +16,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 ## Input Contract
 
-- **`Target`**:要运行的技能标识,来自调用方参数或会话上下文;名称可省略扩展名。接受形式、归一化顺序与失败语义归 `.specify/shared/definitions/skill-reference-definitions.md`(此处只声明参数名与含义);前缀 `/` 只标记该技能的斜杠命令面,**不是**「直接调用它」的指令。
+- **`Target`**:要运行的技能标识,来自调用方参数或会话上下文;名称可省略扩展名。接受形式、归一化顺序与失败语义归 `shared/definitions/skill-reference-definitions.md`(此处只声明参数名与含义);前缀 `/` 只标记该技能的斜杠命令面,**不是**「直接调用它」的指令。
 - **消歧**:输入若命中 `/speckit.*` 命令名(命令面,非技能),报告该名字属命令面并指向对应 `/speckit.*` 入口,不强行执行。
 - **递归**:目标是 run-skills 自身时照常执行并披露这一点;无特殊分支。
 
@@ -42,7 +42,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 ### 3. 执行(加载并遵照,不内联)
 
-- 读取命中路径的 `SKILL.md` 正文,**将其作为本次运行的最高执行指引**,输入按调用方接线;技能自带 `${SKILL_HOME}`(技能自有资源)/`${SKILL_WORKDIR}`(运行时产物)路径约定按其正文与 `.specify/skills/create-skills/SKILL.md` 的路径约定解释。
+- 读取命中路径的 `SKILL.md` 正文,**将其作为本次运行的最高执行指引**,输入按调用方接线;技能自带 `${SKILL_HOME}`(技能自有资源)/`${SKILL_WORKDIR}`(运行时产物)路径约定按其正文与 `skills/external/create-skills/SKILL.md` 的路径约定解释。
 - 把目标技能的产出/报告**转述**给调用方;MUST NOT 将目标技能的逻辑复制进本技能。
 - 运行中发现的异常按目标技能自身的治理处理;run-skills 自身对「无法解析/无效制品/越界路径」三类异常停在本层并上送可行动错误。
 

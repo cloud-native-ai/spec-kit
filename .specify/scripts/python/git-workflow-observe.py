@@ -15,9 +15,9 @@ Mechanism/policy split:
     Bootstrap decision, never a declaration.
 
 Hook (probe + handler mechanism, feature 056): registered in
-``.specify/shared/definitions/probe-definitions.md`` as Handler ``h-git-workflow-observe``
+``shared/definitions/probe-definitions.md`` as Handler ``h-git-workflow-observe``
 (kind=engine, action ``observe``, non-blocking) bound at ``@point:situation``
-scope ``all``. The situation engine (``.specify/scripts/python/trigger-utils.py``, action
+scope ``all``. The situation engine (``scripts/python/trigger-utils.py``, action
 ``assess``) dispatches it after writing its telemetry row, so every situation
 assessment refreshes the observations idempotently.
 
@@ -59,7 +59,7 @@ _ROLE_ROW_NAMES = ("MAIN", "PRE", "DEV")
 
 def resolve_root(workspace):
     """Explicit --workspace > engine self-location (literal `.specify` ancestor) >
-    nearest `.specify` CWD ancestor > CWD. The source copy under `.specify/scripts/python/`
+    nearest `.specify` CWD ancestor > CWD. The source copy under `scripts/python/`
     never self-matches this repository's own `.specify/` tree."""
     if workspace:
         root = Path(workspace).resolve()

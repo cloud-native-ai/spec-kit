@@ -24,7 +24,7 @@ def test_partial_run_records_labeled_review(feedback_store: Path):
         "--points", "Add a resumable checkpoint after Foundational",
         "--partial",
     ])
-    files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
+    files = [f for f in (feedback_store / ".specify/feedback").glob("*.md")]
     assert len(files) == 1
     meta, body = feedback_utils.parse_frontmatter(files[0].read_text(encoding="utf-8"))
     assert meta["partial"] is True
@@ -34,7 +34,7 @@ def test_partial_run_records_labeled_review(feedback_store: Path):
 
 def test_aborted_run_may_record_nothing(feedback_store: Path):
     # Skipping the record entirely is valid: store stays empty.
-    assert not (feedback_store / ".specify/memory/feedback/index.json").exists()
+    assert not (feedback_store / ".specify/feedback/index.json").exists()
     out = feedback_utils.action_status(
         feedback_utils.argparse.Namespace(workspace_root=str(feedback_store), threshold=None)
     )

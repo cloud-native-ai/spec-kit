@@ -68,4 +68,4 @@ Batches partition by disjoint write territory; run them concurrently only when t
 
 ## Re-Anchoring
 
-At entry, restate the batch anchor (item set, authorization, territory, evidence path). After every core step, re-read the rules in force first and record `on-track` / `correction-applied` / `decision-needed`. The obligation's owner is `.specify/shared/definitions/re-anchoring-definitions.md`.
+At entry, restate the batch anchor (item set, authorization, territory, evidence path). After every core step, re-read the rules in force first and record `on-track` / `correction-applied` / `decision-needed`. The obligation's owner is `shared/definitions/re-anchoring-definitions.md`.

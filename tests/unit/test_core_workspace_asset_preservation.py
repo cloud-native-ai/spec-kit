@@ -22,7 +22,7 @@ class TestCoreAssetRelpaths:
 
     def test_includes_essential_paths(self):
         paths = core_asset_relpaths()
-        assert ".specify/memory" in paths
+        assert ".specify/session" in paths
         assert ".specify/templates" in paths
         assert ".specify/scripts" in paths
         assert ".specify/skills" in paths
@@ -35,11 +35,11 @@ class TestCoreAssetRelpaths:
 
 class TestIsCoreAssetInitialized:
     def test_existing_asset_detected(self, tmp_path: Path):
-        (tmp_path / ".specify" / "memory").mkdir(parents=True)
-        assert is_core_asset_initialized(tmp_path, ".specify/memory")
+        (tmp_path / ".specify" / "session").mkdir(parents=True)
+        assert is_core_asset_initialized(tmp_path, ".specify/session")
 
     def test_missing_asset_not_detected(self, tmp_path: Path):
-        assert not is_core_asset_initialized(tmp_path, ".specify/memory")
+        assert not is_core_asset_initialized(tmp_path, ".specify/session")
 
     def test_existing_file_detected(self, tmp_path: Path):
         (tmp_path / ".specify").mkdir(parents=True)
@@ -53,10 +53,10 @@ class TestDetectInitializedCoreAssets:
         assert result == []
 
     def test_partial_core_returns_only_existing(self, tmp_path: Path):
-        (tmp_path / ".specify" / "memory").mkdir(parents=True)
+        (tmp_path / ".specify" / "session").mkdir(parents=True)
         (tmp_path / ".specify" / "instructions.md").write_text("test")
         result = detect_initialized_core_assets(tmp_path)
-        assert ".specify/memory" in result
+        assert ".specify/session" in result
         assert ".specify/instructions.md" in result
         assert ".specify/templates" not in result
 

@@ -43,7 +43,7 @@ REQUIRED_FIELDS = (
 #: Content classes the payload must never carry (C-2). Each marker is a detector, not the
 #: clause text: the clause prose lives in the contract, the detectors live here.
 FORBIDDEN_MARKERS = {
-    "expectation": ("expectation", ".specify/memory/coaching/"),
+    "expectation": ("expectation", ".specify/coaching/"),
     "criteria-row": ("OC-", "PE-"),
     "coach-conclusion": ("deviation", "my reading", "coach concludes"),
     "coach-status": ("judged stalled", "will be judged", "expected state is"),
@@ -177,7 +177,7 @@ def test_c2_the_four_forbidden_classes_are_declared():
         {"expectation": "see expectation.md for the OC rows"},
         {"OC-1": "checklist.md has five rows"},
         {"coach-note": "my reading is that item 4 is covered"},
-        {"payload-ref": ".specify/memory/coaching/20261030T101500Z-fixture-trainee/x.md"},
+        {"payload-ref": ".specify/coaching/20261030T101500Z-fixture-trainee/x.md"},
         {"coach-status": "the subordinate will be judged stalled at the next tick"},
     ],
     ids=[

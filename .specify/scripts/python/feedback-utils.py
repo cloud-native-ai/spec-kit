@@ -8,7 +8,7 @@ feedback store, using plain Markdown files plus a lightweight local JSON index
 
 Layout (relative to workspace root):
 
-    .specify/memory/feedback/
+    .specify/feedback/
         <created-ts>-<unit-slug>.md   # one file per recorded run
         state/<scalar>.json           # one tiny file per store scalar
                                        # (threshold / submitted-at / upstream-repo)
@@ -31,7 +31,7 @@ Each entry is local-scoped (``scope: local``: one unit + one run); a
 framework-wide view exists only as the aggregation built over recorded entries.
 ``/speckit.review`` is a separate SDD-flow mechanism that reviews one feature's
 process — not a whole-framework report (boundary owner:
-``.specify/shared/workflow/feedback-step.md`` § Mechanism boundary).
+``shared/workflow/feedback-step.md`` § Mechanism boundary).
 
 Positioning: feedback targets the Spec Kit framework itself (templates,
 commands, skills, scripts, docs) — never the LLM, agent CLI, harness, or the
@@ -91,7 +91,7 @@ if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
 
-FEEDBACK_SUBDIR = Path(".specify") / "memory" / "feedback"
+FEEDBACK_SUBDIR = Path(".specify") / "feedback"
 PACKAGES_DIRNAME = "packages"
 STATE_DIRNAME = "state"
 # Legacy single-file index (pre-055): kept only as a read-only fallback
@@ -99,7 +99,7 @@ STATE_DIRNAME = "state"
 INDEX_NAME = "index.json"
 STORE_NAME = "feedback"
 # Feature 084, batch 1 row 1: the prompt threshold is a declaration-layer fact. This engine carries no
-# copy of the value — it reads `.specify/shared/declarations/facts/feedback-prompt-threshold.yaml` through the
+# copy of the value — it reads `shared/declarations/facts/feedback-prompt-threshold.yaml` through the
 # shared read entry, and a project without the layer is labelled rather than defaulted (FR-012 /
 # C-049: the compatibility path MUST NOT be readable as a pass).
 THRESHOLD_FACT = "feedback-prompt-threshold"
@@ -1265,7 +1265,7 @@ def action_client_metrics(args: argparse.Namespace) -> Dict[str, Any]:
 
     Derivation is program-first from three existing faces only — the feedback
     store (`kind: external` entries), the routing backlog
-    (`.specify/memory/feedback/backlog.md`), and the code-segment records
+    (`.specify/feedback/backlog.md`), and the code-segment records
     (`.specify/specs/*/code-review.md`). Nothing is written; no aggregate,
     index, score, weight, or total is produced or persisted.
     """
@@ -1516,7 +1516,7 @@ def action_upstream(args: argparse.Namespace) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Exec-Quant payload (068 package leg; contracts/package-layout.md C-1..C-9)
 # --------------------------------------------------------------------------- #
-EXEC_QUANT_STORAGE_REL = Path(".specify") / "memory" / "exec-quant"
+EXEC_QUANT_STORAGE_REL = Path(".specify") / "exec-quant"
 PAYLOAD_DIRNAME = "exec-quant"
 PAYLOAD_RECORDS_DIRNAME = "records"
 PAYLOAD_MANIFEST_NAME = "payload-manifest.json"

@@ -1,0 +1,91 @@
+# Glossary Protocol (Correction · Enrichment · Conflict)
+
+This file is the single source of truth for how
+`/speckit.*` commands use the project glossary at `.specify/glossary.md`. Commands
+embed a lightweight `## Glossary` step that points here (modeled on the `## Feedback` step).
+
+The glossary is a **documentation/prompt-framework** artifact (Constitution Principle IX):
+correction and conflict *judgment* are AI-agent behaviors interpreted from this doc; the
+`.specify/scripts/python/glossary-utils.py` engine performs only deterministic file operations and
+structural conflict detection.
+
+The glossary is loaded as **ambient context** for every command via the Documentation Map
+in `.specify/instructions.md` — no command needs to load it explicitly.
+
+---
+
+## 1. Input correction & anchoring (voice-first)
+
+When interpreting user input, consult the glossary and map any recorded **variant** to its
+**canonical** term. This primarily repairs errors from voice/dictated input (homophones,
+easily-confused words).
+
+- When a correction is applied, **surface it** so it is traceable and the user can override
+  it — e.g. `note: interpreted 『speck it』as canonical 『Spec Kit』 (glossary)`.
+- How that correction is **worded for the reader** — vocabulary, the context it must carry, and
+  which terms may stand unexplained — is governed by
+  `.specify/shared/guidelines/user-facing-comprehension.md` (this file covers surface class ⑨);
+  its condition sets MUST NOT be restated here.
+- The correction is an **interpretation aid only** — never destructively rewrite the user's
+  literal input.
+- If a variant is **ambiguous** (maps to more than one canonical term) or unrecognized, do
+  **not** guess — defer to the user.
+- **Constraint-side reading (约束侧读取)**: the glossary is not only a correction table. A
+  registered term may also carry what the project already fixed about that concept — a
+  **mechanical ceiling** (a count, size, or budget limit), an **established disposition** (the
+  handling the project settled on), or a **named anti-pattern** (a shape the project ruled
+  out). When work introduces, constrains, or redefines a registered term, read that term's
+  entry for these three and write inside them: a ceiling registered against a term does not
+  stop binding because the current task finds it inconvenient, and an anti-pattern named for a
+  term is a ruling, not a suggestion. Read **by topic domain** — pull the entries for the
+  domain the input is about rather than the whole table (summary-first) — and reach an entry's
+  full record through `.specify/glossary.md`; a command step names this obligation and
+  MUST NOT restate its conditions.
+
+## 2. Progressive enrichment (at checkpoints)
+
+At each workflow wrap-up checkpoint (`requirements`, `plan`, `tasks`, `implement`), detect
+newly-appearing **project-specific** terms and propose them as `origin=auto`,
+`status=proposed`.
+
+- **Common everyday words MUST NOT be recorded** — only domain/project terms.
+- Route every proposal through the conflict check (§3) before writing.
+- Programmatic writes go through the engine:
+  `python3 .specify/scripts/python/glossary-utils.py --action add --canonical "<T>" --meaning "<M>" --origin auto --status proposed`.
+
+## 3. Conflict detection & confirmation
+
+Before writing any proposed or manually-entered term, run conflict detection:
+
+```bash
+python3 .specify/scripts/python/glossary-utils.py --action detect-conflict --canonical "<T>" --variants "<csv>"
+```
+
+The engine reports **structural** collisions (identical canonical; a variant already bound to
+a different canonical). Additionally apply prompt-side judgment for **phonetic/near-duplicate**
+and **same-term/different-meaning** clashes.
+
+Non-conflicting writes MUST proceed directly (non-blocking) and be merged into the flow's
+wrap-up report — only conflicts and overwrites of user-authored entries stop for user
+resolution (see below; criteria: `.specify/shared/guidelines/confirmation-gates.md`).
+
+- On any detected or plausible conflict, **present it** (candidate, colliding entries, kind)
+  and obtain an **explicit user resolution** (`keep-existing` / `replace` / `merge-variant` /
+  `add-distinct` / `defer`) **before writing**.
+- **No conflicting change may be written without user confirmation.** The engine enforces this:
+  `add` refuses a conflicting write unless `--confirmed-resolution <choice>` is supplied.
+
+## 4. Manual edits & user precedence (以用户输入为准)
+
+- Users may edit `.specify/glossary.md` directly at any time; it is human-readable.
+- `origin=user` entries are **authoritative**: automatic proposals MUST NOT overwrite them
+  without explicit user confirmation. The engine refuses an `auto` write over a `user` entry
+  unless `--confirmed-resolution` is given.
+  > Gate probe: gate-glossary-user-entry-overwrite — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).
+- User-authored entries are **preserved across regenerations** — instruction generation
+  creates the glossary only if absent and never discards existing content.
+
+## 5. Scope
+
+There is exactly **one project-wide glossary** (no per-feature glossaries), shared across all
+features and commands.

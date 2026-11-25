@@ -32,7 +32,7 @@ def make_finding(**overrides) -> dict:
     import hashlib
     base = {
         "category": "stale-residue",
-        "target": ".specify/memory/todo/example.md",
+        "target": ".specify/todo/example.md",
         "severity": "high",
         "summary": "claims unlanded work that commit abc1234 merged",
         "evidenceRefs": [{"kind": "commit", "ref": "abc1234"}],
@@ -147,7 +147,7 @@ def test_apply_rejects_unknown_finding_exits_2(tmp_path):
     plan.parent.mkdir(parents=True, exist_ok=True)
     plan.write_text(json.dumps({
         "created": "2026-08-20T00:00:00Z", "confirmed": True,
-        "items": [{"findingId": "nope", "disposition": "delete", "target": ".specify/memory/todo/x.md"}],
+        "items": [{"findingId": "nope", "disposition": "delete", "target": ".specify/todo/x.md"}],
     }), encoding="utf-8")
     proc = run_engine(
         ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
@@ -179,7 +179,7 @@ def test_apply_rejects_disposition_mismatch_exits_2(tmp_path):
 
 def test_apply_repair_is_state_only(tmp_path):
     finding = make_finding(
-        category="dead-reference", target=".specify/memory/todo/example.md#scripts/x.py",
+        category="dead-reference", target=".specify/todo/example.md#scripts/x.py",
         detection="programmatic", disposition="repair", severity="medium",
         evidenceRefs=[{"kind": "path", "ref": "scripts/x.py"}],
     )
@@ -206,9 +206,9 @@ def test_apply_repair_is_state_only(tmp_path):
 
 def test_apply_archive_moves_to_archive_root(tmp_path):
     finding = make_finding(
-        category="redundant", target=".specify/memory/draft/old.md",
+        category="redundant", target=".specify/todo/old.md",
         severity="low", summary="superseded by /speckit.docs rewrite",
-        evidenceRefs=[{"kind": "path", "ref": ".specify/memory/todo/new.md"}],
+        evidenceRefs=[{"kind": "path", "ref": ".specify/todo/new.md"}],
         detection="semantic", disposition="archive",
     )
     draft = tmp_path / ".specify" / "memory" / "draft"
@@ -313,7 +313,7 @@ def test_quickstart_cli_grammar_matches_engine():
         ["--action", "collect", "--workspace-root", ".", "--format", "json"],
         ["--action", "record", "--file", "/tmp/sanitize-verdicts.json", "--workspace-root", ".", "--format", "json"],
         ["--action", "status", "--workspace-root", ".", "--format", "json"],
-        ["--action", "apply", "--plan", ".specify/memory/sanitize/cleanup-plan.json", "--workspace-root", ".", "--format", "json"],
+        ["--action", "apply", "--plan", ".specify/sanitize/cleanup-plan.json", "--workspace-root", ".", "--format", "json"],
     ):
         proc = subprocess.run(
             [sys.executable, str(ENGINE), "--action", argv[1], "--help"],

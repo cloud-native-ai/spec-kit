@@ -33,8 +33,8 @@ classification: internal
 | 知识域 | 路径 | 性质 | 检索方式 |
 |--------|------|------|----------|
 | 主题知识 | `.specify/history/`(`README.md` 索引 + `00-…` 跨域教训 + 分主题文件) | 蒸馏后的历史知识 | 主题索引 → 定向读取 |
-| 长期记忆 | `.specify/memory/knowledge/` | 沉淀的项目知识 | `python3 .specify/scripts/python/memory-utils.py --action recall --query "<q>" --format json` |
-| 会话记忆 | `.specify/memory/session/` | 短期、按日期 | 同上引擎(含该 scope)或定向读取 |
+| 长期记忆 | `.specify/knowledge/` | 沉淀的项目知识 | `python3 .specify/scripts/python/memory-utils.py --action recall --query "<q>" --format json` |
+| 会话记忆 | `.specify/session/` | 短期、按日期 | 同上引擎(含该 scope)或定向读取 |
 | 开发文档 | `docs/` | 现役文档 | 文档树 → 定向读取 |
 | 特性注册表 | `.specify/features.md` + `.specify/features/` | 现役状态 | 逐行/逐文件读取 |
 | 规格制品 | `.specify/specs/**`(requirements/plan/tasks/research/test-evidence) | 现役+历史交错 | 定向读取 |

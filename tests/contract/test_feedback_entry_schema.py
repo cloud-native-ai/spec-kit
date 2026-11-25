@@ -39,7 +39,7 @@ def _record(workspace_root: Path, **kw):
 def test_entry_file_frontmatter_and_body(feedback_store: Path):
     _record(feedback_store, unit_id="/speckit.plan", run_id="fm-run",
             feature="027-feedback-mechanism")
-    files = list((feedback_store / ".specify/memory/feedback").glob("*.md"))
+    files = list((feedback_store / ".specify/feedback").glob("*.md"))
     entry = next(f for f in files if f.name != ".gitkeep")
     meta, body = feedback_utils.parse_frontmatter(entry.read_text(encoding="utf-8"))
 
@@ -62,7 +62,7 @@ def test_entry_file_frontmatter_and_body(feedback_store: Path):
 def test_entry_filename_convention(feedback_store: Path):
     _record(feedback_store, unit_id="skill:study-code", unit_type="skill",
             run_id="name-run")
-    files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
+    files = [f for f in (feedback_store / ".specify/feedback").glob("*.md")]
     assert files
     for f in files:
         assert FILENAME_RE.match(f.name), f.name
@@ -72,7 +72,7 @@ def test_entry_filename_convention(feedback_store: Path):
 @pytest.mark.contract
 def test_scope_is_always_local(feedback_store: Path):
     _record(feedback_store, unit_id="/speckit.tasks", run_id="scope-run")
-    files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
+    files = [f for f in (feedback_store / ".specify/feedback").glob("*.md")]
     for f in files:
         meta, _ = feedback_utils.parse_frontmatter(f.read_text(encoding="utf-8"))
         assert meta["scope"] == "local"
@@ -90,7 +90,7 @@ def test_index_entries_sorted_created_desc(feedback_store: Path):
     created = [e["created"] for e in index["entries"]]
     assert len(created) == 3
     assert created == sorted(created, reverse=True)
-    assert not (feedback_store / ".specify/memory/feedback/index.json").exists()
+    assert not (feedback_store / ".specify/feedback/index.json").exists()
 
 
 @pytest.mark.contract
@@ -105,7 +105,7 @@ def test_count_since_submission_invariant(feedback_store: Path):
 def test_partial_run_labels_review(feedback_store: Path):
     _record(feedback_store, unit_id="/speckit.implement", run_id="partial-run",
             review="Only setup completed.", partial=True)
-    files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
+    files = [f for f in (feedback_store / ".specify/feedback").glob("*.md")]
     entry = next(f for f in files if "partial-run" not in f.name or True)
     text = entry.read_text(encoding="utf-8")
     meta, body = feedback_utils.parse_frontmatter(text)
@@ -120,7 +120,7 @@ def test_reindex_preserves_submitted_at(feedback_store: Path):
     feedback_utils.main([
         "--action", "mark-submitted", "--workspace-root", str(feedback_store),
     ])
-    state_file = (feedback_store / ".specify/memory/feedback/state/submitted-at.json")
+    state_file = (feedback_store / ".specify/feedback/state/submitted-at.json")
     submitted_at = json.loads(state_file.read_text(encoding="utf-8"))["submitted_at"]
     assert submitted_at is not None
 

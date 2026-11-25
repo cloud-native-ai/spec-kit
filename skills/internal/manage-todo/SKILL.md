@@ -1,6 +1,6 @@
 ---
 name: manage-todo
-description: Manage the workspace's SPECKIT TODO surface — list every TODO item (workspace `SPECKIT TODO` blocks + parked ideas), scan blocks into reviewable grouped execution plans and execute them with in-step block removal, insert new TODO blocks at the exact code or document location they refer to, and park free-floating ideas into the `.specify/memory/todo/` idea store. This is the executable core of `/speckit.todo`, running four modes (List / Collection / Insertion / Park) over one scanner engine with summary-first digest consumption, context-completed interpretation, FR-013 batch discipline, and a six-rule safety veto set. Use this when the user mentions ["todo", "TODO blocks", "待办", "TODO 管家", "run the todos", "执行待办", "list todos", "列出待办", "scan todos", "扫描 TODO 块", "insert todo", "插入 TODO", "park this idea", "寄存想法", "暂存一个想法", "parked ideas", "SPECKIT TODO", "--collect", "--insert", "--park"].
+description: Manage the workspace's SPECKIT TODO surface — list every TODO item (workspace `SPECKIT TODO` blocks + parked ideas), scan blocks into reviewable grouped execution plans and execute them with in-step block removal, insert new TODO blocks at the exact code or document location they refer to, and park free-floating ideas into the `.specify/todo/` idea store. This is the executable core of `/speckit.todo`, running four modes (List / Collection / Insertion / Park) over one scanner engine with summary-first digest consumption, context-completed interpretation, FR-013 batch discipline, and a six-rule safety veto set. Use this when the user mentions ["todo", "TODO blocks", "待办", "TODO 管家", "run the todos", "执行待办", "list todos", "列出待办", "scan todos", "扫描 TODO 块", "insert todo", "插入 TODO", "park this idea", "寄存想法", "暂存一个想法", "parked ideas", "SPECKIT TODO", "--collect", "--insert", "--park"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/manage-todo/SKILL.md>"
 ---
@@ -60,7 +60,7 @@ Run `{SCRIPT}` and consume summary-first (see Step 1 of Collection Mode): only `
 
 ### Step 2: Parked Store Projection
 
-For each `.specify/memory/todo/*.md`, extract frontmatter fields only (`title`, `status`, `parked_at`, `tags`) — never the body; open a body only if the user explicitly asks about that idea afterwards.
+For each `.specify/todo/*.md`, extract frontmatter fields only (`title`, `status`, `parked_at`, `tags`) — never the body; open a body only if the user explicitly asks about that idea afterwards.
 
 ### Step 3: Report
 
@@ -133,7 +133,7 @@ Execute `{SCRIPT}` from repo root. The script outputs JSON to stdout:
 
 ### Step 3: Group and Organize Blocks
 
-**Recall prior memory first** (native `memory-recall` skill, `skills/internal/memory-recall/SKILL.md`): search `.specify/memory/session/` and `.specify/memory/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`), and list `.specify/memory/todo/` for parked ideas whose theme matches the current blocks. Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. When a block clearly implements a parked idea, mark the parked record `promoted` (see Park Mode Step 4). Never contradict a recalled user decision — pause and ask the user first (user-decision protection, kept).
+**Recall prior memory first** (native `memory-recall` skill, `skills/internal/memory-recall/SKILL.md`): search `.specify/session/` and `.specify/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`), and list `.specify/todo/` for parked ideas whose theme matches the current blocks. Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. When a block clearly implements a parked idea, mark the parked record `promoted` (see Park Mode Step 4). Never contradict a recalled user decision — pause and ask the user first (user-decision protection, kept).
 
 For each valid block, create a **work item** with:
 1. **Source**: `source_file:opening_line` (link to origin)
@@ -252,7 +252,7 @@ Extract from `$ARGUMENTS`:
 
 ### Step 2: Write the Parked Record
 
-Store location: `.specify/memory/todo/` (create the directory if absent — this is the ONE file-creation Park Mode permits). One file per idea:
+Store location: `.specify/todo/` (create the directory if absent — this is the ONE file-creation Park Mode permits). One file per idea:
 
 ```markdown
 ---
@@ -292,7 +292,7 @@ Report the record path, title, and a one-line preview of the body (执行报告:
 3. **Malformed exclusion**: Never execute or plan around malformed blocks — only report their locations.
 4. **Bounded changes**: Each executed task should produce a small, reviewable change. Never batch large refactors into a single execution step.
 5. **No file creation in insertion mode**: The `--insert` mode MUST NOT create new files.
-6. **Park writes stay in the store**: Park Mode creates files ONLY under `.specify/memory/todo/` and modifies only its own parked records — never source code, specs, or other memory layers.
+6. **Park writes stay in the store**: Park Mode creates files ONLY under `.specify/todo/` and modifies only its own parked records — never source code, specs, or other memory layers.
 
 ## Optional: Git Commit
 

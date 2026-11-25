@@ -29,11 +29,11 @@ def _write(path: Path, text: str) -> None:
 
 
 def seed(ws: Path, created: str = OLD) -> dict:
-    (ws / ".specify/memory/exec-quant/records").mkdir(parents=True, exist_ok=True)
-    (ws / ".specify/memory/feedback").mkdir(parents=True, exist_ok=True)
-    (ws / ".specify/memory/session").mkdir(parents=True, exist_ok=True)
+    (ws / ".specify/exec-quant/records").mkdir(parents=True, exist_ok=True)
+    (ws / ".specify/feedback").mkdir(parents=True, exist_ok=True)
+    (ws / ".specify/session").mkdir(parents=True, exist_ok=True)
 
-    _write(ws / ".specify/memory/exec-quant/records/old.json", json.dumps({
+    _write(ws / ".specify/exec-quant/records/old.json", json.dumps({
         "kind": "speckit.exec-quant",
         "schema_version": 2,
         "unit_id": "/speckit.plan",
@@ -43,7 +43,7 @@ def seed(ws: Path, created: str = OLD) -> dict:
         "quality": {"tokens": "not_evaluated", "elapsed_ms": "not_evaluated"},
     }) + "\n")
 
-    _write(ws / ".specify/memory/feedback/20260901T000000Z-speckit-plan.md", f"""---
+    _write(ws / ".specify/feedback/20260901T000000Z-speckit-plan.md", f"""---
 id: "20260901T000000Z-speckit-plan"
 unit_id: "/speckit.plan"
 unit_type: "command"
@@ -57,7 +57,7 @@ disposition_reason: "consumed in test"
 ## Review
 done
 """)
-    _write(ws / ".specify/memory/feedback/20260901T000000Z-speckit-open.md", f"""---
+    _write(ws / ".specify/feedback/20260901T000000Z-speckit-open.md", f"""---
 id: "20260901T000000Z-speckit-open"
 unit_id: "/speckit.plan"
 unit_type: "command"
@@ -85,7 +85,7 @@ open
             "axes": {},
         }
         body = "summary\n\n```json\n" + json.dumps(record, indent=2) + "\n```\n"
-        _write(ws / ".specify/memory/session" / name, f"""---
+        _write(ws / ".specify/session" / name, f"""---
 id: "{name[:-3]}"
 scope: "session"
 source: "/speckit.plan"
@@ -100,7 +100,7 @@ summary: "summary"
     rd("20260901T000000Z-run-determination-speckit-plan-r1.md",
        "r1", "2026-09-02T00:00:00Z")
     rd("20260901T000000Z-run-determination-speckit-plan-r2.md", "r2", None)
-    _write(ws / ".specify/memory/session/2026-09-01-note.md",
+    _write(ws / ".specify/session/2026-09-01-note.md",
            "# a note\n\nworking context\n")
     promotions = ws / "promotions.json"
     _write(promotions, json.dumps({"promotions": [
@@ -171,7 +171,7 @@ def test_distill_writes_receipts_and_summaries(tmp_path: Path) -> None:
     assert payload["stores"]["run-determination"]["receipts"] == 1
     assert payload["stores"]["session-note"]["receipts"] == 1
 
-    receipts = sorted((tmp_path / ".specify/memory/retention/receipts").glob("*.json"))
+    receipts = sorted((tmp_path / ".specify/retention/receipts").glob("*.json"))
     assert len(receipts) == 4
     by_store = {}
     for path in receipts:
@@ -195,7 +195,7 @@ def test_apply_requires_confirmation_and_conserves_counts(tmp_path: Path) -> Non
     refused = _apply(tmp_path, plan, "--allow-unversioned")
     assert refused.returncode == 2
     assert "confirmed" in refused.stderr
-    assert (tmp_path / ".specify/memory/exec-quant/records/old.json").is_file()
+    assert (tmp_path / ".specify/exec-quant/records/old.json").is_file()
 
     _confirm(plan)
     applied = _apply(tmp_path, plan, "--allow-unversioned")
@@ -205,9 +205,9 @@ def test_apply_requires_confirmation_and_conserves_counts(tmp_path: Path) -> Non
     assert payload["remaining"] == 2
     assert payload["conservation_ok"] is True
 
-    assert not (tmp_path / ".specify/memory/exec-quant/records/old.json").exists()
-    assert (tmp_path / ".specify/memory/feedback/20260901T000000Z-speckit-open.md").is_file()
-    assert (tmp_path / ".specify/memory/session/20260901T000000Z-run-determination-speckit-plan-r2.md").is_file()
+    assert not (tmp_path / ".specify/exec-quant/records/old.json").exists()
+    assert (tmp_path / ".specify/feedback/20260901T000000Z-speckit-open.md").is_file()
+    assert (tmp_path / ".specify/session/20260901T000000Z-run-determination-speckit-plan-r2.md").is_file()
 
     ledger = json.loads(Path(payload["ledger"]).read_text(encoding="utf-8"))
     assert ledger["counts"] == {"before": 6, "removed": 4, "remaining": 2,
@@ -244,7 +244,7 @@ def test_apply_refuses_non_git_without_opt_in(tmp_path: Path) -> None:
     refused = _apply(tmp_path, plan)
     assert refused.returncode == 2
     assert "not clean in git" in refused.stderr
-    assert (tmp_path / ".specify/memory/exec-quant/records/old.json").is_file()
+    assert (tmp_path / ".specify/exec-quant/records/old.json").is_file()
 
 
 def test_apply_refuses_dirty_git_targets(tmp_path: Path) -> None:
@@ -257,7 +257,7 @@ def test_apply_refuses_dirty_git_targets(tmp_path: Path) -> None:
     subprocess.run(
         ["git", "-c", "user.email=t@example.com", "-c", "user.name=t",
          "commit", "-qm", "seed"], cwd=tmp_path, check=True)
-    target = tmp_path / ".specify/memory/feedback/20260901T000000Z-speckit-plan.md"
+    target = tmp_path / ".specify/feedback/20260901T000000Z-speckit-plan.md"
     target.write_text(target.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     refused = _apply(tmp_path, plan)
     assert refused.returncode == 2
@@ -279,9 +279,9 @@ def test_two_writers_create_distinct_receipt_paths(tmp_path: Path) -> None:
     for proc in procs:
         _out, err = proc.communicate(timeout=120)
         assert proc.returncode == 0, err
-    receipts = list((tmp_path / ".specify/memory/retention/receipts").glob("*.json"))
+    receipts = list((tmp_path / ".specify/retention/receipts").glob("*.json"))
     assert receipts
     assert len({p.name for p in receipts}) == len(receipts)
-    assert not list((tmp_path / ".specify/memory/retention/receipts").glob("*.part"))
+    assert not list((tmp_path / ".specify/retention/receipts").glob("*.part"))
     for path in receipts:
         assert json.loads(path.read_text(encoding="utf-8"))["store"] == "exec-quant"

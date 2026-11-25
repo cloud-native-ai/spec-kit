@@ -162,7 +162,7 @@ classification: external
 | 可交互图表（交互形式分类/档位/验收判据；交互交付形态） | [./references/semantic-model.md](./references/semantic-model.md) § 交互语义与验收；交付侧 [./references/delivery-contract.md](./references/delivery-contract.md) § D7；引擎落地见 d3js / echarts「交互实现」小节 |
 | 引擎语法、渲染、坑位、脚本 | `references/types/<engine>/`（入口 `<engine>.md`，详见其 `references/`） |
 | 六引擎的能力继承与无损证据 | [./references/merge-provenance.md](./references/merge-provenance.md) |
-| 路由证据（竞技场结论） | `${SKILL_WORKDIR}/.specify/memory/knowledge/visualization-skill-selection.md` |
+| 路由证据（竞技场结论） | `${SKILL_WORKDIR}/.specify/knowledge/visualization-skill-selection.md` |
 
 ## Boundary Between the Two Internal Layers
 
@@ -204,7 +204,7 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
   --points-file "<evaluation-form-points-file>"
 ```
 
-这会经 `skill-draw-diagram-evaluation-form` probe 把评价条目写入 `.specify/memory/feedback/`。不得把本节记录与同次运行的 `## Feedback` 自省共用 `run_id`，也不得把用户评价改写为 agent 自评。
+这会经 `skill-draw-diagram-evaluation-form` probe 把评价条目写入 `.specify/feedback/`。不得把本节记录与同次运行的 `## Feedback` 自省共用 `run_id`，也不得把用户评价改写为 agent 自评。
 
 **处置、回用与传递边界。** 该条目进入既有的 `record→threshold→package→manual→mark-submitted` 链路，并由既有 feedback 处置流程持续标记为 `processed` 或 `ignored`；`processed` 时在 `disposition_reason` 中保留可执行结论。后续执行本技能前，查询本技能已处置的评价单并将适用结论用于语义建模、路由或验收（**含按引擎名筛选**）：
 

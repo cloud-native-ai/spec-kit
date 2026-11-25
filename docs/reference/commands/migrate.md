@@ -50,7 +50,7 @@ For `store-layout` relocation the receipt's `entries[]` manifest is the archive 
 
 ## Anchor merge
 
-The `anchor-layout` dimension compares the legacy anchors (`.specify/memory/{features,constitution,glossary,register,tools}.md`) with their current location (`.specify/<anchor>.md`) and never silently picks a winner:
+The `anchor-layout` dimension compares the legacy anchors (`{features,constitution,glossary,register,tools}.md` kept inside the retired store container — see the framework-map tombstone row) with their current location (`.specify/<anchor>.md`) and never silently picks a winner:
 
 | Situation | Action |
 |-----------|--------|
@@ -65,7 +65,7 @@ Every merged anchor archives both originals under `.specify/archive/migrate/<run
 
 ## Store layout relocation
 
-The `store-layout` dimension moves every declared runtime store from the retired `.specify/memory/<store>/` container to its first-class top-level root `.specify/<store>/`. The store set, its generated/placeholder predicates and the retired-container name come from the machine declaration (`.specify/shared/declarations/facts/runtime-store-layout.yaml`); the planner holds only the decision predicates, never a second store list.
+The `store-layout` dimension moves every declared runtime store from the retired container (its name comes from the declaration's `retired_container` value) to its first-class top-level root `.specify/<store>/`. The store set, its generated/placeholder predicates and the retired-container name come from the machine declaration (`.specify/shared/declarations/facts/runtime-store-layout.yaml`); the planner holds only the decision predicates, never a second store list.
 
 | Situation | Action |
 |-----------|--------|

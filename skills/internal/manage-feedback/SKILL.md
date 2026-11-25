@@ -112,7 +112,7 @@ prompt MUST NOT recommend it.
    `kind`, `slice`, `disposition`, `introspection_ref`, `partial`, `created`,
    `summary`, `path` — parse that shape, never a bare array.
 
-   **Read the routing backlog** (`.specify/memory/feedback/backlog.md`) — the single
+   **Read the routing backlog** (`.specify/feedback/backlog.md`) — the single
    carrier for findings prior consume runs routed but did not execute. Report how many
    rows are `open`, `open-unverified` and `carried-by-spec-*`. An `open-unverified` row
    is **not** a to-do: its underlying defect MUST be re-measured against current
@@ -175,7 +175,7 @@ prompt MUST NOT recommend it.
   improvement command — boundaries owned by
   `shared/guidelines/todo-in-context.md`, `templates/commands/requirements.md`,
   and `shared/workflow/self-improvement-workflow.md`, cited never restated):
-  one row per entry in `.specify/memory/feedback/backlog.md`, listed in the
+  one row per entry in `.specify/feedback/backlog.md`, listed in the
   digest report; an undecidable entry is reported `undecided` and kept for the
   next digest, never silently dropped. The digest report carries this run's hat
   and armed state plus how it was resolved, the entry count and disposition of
@@ -196,7 +196,7 @@ prompt MUST NOT recommend it.
 
 - Zero network operations of any kind (red line); `mark-submitted` remains local
   bookkeeping.
-- Path A operates on both stores — the local store `.specify/memory/feedback/` and the
+- Path A operates on both stores — the local store `.specify/feedback/` and the
   `feedback/` intake directory (read-only until A5's atomic cleanup). Path B operates
   only on the local store. Never edit store files by hand.
 - Exit code 2 from the engine is a verdict — report it, do not argue around it.
@@ -206,7 +206,7 @@ prompt MUST NOT recommend it.
   and how that was determined, how many items landed on each side, whether Path B was
   selected by judgment or taken on an explicit request, and any entry whose route the
   content analysis moved away from its `kind`-based first cut.
-- **Routed ≠ done**: `.specify/memory/feedback/backlog.md` is the single carrier for
+- **Routed ≠ done**: `.specify/feedback/backlog.md` is the single carrier for
   findings routed but not executed — read at inventory, written at A4, and a row
   closes only on evidence that its named owner file changed. The consume-log is a
   batch audit trail; it does not carry work forward.

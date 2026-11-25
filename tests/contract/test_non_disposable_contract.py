@@ -547,7 +547,7 @@ def test_t090_undeclared_sibling_only_hints():
     proc, record = _report_on(FIXTURES / "corpus-g")
     hints = {row["path"] for row in record["coverage"]["undeclared_siblings"]}
     declared = {row["path"] for row in record["coverage"]["roots"]}
-    assert ".specify/memory" in hints, "an existing undeclared sibling must be hinted"
+    assert ".specify/session" in hints, "an existing undeclared sibling must be hinted"
     assert not hints & declared, "a declared root was reported as an undeclared sibling"
     assert record["coverage"]["candidates"] > 0
 

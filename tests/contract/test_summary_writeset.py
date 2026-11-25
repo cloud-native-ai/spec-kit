@@ -161,7 +161,10 @@ def test_write_whitelist_is_the_goal_directory_not_the_team_directory() -> None:
     text = WRITESET_CONTRACT.read_text(encoding="utf-8")
     whitelist = text.split("## Write whitelist", 1)[1].split("## Byte-invariance", 1)[0]
     assert "anchoring/" in whitelist
-    assert ".specify/memory/feedback/" in whitelist
+    # The contract is requirement 036's frozen record: its feedback path is spelled in the
+    # pre-migration form and is never rewritten (037 FR-022), so only the store segment is
+    # asserted here. The live path form is pinned by the skills that carry it.
+    assert "feedback/" in whitelist
     assert "teams/<slug>/summary" not in whitelist, (
         "the dropped per-team summary directory must not reappear in the whitelist"
     )

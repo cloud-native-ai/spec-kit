@@ -5,7 +5,7 @@
 **边界（三条）**：
 1. **档位定义不在此**：哪些字段是 R（必填-阻断）/ I（可推断）/ O（可选）、字段名与关联规则，唯一权威是 [required-info.md](required-info.md)。本文档只写**缺失命中后**章节与图怎么退化、怎么声明。
 2. 通用 PlantUML 绘图规则（语法、字形、图例、版面量测、caption 渲染位置等）的权威出处在 draw-diagram，本文档不重述。
-3. **判据的计算不在此**："进度算不算得出来""有没有计划日期""排期材料是否过弱"这类判定由 `.specify/scripts/progress-engine.py` 给出（字段 `progress_pct=null`、`schedule_status=unknown-schedule`、`gantt.schedule_material.gantt_recommended` / `weak_git_material` / `reason`）；本文档只按结果退化（见 [consistency-rules.md](consistency-rules.md) §0.1）。
+3. **判据的计算不在此**："进度算不算得出来""有没有计划日期""排期材料是否过弱"这类判定由 `scripts/progress-engine.py` 给出（字段 `progress_pct=null`、`schedule_status=unknown-schedule`、`gantt.schedule_material.gantt_recommended` / `weak_git_material` / `reason`）；本文档只按结果退化（见 [consistency-rules.md](consistency-rules.md) §0.1）。
 
 **本文档存在的原因**：真实项目的表单常常填不满——没有细粒度任务、没有计划日期、没有负责人、没有里程碑节点。此时若沿用"信息充足"路径，执行器会被迫**编造**进度百分比、里程碑日期、任务工期。本文档给出一条硬底线：**表单里没有的，一律走"合法终态 + 显式声明"，绝不臆造；报告宁可短而诚实，不可长而虚假。**
 

@@ -213,7 +213,7 @@ COMPLIANT_OBSERVATION = """## Run header
 ## Dispatch
 - mode: native
 - dispatched-at: 2026-10-30T10:15:00Z
-- payload-ref: .specify/memory/coaching/20261030T101500Z-fixture-trainee/dispatch-payload.md
+- payload-ref: .specify/coaching/20261030T101500Z-fixture-trainee/dispatch-payload.md
 - returned: partial
 - anomaly-line: none
 - failure-coordinates: S3 refused the rollback row

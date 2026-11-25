@@ -45,8 +45,8 @@ members:
 config:
   default_pattern: parallel
   pattern_selection: parallel when two or more independent packages exist and either every package is read-only or write_isolation=worktree (the integration queue serializes the write merges); serial when a shared-tree write package or any dependency edge orders the work; iteration only for a bounded repair_loop with an explicit maximum; continuous is never selected.
-  slot_cap_default: projection-of .specify/shared/declarations/facts/concurrency-slot-and-reserve.yaml#/statement/slot_cap_default
-  slot_cap_ceiling: projection-of .specify/skills/sdd-loop-driver/scripts/wp-gate.py --slot-cap-ceiling (WG-16); read at dispatch, never copied here
+  slot_cap_default: projection-of shared/declarations/facts/concurrency-slot-and-reserve.yaml#/statement/slot_cap_default
+  slot_cap_ceiling: projection-of skills/external/sdd-loop-driver/scripts/wp-gate.py --slot-cap-ceiling (WG-16); read at dispatch, never copied here
   package_size_target: "~10 tasks per package (<=16); concurrency bounded by the slot cap read at dispatch from the slot fact, never by a number in this preset"
   write_packages: dispatched alone under shared-tree (effective concurrency 1); under worktree each write package owns a child line + worktree and the integration queue serializes the merges
   verification: one fresh-context verifier execution per Work Package
@@ -71,9 +71,9 @@ Run exactly one SDD stage as bounded Work Packages: the driver derives and gates
 | `stage-verifier` | evaluator | Worker | temporary | one fresh-context execution per verdict |
 | `stage-integrator` | executor | Worker | temporary | one execution per decomposed stage attempt |
 
-The roster defines exactly these four seats. `stage-planner` is the driver itself: it decomposes, invokes the gate, schedules, and writes the spine, and it never dispatches another coordinator. `stage-worker` is filled by one execution per Work Package: the local form is the **fork carrier** (same-family `qodercli` child processes through `.specify/scripts/stage-runner.sh` — prompt via stdin, stream-json output, sentinel-judged completion) and heterogeneous agents use the **subprocess carrier** (an independent child process of the agent's own CLI); remotely it is one detached runner. The **host-internal in-process subagent path is BANNED as a carrier**. `stage-verifier` is filled by one fresh-context read-only execution per verdict and never the package executor. `stage-integrator` is filled by one execution per decomposed stage attempt.
+The roster defines exactly these four seats. `stage-planner` is the driver itself: it decomposes, invokes the gate, schedules, and writes the spine, and it never dispatches another coordinator. `stage-worker` is filled by one execution per Work Package: the local form is the **fork carrier** (same-family `qodercli` child processes through `scripts/stage-runner.sh` — prompt via stdin, stream-json output, sentinel-judged completion) and heterogeneous agents use the **subprocess carrier** (an independent child process of the agent's own CLI); remotely it is one detached runner. The **host-internal in-process subagent path is BANNED as a carrier**. `stage-verifier` is filled by one fresh-context read-only execution per verdict and never the package executor. `stage-integrator` is filled by one execution per decomposed stage attempt.
 
-**Concurrency obligation (C-068)**: this preset carries the obligation once for every seat and every Work Package — `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation (consider concurrency first; dispatch concurrently when allowed; otherwise a named reason code with its evidence form plus the reading triple). The slot cap and the ceiling are reached through the two `projection-of` lines above; this preset carries no numeric slot cap and no numeric ceiling, and an instantiated team text MUST NOT carry its own hand-written parallel section.
+**Concurrency obligation (C-068)**: this preset carries the obligation once for every seat and every Work Package — `shared/definitions/subagent-definitions.md` § The Concurrency Obligation (consider concurrency first; dispatch concurrently when allowed; otherwise a named reason code with its evidence form plus the reading triple). The slot cap and the ceiling are reached through the two `projection-of` lines above; this preset carries no numeric slot cap and no numeric ceiling, and an instantiated team text MUST NOT carry its own hand-written parallel section.
 
 ## Dynamic Structure
 

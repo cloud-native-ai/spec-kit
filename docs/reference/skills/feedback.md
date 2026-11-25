@@ -57,7 +57,7 @@ or skill shape) carrying only that unit's id, never a copy of the rules.
 ## Layout
 
 ```
-.specify/memory/feedback/
+.specify/feedback/
   <YYYYMMDDTHHMMSSZ>-<unit-slug>.md   # one file per recorded run
   introspection/<report-id>.md        # introspection reports (req 047; subdir keeps them out of the root scan)
   backlog.md                          # single carrier for findings routed but NOT executed (read at inventory, written at A4)
@@ -101,7 +101,7 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `retention (via /speckit.sanitize --lane retention)` | After local consumption, `record-retention.py` writes a receipt for entries with a durable carrier (`disposition_reason`, `introspection_ref`, or a consume-log row) and retires them after the declared grace (owner:
 `shared/declarations/facts/memory-retention-thresholds.yaml#/statement`). Open entries are never
 retired. This is separate from package-scoped `cleanup`. |
-| `ingest-exec-quant` | Receiving side of the exec-quant channel (068): unpack an inbound bundle's `exec-quant/` payload into the aggregated layer (`.specify/memory/exec-quant/aggregated/<source-slug>/records/`) with package-level identity attribution; `--package <zip>` required. Idempotent via identity-key dedup (`duplicates_skipped`); never touches the feedback store; degradations (unreadable manifest/records, `unknown-project` identity, conflicts) exit 0 with counters, while a call that cannot run (missing/non-zip package, unwritable store) exits 2. |
+| `ingest-exec-quant` | Receiving side of the exec-quant channel (068): unpack an inbound bundle's `exec-quant/` payload into the aggregated layer (`.specify/exec-quant/aggregated/<source-slug>/records/`) with package-level identity attribution; `--package <zip>` required. Idempotent via identity-key dedup (`duplicates_skipped`); never touches the feedback store; degradations (unreadable manifest/records, `unknown-project` identity, conflicts) exit 0 with counters, while a call that cannot run (missing/non-zip package, unwritable store) exits 2. |
 | `probes` / `map` / `probe-inject` | Migrated to the shared probe engine (056): run them on `probe-utils.py` — see [probe.md](probe.md) for the probe-family CLI, the Handler/HandlerBinding model, and the read-only host boundary. |
 | `migrate-legacy` | One-shot convergence of legacy entries per an approved plan file (`--plan-file`, one `<entry-id> -> delete|re-register` per line); every outcome lands in the migration log. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
@@ -208,7 +208,7 @@ python3 .specify/scripts/python/feedback-utils.py --action package
 ```
 
 - Zips all pending entries (those recorded after the last `submitted_at`; `--all` for the
-  full store) into `.specify/memory/feedback/packages/feedback-<ts>.zip`, plus a
+  full store) into `.specify/feedback/packages/feedback-<ts>.zip`, plus a
   `MANIFEST.md` (entry list, time range, spec-kit version, install source). **Source
   entry files are never modified.**
 - **Framework-scope filter**: a package is feedback *to the Spec Kit developers*, so

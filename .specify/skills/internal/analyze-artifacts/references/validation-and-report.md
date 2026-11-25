@@ -1,7 +1,7 @@
 # Finding validation and report format
 
 Owns §5.5 (independent validation wave), §6 (report) and §7 (next actions) of the analysis
-skill. Extracted from `.specify/templates/commands/analyze.md`; content preserved, form re-expressed.
+skill. Extracted from `templates/commands/analyze.md`; content preserved, form re-expressed.
 
 ## 5.5 Finding validation (independent subagent pass)
 
@@ -35,7 +35,7 @@ read-only validation subagent.**
 - **Dispatch carrier.** The wave dispatches **workers, never sessions**, through one of the two legal
   process carriers owned by `.specify/shared/definitions/subagent-definitions.md` § Three Execution
   Modes: the **fork carrier** for same-family agents (a separate `qodercli` child process through
-  `.specify/skills/sdd-loop-driver/scripts/stage-runner.sh` — prompt via stdin, stream-json output,
+  `skills/external/sdd-loop-driver/scripts/stage-runner.sh` — prompt via stdin, stream-json output,
   sentinel-judged completion) and the **subprocess carrier** for heterogeneous agents (an independent
   child process of the agent's own CLI; this is the read-only **external read-only CLI** form — its
   allowlist and `--no-session-persistence` flags stay unchanged) — one process per finding, run in

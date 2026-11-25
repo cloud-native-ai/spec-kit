@@ -27,6 +27,45 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+
+# The declaration layer's single read entry (Feature 105): the store set is read from
+# `shared/declarations/facts/runtime-store-layout.yaml`, never re-spelled here (C-6).
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:  # the reader ships beside the engine; a sandbox copy without it still runs
+    import declaration_reader
+except ImportError:  # pragma: no cover - defensive
+    declaration_reader = None
+
+STORE_LAYOUT_FACT = "runtime-store-layout"
+
+
+def _runtime_stores():
+    """`(stores, label)`; a degraded read is labelled, never defaulted (C-6)."""
+    if declaration_reader is None:
+        return {}, "declaration-absent: " + STORE_LAYOUT_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), STORE_LAYOUT_FACT)["body"]
+    except declaration_reader.DeclarationError:
+        return {}, declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    statement = body.get("statement")
+    stores = statement.get("stores") if isinstance(statement, dict) else None
+    if not isinstance(stores, dict) or not stores:
+        return {}, declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    return stores, None
+
+
+STORES, STORE_LAYOUT_LABEL = _runtime_stores()
+
+
+def _store_root(name):
+    """`.specify/<name>` — a projection of a declared name, never a second root list."""
+    if name not in STORES:
+        raise SystemExit(
+            STORE_LAYOUT_LABEL or "runtime-store-layout: %r is not a declared store" % name)
+    return ".specify/" + name
+
 CATEGORIES = [
     "stale-residue", "redundant", "dead-reference",
     "index-inconsistency", "broken-symlink", "mirror-drift",
@@ -46,14 +85,13 @@ DEFAULT_SEVERITY = {
 DETERMINISTIC_CATEGORIES = {"dead-reference", "index-inconsistency", "broken-symlink", "mirror-drift"}
 SEMANTIC_CATEGORIES = {"stale-residue", "redundant"}
 
-STORE_REL = Path(".specify") / "memory" / "sanitize" / "findings.json"
-PLAN_REL = Path(".specify") / "memory" / "sanitize" / "cleanup-plan.json"
+STORE_REL = Path(".specify") / "sanitize" / "findings.json"
+PLAN_REL = Path(".specify") / "sanitize" / "cleanup-plan.json"
 ARCHIVE_REL = Path(".specify") / "archive"
 
 # Material roots (data-model §4): runtime-probed; missing roots are empty sets,
 # never errors. The engine's own store is exempt from scanning (no recursion).
 MATERIAL_ROOTS = [
-    ("memory-todo", ".specify/memory/todo"),
     ("memory-draft", ".specify/memory/draft"),
     ("memory-indexes", ".specify/memory"),
     ("specs", ".specify/specs"),
@@ -65,12 +103,14 @@ MATERIAL_ROOTS = [
     ("mirror-scripts", ".specify/scripts"),
     ("legacy-gitworkflow-state", ".specify/git-workflow.md"),
     ("legacy-memory-gitworkflow-state", ".specify/memory/git-workflow.md"),
-    ("legacy-tools-registry", ".specify/tools"),
+    ("tools-domain", ".specify/tools"),
     ("docs", "docs"),
 ]
+if "todo" in STORES:
+    MATERIAL_ROOTS.insert(0, ("memory-todo", _store_root("todo")))
 MATERIAL_TARGET_PREFIXES = tuple(sorted({path for _, path in MATERIAL_ROOTS}))
 FORBIDDEN_TARGET_PREFIXES = ("src/", "tests/", "node_modules/", ".git/")
-SELF_EXEMPT_PREFIX = (".specify/memory/sanitize", ".specify/memory/renumber")
+SELF_EXEMPT_PREFIX = (".specify/sanitize/", ".specify/renumber/")
 
 COMPAT_SYMLINKS = [
     "CLAUDE.md", "QODER.md", "AGENTS.md",
@@ -323,10 +363,9 @@ def _iter_reference_materials(root: Path):
     exempt — its references describe past states and are dead by design.
     Machine-generated stores (feedback/evidence/session/knowledge) are data,
     not prose — excluded. Docs tree is covered solely by the docs-utils lane."""
-    candidates = [
-        root / ".specify" / "memory" / "todo",
-        root / ".specify" / "memory" / "draft",
-    ]
+    candidates = [root / ".specify" / "memory" / "draft"]
+    if "todo" in STORES:
+        candidates.insert(0, root / _store_root("todo"))
     for base in candidates:
         if base.is_dir():
             for path in sorted(base.rglob("*.md")):
@@ -397,7 +436,7 @@ def check_dead_references(root: Path) -> list:
             except ValueError:
                 continue
             repo_root_resolved = root / target if _has_prefix(
-                target, MATERIAL_TARGET_PREFIXES + (".specify/scripts/", ".specify/shared/", ".specify/templates/",
+                target, MATERIAL_TARGET_PREFIXES + ("scripts/", "shared/", "templates/",
                                                     "skills/", "agents/", "src/", "tests/")) else None
             if resolved.exists() or (repo_root_resolved and repo_root_resolved.exists()):
                 continue
@@ -436,10 +475,12 @@ FEATURES_ROW_RE = re.compile(r"^\| (\d{3}) \|")
 
 def check_index_consistency(root: Path) -> list:
     findings = []
-    memory = root / ".specify" / "memory"
+    specify = root / ".specify"
+    # The legacy container is still scanned for index residue; it is never written.
+    memory = specify / "memory"
 
     # features family (C-6)
-    features_md = memory / "features.md"
+    features_md = specify / "features.md"
     if features_md.is_file():
         rows = {}
         for line in features_md.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -454,7 +495,7 @@ def check_index_consistency(root: Path) -> list:
                 findings.append(_finding(
                     "index-inconsistency", f"{features_md.relative_to(root).as_posix()}#missing-{fid}",
                     f"features 索引行 {fid} 指向不存在的 {detail}"))
-        features_dir = memory / "features"
+        features_dir = specify / "features"
         if features_dir.is_dir():
             for path in sorted(features_dir.glob("*.md")):
                 fid = path.stem
@@ -468,8 +509,8 @@ def check_index_consistency(root: Path) -> list:
     # machines may legitimately recreate it during mixed-version windows).
     # Its presence is one repair-suggestion finding per file pointing at the
     # owning engine's reindex; sanitize never deletes it.
-    for rel in ("feedback", "session", "knowledge"):
-        idx = memory / rel / "index.json"
+    for rel in (("feedback", "session", "knowledge") if STORES else ()):
+        idx = root / _store_root(rel) / "index.json"
         if idx.is_file():
             engine = ("feedback-utils.py" if rel == "feedback"
                       else "memory-utils.py")
@@ -480,8 +521,9 @@ def check_index_consistency(root: Path) -> list:
                 f"(落 state 后退役旧文件)"))
 
     # evidence family (C-8): maintained-index store, bidirectional
-    index_path = memory / "evidence" / "index.json"
-    if index_path.is_file():
+    evidence_root = root / _store_root("evidence") if "evidence" in STORES else None
+    index_path = (evidence_root / "index.json") if evidence_root else None
+    if index_path is not None and index_path.is_file():
         rel_index = index_path.relative_to(root).as_posix()
         try:
             index = json.loads(index_path.read_text(encoding="utf-8"))
@@ -497,11 +539,11 @@ def check_index_consistency(root: Path) -> list:
                 if not value:
                     continue
                 indexed.add(value)
-                if not (memory / "evidence" / value).is_dir():
+                if not (evidence_root / value).is_dir():
                     findings.append(_finding(
                         "index-inconsistency", f"{rel_index}#{value}",
                         f"evidence 索引条目 {value} 指向不存在的运行目录"))
-            for path in sorted((memory / "evidence").glob("ev-*")):
+            for path in sorted(evidence_root.glob("ev-*")):
                 if path.is_dir() and path.name not in indexed:
                     findings.append(_finding(
                         "index-inconsistency", path.relative_to(root).as_posix(),
@@ -563,7 +605,7 @@ def parse_mirror_drift_lines(text: str) -> list:
 
 # Orphan-dir detection is scoped to the skills pairs: `agents/` mirrors only
 # *.agent.md files while `.specify/agents/` additionally carries legitimate
-# runtime structure (.specify/templates/instances/execution per agent-definitions),
+# runtime structure (templates/instances/execution per agent-definitions),
 # so source-less dirs there are not rename residue. Two source layers map to
 # two runtime shapes (external flat, internal nested) — keep in step with
 # sync-mirrors.py MIRROR_PAIRS.
@@ -659,8 +701,9 @@ def _legacy_names(root: Path) -> set:
 def check_legacy_install_residue(root: Path) -> list:
     """Pre-layering install residue after a cross-generation `specify init`.
 
-    Detection-rules §4a C-22: legacy flat skill directories, the pre-B2a
-    git-workflow state files, and the old tools-registry directory. Disposition
+    Detection-rules §4a C-22: legacy flat skill directories and the pre-B2a
+    git-workflow state files. `.specify/tools/` is the current tools domain
+    (records + inventories coexist), never residue. Disposition
     is archive throughout — apply's delete refuses non-empty directories, and
     content-bearing residue follows archive-not-delete; the summaries point at
     the migration owner for each class.
@@ -697,14 +740,6 @@ def check_legacy_install_residue(root: Path) -> list:
                     "旧代 git-workflow 状态文件:新模型状态面在 .specify/workflow/git.md——"
                     "归档本文件,并经 git-utils 技能 bootstrap 核对分支状态已迁移",
                     disposition="archive"))
-    legacy_tools = root / ".specify" / "tools"
-    if legacy_tools.is_dir() and (root / ".specify" / "memory" / "tools").is_dir():
-        findings.append(_finding(
-            "stale-residue", ".specify/tools",
-            "旧代工具记录目录:记录新址为 .specify/memory/tools/"
-            "(术语消歧见 .specify/shared/definitions/tool-definitions.md § Terminology)——"
-            "归档本目录前核对记录已迁移",
-            disposition="archive"))
     return findings
 
 
@@ -862,13 +897,13 @@ def collect_semantic_candidates(root: Path):
         paths = extract_repo_paths(text)
         # file-like fragments without a rooted prefix still carry locating
         # power as glob pathspecs ("*platforms/opencode.mjs" matches
-        # .specify/scripts/js/.../platforms/opencode.mjs) — absence-of-work claims are
+        # scripts/js/.../platforms/opencode.mjs) — absence-of-work claims are
         # often contradicted by commits that PREDATE the claim date, so the
         # pack carries the latest bounded history instead of a since-window
         fragments = [f for f in FILE_FRAGMENT_RE.findall(text) if f not in paths]
         pathspecs = list(paths) + [f"*{f}" for f in fragments]
         log = _git(root, ["log", "--oneline", "-n", "20"]
-                   + ["--"] + (pathspecs or [".specify/memory"]))
+                   + ["--"] + (pathspecs or ([_store_root("todo")] if "todo" in STORES else [])))
         if log is None:
             notes.append("git unavailable - semantic detection degraded")
             return [], notes

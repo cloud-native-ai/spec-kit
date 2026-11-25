@@ -18,7 +18,7 @@ grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/.specify/workflow/git
 - **文件已存在**：只替换 `<!-- GIT_WORKFLOW_START -->` 与 `<!-- GIT_WORKFLOW_END -->` **之间**的内容；标记本身与块外内容保持字节不变。
 - **文件不存在**：读取 `${SKILL_HOME}/assets/git-workflow-block.md`，替换占位符后整文件写入。
 - **占位状态**：未建立工作流时 `Workflow model` 声明行保留 `None yet.`——这一行即 Bootstrap 作用域的判定依据。
-- **单一数据源**：分支信息只写入该文件。不要写进 instructions 文件，也不要另建 `.specify/git-workflow.md` 或 `.specify/memory/git-workflow.md`。
+- **单一数据源**：分支信息只写入该文件。不要写进 instructions 文件，也不要另建 `.specify/git-workflow.md` 或退役容器内的 `git-workflow.md`。
 
 ## 旧版块迁移（升级场景）
 
@@ -28,7 +28,7 @@ grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/.specify/workflow/git
 grep -q '<!-- GIT_WORKFLOW_START -->' "${SKILL_WORKDIR:-.}/.specify/instructions.md" && echo "legacy block in instructions"
 ```
 
-命中时：先把该块内容原样迁入 `.specify/workflow/git.md`（文件缺失时先创建），再把 instructions 文件中的整个旧 `## Git Workflow` 章节替换为指针句（"分支角色唯一事实源在 `.specify/workflow/git.md`，由 git-workflow 技能机器维护"），并在报告中说明已迁移。遗留 `docs/git-workflow.md`（上一代位置）/ `.specify/git-workflow.md` / `.specify/memory/git-workflow.md` 仍按 Phase 0 规则处理。
+命中时：先把该块内容原样迁入 `.specify/workflow/git.md`（文件缺失时先创建），再把 instructions 文件中的整个旧 `## Git Workflow` 章节替换为指针句（"分支角色唯一事实源在 `.specify/workflow/git.md`，由 git-workflow 技能机器维护"），并在报告中说明已迁移。遗留 `docs/git-workflow.md`（上一代位置）/ `.specify/git-workflow.md` / 退役容器内的 `git-workflow.md` 仍按 Phase 0 规则处理。
 
 ## 块内容
 

@@ -92,7 +92,7 @@ INTEGRATION_TOKENS = (
 )
 
 #: Store families this slice must not add to (C-12).
-STORE_PREFIXES = (".specify/state/", ".specify/memory/session/", ".specify/memory/knowledge/")
+STORE_PREFIXES = (".specify/state/", ".specify/session/", ".specify/knowledge/")
 
 #: The nine rows `feature-ref.md` § 2 declares: `| <n> | `<path>` | <KIND> | … |`.
 DELIVERY_ROW = re.compile(r"^\|\s*(\d+)\s*\|\s*`([^`]+)`\s*\|\s*([A-Z]+)\s*\|")

@@ -80,7 +80,7 @@ measure.
    wall clock only.
 3. **Report coverage first, then entries** — one row per declared root in declared order (present / count / excluded
    reason), then per entry: `path:line`, class, `detection`, evidence refs, severity, state, proposed disposition.
-4. **Nothing is written**: no tracked path, no `.specify/history/` write, no `.specify/memory/sanitize/findings.json`.
+4. **Nothing is written**: no tracked path, no `.specify/history/` write, no `.specify/sanitize/findings.json`.
    `.specify/.tmp/` is this stage's only scratch and it is git-ignored by `.specify/.gitignore` (`.tmp/`).
 
 ### Step A: 设计（方案） (design) — zero write
@@ -204,7 +204,7 @@ starts only after Step B and only on the **confirmed set**; Steps 1–6 keep the
    `data-model.md` § E-7 — `readings` (before/after detection readings of the same scope), `paths` (changed-path
    list, every rename pair included), `corpus` (the corpus entry ids this group disposes; empty when none),
    `dispositions` (one record per entry, owner page § Disposal Pathways). A file missing one of the four segments
-   does not make the repair valid. Evidence MUST NOT go into `.specify/memory/sanitize/findings.json` or into
+   does not make the repair valid. Evidence MUST NOT go into `.specify/sanitize/findings.json` or into
    `.specify/history/`, and no second evidence store may be created (FR-035).
 4. **Disposal channels.** `correct` / `supersede` are reversible with one `git checkout -- <path>`. `archive` is a
    **move** (`git mv` semantics): the disposition record carries the `source → archive` mapping, the superseded text

@@ -39,7 +39,7 @@ If you cannot identify your agent, skip agent-specific guidance and proceed with
 If you encounter an agent-specific obstacle during execution, generate a feedback document at:
 
 ```
-.specify/memory/feedback/<command>-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
+.specify/feedback/<command>-<agent-slug>-<YYYY-MM-DDTHH-MM-SS>.md
 ```
 
 Structure:

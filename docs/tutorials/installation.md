@@ -130,7 +130,9 @@ After initialization, you should see the following structure and commands:
 - `.specify/templates/` — Spec/plan/task templates
 - `.specify/skills/` — Installed skills (symlinked to tool-specific paths)
 - `.specify/agents/` — layered agent workspace: `templates/` (bundled role agents, installed by init), `instances/` (project-authored agents), `execution/` (dispatch configs/scripts; runtime `logs/` gitignored). Definition files are per-file symlinked to `.github/agents/`, `.qoder/agents/`, etc.
-- `.specify/memory/` — Project memory (constitution, features)
+- `.specify/session/` — Short-term memory (working context of the current effort)
+- `.specify/knowledge/` — Long-term memory (distilled, cross-session knowledge)
+- `.specify/` root anchors — Constitution, features registry, glossary, register, tools guide
 
 **All 18 commands available in your AI agent**:
 

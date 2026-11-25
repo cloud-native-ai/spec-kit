@@ -19,11 +19,11 @@ Standard library only, Python >= 3.8. The gate judges the spec tree it is pointe
 code and adds no framework runtime dependency. The declaration migration accounts for the two deviations from
 that self-containment by name instead of leaving them implicit:
 
-* **One module import — the shared read entry** (``.specify/scripts/python/declaration_reader.py``). It is
+* **One module import — the shared read entry** (``scripts/python/declaration_reader.py``). It is
   located by walking up from this file's own resolved path and supplies the gate roster (`C-044`).
   A project that never received the layer keeps evaluating: the absent read is labelled and the
   inline roster stands (FR-012).
-* **One subprocess call — the judging engine** (``.specify/scripts/python/harness-triple-check.py``). It runs
+* **One subprocess call — the judging engine** (``scripts/python/harness-triple-check.py``). It runs
   only when ``--triple-structure`` is passed, once per run, and each finding line it prints is
   forwarded verbatim under the single check name ``triple-structure``. The flag defaults **off** by
   measurement rather than taste: an existing 081 assertion closes the set of finding *names* a stage
@@ -55,7 +55,7 @@ HEADING = re.compile(r"^(#{1,6})\s+")
 FR_DEF = re.compile(r"^- \*\*FR-(\d{3})\*\*:")
 SC_DEF = re.compile(r"^- \*\*SC-(\d{3})\*\*:")
 TASK_DEF = re.compile(r"^- \[[ xX>~]\] (T\d{3}[A-Za-z]?)")
-# Clause ids follow the syntax owner (.specify/shared/definitions/contract-clause-definitions.md):
+# Clause ids follow the syntax owner (shared/definitions/contract-clause-definitions.md):
 # canonical `C-<digits>` (dotted sub-number allowed) plus the legacy prefixed form.
 CLAUSE_ID = r"(?:[A-Z]{2,4}-\d{2}|C-\d+)(?:\.\d+)*"
 CLAUSE_DEF = re.compile(r"^\s*(?:[-*+]\s+)?\*\*(" + CLAUSE_ID + r")\b")
@@ -92,7 +92,7 @@ GATE_DOD_ROW = re.compile(
 BACKTICK = re.compile(r"`([^`\n]+)`")
 PATH_TOKEN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+/?$")
 PATH_ROOTS = (
-    ".specify/", "skills/", ".specify/shared/", ".specify/templates/",
+    ".specify/", "skills/", "shared/", "templates/",
     "src/", "agents/", "tests/", "docs/", "feedback/",
 )
 
@@ -108,8 +108,8 @@ STAGES = {
 # This gate's roster — the six check names its findings carry and the per-stage file requirement —
 # used to be spelled here: at every `add(findings, "<name>", …)` call site and in the `STAGES` table
 # above. It has one owner now,
-# `.specify/shared/declarations/facts/driver-gate-roster.yaml#/statement`, read through the one shared entry
-# (`.specify/scripts/python/declaration_reader.py`), so a name changed in the declaration changes what this
+# `shared/declarations/facts/driver-gate-roster.yaml#/statement`, read through the one shared entry
+# (`scripts/python/declaration_reader.py`), so a name changed in the declaration changes what this
 # gate emits with no edit here (`C-047` steps 3–5).
 #
 # What stays local is the *selection*, not the value: a call site knows which check applies at that
@@ -130,7 +130,7 @@ def declaration_entry():
 
     This engine exists in three physical copies — the framework source, this repository's mirror and
     a client project's `.specify/` — so the walk resolves each copy to its **own** layer: the nearest
-    ancestor carrying `.specify/scripts/python/declaration_reader.py` is the layer that invocation belongs to,
+    ancestor carrying `scripts/python/declaration_reader.py` is the layer that invocation belongs to,
     and a nested tree cannot misdirect it. Read-only: nothing is written, and the import happens only
     once, at module load.
     """
@@ -254,7 +254,7 @@ def triple_structure_entry():
 
     Same three-copy rule as `declaration_entry()`: the framework source, this repository's mirror
     and a client project's `.specify/` copy each resolve to their own layer, because the nearest
-    ancestor carrying `.specify/scripts/python/harness-triple-check.py` is that copy's own. Read-only; the
+    ancestor carrying `scripts/python/harness-triple-check.py` is that copy's own. Read-only; the
     walk stops at the filesystem root and returns `None` when no copy carries the engine.
     """
     here = os.path.dirname(os.path.realpath(__file__))
@@ -1088,7 +1088,7 @@ def resolve_claimed_status(spec_dir, repo):
         if status is not None:
             return status
     if repo:
-        repo_registry = os.path.join(repo, ".specify", "memory", "features.md")
+        repo_registry = os.path.join(repo, ".specify", "features.md")
         if os.path.isfile(repo_registry):
             status = registry_status(repo_registry, key)
             if status is not None:
@@ -1347,7 +1347,7 @@ def main(argv=None):
                         metavar="CHECK:REL_PATH:LINE")
     parser.add_argument("--triple-structure", action="store_true",
                         help="opt-in (default off): delegate once to the declaration layer's "
-                             "judging engine (.specify/scripts/python/harness-triple-check.py --action "
+                             "judging engine (scripts/python/harness-triple-check.py --action "
                              "verify) and forward each of its finding lines verbatim under the "
                              "single check name triple-structure. Off by measurement: an existing "
                              "081 assertion closes the finding-name set a stage run may produce "
@@ -1374,7 +1374,7 @@ def main(argv=None):
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -1430,8 +1430,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -1443,7 +1443,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py'
+_SIG_SCRIPT = 'skills/external/sdd-loop-driver/scripts/pre-analyze-check.py'
 _SIG_DECLARED = ('--json-out', '--repo', '--spec-dir', '--stage', '--strict', '--triple-structure', '--waive')
 _SIG_HELP = (
     'usage: pre-analyze-check.py [options]\n'

@@ -204,7 +204,7 @@ exception has exactly one producer: a non-zero exit from an engine this run invo
 reported through the exit-code table the `scripts/python/` engines share. The producer
 formerly named beside it — an anomaly the agent surfaced and the user never answered
 (`surfaced_anomaly_unanswered`) — is **dropped**, not deferred, and MUST NOT be declared.
-The per-turn telemetry store `.specify/memory/trigger/telemetry.jsonl` MUST NOT be read
+The per-turn telemetry store `.specify/trigger/telemetry.jsonl` MUST NOT be read
 for this state: its row schema is a closed set owned by another feature and carries no key
 able to express an unresolved red. Seam owner: `OI9_RED_STATE_INPUT` / `read_red_state()`.
 
@@ -234,7 +234,7 @@ flow, widen the current turn, or emit anything beyond the single non-blocking no
 step 6 already owns.
 
 **改点 is a sensor, not a ledger.** The record carries no disposition, no threshold and no
-mutation authority, and it is never written under `.specify/memory/feedback/`. It feeds
+mutation authority, and it is never written under `.specify/feedback/`. It feeds
 SI-7's `intervention.json`, which stays in the baseline evidence run directory keyed by its
 own fields; the join is one-way, and the record never replaces or duplicates that ledger.
 Boundary and flow position: `.specify/shared/workflow/self-improvement-workflow.md` SI-1,
@@ -310,7 +310,7 @@ its class-③ instance):
    python3 .specify/scripts/python/feedback-utils.py --action package
    ```
 
-   The engine zips all pending entries into `.specify/memory/feedback/packages/`
+   The engine zips all pending entries into `.specify/feedback/packages/`
    (**source files untouched**, no network access), and prints the zip path, the
    detected upstream repo (user-configured `upstream_repo` > PEP 610 install metadata
    `direct_url.json` — the custom spec-kit's GitHub/GitLab origin), and manual send
@@ -365,7 +365,7 @@ workaround applied. This is a read-only aid — it never gates execution.
 - **Complex commands**: `--unit-id "/speckit.<command>"`, `--unit-type command`.
 - **External custom units** (host-project skills/agents/commands with an injected `ext-*` probe): `--unit-id custom:<owner>/<name>`, `--unit-type custom-unit`. Entries stay host-project-local (never packaged upstream) — see `/speckit.feedback` § Probe Injection.
 - **Simple commands** (`agents`, `constitution`, `feature`): omit this step entirely. This list is *derived* from the complexity criterion at the top of this file — when a command gains or loses script invocations, or starts or stops producing or consuming another flow's artifact, re-derive the list rather than editing it alone.
-- The engine store lives at `.specify/memory/feedback/`; the threshold's default **value** is owned by
+- The engine store lives at `.specify/feedback/`; the threshold's default **value** is owned by
   `shared/declarations/facts/feedback-prompt-threshold.yaml#/statement` — this carrier states no number
   of its own. `--threshold` and `SPECKIT_FEEDBACK_THRESHOLD` still override it, and a project whose
   declaration layer is absent gets `declaration-absent: feedback-prompt-threshold` on the engine's output

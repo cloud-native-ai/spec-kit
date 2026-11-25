@@ -1,7 +1,7 @@
 # Path B — 打包上送 & Probe Injection
 
 Owns § Path B (steps 1–6) and § Probe Injection of the feedback skill. Extracted from
-`.specify/templates/commands/feedback.md`; content preserved, form re-expressed. The routing
+`templates/commands/feedback.md`; content preserved, form re-expressed. The routing
 judgment that selects Path B (or defers probe injection to an explicit request) lives
 in the skill's SKILL.md (Routing flow).
 
@@ -55,7 +55,7 @@ request rather than by judgment.
      `--action cleanup --package <zip|latest> --dry-run`, then run without `--dry-run`
      in the same session as packaging. Cleanup removes only entries actually inside
      that zip; `cleanup-log.md` records every removal. The zip itself STAYS under
-     `.specify/memory/feedback/packages/` as the delivery artifact.
+     `.specify/feedback/packages/` as the delivery artifact.
    - **Framework project**: run cleanup **only when the user's request for this same
      run also asked for `mark-submitted`** — that pairing is what states the batch is
      genuinely settled. Without a recipient (see the paragraph above), emptying the
@@ -67,7 +67,7 @@ request rather than by judgment.
 6. **After delivery (`mark-submitted`)**: once the batch is dealt with (sent, or
    deliberately ignored) and `mark-submitted` has reset the counter, the zip has
    served its purpose — remove it from the outbox:
-   `rm .specify/memory/feedback/packages/feedback-<ts>.zip`. The store, the outbox,
+   `rm .specify/feedback/packages/feedback-<ts>.zip`. The store, the outbox,
    and the counter all return to zero; `cleanup-log.md` plus the (already-delivered)
    zip's MANIFEST remain the audit trail.
 
@@ -90,7 +90,7 @@ project":
 1. Elicit the target unit (`custom:<owner>/<name>`), lifecycle point (default
    `wrap-up`), and a short collection-intent note (`--notes-file`).
 2. Run `--action probe-inject --unit custom:<owner>/<name> --notes-file <file>` —
-   writes `.specify/memory/feedback/probes/ext-<slug>.md`.
+   writes `.specify/feedback/probes/ext-<slug>.md`.
 3. Verify the injection: the object appears in `--action probes` and after
    `--action map`.
 

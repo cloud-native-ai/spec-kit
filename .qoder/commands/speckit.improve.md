@@ -19,7 +19,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 | `/speckit.<command>` | command template |
 | `skill:<name>` | Skill |
 | an agent artifact (role slug or `.specify/agents/...` path) | agent |
-| a tool record (name / alias / `tool_id` under `.specify/memory/tools/`) | tool record |
+| a tool record (name / alias / `tool_id` under `.specify/tools/`) | tool record |
 | a team (slug or `.specify/teams/<slug>/team.md`) | team definition |
 | `custom:<owner>/<name>` | host-project custom unit |
 

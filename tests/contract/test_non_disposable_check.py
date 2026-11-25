@@ -18,7 +18,7 @@ Fixture map (``tests/fixtures/non-disposable/``)
 fixture                                           shape / corpus row
 ==============================================  ==================================================
 ``surface.yaml``                                  the four declared roots (``.specify/specs``,
-                                                  ``.specify/memory``, ``tests``, ``scripts``)
+                                                  ``.specify/session``, ``tests``, ``scripts``)
 ``surface-degraded.yaml``                         one present-and-empty root, one absent root
 ``surface-bad-kind.yaml`` / ``surface-no-st…``    a fact that is not a ``closed-set`` / has no body
 ``corpus-a1``                                     A1: registry says ``Implemented``, the verdict

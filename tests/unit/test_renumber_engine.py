@@ -75,7 +75,7 @@ def ws(tmp_path: Path) -> Path:
     write(tmp_path, ".specify/features.md", FEATURES_MD)
     write(tmp_path, ".specify/register.md", REGISTER_MD)
     write(tmp_path, "docs/guide.md", "Run the 001-beta workflow.\n")
-    write(tmp_path, ".specify/memory/feedback/20260101T000000Z-note.md",
+    write(tmp_path, ".specify/feedback/20260101T000000Z-note.md",
           "Dated record mentions 001-beta on purpose.\n")
     git(tmp_path, "init", "-q")
     commit_all(tmp_path)
@@ -167,7 +167,7 @@ def test_apply_refuses_unconfirmed_plan_with_zero_side_effects(ws):
     assert code == 2
     assert (ws / ".specify/specs/001-beta").is_dir()
     assert (ws / ".specify/specs/003-beta").exists() is False
-    assert not (ws / ".specify/memory/renumber/ledger").exists()
+    assert not (ws / ".specify/renumber/ledger").exists()
 
 
 def test_apply_renames_rewrites_and_verifies(ws):
@@ -190,7 +190,7 @@ def test_apply_renames_rewrites_and_verifies(ws):
     tasks = (ws / ".specify/specs/001-alpha/tasks.md").read_text(encoding="utf-8")
     assert "T001 first task" in tasks and "T002 duplicated task" in tasks
     # the date-named record is deliberately left alone
-    dated = (ws / ".specify/memory/feedback/20260101T000000Z-note.md").read_text(encoding="utf-8")
+    dated = (ws / ".specify/feedback/20260101T000000Z-note.md").read_text(encoding="utf-8")
     assert "001-beta" in dated
 
 

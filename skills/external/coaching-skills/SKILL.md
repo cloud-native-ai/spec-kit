@@ -131,7 +131,7 @@ nothing else is a precondition.
 - `run-id`: `YYYYMMDDTHHMMSSZ-<trainee-slug>` — a UTC timestamp plus the lowercase
   kebab slug of the resolved Trainee name. For a command Trainee the slug is the
   command name's kebab form (`/speckit.status` → `speckit-status`).
-- Run directory: `.specify/memory/coaching/<run-id>/`, created before the expectation
+- Run directory: `.specify/coaching/<run-id>/`, created before the expectation
   is written.
 - If the directory already exists the run fails closed naming the existing path;
   MUST NOT append a suffix and MUST NOT reuse the directory.

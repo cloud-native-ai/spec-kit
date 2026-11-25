@@ -514,7 +514,7 @@ FEATURES_HEADER = (
 
 def _features_md(rows: list[tuple[str, str]]) -> str:
     body = "".join(
-        "| %s | fixture | fixture feature | Planned | .specify/memory/features/%s.md | %s | 2026-11-03 |\n"
+        "| %s | fixture | fixture feature | Planned | .specify/features/%s.md | %s | 2026-11-03 |\n"
         % (fid, fid, cell)
         for fid, cell in rows
     )

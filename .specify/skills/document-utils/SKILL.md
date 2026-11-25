@@ -19,7 +19,7 @@ classification: external
 
 # Document Utilities
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Overview
 
@@ -58,19 +58,19 @@ JavaScript creation routes (`docx-js`, PptxGenJS, `pdf-lib`), replaced by
 | Read/analyze content | DOCX | `python-docx` paragraph walk, or unpack for the markup — see [docx-editing.md](./references/docx-editing.md) |
 | Create new document | DOCX | `python-docx` — see [docx-creation.md](./references/docx-creation.md) |
 | Edit existing document | DOCX | Unpack → edit markup → pack → validate — see [docx-editing.md](./references/docx-editing.md) |
-| Accept tracked changes / comment | DOCX | `.specify/scripts/docx/accept_changes.py`, `.specify/scripts/docx/comment.py` |
+| Accept tracked changes / comment | DOCX | `scripts/docx/accept_changes.py`, `scripts/docx/comment.py` |
 | Read/extract text | PDF | `pypdf` or `pdfplumber` — see [pdf-operations.md](./references/pdf-operations.md) |
 | Pull tables out of a PDF | PDF | `pdfplumber` table extraction — see [pdf-operations.md](./references/pdf-operations.md) |
 | Create new PDF | PDF | `reportlab` — see [pdf-operations.md](./references/pdf-operations.md) |
 | Merge/split/rotate/encrypt | PDF | `pypdf` — see [pdf-operations.md](./references/pdf-operations.md) |
-| Render pages to images | PDF | `pypdfium2` via `.specify/scripts/pdf/convert_pdf_to_images.py` |
+| Render pages to images | PDF | `pypdfium2` via `scripts/pdf/convert_pdf_to_images.py` |
 | Fill PDF forms | PDF | Field and field-less routes in [pdf-forms.md](./references/pdf-forms.md) |
-| Read/analyze slides | PPTX | `python-pptx` extraction — see [pptx-qa.md](./references/pptx-qa.md); visual overview via `.specify/scripts/pptx/thumbnail.py` |
+| Read/analyze slides | PPTX | `python-pptx` extraction — see [pptx-qa.md](./references/pptx-qa.md); visual overview via `scripts/pptx/thumbnail.py` |
 | Edit existing presentation | PPTX | Unpack → `add_slide.py` / markup edits → `clean.py` → pack — see [pptx-editing.md](./references/pptx-editing.md) |
 | Create from scratch | PPTX | `python-pptx` — see [pptx-creation.md](./references/pptx-creation.md) |
 | Read/analyze spreadsheet | XLSX | `openpyxl` (`data_only=True` for cached values) — see [xlsx-creation.md](./references/xlsx-creation.md) |
-| Create/edit spreadsheet | XLSX | `openpyxl` with formulas, then `.specify/scripts/xlsx/recalc.py` — see [xlsx-creation.md](./references/xlsx-creation.md) |
-| Check any Office package | DOCX/PPTX | `.specify/scripts/office/validate.py` (structural checks + round trip; XSD validation is no longer shipped) |
+| Create/edit spreadsheet | XLSX | `openpyxl` with formulas, then `scripts/xlsx/recalc.py` — see [xlsx-creation.md](./references/xlsx-creation.md) |
+| Check any Office package | DOCX/PPTX | `scripts/office/validate.py` (structural checks + round trip; XSD validation is no longer shipped) |
 | Apply visual theme | Any | Role-based application in [themes-guide.md](./references/themes-guide.md) |
 
 ## DOCX
@@ -99,14 +99,14 @@ Everyday reading, creation and rearranging:
 extraction tuning, encryption and troubleshooting:
 [pdf-reference.md](./references/pdf-reference.md). Form filling, with and without
 fields: [pdf-forms.md](./references/pdf-forms.md). The eight scripts under
-`.specify/scripts/pdf/` carry the form workflow end to end: describe fields, recover
+`scripts/pdf/` carry the form workflow end to end: describe fields, recover
 geometry, audit boxes, fill, and draw a validation overlay to look at.
 
 ## PPTX
 
 - **Reading**: extract text with `python-pptx` (recipe in
   [pptx-qa.md](./references/pptx-qa.md)); get a visual overview from
-  `.specify/scripts/pptx/thumbnail.py`, which converts through LibreOffice and composes a
+  `scripts/pptx/thumbnail.py`, which converts through LibreOffice and composes a
   labelled grid.
 - **Editing**: the unpack/edit/pack road keeps the template's masters, layouts
   and theme. `pptx/add_slide.py` registers a new slide from a layout or a copy,
@@ -123,7 +123,7 @@ geometry, audit boxes, fill, and draw a validation overlay to look at.
 ## XLSX
 
 Write formulas, never their results: a workbook of hardcoded values cannot
-recalculate. `openpyxl` writes and reads; `.specify/scripts/xlsx/recalc.py` runs
+recalculate. `openpyxl` writes and reads; `scripts/xlsx/recalc.py` runs
 LibreOffice headless to fill cached values and prints a JSON verdict (error
 cells, formula count) — read the verdict, not the exit code. Financial-model
 colour coding, number formats and formula construction:
@@ -176,7 +176,7 @@ Breaking any of these yields a file that is corrupt or wrong, not merely plain.
 | Directory | Contents |
 |-----------|----------|
 | `${SKILL_HOME}/scripts/office/` | Shared Office tools: `soffice.py`, `pack.py`, `unpack.py`, `validate.py`, `ooxml.py`, `helpers/`, `validators/` |
-| `${SKILL_HOME}/scripts/docx/` | DOCX-specific: `accept_changes.py`, `comment.py`, `.specify/templates/` |
+| `${SKILL_HOME}/scripts/docx/` | DOCX-specific: `accept_changes.py`, `comment.py`, `templates/` |
 | `${SKILL_HOME}/scripts/pdf/` | PDF-specific: `check_bounding_boxes.py`, `check_fillable_fields.py`, `convert_pdf_to_images.py`, `create_validation_image.py`, `extract_form_field_info.py`, `extract_form_structure.py`, `fill_fillable_fields.py`, `fill_pdf_form_with_annotations.py` |
 | `${SKILL_HOME}/scripts/pptx/` | PPTX-specific: `add_slide.py`, `clean.py`, `thumbnail.py`, `ooxml_parts.py` |
 | `${SKILL_HOME}/scripts/xlsx/` | XLSX-specific: `recalc.py` |
@@ -229,7 +229,7 @@ third-party libraries inside the functions that use them, so `-h`, `--help` and
 - **PPTX**: `python-pptx` (MIT), `Pillow` and `pypdfium2` for the thumbnail grid.
 - **XLSX**: `openpyxl` (MIT).
 - **External program**: LibreOffice (`soffice`, MPL-2.0), invoked only as a
-  subprocess via `.specify/scripts/office/soffice.py` for conversion, PNG thumbnails and
+  subprocess via `scripts/office/soffice.py` for conversion, PNG thumbnails and
   recalculation. It is not bundled and not imported. On hosts whose sandbox
   forbids the socket family LibreOffice needs, conversion is unavailable and
   `soffice.af_unix_available()` reports it; the Python routes above still work.

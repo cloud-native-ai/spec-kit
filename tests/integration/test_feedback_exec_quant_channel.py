@@ -25,7 +25,7 @@ Engines are exercised through their real CLIs in-process
 (``tests.script_api`` loads the framework sources ``scripts/python/…``, never
 the ``.specify/`` mirrors). All fixtures are self-constructed; the real
 inbound bundle ``feedback/feedback-20261022T062525Z.zip`` and the runtime
-records under ``.specify/memory/`` are never touched.
+records under the runtime stores are never touched.
 
 Red-first evidence: notes/red-first-evidence.md (§ part 4a / T019).
 """

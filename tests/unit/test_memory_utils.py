@@ -75,7 +75,7 @@ def test_record_writes_file_and_index(tmp_path: Path):
     assert index["scope"] == "session"
     assert len(index["entries"]) == 1
     assert index["entries"][0]["source"] == "/speckit.tasks"
-    assert not (tmp_path / ".specify/memory/session/index.json").exists()
+    assert not (tmp_path / ".specify/session/index.json").exists()
 
 
 def test_stable_slug_disambiguates_non_ascii_titles():
@@ -98,12 +98,12 @@ def test_knowledge_non_ascii_titles_do_not_overwrite(tmp_path: Path):
     memory_utils.action_record(_namespace(title="统一环境变量设计决策", content="A", **common))
     memory_utils.action_record(_namespace(title="记忆系统边界约定", content="B", **common))
 
-    files = list((tmp_path / ".specify/memory/knowledge").glob("*.md"))
+    files = list((tmp_path / ".specify/knowledge").glob("*.md"))
     assert len(files) == 2  # two distinct CJK titles -> two distinct files (no overwrite)
 
     # re-recording an identical CJK title upserts rather than adding a third file
     memory_utils.action_record(_namespace(title="记忆系统边界约定", content="B2", **common))
-    files = list((tmp_path / ".specify/memory/knowledge").glob("*.md"))
+    files = list((tmp_path / ".specify/knowledge").glob("*.md"))
     assert len(files) == 2
 
 
@@ -113,7 +113,7 @@ def test_knowledge_upsert_merges_tags(tmp_path: Path):
     memory_utils.action_record(_namespace(content="First", tags="style", **common))
     result = memory_utils.action_record(_namespace(content="Second", tags="review", **common))
 
-    knowledge_dir = tmp_path / ".specify/memory/knowledge"
+    knowledge_dir = tmp_path / ".specify/knowledge"
     files = list(knowledge_dir.glob("*.md"))
     assert len(files) == 1  # same slug -> single file (upsert)
 
@@ -187,7 +187,7 @@ def test_prune_keeps_only_max_entries(tmp_path: Path):
     result = memory_utils.action_prune(_namespace(action="prune", workspace_root=str(tmp_path),
                                                   scope="session", max_entries=2))
     assert result["remaining"] == 2
-    remaining_files = list((tmp_path / ".specify/memory/session").glob("*.md"))
+    remaining_files = list((tmp_path / ".specify/session").glob("*.md"))
     assert len(remaining_files) == 2
 
 

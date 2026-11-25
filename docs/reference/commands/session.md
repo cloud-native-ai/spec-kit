@@ -50,7 +50,7 @@ Name bundles by dispatch label (`<team-slug>--<run-stamp>--<member-role>`) so `/
 
 - Read-only toward host session storage; records are copied, never moved or mutated.
 - The bundle's version-control fate is yours — the command never edits `.gitignore`.
-- Not related to Spec Kit's memory session layer (`.specify/memory/session/`) — a different concept.
+- Not related to Spec Kit's memory session layer (`.specify/session/`) — a different concept.
 
 ## See also
 

@@ -198,5 +198,5 @@ The obligation binds all three execution modes (native / virtual / external) equ
 | **Agent Instance** (a.k.a. agent definition) | Responsibility-bound `.agent.md` (under `.specify/agents/instances/`) a subagent is launched from | `agent-definitions.md`; authored via `/speckit.agents`, `skills/internal/create-agent` |
 | **Subagent** (this document) | A running, task-scoped delegated Agent Execution | here |
 | **Team** | Multi-agent structure orchestrating several subagents | `/speckit.team`, `skills/internal/create-team` |
-| **Tool** | Pre-verified reusable capability record (`.specify/memory/tools/`) | `shared/definitions/tool-definitions.md` |
+| **Tool** | Pre-verified reusable capability record (`.specify/tools/`) | `shared/definitions/tool-definitions.md` |
 | **AI agent CLI** | A supported coding agent binary (`qodercli`, `claude`, …) | `docs/reference/cli/` |

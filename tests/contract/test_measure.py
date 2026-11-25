@@ -19,7 +19,7 @@ expected to fail on the pre-implementation tree — each first asserts the scrip
 the row, so red is "the engine is missing", never an import error.
 
 **Fixture posture**: every store is built from scratch under ``tmp_path``; no test reads or writes the real
-``.specify/memory/exec-quant/`` store.
+``.specify/exec-quant/`` store.
 
 **Owner boundary**: the exit-status values, the exclusion-class names and the JSON key set are owned by
 ``contracts/measure-report.contract.md`` C-57/C-58/C-60. This file reads them from that owner at run time instead of

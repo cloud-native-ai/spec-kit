@@ -95,8 +95,8 @@ classification: external
 
 ### Phase 0: 调谐作用域判定
 
-1. **版本漂移探测**：本技能随分支版本化——若会话开始时在旧分支加载了旧版技能文本、或会话中途切换过分支，加载文本可能与当前检出的 `${SKILL_HOME}/SKILL.md` 不一致（判据：状态文件位置约定不同——本技能约定 `.specify/workflow/git.md`，上一代位置 `docs/git-workflow.md` 与更早的 `.specify/git-workflow.md` / `.specify/memory/git-workflow.md` 均为旧约定）。命中漂移时：以当前检出为准，重新读取本技能与 references 后再继续判定；漂移未排除前不得写入任何状态文件，避免按旧约定重复建文档。无论加载文本约定哪个位置，均无条件探测最新位置 `.specify/workflow/git.md` 的托管块，命中即直接以该块为数据源。
-2. 若存在任一遗留数据源（上一代位置 `docs/git-workflow.md`、前代位置 `.specify/git-workflow.md`、更早位置 `.specify/memory/git-workflow.md`，或更早版本写在 `.specify/instructions.md` `## Git Workflow` 章节内的托管块），先把其分支映射提取到 `.specify/workflow/git.md` 的 Git Workflow 托管块，并把该遗留文件/旧块报告为「已冗余，待用户确认处理」——**不自动删除**（命令见 [bootstrap-commands.md](./references/bootstrap-commands.md#遗留配置迁移)；instructions 内旧块按 [instructions-lookup.md](./references/instructions-lookup.md) 的迁移规则替换为指针）。
+1. **版本漂移探测**：本技能随分支版本化——若会话开始时在旧分支加载了旧版技能文本、或会话中途切换过分支，加载文本可能与当前检出的 `${SKILL_HOME}/SKILL.md` 不一致（判据：状态文件位置约定不同——本技能约定 `.specify/workflow/git.md`，上一代位置 `docs/git-workflow.md` 与更早的 `.specify/git-workflow.md` / 退役容器内的 `git-workflow.md`（见框架地图墓碑行）均为旧约定）。命中漂移时：以当前检出为准，重新读取本技能与 references 后再继续判定；漂移未排除前不得写入任何状态文件，避免按旧约定重复建文档。无论加载文本约定哪个位置，均无条件探测最新位置 `.specify/workflow/git.md` 的托管块，命中即直接以该块为数据源。
+2. 若存在任一遗留数据源（上一代位置 `docs/git-workflow.md`、前代位置 `.specify/git-workflow.md`、更早位置（退役容器内）的 `git-workflow.md`，或更早版本写在 `.specify/instructions.md` `## Git Workflow` 章节内的托管块），先把其分支映射提取到 `.specify/workflow/git.md` 的 Git Workflow 托管块，并把该遗留文件/旧块报告为「已冗余，待用户确认处理」——**不自动删除**（命令见 [bootstrap-commands.md](./references/bootstrap-commands.md#遗留配置迁移)；instructions 内旧块按 [instructions-lookup.md](./references/instructions-lookup.md) 的迁移规则替换为指针）。
 3. 检查`.specify/workflow/git.md` 的 Git Workflow 托管块是否已填写（存在 MAIN/PRE/DEV 行，且不是 `None yet.` 占位行）。
 4. 检查用户是否传入了操作参数（具体的 git 操作指令）。
 
@@ -172,7 +172,7 @@ classification: external
 - 块中记录的分支名与实际分支是否一致（不一致属实质偏离，进入收敛建议）
 - `Workflow model` 声明行存在且块结构与声明模型一致（三层模型须 MAIN/PRE/DEV 三行齐备、`Tracking` 与实际 upstream 相符；其他模型须其约定行齐备）、`Last updated` 存在
 - 标记 `<!-- GIT_WORKFLOW_START -->` / `<!-- GIT_WORKFLOW_END -->` 成对存在（缺失会破坏"只替换标记之间内容"的写入规则）
-- 不存在第二个数据源：`.specify/instructions.md` 内旧版 `## Git Workflow` 托管块、遗留 `.specify/git-workflow.md` 或 `.specify/memory/git-workflow.md` 若仍在，报告为冗余并按迁移规则处理
+- 不存在第二个数据源：`.specify/instructions.md` 内旧版 `## Git Workflow` 托管块、遗留 `.specify/git-workflow.md` 或退役容器内的 `git-workflow.md` 若仍在，报告为冗余并按迁移规则处理
 
 #### 2.6 输出维护报告
 

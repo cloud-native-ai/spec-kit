@@ -19,13 +19,13 @@ classification: external
 
 Own the **transport mechanics** of remote execution: connection options, quoting, stdin script push, user switching and exit-code propagation. Host aliases, users and paths are runtime policy supplied by the caller — this skill embeds none.
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Overview
 
 | Concern | Owner |
 |---------|-------|
-| SSH options, quoting, stdin, exit codes | this skill (`.specify/scripts/ssh-exec.py`) |
+| SSH options, quoting, stdin, exit codes | this skill (`scripts/ssh-exec.py`) |
 | Topology (orchestration side vs execution side) | `.specify/shared/workflow/execution-topology.md` |
 | Whether to dispatch remotely | the calling skill's carrier rule |
 | Remote user / path / alias values | the caller |
@@ -108,7 +108,7 @@ Cannot execute command-line and remote command.
 
 ## Resources
 
-- `.specify/scripts/ssh-exec.py` — the only execution entry point; `--help` for the full option surface.
+- `scripts/ssh-exec.py` — the only execution entry point; `--help` for the full option surface.
 - `references/recipes.md` — intent → command recipes, including the SDD stdin-script pattern.
 - `references/pitfalls.md` — symptom-first troubleshooting, starting with the RemoteCommand conflict.
 

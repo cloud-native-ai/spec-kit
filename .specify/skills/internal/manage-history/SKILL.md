@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-history/SKILL.md>"
 
 # manage-history
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -16,15 +16,15 @@ Distill the **current AI tool's** past conversations **for the current project**
 
 This skill owns the executable core of `/speckit.history`: Steps 1–6 (tool identification, clean extraction, five-dimension distillation, theme aggregation, manifest handling) and the Safety Rules, all inline. The per-tool heavy lifting is externalized to the engines — `.specify/scripts/bash/collect-history.sh` (locate / extract / manifest-update) and `.specify/scripts/python/history-utils.py` (pluggable `STORE_RESOLVERS` per tool) — and this skill drives them as invocation instructions. The command template keeps entry, user-input handling, and lifecycle only.
 
-Canonical extraction source: `.specify/templates/commands/history.md` § Steps 1–6 and § Safety Rules. Content moved here verbatim in substance. Long-form reference (owner of the conceptual model): `docs/reference/commands/history.md`.
+Canonical extraction source: `templates/commands/history.md` § Steps 1–6 and § Safety Rules. Content moved here verbatim in substance. Long-form reference (owner of the conceptual model): `docs/reference/commands/history.md`.
 
-**The manifest's schema is a machine fact, not this skill's.** Its file name, its three top-level keys (one of which is the per-session map the incremental read addresses) and the per-session entry key are owned by `.specify/shared/declarations/facts/history-manifest-schema.yaml#/statement`, and `.specify/scripts/python/history-utils.py` reads them from there; this skill describes the manifest's *role* (which sessions were already distilled) and reaches its shape by that pointer instead of restating it. The five distillation categories this skill names are **not** a machine fact (no engine reads them) and stay here as prose — their non-migration is recorded in `contracts/migration-batches.contract.md` § Facts outside the roster, not as an exclusion row, because this unit is in scope for the manifest schema.
+**The manifest's schema is a machine fact, not this skill's.** Its file name, its three top-level keys (one of which is the per-session map the incremental read addresses) and the per-session entry key are owned by `shared/declarations/facts/history-manifest-schema.yaml#/statement`, and `scripts/python/history-utils.py` reads them from there; this skill describes the manifest's *role* (which sessions were already distilled) and reaches its shape by that pointer instead of restating it. The five distillation categories this skill names are **not** a machine fact (no engine reads them) and stay here as prose — their non-migration is recorded in `contracts/migration-batches.contract.md` § Facts outside the roster, not as an exclusion row, because this unit is in scope for the manifest schema.
 
 ### 四段形态 (the four-stage form)
 
 `/speckit.history` runs in four stages, in this order and under these names:
 **回顾 (review) → 设计（方案） (design) → 用户确认 (user confirm) → 执行 (execute)**. This line is the seam's one
-statement of the ladder; `.specify/templates/commands/history.md` enumerates it once as a delegation list, and no other face
+statement of the ladder; `templates/commands/history.md` enumerates it once as a delegation list, and no other face
 restates it.
 
 The four stages are **three insertions plus the existing list**, never a renumbering: **Step 0** (回顾) sits before
@@ -59,7 +59,7 @@ measure.
    ```bash
    mkdir -p .specify/.tmp
    { git status --porcelain=v1
-     python3 .specify/scripts/python/non-disposable-check.py --roots | cut -d' ' -f1 \
+     python3 scripts/python/non-disposable-check.py --roots | cut -d' ' -f1 \
        | while read -r root; do [ -d "$root" ] && find "$root" -type f -print; done \
        | LC_ALL=C sort | while IFS= read -r file; do sha256sum "$file"; done
    } > .specify/.tmp/history-seam-snapshot-before.txt
@@ -67,26 +67,26 @@ measure.
    (On a host without `sha256sum`, `shasum -a 256` is the same reading; both snapshots must use one command.)
    The snapshot is the pair (**`git status --porcelain=v1` full text**, **content hashes over the declared root
    set**). Never type the ten directory names here: the set and its count are owned by
-   `.specify/shared/declarations/facts/non-disposable-review-surface.yaml#/statement`, read through
-   `.specify/scripts/python/declaration_reader.py` (a missing or malformed declaration is exit `2` naming the path — never
+   `shared/declarations/facts/non-disposable-review-surface.yaml#/statement`, read through
+   `scripts/python/declaration_reader.py` (a missing or malformed declaration is exit `2` naming the path — never
    "zero candidates, all green").
 2. **Read the review surface** — the declared roots **of the HEAD working tree**; git history (commit / blame /
    old-version diff) is not a review input:
    ```bash
-   python3 .specify/scripts/python/non-disposable-check.py --json > .specify/.tmp/history-review.json
+   python3 scripts/python/non-disposable-check.py --json > .specify/.tmp/history-review.json
    ```
    Exit `0` clean, `1` findings, `2` input error. The semantic face is sharded (`--scope`) and may be delegated to
    parallel subagents; the same tree at any concurrency yields the same entry set by name, so concurrency moves the
    wall clock only.
 3. **Report coverage first, then entries** — one row per declared root in declared order (present / count / excluded
    reason), then per entry: `path:line`, class, `detection`, evidence refs, severity, state, proposed disposition.
-4. **Nothing is written**: no tracked path, no `.specify/history/` write, no `.specify/memory/sanitize/findings.json`.
+4. **Nothing is written**: no tracked path, no `.specify/history/` write, no `.specify/sanitize/findings.json`.
    `.specify/.tmp/` is this stage's only scratch and it is git-ignored by `.specify/.gitignore` (`.tmp/`).
 
 ### Step A: 设计（方案） (design) — zero write
 
 1. **Propose per entry**: one disposition — a member of the four-value set owned by
-   `.specify/shared/definitions/non-disposable-definitions.md` § Disposition Set, cited and never re-listed here — plus the
+   `shared/definitions/non-disposable-definitions.md` § Disposition Set, cited and never re-listed here — plus the
    paths it would touch, its reversibility, and the **group** it belongs to (a group is one detection class). End
    with exactly one confirmation request; execute nothing.
 2. **Write nothing**, with one sanctioned exception: if carrying the plan to Step B needs a file, it lands under
@@ -204,7 +204,7 @@ starts only after Step B and only on the **confirmed set**; Steps 1–6 keep the
    `data-model.md` § E-7 — `readings` (before/after detection readings of the same scope), `paths` (changed-path
    list, every rename pair included), `corpus` (the corpus entry ids this group disposes; empty when none),
    `dispositions` (one record per entry, owner page § Disposal Pathways). A file missing one of the four segments
-   does not make the repair valid. Evidence MUST NOT go into `.specify/memory/sanitize/findings.json` or into
+   does not make the repair valid. Evidence MUST NOT go into `.specify/sanitize/findings.json` or into
    `.specify/history/`, and no second evidence store may be created (FR-035).
 4. **Disposal channels.** `correct` / `supersede` are reversible with one `git checkout -- <path>`. `archive` is a
    **move** (`git mv` semantics): the disposition record carries the `source → archive` mapping, the superseded text

@@ -240,15 +240,16 @@ def detect(target: Path) -> dict:
     }
     feature_rows = 0
     if specify.is_dir():
-        memory = specify / "memory"
-        constitution = memory / "constitution.md"
+        # The project anchors live at the `.specify/` root (anchor-layout move); the
+        # `memory` tier below is the report's output vocabulary, never a path.
+        constitution = specify / "constitution.md"
         if constitution.is_file():
             artifacts["constitution"] = str(constitution.relative_to(target))
-        features_index = memory / "features.md"
+        features_index = specify / "features.md"
         if features_index.is_file():
             artifacts["features_index"] = str(features_index.relative_to(target))
             feature_rows = count_feature_rows(features_index)
-        features_dir = memory / "features"
+        features_dir = specify / "features"
         if features_dir.is_dir():
             artifacts["feature_files"] = len(list(features_dir.glob("*.md")))
         specs_dir = specify / "specs"
@@ -329,7 +330,7 @@ def main() -> int:
 
 
 #
-# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -385,8 +386,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
-# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `shared/definitions/script-interface-definitions.md`, its executable form by
+# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -398,7 +399,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = '.specify/skills/internal/summarize-project/scripts/detect-project-sources.py'
+_SIG_SCRIPT = 'skills/internal/summarize-project/scripts/detect-project-sources.py'
 _SIG_DECLARED = ('--target',)
 _SIG_HELP = (
     'usage: detect-project-sources.py [options]\n'

@@ -3,8 +3,7 @@
 
 Layout owned here (mechanism): the project anchors live at the `.specify/` root —
 `features.md`, `constitution.md`, `glossary.md`, `register.md`, `tools.md` — and the feature-detail files
-live at `.specify/features/<NNN>-<slug>.md`. The legacy layout kept the five anchors under
-`.specify/memory/` and the details at `.specify/memory/features/<NNN>.md`.
+live at `.specify/features/<NNN>-<slug>.md`. Legacy layout: the five anchors under `.specify/memory/` and the details at `.specify/memory/features/<NNN>.md`.
 
 `--check`  detect only: exit 0 clean, 1 findings (a plan), 2 input error.
 `--apply`  archive-first convergence. Every replaced/moved/merged original is copied into
@@ -214,7 +213,7 @@ def _atomic_write(path: Path, text: str) -> None:
 
 
 def _slug_from_registry(workspace: Path, fid: str):
-    # The registry lives at the anchor root in a migrated project and under .specify/memory/ in a legacy one.
+    # The registry lives at the anchor root in a migrated project and under memory/ in a legacy one.
     for candidate in (workspace / ".specify" / "features.md",
                       workspace / ".specify" / "memory" / "features.md"):
         if candidate.is_file():

@@ -5,7 +5,7 @@
 ## 存储布局
 
 ```text
-.specify/memory/evidence/
+.specify/evidence/
 └── ev-<YYYYMMDD>-<HHMMSS>-<slug>/   # 一次证据运行(不可变)
     ├── findings.json                # 证据合同(下述)
     ├── manifest.json                # 运行元数据(泳道状态+reason、引擎信息、digest)
@@ -46,7 +46,7 @@
 - **裁决字段禁令**:全文档递归不得出现 `severity` / `score(s)` / `aiFixPrompt` / `recommendation` / `supportTrack` / `priority`——严重度与建议属于消费层,不属于证据。
 - **七态封闭**:evidenceState 只能取七态词汇,消费方不得裁剪或重定义语义。
 - **隐私双闸**:引擎侧脱敏漏斗(privacy-safe-text / semantic-facets)+ Python 侧落盘前二次过滤(密钥模式、绝对路径掩码)。
-- **打包排除**:`.specify/memory/evidence/` 不进入 feedback package zip。
+- **打包排除**:`.specify/evidence/` 不进入 feedback package zip。
 
 ## 五泳道
 

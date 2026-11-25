@@ -22,7 +22,7 @@ def _record(workspace: Path, run_id: str, kind: str | None = None) -> str:
     entry = feedback_utils.scan_entries(workspace)[0]
     eid = entry["id"]
     if kind:  # simulate an external entry by patching kind in the entry file
-        entry_file = workspace / ".specify/memory/feedback" / entry["file"]
+        entry_file = workspace / ".specify/feedback" / entry["file"]
         meta, body = feedback_utils.parse_frontmatter(
             entry_file.read_text(encoding="utf-8"))
         meta["kind"] = kind
@@ -69,7 +69,7 @@ confirmed_at: null
 
 def _write_report(workspace: Path, report_id: str, text: str,
                   subdir: bool = True) -> Path:
-    base = workspace / ".specify/memory/feedback"
+    base = workspace / ".specify/feedback"
     if subdir:
         base = base / "introspection"
         base.mkdir(parents=True, exist_ok=True)

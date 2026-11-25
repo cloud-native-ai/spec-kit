@@ -21,12 +21,12 @@ Contracts this engine implements (clause ids are owned by
   ``findings`` / ``measured`` / ``checked_at``; a ``not-applicable`` decision is
   distinguishable from ``pass``.
 
-The facts are read through ``.specify/scripts/python/declaration_reader.py`` (the single
+The facts are read through ``scripts/python/declaration_reader.py`` (the single
 declaration read entry); no class name, root pattern, code vocabulary or threshold is
 carried in this file as a second definition.
 
 Usage:
-  python3 .specify/scripts/python/concurrency-check.py <action> [options]
+  python3 scripts/python/concurrency-check.py <action> [options]
 
   actions:
     classify       map execution bodies to their declared class (needs no record)
@@ -36,7 +36,7 @@ Usage:
     capability     judge dispatch capability and the coordinator verdict (needs --record)
 
   options:
-    --repo PATH        repository root whose .specify/shared/declarations/ is read
+    --repo PATH        repository root whose shared/declarations/ is read
                        (default: resolved from this script's own location)
     --record PATH      the record to judge (serial-reason / reading / capability)
     --json-out PATH    write the judgement envelope here (the only write)
@@ -76,7 +76,7 @@ RECORD_ACTIONS = ("serial-reason", "reading", "capability")
 PATTERNS = ("concurrent", "serial")
 
 #: Tool names that constitute a dispatch tool (FR-021(a), [[STR-004]]). The concept's
-#: definition owner is ``.specify/shared/definitions/subagent-definitions.md``; this set is the
+#: definition owner is ``shared/definitions/subagent-definitions.md``; this set is the
 #: engine's executable spelling of the host tool names that create sibling executors.
 DISPATCH_TOOLS = frozenset({"agent", "task", "subagent", "dispatch", "spawn_agent"})
 
@@ -116,6 +116,29 @@ except ImportError:  # pragma: no cover - defensive; the sibling always ships to
     declaration_reader = None
 
 
+STORE_LAYOUT_FACT = "runtime-store-layout"
+
+
+def _runtime_store_roots():
+    """`(roots, label)`: the declared store roots, or a labelled empty set (C-6)."""
+    if declaration_reader is None:  # pragma: no cover - the sibling always ships together
+        return (), "declaration-absent: " + STORE_LAYOUT_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), STORE_LAYOUT_FACT)["body"]
+    except declaration_reader.DeclarationError:
+        return (), declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    statement = body.get("statement")
+    stores = statement.get("stores") if isinstance(statement, dict) else None
+    if not isinstance(stores, dict) or not stores:
+        return (), declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    return tuple(".specify/" + name for name in stores), None
+
+
+STORE_ROOTS, STORE_LAYOUT_LABEL = _runtime_store_roots()
+
+
+
 class EngineInputError(Exception):
     """An input or environment error (exit 2) with a stable code for the envelope."""
 
@@ -133,10 +156,10 @@ def default_repo():
 
     Framework source form: ``<root>/scripts/python/concurrency-check.py``.
     Mirror form: ``<root>/.specify/scripts/python/concurrency-check.py`` — the literal
-    ``.specify`` component directly above ``.specify/scripts/`` is stripped. This is the
+    ``.specify`` component directly above ``scripts/`` is stripped. This is the
     F-093-002 path trap's required shape: a worktree that itself lives under
     ``.specify/.tmp/...`` still resolves to the worktree root, because the component
-    below ``.specify/scripts/`` is what is read, never the first ``.specify`` anywhere above.
+    below ``scripts/`` is what is read, never the first ``.specify`` anywhere above.
     """
     parts = Path(__file__).resolve().parts
     if len(parts) >= 3 and parts[-3:-1] == ("scripts", "python"):
@@ -467,13 +490,13 @@ def action_classify(repo, args):
             "uncovered", "roots",
             "root %r carries no class applies_to entry: the class table and the roots "
             "fact disagree" % root_id,
-            ".specify/shared/declarations/facts/executor-enumeration-roots.yaml",
+            "shared/declarations/facts/executor-enumeration-roots.yaml",
             compared=[sorted(root_id_set), sorted(class_root_set)]))
     for root_id in sorted(class_root_set - root_id_set):
         findings.append(finding(
             "uncovered", "roots",
             "the class table applies to root %r which the roots fact does not declare"
-            % root_id, ".specify/shared/declarations/facts/executor-enumeration-roots.yaml",
+            % root_id, "shared/declarations/facts/executor-enumeration-roots.yaml",
             compared=[sorted(class_root_set), sorted(root_id_set)]))
     for row in rule_rows:
         if not isinstance(row, dict):
@@ -485,14 +508,14 @@ def action_classify(repo, args):
                 "class-unknown", "decision-rule",
                 "the decision rule names class %r, absent from the closed class table %s"
                 % (row_class, sorted(class_names)),
-                ".specify/shared/declarations/facts/concurrency-class.yaml",
+                "shared/declarations/facts/concurrency-class.yaml",
                 compared=[row_class, sorted(class_names)]))
         if row_root and row_root not in root_id_set:
             findings.append(finding(
                 "uncovered", "decision-rule",
                 "the decision rule names root %r, absent from the enumeration roots %s"
                 % (row_root, sorted(root_id_set)),
-                ".specify/shared/declarations/facts/executor-enumeration-roots.yaml",
+                "shared/declarations/facts/executor-enumeration-roots.yaml",
                 compared=[row_root, sorted(root_id_set)]))
     measured_roots = {}
     measured_bodies = []
@@ -772,7 +795,7 @@ def action_serial_reason(repo, args):
             "bijection-gap", "serial-reason",
             "condition<->code bijection is short: conditions without a code %s; "
             "condition-bound codes without a condition %s"
-            % (missing_codes, missing_conditions), ".specify/shared/declarations/facts/serial-reason.yaml",
+            % (missing_codes, missing_conditions), "shared/declarations/facts/serial-reason.yaml",
             kind="inconsistency", compared=[condition_index, bound_conditions]))
 
     evidence = record.get("evidence")
@@ -866,7 +889,7 @@ def read_gate_ceiling(repo, override):
     The ceiling's owner is the gate script, not the repository under judgement: the
     declaration is read from ``--repo`` first (a client project may carry its own
     ``.specify`` projection) and then from this engine's own tree, so a fixture that
-    copies only ``.specify/shared/declarations/`` still reads the owner's default. The engine
+    copies only ``shared/declarations/`` still reads the owner's default. The engine
     carries no numeric ceiling of its own; when neither the call-time override nor
     the gate script's declaration is readable, that is an input error.
     """
@@ -877,7 +900,7 @@ def read_gate_ceiling(repo, override):
     if own != repo:
         roots.append(own)
     for base in roots:
-        for rel in (".specify/skills/sdd-loop-driver/scripts/wp-gate.py",
+        for rel in ("skills/external/sdd-loop-driver/scripts/wp-gate.py",
                     ".specify/skills/sdd-loop-driver/scripts/wp-gate.py"):
             path = base / rel
             if not path.is_file():
@@ -1032,8 +1055,9 @@ def action_reading(repo, args):
 #: The document surfaces where a competing "which stages decompose" rule could live.
 #: Tests and fixtures are assertions over the rule, not sources of it, and are excluded.
 FOURTH_SOURCE_SURFACES = (
-    "shared", "skills", "templates", "agents", "docs/reference",
-    ".specify/skills", ".specify/shared", ".specify/templates", ".specify/memory",
+    ("shared", "skills", "templates", "agents", "docs/reference",
+     ".specify/skills", ".specify/shared", ".specify/templates")
+    + STORE_ROOTS
 )
 FOURTH_SOURCE_EXTRA = (".specify/instructions.md",)
 
@@ -1189,7 +1213,7 @@ def action_coverage(repo, args):
             findings.append(finding(
                 "coverage-undeclared", args.stage,
                 "stage %r is not declared in decomposition-coverage.yaml" % args.stage,
-                ".specify/shared/declarations/facts/decomposition-coverage.yaml"))
+                "shared/declarations/facts/decomposition-coverage.yaml"))
         selected = [by_stage[args.stage]] if args.stage in by_stage else []
 
     max_turns_budget = (slot_statement.get("unit_budget") or {})
@@ -1203,7 +1227,7 @@ def action_coverage(repo, args):
             findings.append(finding(
                 "coverage-undeclared", stage,
                 "coverage %r is outside the closed values %s" % (coverage, coverage_values),
-                ".specify/shared/declarations/facts/decomposition-coverage.yaml"))
+                "shared/declarations/facts/decomposition-coverage.yaml"))
         elif coverage == "off":
             decision = entry.get("decision") or entry.get("decision_reason")
             if decision:
@@ -1214,7 +1238,7 @@ def action_coverage(repo, args):
                 findings.append(finding(
                     "coverage-undeclared", stage,
                     "stage %r stays serial (coverage=off) with no named decision record"
-                    % stage, ".specify/shared/declarations/facts/decomposition-coverage.yaml"))
+                    % stage, "shared/declarations/facts/decomposition-coverage.yaml"))
         elif coverage == "on":
             cell["decision"] = "covered"
             if entry.get("concurrency_source"):
@@ -1225,9 +1249,9 @@ def action_coverage(repo, args):
                 cell["single_package_decision_required"] = True
         cell_statement[stage] = cell
 
-    allowed = {".specify/shared/declarations/facts/decomposition-coverage.yaml",
+    allowed = {"shared/declarations/facts/decomposition-coverage.yaml",
                ".specify/shared/declarations/facts/decomposition-coverage.yaml",
-               ".specify/shared/declarations/facts/concurrency-slot-and-reserve.yaml"}
+               "shared/declarations/facts/concurrency-slot-and-reserve.yaml"}
     spines = read_spine_project_config(repo, spine_keys)
     # Every state spine IS the projection surface (one per feature line, each a run-scoped
     # projection), so a key inside `.specify/state/**` is never a "fourth place"; a fourth
@@ -1368,7 +1392,7 @@ def action_capability(repo, args):
 
     findings = []
     measured = {
-        "verdict_fact": ".specify/shared/declarations/facts/coordinator-dispatch-verdict.yaml",
+        "verdict_fact": "shared/declarations/facts/coordinator-dispatch-verdict.yaml",
         "verdict_allowed_values": allowed,
         "agents": [],
     }
@@ -1482,7 +1506,7 @@ def build_parser():
         description=(
             "The concurrency judgement engine: classify bodies, judge serial reasons, "
             "readings, per-stage coverage and dispatch capability from the declaration "
-            "facts (owner: .specify/shared/declarations/facts/)."
+            "facts (owner: shared/declarations/facts/)."
         ),
     )
     _sig_configure(
@@ -1494,7 +1518,7 @@ def build_parser():
     parser.add_argument("action", choices=ACTIONS,
                         help="the read-only action to run")
     parser.add_argument("--repo", default=None,
-                        help="repository root whose .specify/shared/declarations/ is read "
+                        help="repository root whose shared/declarations/ is read "
                              "(default: resolved from this script's own location)")
     parser.add_argument("--record", default=None,
                         help="the record to judge (serial-reason / reading / capability)")

@@ -1,23 +1,25 @@
 ---
 name: memory-recall
-description: Retrieve relevant prior memory before or during a Spec Kit task, using a lightweight local file index (no vectors). Searches short-term working notes in .specify/memory/session/ and long-term knowledge in .specify/memory/knowledge/ by keyword, tag, source, feature, and date, then injects the most relevant entries into context. Pairs with memory-record. Triggers include "回忆", "查找记忆", "recall memory", "what do we know about", "prior decisions".
+description: Retrieve relevant prior memory before or during a Spec Kit task, using a lightweight local file index (no vectors). Searches short-term working notes in .specify/session/ and long-term knowledge in .specify/knowledge/ by keyword, tag, source, feature, and date, then injects the most relevant entries into context. Pairs with memory-record. Triggers include "回忆", "查找记忆", "recall memory", "what do we know about", "prior decisions".
 skill_id: "<SKILL:.specify/skills/internal/memory-recall/SKILL.md>"
 classification: internal
 ---
 
 # memory-recall
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Overview
-Search the project memory store and surface the most relevant entries so the current Spec Kit task can build on past decisions, preferences, and working state. This is the *retrieval* half of the memory system; `memory-record` is the capture half. Retrieval uses a plain local JSON index and keyword/tag scoring — there is no vector store.
+Search the project memory stores and surface the most relevant entries so the current Spec Kit task can build on past decisions, preferences, and working state. This is the *retrieval* half of the memory system; `memory-record` is the capture half. Retrieval uses a plain local JSON index and keyword/tag scoring — there is no vector store.
+
+**Search boundary (P-1)**: retrieval reads only the two memory stores. Runtime stores (feedback, evidence, exec-quant, trigger, retention, renumber, sanitize, housekeeping, coaching, todo, tools, migrate) are records, not memory — they are never traversed, and text that exists only there is never returned.
 
 ## When to use
 - At the start of a `/speckit.*` command or skill run, to load relevant context before acting.
 - Mid-task, when you need prior decisions or conventions on a specific subject.
 - When the user asks what is already known/decided about a topic.
-- To check whether a user emphasis has occurred before, query the stable `key:<ascii-slug>` tag; the promotion trigger is owned by `.specify/shared/guidelines/knowledge-promotion.md` § 2.
+- To check whether a user emphasis has occurred before, query the stable `key:<ascii-slug>` tag; the promotion trigger is owned by `shared/guidelines/knowledge-promotion.md` § 2.
 
 ## Workflow
 1. Derive a compact query from the task: key terms, the feature key (if any), and useful tags.
@@ -44,8 +46,8 @@ Search the project memory store and surface the most relevant entries so the cur
 ## Related actions
 
 The scope domain — the closed set `--scope` accepts, plus `all` as its expansion — is a machine fact
-owned by `.specify/shared/declarations/facts/memory-types.yaml#/statement` and read by
-`.specify/scripts/python/memory-utils.py`; this skill states which action answers which question, not the
+owned by `shared/declarations/facts/memory-types.yaml#/statement` and read by
+`scripts/python/memory-utils.py`; this skill states which action answers which question, not the
 member set.
 
 - `--action list --scope <one member of the declared set, or all> --limit N` — browse the most recent entries without a query.
@@ -54,7 +56,7 @@ member set.
 
 ## Path Conventions
 - Engine (shared project script): `${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py`.
-- Memory store (read from): `${SKILL_WORKDIR}/.specify/memory/session/` and `${SKILL_WORKDIR}/.specify/memory/knowledge/`.
+- Memory stores (read from): `${SKILL_WORKDIR}/.specify/session/` and `${SKILL_WORKDIR}/.specify/knowledge/` — the two first-class top-level memory stores; no other retrieval source exists.
 
 ## Resource ID
 - Canonical ID: `<SKILL:.specify/skills/internal/memory-recall/SKILL.md>`

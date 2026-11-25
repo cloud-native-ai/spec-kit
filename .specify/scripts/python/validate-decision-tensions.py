@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """validate-decision-tensions.py — deterministic structural checker for Decision Tension Records.
 
-Program-First discipline (.specify/shared/guidelines/token-efficiency.md): the propositions checked here
+Program-First discipline (shared/guidelines/token-efficiency.md): the propositions checked here
 are fixed, textual and decidable, so a program judges them and prints a verdict; an agent MUST
 NOT re-derive them by reading the plan and declaring a result. The record shape, the admissibility
 criteria, the rejection forms and the load-bearing threshold are owned by
-``.specify/shared/guidelines/decision-tension.md`` — this checker consumes them, it never restates them.
+``shared/guidelines/decision-tension.md`` — this checker consumes them, it never restates them.
 
 Checks (the closed six-label set; a record with one label yields at most one finding, and the
 cross-label precedence is load-bearing):
@@ -106,7 +106,7 @@ NONE_LITERAL = "none"
 
 # The ``N/A`` form: when the section carries no record, it must carry the literal ``N/A`` plus one
 # explanation per load-bearing trigger, saying why that trigger does not hold. The trigger names are
-# the owner's (``.specify/shared/guidelines/decision-tension.md`` § 承重门槛) — this checker reads them, it
+# the owner's (``shared/guidelines/decision-tension.md`` § 承重门槛) — this checker reads them, it
 # does not define them; extending the trigger set is an owner revision.
 NA_LITERAL = "N/A"
 NA_DOES_NOT_HOLD = "不成立"
@@ -114,7 +114,7 @@ LOAD_BEARING_TRIGGERS = ("不可逆", "跨团队", "高爆炸半径", "与宪法
 # One line justifies one trigger: naming a trigger on a line that also names another is a list,
 # not a justification. The remainder must say why the trigger does not hold; a bare negation is
 # not a reason, and this closed set is the mechanical line between the two (owner: the N/A
-# grammar in ``.specify/shared/guidelines/decision-tension.md`` § 记录行文法).
+# grammar in ``shared/guidelines/decision-tension.md`` § 记录行文法).
 NA_NEGATION_ONLY = ("不会", "不是", "没有", "否", "无", "不成立", "不存在")
 
 # The ADR's ``tension_id`` reference slot (``docs/decisions/template.md`` § Alternatives): the

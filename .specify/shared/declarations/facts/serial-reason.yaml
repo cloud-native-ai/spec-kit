@@ -2,7 +2,7 @@
 #
 # The one machine-read owner of the code set, the two groups, each code's bound FR-005 condition, its
 # evidence form and the declaration order (FR-006, FR-007, FR-009). Read through
-# `.specify/scripts/python/declaration_reader.py`; the engine validates a record's `codes` list against this
+# `scripts/python/declaration_reader.py`; the engine validates a record's `codes` list against this
 # entry and MUST NOT carry a code literal of its own.
 #
 # Grouping rule (C-006): a `condition-bound` code names the FR-005 condition whose failure it explains
@@ -56,7 +56,7 @@ statement:
       evidence_requirement: the enumerated unit set plus the named missing mechanism
       evidence_extra_field: missing_mechanism
 consumers:
-  - .specify/scripts/python/concurrency-check.py
+  - scripts/python/concurrency-check.py
   - tests/contract/test_concurrency_serial_reason.py
 former_carriers: []
 note: "Order is part of the value (FR-006): an ordered codes list sorts by this declaration order, and the engine reads the order from the list, never from a constant. `condition_index` is the condition side of the bijection and is exactly the FR-005 clauses the grouped members bind; FR-005(a) (fewer than two ready units) has no condition-bound code by decision: its shortfall IS the factual `single-unit` code, which FR-006 forbids counting as a bijection gap. `single-unit` and `mechanism-not-yet-landed` are factual, never condition-bound. Simplicity, controllability and history are not codes (FR-009): the set is closed and grows only by revising this entry."

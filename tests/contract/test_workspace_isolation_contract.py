@@ -778,13 +778,13 @@ def test_wi_08_readonly_forbidden_paths(tmp_path):
 def test_wi_09_runtime_path_set_and_exclusions(tmp_path):
     worktree = tmp_path / "wt"
     for rel in [
-        ".specify/memory/feedback/f1.md",
-        ".specify/memory/session/s1.md",
-        ".specify/memory/knowledge/k1.md",
-        ".specify/memory/exec-quant/e1.jsonl",
-        ".specify/memory/evidence/ev.md",
+        ".specify/feedback/f1.md",
+        ".specify/session/s1.md",
+        ".specify/knowledge/k1.md",
+        ".specify/exec-quant/e1.jsonl",
+        ".specify/evidence/ev.md",
         ".specify/history/h.md",
-        ".specify/memory/trigger/t.md",
+        ".specify/trigger/t.md",
     ]:
         path = worktree / rel
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -803,7 +803,7 @@ def test_wi_09_runtime_path_set_and_exclusions(tmp_path):
 
 def test_wi_10_archive_conflict_preserved(tmp_path):
     worktree = tmp_path / "wt"
-    src = worktree / ".specify" / "memory" / "feedback"
+    src = worktree / ".specify" / "feedback"
     src.mkdir(parents=True)
     (src / "same.md").write_text("line-local", encoding="utf-8")
     dest = tmp_path / "archive"

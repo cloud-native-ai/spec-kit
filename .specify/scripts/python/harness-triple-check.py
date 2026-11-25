@@ -3,7 +3,7 @@
 
 Feature 084 (harness triple structure). Contract: `contracts/harness-triple-check.contract.md`
 C-026…C-041. Value domains (exit codes, kinds, states, reasons, required keys) are **not** in this file:
-they are read from `.specify/shared/declarations/contract.yaml` through `declaration_reader.load_contract`.
+they are read from `shared/declarations/contract.yaml` through `declaration_reader.load_contract`.
 
 **Read-only (C-026/C-039).** This engine opens no write point of any kind. Its only outputs are stdout,
 stderr, and — only when `--json-out` is given — one JSON report at the path asked for. No model
@@ -19,7 +19,7 @@ Reading it as a proof of semantics is the false green this feature exists to rem
 
 **Six findings, no seventh (FR-017 / C-035).** The instance form of each finding is
 ``code + ": " + arguments``, and the codes are carried here the way
-`.specify/scripts/python/closure-acceptance-check.py` carries its reason codes: the literal template text and its
+`scripts/python/closure-acceptance-check.py` carries its reason codes: the literal template text and its
 argument grammar are owned by `requirements.md` § Shared Strings, and
 `tests/contract/test_harness_triple_structure.py` derives its expectations from that table instead of
 re-spelling anything. Two of the six are filled by conditions whose own name is not in the set, and each
@@ -27,7 +27,7 @@ choice is named here so review can challenge the boundary rather than discover i
 
 * **Two declarations claiming one slug** is emitted as `duplicated-fact-literal` with the *declaration*
   path as its argument. The residual-literal side of that template (a carrier restating the value) is the
-  reused `duplicate-fact` face of `.specify/scripts/python/doc-consistency-check.py` and is **delegated**, never
+  reused `duplicate-fact` face of `scripts/python/doc-consistency-check.py` and is **delegated**, never
   reimplemented: FR-010 forbids a second scanner and C-038 forbids a subprocess, so this engine reports
   that face as `residual-literals: delegated` and never as a pass.
 * **A unit named by both a declaration and an exclusion row** (`data-model.md` E-2 R-4) is emitted as
@@ -49,18 +49,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import declaration_reader as declarations  # noqa: E402  (import follows the sys.path entry above)
 
-#: The candidate screen's three carrier surfaces (C-030). `.specify/shared/definitions/*.md` is deliberately absent:
+#: The candidate screen's three carrier surfaces (C-030). `shared/definitions/*.md` is deliberately absent:
 #: definition documents own facts, they do not get a disposition.
 CARRIER_PATTERNS = (
-    ".specify/templates/commands/*.md",
+    "templates/commands/*.md",
     "skills/external/*/SKILL.md",
     "skills/internal/*/SKILL.md",
-    ".specify/shared/workflow/*.md",
+    "shared/workflow/*.md",
 )
 
 #: C-030's engine-reference test: a text token pointing at a framework-internal deterministic engine.
 ENGINE_REFERENCE = re.compile(
-    r"(.specify/scripts/python/[A-Za-z0-9_.-]+\.py"
+    r"(scripts/python/[A-Za-z0-9_.-]+\.py"
     r"|skills/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/scripts/[A-Za-z0-9_.-]+)")
 
 #: The six finding codes (see the module docstring for the argument each one takes).
@@ -104,7 +104,7 @@ def finding(identity, *args):
 # the tree under judgement
 # --------------------------------------------------------------------------- #
 def resolve_repo(explicit=None):
-    """C-028 — the root is the directory that contains ``.specify/scripts/python/``, never a `.specify` match."""
+    """C-028 — the root is the directory that contains ``scripts/python/``, never a `.specify` match."""
     if explicit:
         return Path(explicit).expanduser().resolve()
     here = Path(__file__).resolve()
@@ -580,7 +580,7 @@ def main(argv=None):
 
     parser.add_argument("--action", required=True, choices=("coverage", "verify", "lookup"))
     parser.add_argument("--repo", default=None,
-                        help="repository root (default: the directory holding .specify/scripts/python/)")
+                        help="repository root (default: the directory holding scripts/python/)")
     parser.add_argument("--format", choices=("text", "json"), default="text")
     parser.add_argument("--json-out", default=None,
                         help="write JSON report here (triggers the write)")

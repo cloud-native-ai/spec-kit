@@ -17,7 +17,7 @@ This skill never executes cleanup: data reclamation is `/speckit.sanitize`, mech
 
 ## Input Contract
 
-- **Scope**: the directory set named by `$ARGUMENTS`, else the framework-owned surfaces under `.specify/` (runtime state, specs, memory/history, scripts/templates, skills/agents/teams, root anchors).
+- **Scope**: the directory set named by `$ARGUMENTS`, else the framework-owned surfaces under `.specify/` (runtime state, specs, history, scripts/templates, skills/agents/teams, root anchors).
 - **Output**: the report directory named by `$ARGUMENTS`, else `.specify/studies/debt-audit-<YYYY-MM-DD>/` (`report.md` plus one `d-<n>-<domain>.md` per domain).
 - **Reuse baseline**: an optional previous register; every reused finding MUST be re-verified and re-classified (`resolved` / `still` / `changed` / `new`) — never copied forward as a fact.
 - **Dispatch carrier**: the local fork carrier (`scripts/bash/stage-runner.sh`) for same-family agents, the subprocess carrier for heterogeneous ones. The host-internal in-process subagent path is BANNED as a concurrency carrier.
@@ -27,11 +27,11 @@ This skill never executes cleanup: data reclamation is `/speckit.sanitize`, mech
 
 ### 1. Load context (before any scan)
 
-Read, by pointer: `shared/definitions/framework-map.md` (directory semantics), `shared/definitions/non-disposable-definitions.md` (disposition set and retention), `shared/guidelines/confirmation-gates.md` (destructive gates), `shared/definitions/one-source-of-truth.md` (fact ownership). Load the project's history knowledge (`history/`, `memory/knowledge/`, `register.md`, `features.md`). The agent repeats this load in each execution; this step exists so the partition is informed.
+Read, by pointer: `shared/definitions/framework-map.md` (directory semantics), `shared/definitions/non-disposable-definitions.md` (disposition set and retention), `shared/guidelines/confirmation-gates.md` (destructive gates), `shared/definitions/one-source-of-truth.md` (fact ownership). Load the project's history knowledge (`history/`, `knowledge/`, `register.md`, `features.md`). The agent repeats this load in each execution; this step exists so the partition is informed.
 
 ### 2. Partition into disjoint read domains
 
-Split the scope into domains whose read sets never intersect (e.g. runtime state + scratch, specs by number band, memory/history/register, code surfaces). Declare each domain's paths before dispatch. A path assigned to two domains is a dispatch defect.
+Split the scope into domains whose read sets never intersect (e.g. runtime state + scratch, specs by number band, history/register, code surfaces). Declare each domain's paths before dispatch. A path assigned to two domains is a dispatch defect.
 
 ### 3. Dispatch one sdd-debt-governor execution per domain
 

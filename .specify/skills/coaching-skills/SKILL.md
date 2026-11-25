@@ -8,7 +8,7 @@ classification: external
 
 # coaching-skills
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Goal
 
@@ -36,7 +36,7 @@ Invocation: `coaching-skills <trainee> [<work>]`.
   an empty value dispatches the no-argument form and is never a missing parameter.
 - **`Trainee`**: the Trainee reference — a Skill or a command surface. Skill-reference
   forms, normalization order, disambiguation rules and failure semantics are owned by
-  `.specify/shared/definitions/skill-reference-definitions.md` — reach them there, and report
+  `shared/definitions/skill-reference-definitions.md` — reach them there, and report
   the raw and the normalized identifier plus the decision class. A leading `/` is only
   the surface form (both kinds carry it) and is **never** an instruction to invoke the
   Trainee directly instead of running this loop; the kind is decided by scanning both
@@ -64,7 +64,7 @@ carry it.
 - **Scan both lists** after stripping **one leading `/` only**. The `speckit.` prefix is a
   **command namespace**, not a skill-name prefix: the Skill set is scanned with the
   prefix retained (`/speckit.humanize` does not match the `humanize` skill); the Command
-  set is scanned through the canonical templates `.specify/templates/commands/<name>.md` and, when
+  set is scanned through the canonical templates `templates/commands/<name>.md` and, when
   the name starts with `speckit.`, its prefix-stripped form mapped to `<name>.md`, plus
   the generated per-tool copies as aliases.
 - Exactly one hit decides the executor kind: a **Skill** (decision class `skill`
@@ -131,7 +131,7 @@ nothing else is a precondition.
 - `run-id`: `YYYYMMDDTHHMMSSZ-<trainee-slug>` — a UTC timestamp plus the lowercase
   kebab slug of the resolved Trainee name. For a command Trainee the slug is the
   command name's kebab form (`/speckit.status` → `speckit-status`).
-- Run directory: `.specify/memory/coaching/<run-id>/`, created before the expectation
+- Run directory: `.specify/coaching/<run-id>/`, created before the expectation
   is written.
 - If the directory already exists the run fails closed naming the existing path;
   MUST NOT append a suffix and MUST NOT reuse the directory.
@@ -233,10 +233,10 @@ reported before the next tick rather than waiting for the clock.
 
 **This section demonstrates the duty; it does not define it.** Scope, cadence, the stall
 threshold and the transition classes are owned by
-`.specify/shared/guidelines/reporting-obligations.md` — reach them there. This skill MUST NOT
+`shared/guidelines/reporting-obligations.md` — reach them there. This skill MUST NOT
 restate any of them, because a restatement would make the shipped example a second
 definition of the obligation. The label convention is owned by
-`.specify/shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract.
+`shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract.
 
 ## Compare
 

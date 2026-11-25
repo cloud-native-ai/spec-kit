@@ -60,7 +60,7 @@ CONST_TPL = ROOT / "templates" / "constitution-template.md"
 # delegation only); the command-side double-landing pins follow the content to
 # that new owner, in the same extraction form the double-landing guard uses.
 CONST_SKILL = ROOT / "skills" / "internal" / "manage-constitution" / "SKILL.md"
-# Repaired 2026-11-12: the stale `.specify/memory/` literal made every live-facing
+# Repaired 2026-11-12: the stale retired-root literal made every live-facing
 # check baseline-red; the live constitution is `.specify/constitution.md`.
 CONST_LIVE = ROOT / ".specify" / "constitution.md"
 PLAN_TPL = ROOT / "templates" / "plan-template.md"

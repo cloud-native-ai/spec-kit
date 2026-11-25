@@ -1,0 +1,5 @@
+task: T031
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: sync-mirrors.py --write over the feature-touched sources (23938f22e..HEAD + worktree, 95 files after the T029 fragment readers) then --check = rc 2 / 369 residual members vs baseline 444 / NEW members 0 / cured 75 (test-evidence/p4-sync-mirrors-check.txt); all touched pairs cmp-clean (pair_failures=0); regen-command-copies.py (typer-capable /usr/local/bin/python3) regenerated all per-tool copies and --check rc 0; templates/instructions-template.md mirror synced before the T030 generator run; no mirror hand-edited
+at: 2026-11-25T08:20:00Z

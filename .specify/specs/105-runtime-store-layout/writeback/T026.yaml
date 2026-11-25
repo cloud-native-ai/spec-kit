@@ -1,0 +1,5 @@
+task: T026
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: post-rewrite class reading test-evidence/t026-t030-rewrite-readings.txt (framework-source 4 files / 9 occurrences = exactly the L-5 allowlist); guard test tests/contract/test_store_layout_live_refs.py::test_product_class_occurrence_sets_equal_the_allowlist shows framework-source unexpected=[] missing=[]; rewrote shared/** 20 files + skills/** 38 files + 2 mechanism-inventory.py probes (memory/feedback|knowledge|session -> new roots) + agents/sdd-debt-governor.agent.md + shared/workflow/target-resolution.md detection set; legacy contexts kept by pointer (git-utils five files, sanitize-materials legacy lane, derivation/non-disposable rephrasing); runtime-store-layout.yaml note/comment tightened so the literal survives only on the retired_container key; anchor-layout-migrate.py docstring reflowed so both matching lines carry the legacy context; dated-record trees zero rewrites
+at: 2026-11-25T07:40:00Z

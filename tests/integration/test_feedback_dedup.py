@@ -35,7 +35,7 @@ def test_second_record_same_unit_run_is_duplicate(feedback_store: Path, capsys):
     assert second["count_since_submission"] == 1  # unchanged
 
     # Only one entry file on disk
-    files = [f for f in (feedback_store / ".specify/memory/feedback").glob("*.md")]
+    files = [f for f in (feedback_store / ".specify/feedback").glob("*.md")]
     assert len(files) == 1
 
 

@@ -7,7 +7,7 @@ classification: external
 
 > **分类注解**：本 skill 依**依赖轴**判定为 external——自身零 spec-kit 运行时依赖，任何宿主 agent 可直接加载；其内容编排目标项目的治理与维护命令（语义耦合在此显式声明），该耦合只体现在它指挥宿主 agent 在目标项目执行 `/speckit.*`，不构成本 skill 的运行时依赖。**与 sdd-project-setup 是软协同**：setup 负责一次性 bootstrap，本 skill 负责 bootstrap 之后的周期性维护；本 skill 不安装/初始化项目，setup 也不依赖本 skill 才能完成 bootstrap。**与 sdd-loop-driver 是软协同**：loop-driver 负责 SDD 开发阶段推进，本 skill 不推进任何阶段。
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## What This Skill Does
 
@@ -38,12 +38,12 @@ H3 STRENGTHEN 按依赖次序、按需：
              /speckit.history → /speckit.docs 深化 → /speckit.research
              → /speckit.feature 生成
 H4 VERIFY    五族前置检查（本地仅④⑤）+ 双矩阵复扫 + 符号链接 + hook health
-H5 REPORT    候选工作清单 + 运行报告（归档到 .specify/memory/housekeeping/）
+H5 REPORT    候选工作清单 + 运行报告（归档到 .specify/housekeeping/）
 ```
 
 ### H0 — Entry
 
-- **目标项目**：遵循共享契约 `.specify/shared/workflow/target-resolution.md`。**本 skill 强依赖 `.specify/`**：显式目标优先；未给 → 从会话 cwd **向上搜索**最近的合法 `.specify/` 根（显式本地路径则从其向上搜索）；项目根必须包含 `.specify/`（至少含 `.specify/memory/`、`.specify/scripts/`、`.specify/templates/` 之一）；解析为绝对路径；**拒绝 basename 为 `.specify` 的根**；目标是框架源仓且未显式指定时先警告。**找不到 `.specify/` → 拒绝执行**，提示运行 `sdd-project-setup`（install）或 `specify init <project-dir>`，可按需 handoff setup。远端先跑 execution-side target-root probe。
+- **目标项目**：遵循共享契约 `.specify/shared/workflow/target-resolution.md`。**本 skill 强依赖 `.specify/`**：显式目标优先；未给 → 从会话 cwd **向上搜索**最近的合法 `.specify/` 根（显式本地路径则从其向上搜索）；项目根必须包含 `.specify/`（至少含 `memory/`、`scripts/`、`templates/` 之一）；解析为绝对路径；**拒绝 basename 为 `.specify` 的根**；目标是框架源仓且未显式指定时先警告。**找不到 `.specify/` → 拒绝执行**，提示运行 `sdd-project-setup`（install）或 `specify init <project-dir>`，可按需 handoff setup。远端先跑 execution-side target-root probe。
 - **模式**：未给 → `check`（不执行不可逆清理，但自动执行可逆修复、git 干净前提下的重复编号重排与 docs 死链修复）；用户明确要求清理 → `cleanup`（在 check 基础上再执行破坏性回收，仍由 sanitize 既有单批确认保护）。
 - **命令面**：不假设目标项目的 `/speckit.*` 副本存在；H2 前探测命令副本，缺失时按 `.specify/skills/internal/<name>/SKILL.md` 直接加载 owner 技能，不假设 slash 命令可用。
 - 目标项目必须已有 `.specify/` 与 constitution；缺失 → 停止并 handoff `sdd-project-setup`（bootstrap 是 setup 的职责）。
@@ -59,7 +59,7 @@ python3 ${SKILL_HOME}/scripts/logical-framework.py --project <project-dir> --jso
 
 物理矩阵回答 `.specify/` 装没装，逻辑矩阵回答 instructions/features/docs 必选层与 anchors/glossary/register/knowledge 推荐层、agents/teams 条件层配没配（`anchors` 层检查 `.specify/anchoring/*/anchor.md`，不读历史 `.specify/goal/` 路径）。两层都跑完才算 H1 完成；缺口凭据永远是**本次** H1，不是上次运行的记忆。
 
-**H2 的 migrate 前置（按需）**：H1 缺口凭据显示版本混杂态（机制盘点 partial/degraded 且 provenance 为旧版残留、`.specify/source.json` 落后于已安装 CLI，或 sanitize Migration lane 报告 `migrate-required`）时，先在 H2 次序最前调用 `/speckit.migrate`（dry-run → 自动 apply；可由回执恢复的项按可逆处理，无需二次确认），再进入 sanitize 等其余步骤；干净 workspace 具名 `migrate: not-required`。命令流 owner 是 `.specify/templates/commands/migrate.md`（本技能只决定时机与次序，不复述步骤、选项与退出码）；周期复核仍归 sanitize 的 Migration lane（一次性主入口与周期回退的分工按其 owner 文本）。
+**H2 的 migrate 前置（按需）**：H1 缺口凭据显示版本混杂态（机制盘点 partial/degraded 且 provenance 为旧版残留、`.specify/source.json` 落后于已安装 CLI，或 sanitize Migration lane 报告 `migrate-required`）时，先在 H2 次序最前调用 `/speckit.migrate`（dry-run → 自动 apply；可由回执恢复的项按可逆处理，无需二次确认），再进入 sanitize 等其余步骤；干净 workspace 具名 `migrate: not-required`。命令流 owner 是 `templates/commands/migrate.md`（本技能只决定时机与次序，不复述步骤、选项与退出码）；周期复核仍归 sanitize 的 Migration lane（一次性主入口与周期回退的分工按其 owner 文本）。
 
 ### H2 — Reconcile
 
@@ -99,9 +99,9 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 产出两件东西：
 
 1. **候选工作清单**（建议而非强制）：未完成 feature、大规模反馈改进、SPECKIT TODO 事项。它是本 skill 的**唯一候选清单所有者**；setup 不再产出 `sdd-candidates-*.yaml`。
-2. **运行报告**：归档到目标项目的 `.specify/memory/housekeeping/<UTC-ts>-<mode>.yaml`（一次运行一个文件；远端拓扑在目标侧写入）。字段、`check|cleanup` 的可空字段与 `sanitize_retention` 计数口径见 `./references/maintenance-recipes.md` § H5；本文件不复写 schema。
+2. **运行报告**：归档到目标项目的 `.specify/housekeeping/<UTC-ts>-<mode>.yaml`（一次运行一个文件；远端拓扑在目标侧写入）。字段、`check|cleanup` 的可空字段与 `sanitize_retention` 计数口径见 `./references/maintenance-recipes.md` § H5；本文件不复写 schema。
 
-不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`；运行报告只落 `.specify/memory/housekeeping/`。
+不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`；运行报告只落 `.specify/housekeeping/`。
 
 ## Hard Requirements
 
@@ -111,7 +111,7 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 4. **幂等收敛**：稳定态上重复执行零结构写、零内容重建；每项动作前以本次 H1 为凭据，禁止凭上次运行的记忆跳过或重做。
 5. **sanitize 是唯一的破坏性门**：`check` 默认只扫描；`cleanup` 必须显式请求。破坏性回收/删除由 sanitize 既有确认门保护；本 skill MUST NOT 新增第二道确认门，也 MUST NOT 绕过 sanitize 直接执行 apply。
 6. **记录回收红线**：没有 retention receipt 不删除；open feedback、unsettled run-determination、不可解析 exec-quant、无 promotion/ephemeral 决策的 session 笔记永不回收；默认宽限 30 天；目标路径 git 脏时拒绝 apply（非 git 项目需显式 `--allow-unversioned`）。
-7. **本地 fork 承载**：本地拓扑的派发 MUST 缺省使用 **fork 承载**——同族 `qodercli` 子进程经 `.specify/skills/sdd-loop-driver/scripts/stage-runner.sh` 启动（prompt 经 stdin、stream-json 输出、哨兵判定）；异构 agent MUST 使用 **subprocess 承载**——该 agent 自身 CLI 的独立子进程。宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。远端拓扑经 `run-agent` 外部 CLI 派发。
+7. **本地 fork 承载**：本地拓扑的派发 MUST 缺省使用 **fork 承载**——同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh` 启动（prompt 经 stdin、stream-json 输出、哨兵判定）；异构 agent MUST 使用 **subprocess 承载**——该 agent 自身 CLI 的独立子进程。宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。远端拓扑经 `run-agent` 外部 CLI 派发。
 8. **不推进 SDD 阶段**：requirements → … → review 归 `sdd-loop-driver`；本 skill 只做治理、维护、强化与报告。
 9. **进度可见**：长任务按 `.specify/shared/guidelines/progress-reporting.md` 的 15 分钟四要素节奏汇报；派发子代理时把该义务注入载荷。
 10. **参数化、零机器路径**：目标路径、别名、运行用户全部入口参数；MUST NOT 嵌入用户名、主机名、家目录或项目族路径。
@@ -142,7 +142,7 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 ## Subagent Delegation
 
 - **Carrier decision**（owner：`.specify/shared/workflow/execution-topology.md` § Carrier decision）：
-  - **本地（缺省）**：目标=当前项目；H1 盘点由编排者直接运行只读脚本，H2–H5 的派发 MUST 用 **fork 承载**（同族 `qodercli` 子进程经 `.specify/skills/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）。宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。
+  - **本地（缺省）**：目标=当前项目；H1 盘点由编排者直接运行只读脚本，H2–H5 的派发 MUST 用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）。宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。
   - **远程三元组给全 → 远端**：`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；H1 盘点在目标侧执行，H2/H3 的 `/speckit.*` 经 run-agent 驱动，H4 hook-health 在目标侧执行；CLI 缺省取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖。
   - **部分远程信息 → 问一个澄清问题**，不猜、不静默回退本地。
 - **盘点与验证**：本地由编排者直接运行只读脚本；远端经 `ssh + su` 在 `<project-dir>` 下执行。
@@ -161,7 +161,7 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 
 ## Self-Improvement Contract
 
-This skill is an Execution Subject. Own-run observations (execution friction, missed gaps, wrong target resolution, duplicated owner logic) route through `improve-skills` against the canonical runtime directory `.specify/skills/sdd-house-keeping/` (framework source: `.specify/skills/sdd-house-keeping/`); the mutation route is `improve-skills`, validation is the skill-conformance suite plus the create-skills RED-GREEN pressure test, and the later comparison signal is the next run's observed behavior. The canonical workflow is owned by `.specify/shared/workflow/self-improvement-workflow.md`; this section does not restate it. Creation is capability evidence only, never evidence of improvement.
+This skill is an Execution Subject. Own-run observations (execution friction, missed gaps, wrong target resolution, duplicated owner logic) route through `improve-skills` against the canonical runtime directory `.specify/skills/sdd-house-keeping/` (framework source: `skills/external/sdd-house-keeping/`); the mutation route is `improve-skills`, validation is the skill-conformance suite plus the create-skills RED-GREEN pressure test, and the later comparison signal is the next run's observed behavior. The canonical workflow is owned by `.specify/shared/workflow/self-improvement-workflow.md`; this section does not restate it. Creation is capability evidence only, never evidence of improvement.
 
 ## Wrap-up
 

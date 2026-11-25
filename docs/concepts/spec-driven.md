@@ -78,7 +78,7 @@ The SDD methodology is significantly enhanced through four powerful commands tha
 
 This command provides centralized feature management for SDD projects:
 
-In Spec Kit, a **feature** is a long-lived registry entry that represents a trackable unit of work (name, ID, status, and links). It lives under `.specify/memory/` (index + per-feature memory) and is meant to evolve across iterations.
+In Spec Kit, a **feature** is a long-lived registry entry that represents a trackable unit of work (name, ID, status, and links). It lives at `.specify/features.md` (index) plus `.specify/features/<ID>.md` (per-feature details) and is meant to evolve across iterations.
 
 1. **Feature Index Creation**: Creates or updates a project-level feature index (`features.md`) in Markdown table format
 1. **Feature Documents Maintainance**: updates a project-level feature details document in (`features/`) folder
@@ -90,7 +90,7 @@ In Spec Kit, a **feature** is a long-lived registry entry that represents a trac
 
 This command creates or updates a **requirements specification**: the detailed, versioned statement of WHAT and WHY (scenarios, constraints, and acceptance criteria) for a feature iteration.
 
-In Spec Kit, **requirements** are not the same thing as a feature entry: requirements live under `.specify/specs/<REQUIREMENTS_KEY>/requirements.md` and can iterate over time; the feature registry under `.specify/memory/` is the long-lived tracking and summary layer.
+In Spec Kit, **requirements** are not the same thing as a feature entry: requirements live under `.specify/specs/<REQUIREMENTS_KEY>/requirements.md` and can iterate over time; the feature registry at `.specify/features.md` plus `.specify/features/` is the long-lived tracking and summary layer.
 
 This command transforms a simple feature prompt into a complete, structured specification with automatic repository management:
 
@@ -125,7 +125,7 @@ After a plan is created, this command analyzes the plan and related design docum
 This command makes hidden tool calls explicit and reusable across MCP/System/Shell/Project ecosystems:
 
 1. **Unified Discovery**: Discovers candidate tools across four sources with one normalized view
-2. **Record Reuse**: Reuses `.specify/memory/tools/<tool-name>.md` if it already exists and is complete
+2. **Record Reuse**: Reuses `.specify/tools/<tool-name>.md` if it already exists and is complete
 3. **Guided Completion**: Prompts for missing fields and validates ToolRecord completeness before invocation
 4. **Execution Gate**: Shows one preview summary and requires explicit user confirmation before any execution
 5. **Alias Support**: Supports alias/rename mapping so stable human-friendly names can be reused in later calls

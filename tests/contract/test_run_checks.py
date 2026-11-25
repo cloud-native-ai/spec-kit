@@ -43,7 +43,7 @@ TEAM_DOC = ROOT / "docs" / "reference" / "commands" / "team.md"
 EXEC_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "execution-guide.md"
 GOAL_GUIDE = ROOT / "skills" / "internal" / "create-team" / "references" / "goal.md"
 CREATE_MODE = ROOT / "skills" / "internal" / "create-team" / "references" / "create-mode.md"
-TOOL_RECORD = ROOT / ".specify" / "memory" / "tools" / "goal-utils.py.md"
+TOOL_RECORD = ROOT / ".specify" / "tools" / "goal-utils.py.md"
 # 057 提取:五查调用的真源面移到 run-team SKILL.md——守卫随真源迁移。
 RUN_TEAM_SKILL = ROOT / "skills" / "internal" / "run-team" / "SKILL.md"
 QUICKSTART_RUN = (

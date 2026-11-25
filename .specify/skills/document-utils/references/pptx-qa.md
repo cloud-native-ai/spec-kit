@@ -69,9 +69,9 @@ for index in range(len(document)):
 document.close()
 ```
 
-`.specify/scripts/pdf/convert_pdf_to_images.py` does the same rasterization if you prefer
+`scripts/pdf/convert_pdf_to_images.py` does the same rasterization if you prefer
 a script to a snippet. In a sandbox where LibreOffice cannot open its socket,
-`.specify/scripts/office/soffice.py` owns the environment that makes the conversion work.
+`scripts/office/soffice.py` owns the environment that makes the conversion work.
 
 To re-render one slide after a fix, convert again and render only that page
 index -- the PDF page order follows the slide order, and hidden slides may be
@@ -117,8 +117,8 @@ claim.
 
 A deck can render and still be structurally wrong -- an orphaned part, a missing
 content type, a relationship pointing at a deleted file. After editing an
-unpacked tree, `.specify/scripts/pptx/clean.py` reclaims the orphans and
-`.specify/scripts/office/pack.py` validates on the way out. Reopening the packed file with
+unpacked tree, `scripts/pptx/clean.py` reclaims the orphans and
+`scripts/office/pack.py` validates on the way out. Reopening the packed file with
 python-pptx is a cheap final check that a reader accepts it:
 
 ```python

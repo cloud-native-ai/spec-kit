@@ -93,8 +93,12 @@ def test_c6_terminology_constitution():
 
 def test_c7_deviation_log_location():
     body = principle_section(read(CONSTITUTION))
-    assert ".specify/specs/" in body and ".specify/memory/" in body, \
-        "deviation log locations (.specify/specs/<key>/ or .specify/memory/) not named"
+    assert ".specify/specs/" in body, \
+        "deviation log location (.specify/specs/<key>/) not named"
+    # The principle's second location is the retired store container (analyze residue G-03:
+    # the live constitution still spells it and is outside this feature's write grant). The
+    # retirement itself is recorded in shared/definitions/framework-map.md (tombstone row);
+    # this test does not re-assert the retired literal.
 
 
 # ---------------------------------------------------------------------------

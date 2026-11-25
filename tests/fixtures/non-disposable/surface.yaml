@@ -7,6 +7,6 @@ fact: non-disposable-review-surface
 kind: closed-set
 statement:
   - .specify/specs
-  - .specify/memory
+  - .specify/session
   - tests
   - scripts

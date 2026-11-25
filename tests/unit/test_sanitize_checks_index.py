@@ -55,7 +55,7 @@ def test_feedback_legacy_index_is_residue_finding(tmp_path):
     """A legacy feedback index.json is transitional residue: presence alone
     is one repair-suggestion finding pointing at reindex — never deleted."""
     ws = make_ws(tmp_path)
-    fb = ws / ".specify" / "memory" / "feedback"
+    fb = ws / ".specify" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
     (fb / "index.json").write_text(json.dumps({
         "store": "feedback", "updated": "x", "threshold": 10, "count_since_submission": 0,
@@ -64,7 +64,7 @@ def test_feedback_legacy_index_is_residue_finding(tmp_path):
     findings = su.check_index_consistency(ws)
     fb_findings = [f for f in findings if "feedback" in f["target"]]
     assert len(fb_findings) == 1
-    assert fb_findings[0]["target"] == ".specify/memory/feedback/index.json"
+    assert fb_findings[0]["target"] == ".specify/feedback/index.json"
     assert fb_findings[0]["disposition"] == "repair"
     assert "reindex" in fb_findings[0]["summary"]
 
@@ -72,21 +72,21 @@ def test_feedback_legacy_index_is_residue_finding(tmp_path):
 def test_session_and_knowledge_legacy_indexes_also_flagged(tmp_path):
     ws = make_ws(tmp_path)
     for scope in ("session", "knowledge"):
-        d = ws / ".specify" / "memory" / scope
+        d = ws / ".specify" / scope
         d.mkdir(parents=True, exist_ok=True)
         (d / "index.json").write_text(json.dumps({"scope": scope, "entries": []}),
                                       encoding="utf-8")
     findings = su.check_index_consistency(ws)
     targets = {f["target"] for f in findings}
-    assert ".specify/memory/session/index.json" in targets
-    assert ".specify/memory/knowledge/index.json" in targets
+    assert ".specify/session/index.json" in targets
+    assert ".specify/knowledge/index.json" in targets
 
 
 def test_scan_store_without_index_is_clean(tmp_path):
     """The req 055 end state: entries on disk, no index — zero findings,
     even when an index would have gone stale (disk has extra entries)."""
     ws = make_ws(tmp_path)
-    fb = ws / ".specify" / "memory" / "feedback"
+    fb = ws / ".specify" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
     (fb / "20260820T000000Z-unit.md").write_text("# entry\n", encoding="utf-8")
     findings = su.check_index_consistency(ws)
@@ -97,7 +97,7 @@ def test_feedback_bookkeeping_files_exempt(tmp_path):
     """Store scaffolding (logs / probe-map) produces no findings of its own;
     with a legacy index present the only finding is the residue itself."""
     ws = make_ws(tmp_path)
-    fb = ws / ".specify" / "memory" / "feedback"
+    fb = ws / ".specify" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
     (fb / "index.json").write_text(json.dumps({"entries": []}), encoding="utf-8")
     for name in ("cleanup-log.md", "consume-log.md", "migration-log.md",
@@ -111,7 +111,7 @@ def test_feedback_bookkeeping_files_exempt(tmp_path):
 
 def test_evidence_index_run_without_dir(tmp_path):
     ws = make_ws(tmp_path)
-    ev = ws / ".specify" / "memory" / "evidence"
+    ev = ws / ".specify" / "evidence"
     ev.mkdir(parents=True, exist_ok=True)
     (ev / "index.json").write_text(json.dumps({
         "store": "evidence", "updated": "x",
@@ -123,7 +123,7 @@ def test_evidence_index_run_without_dir(tmp_path):
 
 def test_evidence_dir_without_index(tmp_path):
     ws = make_ws(tmp_path)
-    ev = ws / ".specify" / "memory" / "evidence"
+    ev = ws / ".specify" / "evidence"
     (ev / "ev-20260820-020000-y").mkdir(parents=True, exist_ok=True)
     (ev / "index.json").write_text(json.dumps({
         "store": "evidence", "updated": "x", "entries": []}), encoding="utf-8")
@@ -137,7 +137,7 @@ def test_unparseable_index_is_single_finding(tmp_path):
     """A corrupt feedback index.json is subsumed by the residue rule: its
     presence — parseable or not — is exactly one finding (req 055)."""
     ws = make_ws(tmp_path)
-    fb = ws / ".specify" / "memory" / "feedback"
+    fb = ws / ".specify" / "feedback"
     fb.mkdir(parents=True, exist_ok=True)
     (fb / "index.json").write_text("{corrupt", encoding="utf-8")
     findings = su.check_index_consistency(ws)

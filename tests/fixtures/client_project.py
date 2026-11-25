@@ -49,7 +49,7 @@ never goes stale — it is rebuilt from the current source on every build):
   item 4). The whole mirror — not just the four Feature 072 engines — because
   the probe registry's non-entity catalog references engine script paths that
   registry validation requires reachable from the workspace root;
-- ``.specify/memory/feedback/`` — the per-entry feedback store directory.
+- ``.specify/feedback/`` — the per-entry feedback store directory.
 
 Tests may invoke the installed copy (``project.engine_path(name)``, exercising
 the real self-location path) or the framework copy by absolute path
@@ -382,7 +382,7 @@ class ClientProject:
 
     @property
     def feedback_dir(self) -> Path:
-        return self.path / ".specify" / "memory" / "feedback"
+        return self.path / ".specify" / "feedback"
 
     @property
     def probes_dir(self) -> Path:

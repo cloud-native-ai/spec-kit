@@ -37,13 +37,13 @@ fi
 |---|---|---|
 | `## Feedback` engine persistence (`feedback-utils.py`) | Run per `feedback-step.md` | **Skip the entire Feedback step** (no engine, no store, no prompt) |
 | Propagation to built-in role agents (`.specify/agents/templates/*.agent.md`) | Per convention (e.g. Skill Enablement) | **Skip** — no role agents exist |
-| Memory engine (`memory-utils.py`, `.specify/memory/session|knowledge/`) | Available | **Unavailable** — state the limitation instead of erroring |
+| Memory engine (`memory-utils.py`, `.specify/session|knowledge/`) | Available | **Unavailable** — state the limitation instead of erroring |
 | Canonical shared docs (`.specify/shared/workflow/*.md`) | Read as source of truth | **Not present** — the block embedded in the skill file governs |
 | Output paths under `.specify/**` (reports, teams, review records, workflow docs) | Default | **Fall back** to the skill's declared alternative (e.g. `docs/`, the host skills directory, or a user-specified path); ask when no alternative is declared |
 | Mirror/dual-copy discipline (`skills/` ↔ `.specify/skills/`) | Enforced | **Not applicable** — edit only the single host copy, matching the host directory's existing skill format |
 
 Steps that are not Spec-Kit-specific (the skill's core capability, its own
-`${SKILL_HOME}` .specify/scripts/references/assets) run identically in both modes.
+`${SKILL_HOME}` scripts/references/assets) run identically in both modes.
 
 ## Canonical gate line for `## Feedback` sections
 
