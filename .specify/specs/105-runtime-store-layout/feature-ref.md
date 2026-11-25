@@ -51,8 +51,9 @@
 | FR-024 契约测试集 | WP12, WP13 | M-8；L-5/L-8 |
 | FR-025 并发写安全 | WP02, WP12 | E-1/I-10；M-4 |
 | FR-026 行为保持留证 | WP12, WP14, WP15 | P-5；L-8 |
+| FR-027 不兼容变更迁移闭包 | WP12, WP15 | `migrate-store-layout.contract.md` M-10；plan § Backward-Incompatible Change Inventory（BC01…BC18） |
 
-覆盖核对：26/26 FR 均有 WP 与契约落点；无 FR 落在计划外。
+覆盖核对：27/27 FR 均有 WP 与契约落点；无 FR 落在计划外。
 
 ## SC → 证据矩阵
 
@@ -66,6 +67,7 @@
 | SC-006 活引用面零旧路径 | supporting | `test_store_layout_live_refs.py`（允许集双向相等 + 变异转红） | WP10/WP12 |
 | SC-007 镜像与副本 | supporting | `sync-mirrors.py --check` + `regen --check` + member-set 基线对比 | WP11/WP14 |
 | SC-008 忽略与跟踪 | supporting | `test_tools_domain.py` + `test_specify_gitignore_template.py` + `git check-ignore` 夹具 | WP06/WP12 |
+| SC-009 不兼容变更闭包 | final | `test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed` + M-8 夹具的 dry-run/apply 读数 + `acceptance-105.md` SC-009 行 | WP12/WP15 |
 
 **Failed final-path criteria block the status flip**; supporting criteria are reported with their measured baseline (plan T-003 for SC-007's absolute reading).
 

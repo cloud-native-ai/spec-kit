@@ -4,9 +4,9 @@
 **Requirement Key**: `105-runtime-store-layout`
 **Related Feature**: 024 Specification Workspace Versioning（`.specify/features.md` 行 105；本阶段维持 `Planned`，无状态迁移权）
 **Input**: Design documents from `.specify/specs/105-runtime-store-layout/`
-**Prerequisites**: plan.md（技术路线 / Mirror Obligations / Work Packages ×15 / Structure Decision）、requirements.md（26 FR / 8 SC / 6 STR / A-1…A-16 / 17 行 Store Inventory）、research.md（R-1…R-13 实测）、data-model.md（E-1…E-10 / I-1…I-10）、contracts/ ×4（C-1…C-8 / M-1…M-9 / P-1…P-6 / L-1…L-8）、quickstart.md（S-0…S-8）、feature-ref.md（FR→WP 26/26、SC→证据 8/8）
+**Prerequisites**: plan.md（技术路线 / Mirror Obligations / Work Packages ×15 / Structure Decision / § Backward-Incompatible Change Inventory BC01…BC18）、requirements.md（27 FR / 9 SC / 6 STR / A-1…A-16 / 17 行 Store Inventory）、research.md（R-1…R-13 实测）、data-model.md（E-1…E-10 / I-1…I-10）、contracts/ ×4（C-1…C-8 / M-1…M-10 / P-1…P-6 / L-1…L-8）、quickstart.md（S-0…S-8）、feature-ref.md（FR→WP 27/27、SC→证据 9/9）
 
-**Tests Mode**: ON（Constitution Principle IV "Test-First & Contract-Driven Implementation" 是测试强制原则；本特性交付引擎、迁移 CLI 与契约测试，测试形态为 contract / integration / unit 运行时测试，而非模板结构测试。plan.md § Test-First Coverage 为 SC-001…SC-008 逐条定义红先夹具与变异转红断言。唯一 migration/regression 例外：US6 的残留 / 符号链接 / 只读 / 半迁移断言守的是 WP08 已交付的执行器行为，按 `.specify/skills/internal/create-tasks/SKILL.md` § Task Generation Rules 的 migration/regression 例外置于执行器实现之后，红能力由变异演练证明，不冒充红先。）
+**Tests Mode**: ON（Constitution Principle IV "Test-First & Contract-Driven Implementation" 是测试强制原则；本特性交付引擎、迁移 CLI 与契约测试，测试形态为 contract / integration / unit 运行时测试，而非模板结构测试。plan.md § Test-First Coverage 为 SC-001…SC-009 逐条定义红先夹具与变异转红断言。migration/regression 例外共两处：US6 的残留 / 符号链接 / 只读 / 半迁移断言守的是 WP08 已交付的执行器行为，按 `.specify/skills/internal/create-tasks/SKILL.md` § Task Generation Rules 的 migration/regression 例外置于执行器实现之后，红能力由变异演练证明，不冒充红先；T042 的 FR-027/SC-009 清点守卫守的是已落盘的 plan 清点与 T016 已交付的迁移行为，按同一例外以变异演练证明红能力。）
 
 **Tests**: 红先证据的唯一落点是 `.specify/specs/105-runtime-store-layout/notes/red-first-evidence.md`（每支测试一条：命令、真实输出、退出码）。失败 nodeid 名集的捕获与比较形式归 owner `.specify/skills/internal/implement-feature/SKILL.md` § Test runs，本文件只给路径与命令，不复述比较形式。测试执行唯一入口是 `bash scripts/bash/run-tests.sh`；interpreter 选择固定在 § Environment Prerequisites，任务行不写解释器级测试命令。
 
@@ -15,13 +15,13 @@
 ## Definition of Done (DoD)
 
 - DoD-1: 全部任务行为 `[X]`；若出现 `[~]`，其理由逐条记录在 `.specify/specs/105-runtime-store-layout/verification.md` 的 `deferred_tasks=`。
-- DoD-2: 交付面 = 1 份机器声明（`shared/declarations/facts/runtime-store-layout.yaml` + `shared/declarations/contract.yaml` 注册）+ 14 个顶层存储根 + 1 条墓碑行 + `specify migrate` 第六维 `store-layout` + 包内种子 `seed/` + 8 支新测试模块 + 1 支 fixture builders + 活引用 / 忽略 / 镜像 / 副本更新；零新增第三方依赖、零新增存储引擎 / 注册表 / 调度器 / 第二注入机制。
-- DoD-3: 契约覆盖如实记账——4 份契约共 31 条款（C 8 / M 9 / P 6 / L 8）；其中 `store-layout.contract.md` 的 8 条 C 条款是机器可判定形式，8 条各被一个任务行 `[green:]` 认领一次（C-7 的认领行 T009 先于 C-4/C-5/C-6 的认领行，产生一条 green-cross-phase WARN，按实现顺序裁定：C-7 的绿点是 init，早于 US4 / US5）；M / P / L 共 23 条以条款号引用但不具 `[green:]` 形态（`clause_extract.py` 对这三份文件返回 `form=md-none`，这是计划期条款号的既有事实，不是本阶段可修复项）。`account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout` 报 `claimed clauses: 8` 且 `clause-uncovered` beyond baseline = 0；其 `fr-uncovered` 车道只读机器可判定条款的 citation group，读数 6/26 是 md-none 结构的既有事实——FR 覆盖的权威判据是本文件的 Requirement Coverage Map（26/26）加 `pre-analyze-check.py --stage tasks` 的 `runtime-stack-row` 行级校验 errors=0，不把会计器的 FR 车道冒充通过。
-- DoD-4: 8 支新测试模块（`test_runtime_store_layout.py`、`test_store_layout_live_refs.py`、`test_tools_domain.py`、`test_store_layout_migration_us1_us2.py`、`test_store_layout_migration_us3_us6.py`、`test_memory_preservation.py`、`test_dispatch_injection_paths.py`、`test_init_new_layout.py`）与按 L-3 更新的既有测试全绿；全量套件相对 implement 入口的名字级失败基线零**新增**失败（既有红逐条点名、不声称全绿）。
+- DoD-2: 交付面 = 1 份机器声明（`shared/declarations/facts/runtime-store-layout.yaml` + `shared/declarations/contract.yaml` 注册）+ 1 份封闭的向后不兼容变更清点（`plan.md` § Backward-Incompatible Change Inventory，BC01…BC18）及其机器守卫 + 14 个顶层存储根 + 1 条墓碑行 + `specify migrate` 第六维 `store-layout` + 包内种子 `seed/` + 8 支新测试模块 + 1 支 fixture builders + 活引用 / 忽略 / 镜像 / 副本更新；零新增第三方依赖、零新增存储引擎 / 注册表 / 调度器 / 第二注入机制。
+- DoD-3: 契约覆盖如实记账——4 份契约共 32 条款（C 8 / M 10 / P 6 / L 8）；其中 `store-layout.contract.md` 的 8 条 C 条款是机器可判定形式，8 条各被一个任务行 `[green:]` 认领一次（C-1→T003、C-2/C-3→T007、C-4→T023、C-5→T030、C-6→T032、C-7→T038、C-8→T040；认领行序与条款序号单调一致，零 green-cross-phase WARN；C-7 的绿点落在验收证据包 T038，因为全新初始化的机器绿由 SC-005 实测读数收口）；M / P / L 共 24 条以条款号引用但不具 `[green:]` 形态（`clause_extract.py` 对这三份文件返回 `form=md-none`；M-10（FR-027/SC-009 闭包）同样如此，这是计划期条款号的既有事实，不是本阶段可修复项）。`account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout` 报 `claimed clauses: 8` 且 `clause-uncovered` beyond baseline = 0；其 `fr-uncovered` 车道只读机器可判定条款的 citation group，读数 6/27（FR-027 不落在任何 C 条款 citation group 中）是 md-none 结构的既有事实——FR 覆盖的权威判据是本文件的 Requirement Coverage Map（27/27）加 `pre-analyze-check.py --stage tasks` 的 `runtime-stack-row` 行级校验 errors=0，不把会计器的 FR 车道冒充通过。
+- DoD-4: 8 支新测试模块（`test_runtime_store_layout.py`（含 FR-027/SC-009 清点守卫 `test_backward_incompatible_inventory_is_closed`）、`test_store_layout_live_refs.py`、`test_tools_domain.py`、`test_store_layout_migration_us1_us2.py`、`test_store_layout_migration_us3_us6.py`、`test_memory_preservation.py`、`test_dispatch_injection_paths.py`、`test_init_new_layout.py`）与按 L-3 更新的既有测试全绿；全量套件相对 implement 入口的名字级失败基线零**新增**失败（既有红逐条点名、不声称全绿）。
 - DoD-5: plan.md § Mirror Obligations 逐行落地——触及的源文件镜像已再生成且逐字节一致；`sync-mirrors.py --check` 的漂移成员集相对 450-DIFF 基线**无新增成员**（scope 同步可顺带治愈成员，按成员集差值记录）；`regen-command-copies.py --check` exit 0；零手改镜像 / 副本。
 - DoD-6: 活引用封闭成立——按 L-5 的四文件允许集（墓碑行、退役根声明、anchor 迁移引擎、遗留残留扫描器）与三类产物面逐类比较，实测 = 声明（双向），类外零出现；四个变异演练（清单搬入未列文件 / 未列行）逐项转红并复原，读数落 `test-evidence/mutation-drill.md`。
 - DoD-7: dogfood 完成——`.specify/memory/` 不再存在；受跟踪条目全部位于新顶层存储；每个存储的迁移回执为 v2 逐 run 一文一件；`git log --follow` 可追溯被移动条目；本仓无引擎重建退役根。
-- DoD-8: `verification.md` 逐条记录 SC-001…SC-008 的状态、命令与证据指针；`final` 路径的 SC-001…SC-005 记 `pass` 并带 smoke 记录（`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=` 存在且非空）；dated record（`docs/reference/history/**`、`docs/decisions/**`、`.specify/specs/**`、`.specify/archive/**` 与记录型存储内既有条目）逐字未改。
+- DoD-8: `verification.md` 逐条记录 SC-001…SC-009 的状态、命令与证据指针；`final` 路径的 SC-001…SC-005 与 SC-009 记 `pass` 并带 smoke 记录（`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=` 存在且非空）；dated record（`docs/reference/history/**`、`docs/decisions/**`、`.specify/specs/**`、`.specify/archive/**` 与记录型存储内既有条目）逐字未改。
 
 **DoD Status**: pending
 
@@ -29,8 +29,8 @@
 
 - GATE-1: 任务文件结构合法 — check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/105-runtime-store-layout/tasks.md` exit 0（0 error；WARN 逐条裁定并记录）。
 - GATE-2: 跨产物一致 — check: `/usr/local/bin/python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/105-runtime-store-layout --stage tasks --repo .` 输出 `decision=pass` 且 errors=0（advisory 逐条裁定）。
-- GATE-3: 条款与 FR 覆盖 — check: `/usr/local/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout` 输出 `claimed clauses: 8` 且 `clause-uncovered` 的 beyond-baseline 为 0；`pre-analyze-check.py --stage tasks` 的 `runtime-stack-row` errors=0（每个 in-scope 运行时行的 FR 集至少被一个任务行引用）；本文件 Requirement Coverage Map 为 26/26。会计器的 `fr-uncovered` 车道按 6/26 如实报告（三份契约 `form=md-none` 的结构事实），不作通过判据。
-- GATE-4: final-path 成功判据 + smoke 记录 — check: `verification.md` 中 `**Path**` 为 `final` 的 SC-001…SC-005 全部 `pass`，且 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（存在且非空）齐备（条件集 owner：`shared/workflow/acceptance-hardening.md` § Gates）。
+- GATE-3: 条款与 FR 覆盖 — check: `/usr/local/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout` 输出 `claimed clauses: 8` 且 `clause-uncovered` 的 beyond-baseline 为 0；`pre-analyze-check.py --stage tasks` 的 `runtime-stack-row` errors=0（每个 in-scope 运行时行的 FR 集至少被一个任务行引用）；本文件 Requirement Coverage Map 为 27/27。会计器的 `fr-uncovered` 车道按 6/27 如实报告（三份契约 `form=md-none` 的结构事实），不作通过判据。
+- GATE-4: final-path 成功判据 + smoke 记录 — check: `verification.md` 中 `**Path**` 为 `final` 的 SC-001…SC-005 与 SC-009 全部 `pass`，且 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（存在且非空）齐备（条件集 owner：`shared/workflow/acceptance-hardening.md` § Gates）。
 - GATE-5: 全量套件零新增失败 — check: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --names-out <failed-list-file>` 的失败名集相对 implement 入口基线做 `comm -13` 为空（既有红逐条点名）。
 - GATE-6: 镜像与副本干净 — check: `python3 scripts/python/sync-mirrors.py --check` 的漂移成员集相对 `test-evidence/sync-mirrors-baseline.txt` 无新增成员；`python3 scripts/python/regen-command-copies.py --check` exit 0；触及镜像对 `cmp` 空输出。
 - GATE-7: 活引用封闭 + 退役根缺失 — check: `bash scripts/bash/run-tests.sh tests/contract/test_store_layout_live_refs.py -q` exit 0 且 `test ! -e .specify/memory`。
@@ -45,10 +45,10 @@
 
 ## Format: `[ID] [P?] [Story] Description`
 
-- **[P]**: 可与同阶段其它 `[P]` 行并行（写目标不同、无未完成依赖）。本文件的 `[P]` 只出现在写目标逐行不同的行：Foundational 的 T004 / T005，US1 的 T007 / T008，US5 的 T026 / T027 / T028 / T029。US3 的 T017 / T018 共用 `notes/red-first-evidence.md` 这一追加 sink，按行序串行故零 `[P]`（同 104 先例）；`validate-tasks.py` 对 T007 / T008 报告的 parallel-safe WARN 已按实际写目标裁定——T007 只写 `shared/definitions/framework-map.md`，行内的 `.specify/session/`、`.specify/knowledge/`、`.specify/memory/` 是墓碑行文本的引用，不是写目标；T008 才是创建这些目录的行。
+- **[P]**: 可与同阶段其它 `[P]` 行并行（写目标不同、无未完成依赖）。本文件的 `[P]` 只出现在写目标逐行不同的行：Foundational 的 T004 / T005，US1 的 T007，US5 的 T026 / T027 / T028 / T029。US3 的 T017 / T018 共用 `notes/red-first-evidence.md` 这一追加 sink，按行序串行故零 `[P]`（同 104 先例）。T008 不标 `[P]`（2026-11-25 裁定）：其写目标（`seed/`、`pyproject.toml`、`src/specify_cli/__init__.py`）与 T007（`shared/definitions/framework-map.md`）实际不相交，但 T007 的墓碑引文内含 `.specify/session/`、`.specify/knowledge/`、`.specify/memory/` 三个字面量，`validate-tasks.py` 的写目标分类器将它们计入写目标并与 T008 的行内目标重叠；按行序串行以保持零 parallel-safe WARN。
 - **[Story]**: 用户故事标签（`[US1]`…`[US6]`），只出现在用户故事阶段的任务行；Setup / Foundational / Polish 阶段零 `[US` 标记。
 - **[blockedBy: T001,T002]**: 显式依赖标签；被列任务全部 `[X]` 前不得开始本行。仅阶段顺序关系时不写。
-- **[green: <contract>#<clause>]**: 绿点认领。本特性 `[green:]` 只用于 `contracts/store-layout.contract.md` 的机器可判定条款（C-1…C-8）：C-1→T003、C-2/C-3→T007、C-7→T009、C-4→T023、C-5→T030、C-6→T032、C-8→T040。C-7 的认领行先于 C-4/C-5/C-6，因而按实现顺序保留一条 green-cross-phase WARN（C-7 的绿点是 init，早于 US4 / US5；不为消警而改认领行）；M / P / L 条款只以条款号引用。分区结果由 `validate-tasks.py` 的四项 green 检查与 `account-clause-coverage.py` 共同核对。
+- **[green: <contract>#<clause>]**: 绿点认领。本特性 `[green:]` 只用于 `contracts/store-layout.contract.md` 的机器可判定条款（C-1…C-8）：C-1→T003、C-2/C-3→T007、C-4→T023、C-5→T030、C-6→T032、C-7→T038、C-8→T040。认领行序与条款序号单调一致，零 green-cross-phase WARN；C-7 的绿点落在验收证据包 T038（全新初始化的机器绿由 SC-005 实测读数收口，US1 的 T009 只做测试转绿与取证，不冒充最终绿点）。M / P / L 条款只以条款号引用（含 M-10）。分区结果由 `validate-tasks.py` 的四项 green 检查与 `account-clause-coverage.py` 共同核对。
 - 每行必须单行完成（含文件路径与全部标签），不得换行续写。
 
 ### Task State Sigil (REQUIRED)
@@ -67,10 +67,11 @@
 
 | Premise | Re-derivation command | Real output |
 |---------|-----------------------|-------------|
-| 需求条目计数（FR / SC / STR） | `grep -cE '^\- \*\*FR-[0-9]+\*\*:' .specify/specs/105-runtime-store-layout/requirements.md`；同法 `SC-`；`grep -cE '^\| \`STR-[0-9]+\`' …/requirements.md` | **26 / 8 / 6** |
-| 契约条款数（逐文件） | `grep -cE '^## [CMPL]-[0-9]+' .specify/specs/105-runtime-store-layout/contracts/*.md` | store-layout **8**（C-1…C-8）/ migrate **9**（M-1…M-9）/ memory **6**（P-1…P-6）/ live-refs **8**（L-1…L-8）；合计 **31**。**陷阱形**：`grep -c 'C-'` 会把正文引用一起算入，计量单位是行首 `##` 条款定义行 |
-| 机器可判定条款形式 | `/usr/local/bin/python3 .specify/scripts/python/clause_extract.py .specify/specs/105-runtime-store-layout/contracts/*.md` | 仅 `store-layout.contract.md` 为 `form=md-heading clauses=8`；其余三份 `form=md-none clauses=0`（M / P / L 前缀不属 clause-syntax owner 的 C- 形式） |
-| 计划工作包计数 | `grep -cE '^\| WP[0-9]+' .specify/specs/105-runtime-store-layout/plan.md` | **15**（WP01…WP15） |
+| 需求条目计数（FR / SC / STR） | `grep -cE '^\- \*\*FR-[0-9]+\*\*:' .specify/specs/105-runtime-store-layout/requirements.md`；同法 `SC-`；`grep -cE '^\| \`STR-[0-9]+\`' …/requirements.md` | **27 / 9 / 6**（2026-11-25 addendum 复测：FR-027、SC-009 已加入，既有 ID 未重编号） |
+| 契约条款数（逐文件） | `grep -cE '^## [CMPL]-[0-9]+' .specify/specs/105-runtime-store-layout/contracts/*.md` | store-layout **8**（C-1…C-8）/ migrate **10**（M-1…M-10）/ memory **6**（P-1…P-6）/ live-refs **8**（L-1…L-8）；合计 **32**。**陷阱形**：`grep -c 'C-'` 会把正文引用一起算入，计量单位是行首 `##` 条款定义行 |
+| 机器可判定条款形式 | `/usr/local/bin/python3 .specify/scripts/python/clause_extract.py .specify/specs/105-runtime-store-layout/contracts/*.md` | 仅 `store-layout.contract.md` 为 `form=md-heading clauses=8`；其余三份 `form=md-none clauses=0`（M / P / L 前缀不属 clause-syntax owner 的 C- 形式；新增 M-10 不改变该形式） |
+| 计划工作包计数 | `grep -cE '^\| WP[0-9]+' .specify/specs/105-runtime-store-layout/plan.md` | **15**（WP01…WP15）；FR-027/SC-009 由 WP12/WP15 承载，未新增 WP |
+| 不兼容变更清点计数 | `grep -cE '^\| BC[0-9]+' .specify/specs/105-runtime-store-layout/plan.md` | **18**（BC01…BC18：14 迁移 + 容器 + `draft` + 种子命名空间 + 维度集扩展） |
 | quickstart 场景数 | `grep -c '^## Scenario' .specify/specs/105-runtime-store-layout/quickstart.md` | **9**（S-0…S-8） |
 | 9 个新文件当前状态 | 逐个 `test -e`（3 个 contract 测试 + 5 个 integration 测试 + 1 个 fixture builders） | 9/9 **ABSENT**（红先的前提） |
 | 编辑目标与守卫在位 | 逐个 `test -e`（`src/specify_cli/__init__.py`、`shared/declarations/{contract.yaml,facts/memory-types.yaml,facts/non-disposable-review-surface.yaml,exclusions/no-machine-fact.yaml}`、`shared/definitions/framework-map.md`、`scripts/python/*` 17 个引擎 + `scripts/bash/create-new-tools.sh`、`templates/commands/migrate.md`、三份 ignore 模板、`.specify/.gitignore`、`pyproject.toml`、`memory/` 包内种子、`.specify/instructions.md`、`.specify/glossary.md`、`tests/contract/test_migrate_engine_contract.py`、`tests/unit/test_migrate_planner.py`） | 21/21 **OK**；`.specify/tools/` **ABSENT**（生成清单尚未生成）；包内种子 `memory/` 4 条目（`constitution.md`、`features.md`、`session/`、`knowledge/`） |
@@ -79,7 +80,7 @@
 | 镜像与副本基线 | `python3 scripts/python/sync-mirrors.py --check`；`python3 scripts/python/regen-command-copies.py --check` | `sync-mirrors` rc **2**、**450 DIFF**、0 MISS / 0 ORPHAN；`regen` rc **0**（`OK: all per-tool command copies match the source templates.`） |
 | 忽略规则现状 | `git check-ignore -v .specify/memory/sanitize/findings.json .specify/memory/trigger/telemetry.jsonl .specify/tools/system.json` | `.specify/.gitignore:23:memory/sanitize/`、`:27:memory/trigger/telemetry.jsonl`、`:16:tools/`（三处均需在同一变更内改到新路径 / 收窄） |
 | 条款覆盖基线 | `/usr/local/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout --freeze > .specify/specs/105-runtime-store-layout/coverage-baseline.txt` | 已冻结：**787** 行、`base-sha: 464ef0f045c4`、`files: 322 (parsed 214 + named 108)` |
-| 条款覆盖改后读数（生成时） | `/usr/local/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout` | `claimed clauses 8`；`clause-uncovered pass (785) — 0 beyond the frozen baseline`；`coverage-baseline-delta pass (0)`；`fr-uncovered fail (20) — 6 of 26 cited from citation groups`（三份契约 `form=md-none` 的结构事实，按 DoD-3 / GATE-3 如实报告、不作通过判据） |
+| 条款覆盖改后读数（生成时） | `/usr/local/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/105-runtime-store-layout` | `claimed clauses 8`；`clause-uncovered pass (785) — 0 beyond the frozen baseline`；`coverage-baseline-delta pass (0)`；`fr-uncovered fail (21) — 6 of 27 FRs cited from citation groups`（三份契约 `form=md-none` 的结构事实，FR-027 不落在任何 C 条款 citation group；按 DoD-3 / GATE-3 如实报告、不作通过判据）；FR universe **27**（2026-11-25 addendum 复测） |
 | flow-class 判定 | `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:105-runtime-store-layout"` | `flow_class: execution`、`source: declaration`、rc **0** |
 
 ## Requirement Coverage Map
@@ -112,8 +113,9 @@
 | FR-024 | T002、T011、T017、T018、T021、T025、T035 | | |
 | FR-025 | T002、T019 | | |
 | FR-026 | T020、T033、T037、T039 | | |
+| FR-027 | T016、T042、T043 | SC-009 | T016、T042、T043 |
 
-**SC 路径读数**：SC-001…SC-005 为 `final`；SC-006…SC-008 为 `supporting`（owner：`requirements.md` § Success Criteria）。supporting 判据按其实测基线报告，不冒充 final 门禁。
+**SC 路径读数**：SC-001…SC-005 与 SC-009 为 `final`；SC-006…SC-008 为 `supporting`（owner：`requirements.md` § Success Criteria）。supporting 判据按其实测基线报告，不冒充 final 门禁。
 
 ## Work Package → Task Map (15/15 preserved)
 
@@ -122,10 +124,10 @@
 | WP01 | T002、T003、T007 | WP09 | T015 |
 | WP02 | T004、T005 | WP10 | T026、T027、T028、T030 |
 | WP03 | T017、T018、T019、T020 | WP11 | T031、T032 |
-| WP04 | T021、T022、T024 | WP12 | T002、T011、T017、T018、T021、T025、T032、T035 |
+| WP04 | T021、T022、T024 | WP12 | T002、T011、T017、T018、T021、T025、T032、T035、T042 |
 | WP05 | T006、T008、T009 | WP13 | T010、T034、T035 |
 | WP06 | T021、T023、T024 | WP14 | T033 |
-| WP07 | T010、T011、T012、T016 | WP15 | T037、T038、T039、T040、T041 |
+| WP07 | T010、T011、T012、T016 | WP15 | T037、T038、T039、T040、T041、T043 |
 | WP08 | T013、T014、T016 | | |
 
 ## Phase 1: Setup (Shared Infrastructure)
@@ -162,8 +164,8 @@
 ### Implementation for User Story 1
 
 - [ ] T007 [P] [US1] [blockedBy: T003] 在 `shared/definitions/framework-map.md` 为 14 个顶层存储各写一行（owner / 生命周期 / 内容类别，指针到 owner 文档而非复述规则），并把 `.specify/memory/` 写成唯一墓碑行（A-2 措辞：历史 catch-all 桶；已退役；agent 语境记忆由 `.specify/session/` 与 `.specify/knowledge/` 承载；任何引擎 MUST NOT 视其为活存储）。 [green: contracts/store-layout.contract.md#C-2] [green: contracts/store-layout.contract.md#C-3]
-- [ ] T008 [P] [US1] [blockedBy: T003] 落地包内种子与 init 播种：包内 `memory/` 改名为 `seed/`（保留两个锚点与 `session/`、`knowledge/` 占位）；`pyproject.toml` force-include 同步；`src/specify_cli/__init__.py` 的 `copy_local_templates` 播种 `.specify/session/` + `.specify/knowledge/` 且不创建 `.specify/memory/`、`_CORE_SPECIFY_ASSETS` 以两记忆 tier 替换 `.specify/memory` 项、`rewrite_paths()` 移除通用 `memory` 段与 `memory/<anchor>` 特例、`migrate_placeholder_dir()` 指向种子目录、`features_dir` 注释修正；检测到旧内容时原地保留并指向 `specify migrate`（C-7，FR-013 执行者裁定；FR-017、FR-019）。
-- [ ] T009 [US1] [blockedBy: T006,T007,T008] US1 转绿与取证：以唯一入口运行 `tests/integration/test_init_new_layout.py` 与运行 `tests/contract/test_runtime_store_layout.py`——清单 / 声明 / 地图 / 墓碑函数全绿，允许残余失败只限 `test_repo_has_no_retired_root` 与 `test_mirror_member_set`（待 US5）；逐函数结果与 init 树清单写入 `notes/red-first-evidence.md`（FR-017） [green: contracts/store-layout.contract.md#C-7]。
+- [ ] T008 [US1] [blockedBy: T003] 落地包内种子与 init 播种：包内 `memory/` 改名为 `seed/`（保留两个锚点与 `session/`、`knowledge/` 占位）；`pyproject.toml` force-include 同步；`src/specify_cli/__init__.py` 的 `copy_local_templates` 播种 `.specify/session/` + `.specify/knowledge/` 且不创建 `.specify/memory/`、`_CORE_SPECIFY_ASSETS` 以两记忆 tier 替换 `.specify/memory` 项、`rewrite_paths()` 移除通用 `memory` 段与 `memory/<anchor>` 特例、`migrate_placeholder_dir()` 指向种子目录、`features_dir` 注释修正；检测到旧内容时原地保留并指向 `specify migrate`（C-7，FR-013 执行者裁定；FR-017、FR-019）。
+- [ ] T009 [US1] [blockedBy: T006,T007,T008] US1 转绿与取证：以唯一入口运行 `tests/integration/test_init_new_layout.py` 与运行 `tests/contract/test_runtime_store_layout.py`——清单 / 声明 / 地图 / 墓碑函数全绿，允许残余失败只限 `test_repo_has_no_retired_root` 与 `test_mirror_member_set`（待 US5）；逐函数结果与 init 树清单写入 `notes/red-first-evidence.md`（FR-017）；C-7 的 `[green:]` 归 T038（全新初始化的最终绿以 SC-005 实测读数收口）。
 
 **Checkpoint**: US1 独立可验——声明、地图、墓碑与全新初始化成立；旧根缺失与镜像读数的收口在 US5 的 dogfood / 再生成之后。
 
@@ -275,13 +277,16 @@
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-**Purpose**: quickstart 实跑、逐 SC 的验收证据包、非目标审计与最终门禁——跨故事、不可提前的收尾面。
+**Purpose**: quickstart 实跑、逐 SC 的验收证据包、非目标审计与最终门禁——跨故事、不可提前的收尾面；FR-027/SC-009 的清点守卫与证据（2026-11-25 用户追加要求）在本阶段追加，不新增 WP。
 
 - [ ] T037 [blockedBy: T033,T036] quickstart 实跑记录：执行 `quickstart.md` S-0 的三条基线命令与 S-7 的 dogfood 复核命令并贴真实输出；S-1…S-6、S-8 是 route-b 场景，逐条指向其钉住测试并声明该读法；落盘 `notes/quickstart-run.md`（含 teardown：只删除 `.specify/.tmp/quickstart-105/` 自建目录）（FR-026）。
-- [ ] T038 [blockedBy: T037] 验收证据包：写 `test-evidence/acceptance-105.md` 逐条记录 SC-001…SC-008 的状态、测量命令、真实输出与证据指针（SC-001 的基线 `git ls-tree` 与迁移后 `test ! -d`、SC-004 的三形态读数、SC-006 的允许集双向读数、SC-007 的成员集差值、SC-008 的 `git check-ignore` 夹具）；final / supporting 路径标注与 `requirements.md` 一致。
-- [ ] T039 [blockedBy: T038] `verification.md`：写逐 SC 状态行（SC-001…SC-005 `pass`，SC-006…SC-008 按实测 supporting 读数）、`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（指向存在的证据文件）与 `deferred_tasks=`（无 `[~]` 时为空）；不伪造未测读数。
+- [ ] T038 [blockedBy: T037] 验收证据包：写 `test-evidence/acceptance-105.md` 逐条记录 SC-001…SC-008 的状态、测量命令、真实输出与证据指针（SC-001 的基线 `git ls-tree` 与迁移后 `test ! -d`、SC-004 的三形态读数、SC-006 的允许集双向读数、SC-007 的成员集差值、SC-008 的 `git check-ignore` 夹具）；final / supporting 路径标注与 `requirements.md` 一致；SC-009 行由 T043 追加（C-7 的机器绿以本行记录的 SC-005 实测读数收口）。 [green: contracts/store-layout.contract.md#C-7]
+- [ ] T039 [blockedBy: T038] `verification.md`：写逐 SC 状态行（SC-001…SC-005 `pass`，SC-006…SC-008 按实测 supporting 读数；SC-009 的 final pass 行与 smoke 记录由 T043 追加）、`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（指向存在的证据文件）与 `deferred_tasks=`（无 `[~]` 时为空）；不伪造未测读数。
 - [ ] T040 [blockedBy: T032,T033] 非目标与零第二机制审计：断言零新增存储引擎 / 注册表 / 调度器 / 第二上下文注入机制、零新增第三方依赖（`pyproject.toml` 未新增 runtime 依赖）、条目格式与写入协议不变（055 协议）、`draft/` 无新家、`git-workflow.md` 未改写；把命令、真实输出与结论写入 `test-evidence/non-goals-audit.md`。 [green: contracts/store-layout.contract.md#C-8]
-- [ ] T041 [blockedBy: T039,T040] 最终门禁：以 `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --names-out <failed-list-file>` 跑全量套件并与 implement 入口基线做 `comm -13`（既有红逐条点名、零新增）；`sync-mirrors.py --check` 成员集对比、`regen-command-copies.py --check`、`test_store_layout_live_refs.py`、`test ! -e .specify/memory` 与 `grep -cE '^- \[[ >]\]' tasks.md` 逐项复验；命令与读数写入 `notes/red-first-evidence.md`。
+> FR-027/SC-009 与 plan § Backward-Incompatible Change Inventory 是 2026-11-25 的用户追加要求（记录见 `requirements.md` § Clarifications 末节）：T042 / T043 以新 ID 追加、既有任务不重编号；最终门禁 T041 排在其后执行，以覆盖新增守卫与证据。
+- [ ] T042 [blockedBy: T016] FR-027/SC-009 清点守卫（migration/regression 例外）：在 `tests/contract/test_runtime_store_layout.py` 增加 `test_backward_incompatible_inventory_is_closed`——按 plan § Backward-Incompatible Change Inventory 断言（a）Store Inventory 中处置为 relocate / retire / retired-container 的行各被恰好一条 BC 行引用（集合 {#1…#15, #17}）；（b）每行 behavior ∈ 闭集 `migrate:relocate` / `migrate:container-pass` / `migrate:refuse:<M-5 token>` / `compatibility-bridge` / `no-workspace-object`，且 refuse token 存在于 M-5 表；（c）每行证据指针解析到存在的测试路径、证据文件或任务 ID；（d）禁用词 `manual` / `docs-only` / `fallback` / `runtime-fallback` / `todo` 零出现；执行变异演练（删一行 / 把一条 behavior 改为禁用词）使测试转红并复原，读数写入 `notes/red-first-evidence.md`。
+- [ ] T043 [blockedBy: T042,T038,T039] SC-009 验收证据：把 T016 / T035 的迁移读数（每个 store 的 dry-run 零写入、`--apply` 逐字节移动、dual / residue 拒绝）与 T042 的守卫输出汇总为 `test-evidence/acceptance-105.md` 的 SC-009 行，并向 `verification.md` 追加 `SC-009` 的 final pass 行及 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（指向存在的证据文件）；不伪造未测读数。
+- [ ] T041 [blockedBy: T039,T040,T043] 最终门禁：以 `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --names-out <failed-list-file>` 跑全量套件并与 implement 入口基线做 `comm -13`（既有红逐条点名、零新增）；`sync-mirrors.py --check` 成员集对比、`regen-command-copies.py --check`、`test_store_layout_live_refs.py`、`test_runtime_store_layout.py`（含 BC 清点守卫）、`test ! -e .specify/memory` 与 `grep -cE '^- \[[ >]\]' tasks.md` 逐项复验；命令与读数写入 `notes/red-first-evidence.md`。
 
 ---
 
@@ -292,7 +297,7 @@
 - **Setup (Phase 1)**: 无依赖——T001 先落基线。
 - **Foundational (Phase 2)**: 依赖 Setup；声明与引擎根常量完成后才允许任何故事的实现行；T004 / T005 可并行。
 - **User Stories (Phase 3–8)**: 均依赖 Foundational；按 P1（US1 → US2 → US3）→ P2（US4 → US5）→ P3（US6）推进；跨故事的显式依赖由 `[blockedBy:]` 承载，不靠阶段顺序猜测。
-- **Polish (Phase 9)**: 依赖全部用户故事与 dogfood 完成（镜像 / 副本再生成与全量套件必须在全部源编辑之后）。
+- **Polish (Phase 9)**: 依赖全部用户故事与 dogfood 完成（镜像 / 副本再生成与全量套件必须在全部源编辑之后）。FR-027/SC-009 追加行把收尾顺序固定为 T038 → T039 → T042 → T043 → T041：T042 依赖 US2 的 T016，T043 依赖 T042 / T038 / T039，最终门禁 T041 在 T043 之后执行。
 
 ### User Story Dependencies
 
@@ -306,7 +311,7 @@
 ### Within Each User Story
 
 - 新行为测试先写并确认失败 → 实现 → 转绿取证；US6 的回归守卫按例外置于实现之后，红能力由变异演练证明。
-- 同一文件的多行严格按行序串行：`src/specify_cli/__init__.py`（T008 → T012 → T013 → T014）、`shared/definitions/framework-map.md`（T007）、`scripts/python/sanitize-utils.py`（T005 → T022 → T026）、`tests/fixtures/store-layout-105/builders.py`（T010 → T034）。
+- 同一文件的多行严格按行序串行：`src/specify_cli/__init__.py`（T008 → T012 → T013 → T014）、`shared/definitions/framework-map.md`（T007）、`scripts/python/sanitize-utils.py`（T005 → T022 → T026）、`tests/fixtures/store-layout-105/builders.py`（T010 → T034）、`tests/contract/test_runtime_store_layout.py`（T002 → T042）。
 - 每个故事以 `**Checkpoint**` 收口，独立可验后再进入下一故事。
 
 ### Parallel Opportunities
@@ -356,7 +361,8 @@ Task: "运行期指南再生成与 glossary 更新（T030）→ 镜像 / 副本�
 
 - [P] 任务 = 不同写目标、无未完成依赖；共享 sink（`notes/red-first-evidence.md`）不算并行面。
 - Story 标签只用于用户故事阶段行，便于按故事追踪；Setup / Foundational / Polish 零 `[US` 标记。
-- 契约条款分区：8 条机器可判定 C 条款各被一行 `[green:]` 认领；M / P / L 共 23 条以条款号引用（理由见 DoD-3），不声称机器可判定的全覆盖。
+- 契约条款分区：8 条机器可判定 C 条款各被一行 `[green:]` 认领；M / P / L 共 24 条以条款号引用（理由见 DoD-3），不声称机器可判定的全覆盖。
+- FR-027/SC-009 的清点守卫（T042）按 migration/regression 例外以变异演练证明红能力，与 US6 同一纪律；它守的是 plan 的封闭清点与 T016 已交付的迁移行为，不冒充红先。
 - 既有守卫的名字级基线由 `/speckit.implement` 的 Step 0 重采（owner：`.specify/skills/internal/implement-feature/SKILL.md` § Test runs），本文件不复述比较形式。
 - dated record 的旧路径提及是历史事实，不是活引用；活引用守卫的允许集是封闭的四文件，任何新增必须修订 `contracts/live-reference-migration.contract.md` L-5 与本文件 T025 的钉住副本。
 - plan-owned 面无任务行主动编辑；若实现中确需小修，按 DoD-3 的同一披露纪律逐项声明；实质性改动停线回抛。

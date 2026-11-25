@@ -1,0 +1,7 @@
+# decomposition-check.py — mode=tasks (addendum reconciliation)
+# captured 2026-11-25T03:41:04Z (UTC) on branch: 105-runtime-store-layout at HEAD dfa3153fa (working tree)
+# command: /usr/local/bin/python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/105-runtime-store-layout/requirements.md --tasks .specify/specs/105-runtime-store-layout/tasks.md
+
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 27, "task_count": 43, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-25T03:41:04Z"}
+
+exit: 0

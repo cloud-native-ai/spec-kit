@@ -1,0 +1,6 @@
+# validate-tasks.py — .specify/specs/105-runtime-store-layout/tasks.md
+# captured 2026-11-25T03:41:04Z (UTC) on branch: 105-runtime-store-layout at HEAD dfa3153fa (working tree)
+# command: python3 .specify/scripts/python/validate-tasks.py .specify/specs/105-runtime-store-layout/tasks.md
+
+PASS: .specify/specs/105-runtime-store-layout/tasks.md — 0 error(s), 0 warning(s)
+exit: 0

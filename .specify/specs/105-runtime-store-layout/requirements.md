@@ -6,7 +6,7 @@
 **Flow Class**: execution
 **Flow Type**: -
 **Readers**: 框架维护者（修订引擎路径常量、`templates/`、`skills/`、`shared/`、安装/迁移 CLI、`.specify/glossary.md` 与 `docs/**` 的作者）与下游项目维护者（升级后需要判定「我的运行期数据去哪了、memory 目录还剩什么、哪条路径才是权威」）
-**Reading scenario**: 当需要判定「每个 `.specify/memory/*` 子目录的最终归属」「`.specify/memory/` 本身是否仍存在及其唯一含义」「临时记忆（session 层）与 super agent→sub agent 上下文注入是否保持原行为」「既有客户项目的数据如何迁移、何时拒绝而不是静默并存」「新顶层目录由谁拥有、如何登记、是否被忽略」「如何确定性验收」时打开本规格，据 FR-001…FR-026 与 SC-001…SC-008 放行 `/speckit.clarify` 与后续规划
+**Reading scenario**: 当需要判定「每个 `.specify/memory/*` 子目录的最终归属」「`.specify/memory/` 本身是否仍存在及其唯一含义」「临时记忆（session 层）与 super agent→sub agent 上下文注入是否保持原行为」「既有客户项目的数据如何迁移、何时拒绝而不是静默并存」「新顶层目录由谁拥有、如何登记、是否被忽略」「每个向后不兼容变更由哪条迁移/拒绝行为收口」「如何确定性验收」时打开本规格，据 FR-001…FR-027 与 SC-001…SC-009 放行 `/speckit.clarify` 与后续规划
 **Input**: User description: "需要启动一个无人值守开发流程, 将 session/、knowledge/、feedback/、evidence/ 等 runtime store 也从memory目录中移到上层, 让memory目录就仅仅是服务于agent语境下的"记忆"而不是人类语境下的"一切需要记住的东西", 这对之前开发的临时记忆系统和super agent向sub agent动态注入上下文机制很关键."
 
 **输入校正**：①「移到上层」读作迁到 `.specify/` **顶层**、成为一等存储根（`.specify/<store>/`），不是再套一层分组目录；②「memory目录」指当前作为 catch-all 容器的 `.specify/memory/`，其去留由 A-2 裁定；③「临时记忆系统」按源码实测对应 memory 系统的 **session 层**（短期/可遗忘；`memory-types` 闭集为 `session`、`knowledge`；`run-determination` 经 memory 引擎把判定记录持久化进 session），仓内不存在另一个独立的「临时记忆」组件；④「super agent向sub agent动态注入上下文机制」读作既有派发载荷契约（七字段下行 / 四项注入 / 五要素上行，owner：`shared/definitions/superagent-definitions.md`）加子代理可声明的 `memory-recall` 检索，不是第二套机制；本特性只改其存储路径，不改契约语义。
@@ -80,6 +80,7 @@
 1. **Given** 一个只有旧布局数据的夹具项目，**When** 执行迁移，**Then** 每个已知存储的内容移动到对应新顶层路径，条目逐字节一致，回执按 run 记录，旧根在迁移完成后为空并被移除。
 2. **Given** 同一存储的旧位置与新位置都含非空内容，**When** 执行迁移，**Then** 迁移拒绝自动合并，输出两侧路径与修复入口，不移动、不覆盖、不删除任何一侧的数据。
 3. **Given** 迁移已成功一次，**When** 再次执行迁移，**Then** 判定为已收敛（no-op），不产生重复条目、不重建旧根。
+4. **Given** plan 的 § Backward-Incompatible Change Inventory，**When** 逐行执行 `/speckit.migrate` 的 dry-run 与 apply/refuse 并运行清点守卫，**Then** 每一行都产出其具名结局（`migrate:relocate` / `migrate:container-pass` / `migrate:refuse:*` / `compatibility-bridge` / `no-workspace-object`）与证据指针；任一未映射、未迁移或依赖运行时回退 / 人工说明的行使守卫转红（FR-027、SC-009）。
 
 ---
 
@@ -205,6 +206,7 @@
 - **FR-024**: 契约测试 MUST 钉住：每个引擎在新根上的往返；退役根在活引用面之外零出现（允许集被守卫测试钉住，见 SC-006）；迁移三种形态（仅旧 / 并存拒绝 / 幂等重跑）；记忆记录→召回；派发注入夹具；全新初始化布局；忽略与跟踪的拆分（`tools/`）；模板与已安装副本一致。
 - **FR-025**: 并发写安全 MUST 保持：每个存储仍是每条目一文件、派生索引即读即建；MUST NOT 引入共享可变聚合；每个新存储 MUST 有一个「两写入者产生不同路径」的模拟测试。
 - **FR-026**: 验收 MUST 证明**行为保持**而不只是路径存在：记忆记录→召回、feedback 记录→打包/接收链路的路径、evidence 车道读取 feedback、exec-quant 收集、trigger 求值、retention 车道、`run-determination` 持久化、以及一次派发上下文注入场景，全部在新路径下各跑一次并留证。
+- **FR-027**: 本特性引入的每一个**向后不兼容变更**（使既有工作区在新版本下的路径或行为不再成立的变更）MUST 在 `/speckit.migrate` 中拥有可执行迁移逻辑，或在迁移不安全处给出确定性拒绝；MUST NOT 只依赖运行时双路径回退或人工操作说明。plan MUST 维护一份**封闭的向后不兼容变更清点**（`plan.md` § Backward-Incompatible Change Inventory），与 § Store Inventory 逐行对应，并覆盖本特性交付的全部路径/契约断点（至少含容器退役、包内种子命名空间改名与 tools 记录/清单分裂）；清点中的每一行 MUST 具名其迁移/拒绝行为（闭集：`migrate:relocate`、`migrate:container-pass`、`migrate:refuse:<M-5 token>`、`compatibility-bridge`、`no-workspace-object`）与证据指针。`no-workspace-object` 只允许用于不进入任何工作区的包内资产命名空间，且其工作区可见后果 MUST 由对应的 store 行与全新初始化夹具覆盖；任何工作区状态变更 MUST NOT 归入该类。清点中任一未映射、未迁移或依赖回退/人工说明的行 MUST 使 FR-027 的守卫测试转红。
 
 ### Key Entities *(include if requirement involves data)*
 
@@ -266,6 +268,7 @@
 - **SC-006**: 活引用面零旧路径：以基线提交 `23938f22e` 加实现起点捕获的允许集为参照，按**产物类**比较（框架源类：`templates/`、`skills/`、`shared/`、`scripts/`、`src/`；运行期指南类：`.specify/instructions.md`、`.specify/glossary.md`；现行文档类：`docs/**` 除 `docs/reference/history/**` 与 `docs/decisions/**`），每类对旧路径字面量 [[STR-001]] 的出现文件集合 MUST 等于声明的允许集（墓碑行、迁移引擎与其契约测试、遗留残留扫描器——该允许集由守卫测试钉住并断言实测 = 声明）；允许集之外的产物 MUST 零出现，允许集之内 MUST 只以墓碑/迁移语境出现。**Path**: supporting
 - **SC-007**: 镜像与副本干净：`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 均 rc 0；严格镜像对逐字节一致，相对基线无新增漂移。**Path**: supporting
 - **SC-008**: 忽略与跟踪各归其位：`.specify/.gitignore` 模板与已安装副本逐字节一致；基线中被忽略的运行期路径在各自新位置仍被忽略、被跟踪的存储条目仍被跟踪；[[STR-006]] 下 `*.md` 被跟踪、生成 `*.json` 被忽略。**Path**: supporting
+- **SC-009**: 向后不兼容变更闭包：plan § Backward-Incompatible Change Inventory 的每一行都映射到一条**被测试的**迁移/拒绝行为；任一 Store Inventory 状态变更行未被映射、或任一映射缺少证据读数，守卫测试 MUST 转红；对全部映射的 store 变更，`/speckit.migrate` 的 dry-run 零写入与 `--apply` 行为 MUST 被演示并留证。**Path**: final
 
 ### Measurement Sources & Collection Methods
 
@@ -277,6 +280,7 @@
 - **SC-006 Source**: 仓内扫描（按类枚举出现文件集合）+ 守卫测试的允许集断言。实现与 review 各一次；扫描命令与输出存证。
 - **SC-007 Source**: 两个 `--check` 命令的 rc 与输出；严格镜像对的 `cmp` 结果。实现与 review 各一次。
 - **SC-008 Source**: `git check-ignore -v` 夹具；模板与已安装副本的 `cmp`。实现一次。
+- **SC-009 Source**: `tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed` 的清单 / 行为闭集 / 证据指针断言与变异演练；M-8 夹具套件的 dry-run 零写入与 `--apply` 读数（legacy / dual / residue）。读数写入 `test-evidence/acceptance-105.md` 的 SC-009 行。实现与 review 各一次。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 
@@ -308,3 +312,14 @@
 - Q: 一次性迁移的执行者是 `specify init` 刷新还是 `specify migrate`（FR-013 原文「和/或」）？ → A: 数据搬迁唯一执行者 = `specify migrate`（plan → apply → archive-first → 回执）；`specify init` 只播种新布局/刷新资产并跳过旧内容，检测到旧存储内容时原地保留并指向 `specify migrate`；已落为 FR-013 的执行者裁定。
 - Q: A-7/FR-015 的「新位置含非空内容」如何对待忽略生成物与安装器占位？ → A: 冲突判定只统计各存储的权威条目；机器可再生且被忽略的生成物（如 `.specify/tools/*.json`）与安装器播种占位/锚点不构成冲突内容，迁移照常执行且不覆盖、不删除它们；已落为 A-7 的口径句与 FR-015 的引用。
 - Q: A-16 的「Runtime Store」词汇表条目何时落地、如何确认？ → A: 实现阶段产出提议文本并留在 run 证据/笔记；未经用户确认不写入 `.specify/glossary.md`；FR-021 的既有活路径更新先行；无验收标准依赖该词条，无人值守运行不因等待确认而阻塞。
+
+### Session 2026-11-25（无人值守 tasks 阶段，用户追加要求：不兼容变更的迁移闭包）
+
+**原始追加（逐字）**：
+
+> 需要将所有不向前兼容的修改都在speckit.migrate命令中添加迁移逻辑
+
+- Q: 「不向前兼容的修改」如何解读？ → A: 读作**向后不兼容变更**（backward-incompatible change）：使既有工作区在新版本下的路径或行为不再成立的变更。逐项为 Store Inventory 的 14 个迁移行、容器退役、`draft/` 退役、tools 记录/清单分裂、包内种子命名空间改名（`memory/` → `seed/`）与 migrate 维度集扩展（五 token 闭集 → 六 token）。解读落为 FR-027 与 SC-009，不重编号既有 FR/SC。
+- Q: 哪些变更必须由 `/speckit.migrate` 承担？ → A: 凡涉及工作区状态的变更（存储路径、容器、记录/清单分裂）都由 `store-layout` 维度执行（`migrate:relocate` / `migrate:container-pass`）或按 M-5 封闭词表确定性拒绝；不进入任何工作区的包内资产命名空间以 `no-workspace-object` 登记，其工作区可见后果由对应的 store 行与全新初始化夹具覆盖。两类都不允许以运行时双路径回退或人工操作说明替代（与 A-8、FR-013 的执行者裁定一致且更严格）。
+- Q: 迁移不安全的形态如何处理？ → A: 复用 M-5 的封闭拒绝词表（`dual-content`、`unknown-residue`、`symlink-source`、`symlink-target`、`permission-denied`、`path-collision:<relpath>`）；拒绝是终态（run `blocked`，exit 3），数据原地保留、两侧路径点名，不回退、不静默跳过、不以「新建空存储」冒充成功。
+- Q: 与 097 既有结构的衔接？ → A: 不新建迁移引擎；第六维 `store-layout` 复用既有 plan → apply → archive-first → 回执；旧 v1 回执继续作为续跑输入（`compatibility-bridge`），两个 097 维度 pin 测试改为「前缀保持 + 六 token 全集」守卫（M-1 / M-6 / M-10）。

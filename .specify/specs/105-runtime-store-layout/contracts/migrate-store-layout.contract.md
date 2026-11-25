@@ -1,6 +1,6 @@
 # Contract — `specify migrate` store-layout dimension
 
-**Spec**: `requirements.md` FR-013…FR-016, FR-024, FR-026 · **Plan**: `plan.md` WP07/WP08/WP09/WP13 · **Date**: 2026-11-25
+**Spec**: `requirements.md` FR-013…FR-016, FR-024, FR-026, FR-027 · **Plan**: `plan.md` WP07/WP08/WP09/WP13 · **Date**: 2026-11-25
 
 The migration reuses the existing `specify migrate` structure: dry-run plan → single `--apply` authorization → archive-first execution → per-run receipt → deterministic outcomes. This contract defines the added dimension and every decision the planner/executor must make. It does not restate the six-value disposition domain, the outcome/exit-code table, or the archive-first criterion (owners: `097 requirements` FR-014/FR-019, `.specify/shared/guidelines/confirmation-gates.md`).
 
@@ -109,3 +109,12 @@ Each reading MUST have a red-ability drill: a mutation that removes the guard (e
 ## M-9 Outcome mapping
 
 The existing outcome/exit-code table applies unchanged: `clean` 0 / `planned` 1 / `applied` 0 / `blocked` 3 / input error 2. A `store-layout` `refuse` or `blocked` makes the run `blocked` (3). The plan summary and text output list the new dimension and its items without changing the envelope.
+
+## M-10 Backward-incompatible change closure (FR-027 / SC-009)
+
+- **Closed inventory.** The plan's `## Backward-Incompatible Change Inventory` is the closed list of this feature's backward-incompatible changes. It corresponds to the Store Inventory's state-changing rows (14 relocations, the container retirement, the `draft` retirement) and additionally records the package seed namespace change and the migrate dimension-set extension; the non-store `git-workflow.md` row is unchanged and is deliberately row-less. Every row names exactly one primary behavior from the closed class set `migrate:relocate` / `migrate:container-pass` / `migrate:refuse:<M-5 token>` / `compatibility-bridge` / `no-workspace-object`, plus an evidence pointer. `no-workspace-object` is admissible only for a package-internal asset namespace that never exists in a workspace; any workspace-state change MUST NOT use it.
+- **Forbidden behaviors.** No row may name a runtime dual-path fallback, a manual-only remedy, a docs-only change, or a placeholder as its behavior. A row whose behavior cannot be demonstrated by its named evidence is a plan defect, not an implementation choice.
+- **Inventory completeness guard.** `tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed` asserts: (a) every Store Inventory row with disposition `relocate` / `retire` / `retired-container` is cited by exactly one inventory row; (b) every behavior is in the closed class set and every `migrate:refuse:` token exists in M-5; (c) every row's evidence pointer resolves to an existing test path, evidence file, or task id; (d) the forbidden behavior words are absent; (e) a mutation drill (delete one row / replace one behavior with a forbidden word) turns the test red. An unmapped or unmigrated row therefore makes the guard red (SC-009).
+- **Refusal semantics.** A refusal is a terminal, deterministic run outcome (`blocked`, exit 3, M-9), never a soft warning: the data stays in place, the receipt names the path(s), and no fallback path is attempted. The inventory's `migrate:refuse:*` rows are demonstrated by the M-8 dual / residue / symlink / readonly fixtures, not by prose.
+- **No runtime fallback.** After a completed run the engine reads only the new roots (M-7, I-6); this clause adds no reader to the retired-root allowlist. `compatibility-bridge` rows (v1 receipts as resume inputs) read old inputs only inside the migration engine, never at runtime.
+- **Evidence.** Each row's reading lands in `test-evidence/acceptance-105.md` (SC-009 row) and its raw command output in `notes/red-first-evidence.md`; the dry-run zero-write plus `--apply` readings that demonstrate every `migrate:relocate` row come from the M-8 suite run recorded at T016.
