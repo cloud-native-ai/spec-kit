@@ -39,6 +39,37 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Tuple
 
+
+# The declaration layer's single read entry (Feature 105): the store set is read from
+# `shared/declarations/facts/runtime-store-layout.yaml`, never re-spelled here (C-6).
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:  # the reader ships beside the engine; a sandbox copy without it still runs
+    import declaration_reader
+except ImportError:  # pragma: no cover - defensive
+    declaration_reader = None
+
+STORE_LAYOUT_FACT = "runtime-store-layout"
+
+
+def _runtime_stores():
+    """`(stores, label)`; a degraded read is labelled, never defaulted (C-6)."""
+    if declaration_reader is None:
+        return {}, "declaration-absent: " + STORE_LAYOUT_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), STORE_LAYOUT_FACT)["body"]
+    except declaration_reader.DeclarationError:
+        return {}, declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    statement = body.get("statement")
+    stores = statement.get("stores") if isinstance(statement, dict) else None
+    if not isinstance(stores, dict) or not stores:
+        return {}, declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    return stores, None
+
+
+STORES, STORE_LAYOUT_LABEL = _runtime_stores()
+
 ENGINE_NAME = "seal-utils.py"
 
 #: C-001 / 100 C-101: the action set is closed at exactly six values.
@@ -567,7 +598,7 @@ ARCHIVE_LIVE_FILES = frozenset((
 ))
 ARCHIVE_DATED_SUBDIRS = ("notes/", "test-evidence/", "checklists/", "slices/")
 ARCHIVE_LIVE_TREES = ("shared/", ".specify/shared/", "tests/")
-ARCHIVE_DATED_TREES = (".specify/memory/", ".specify/history/")
+ARCHIVE_DATED_TREES = tuple(".specify/%s/" % name for name in STORES) + (".specify/history/",)
 ARCHIVE_FEATURES_DETAIL_PREFIX = ".specify/features/"
 ARCHIVE_MIXED_HEADING_RE = re.compile(
     r"^##\s+Related Specifications/Requirements\s*$")
@@ -3878,8 +3909,8 @@ def _archive_dirty_paths(repo: Path, spec_dir: Path, recorded):
     pathspecs.extend([
         ".specify/register.md", ".specify/glossary.md",
         ".specify/instructions.md", ".specify/features.md", ".specify/features",
-        ".specify/memory", ".specify/history", "shared", ".specify/shared", "tests",
-    ])
+        ".specify/history", "shared", ".specify/shared", "tests",
+    ] + [".specify/%s" % name for name in STORES])
     proc = _run_git(repo, ["status", "--porcelain", "--"] + pathspecs)
     if proc.returncode != 0:
         return None
@@ -3973,8 +4004,8 @@ def _archive_scan_files(repo: Path, spec_dir: Path, ordered) -> list:
                 ".specify/glossary.md", ".specify/instructions.md"):
         if (repo / rel).is_file():
             files[rel] = repo / rel
-    for rel in (".specify/features", ".specify/memory", ".specify/history",
-                "shared", ".specify/shared", "tests"):
+    for rel in ((".specify/features",) + tuple(".specify/%s" % name for name in STORES)
+                + (".specify/history", "shared", ".specify/shared", "tests")):
         root = repo / rel
         if root.is_dir():
             for path in root.rglob("*"):

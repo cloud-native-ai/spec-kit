@@ -1,0 +1,5 @@
+task: T004
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: nine single-store engines repointed to .specify/<store>/ (memory-utils, feedback-utils, evidence-utils, exec-quant, run-determination, trigger-utils, probe-utils, record-retention, role-edge-check); anchor-layout-migrate.py keeps its legacy reader literals per L-5; py_compile exit 0; memory record→recall smoke exit 0 landing .specify/session/<slug>.md
+at: 2026-11-25T05:11:28Z

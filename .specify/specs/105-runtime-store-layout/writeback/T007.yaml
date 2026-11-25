@@ -1,0 +1,5 @@
+task: T007
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: shared/definitions/framework-map.md now carries 14 store rows (owner/lifecycle/content class) and exactly one tombstone row for .specify/memory; the retired Project memory row is gone and a Project anchors row registers the root anchors; layout test test_framework_map_rows_and_tombstone PASSED
+at: 2026-11-25T05:11:28Z

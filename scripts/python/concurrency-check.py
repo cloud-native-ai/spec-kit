@@ -116,6 +116,29 @@ except ImportError:  # pragma: no cover - defensive; the sibling always ships to
     declaration_reader = None
 
 
+STORE_LAYOUT_FACT = "runtime-store-layout"
+
+
+def _runtime_store_roots():
+    """`(roots, label)`: the declared store roots, or a labelled empty set (C-6)."""
+    if declaration_reader is None:  # pragma: no cover - the sibling always ships together
+        return (), "declaration-absent: " + STORE_LAYOUT_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), STORE_LAYOUT_FACT)["body"]
+    except declaration_reader.DeclarationError:
+        return (), declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    statement = body.get("statement")
+    stores = statement.get("stores") if isinstance(statement, dict) else None
+    if not isinstance(stores, dict) or not stores:
+        return (), declaration_reader.absent_label(STORE_LAYOUT_FACT)
+    return tuple(".specify/" + name for name in stores), None
+
+
+STORE_ROOTS, STORE_LAYOUT_LABEL = _runtime_store_roots()
+
+
+
 class EngineInputError(Exception):
     """An input or environment error (exit 2) with a stable code for the envelope."""
 
@@ -1032,8 +1055,9 @@ def action_reading(repo, args):
 #: The document surfaces where a competing "which stages decompose" rule could live.
 #: Tests and fixtures are assertions over the rule, not sources of it, and are excluded.
 FOURTH_SOURCE_SURFACES = (
-    "shared", "skills", "templates", "agents", "docs/reference",
-    ".specify/skills", ".specify/shared", ".specify/templates", ".specify/memory",
+    ("shared", "skills", "templates", "agents", "docs/reference",
+     ".specify/skills", ".specify/shared", ".specify/templates")
+    + STORE_ROOTS
 )
 FOURTH_SOURCE_EXTRA = (".specify/instructions.md",)
 

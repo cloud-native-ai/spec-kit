@@ -1,0 +1,5 @@
+task: T008
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: package seed renamed memory/→seed/ via git mv with pyproject force-include synced; copy_local_templates seeds .specify/session + .specify/knowledge from the declared seeded tiers, never creates .specify/memory, and detects the legacy anchor through the declaration's retired_container; _CORE_SPECIFY_ASSETS swaps .specify/memory for the two tiers; rewrite_paths drops the memory segment and anchor specials; migrate_placeholder_dir points at seed/; features_dir comment repaired; fresh-init test PASSED (test-evidence/init-tree-t009.txt)
+at: 2026-11-25T05:11:28Z

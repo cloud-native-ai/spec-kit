@@ -1,0 +1,5 @@
+task: T005
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: sanitize-utils, renumber-utils, seal-utils, concurrency-check read the layout fact via declaration_reader with absent_label and no fallback roster; non-disposable-review-surface.yaml now lists the 14 store roots (24 members, no .specify/memory); no-machine-fact.yaml comment repaired; layout test test_declaration_equals_inventory_and_consumer_sets PASSED; py_compile and --version exit 0 on all five
+at: 2026-11-25T05:11:28Z

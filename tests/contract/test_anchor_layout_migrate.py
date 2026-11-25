@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "scripts" / "python" / "anchor-layout-migrate.py"
-PLACEHOLDER_DIR = REPO_ROOT / "memory"
+PLACEHOLDER_DIR = REPO_ROOT / "seed"
 
 ANCHORS = ("features.md", "constitution.md", "glossary.md", "register.md", "tools.md")
 

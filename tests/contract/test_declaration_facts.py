@@ -57,6 +57,10 @@ POST_094_FACT_KEYS = {
     "executor-enumeration-roots", "serial-reason",
 }
 
+# 2026-11-25 (105-runtime-store-layout, contract C-6): the store-roster fact registers by the
+# same additive shape; the pre-existing keys and `registered_facts` stay untouched.
+POST_105_FACT_KEYS = {"runtime-store-layout"}
+
 TASK_ROW = "- [ ] T{n:03d} deliver the fixture row"
 
 
@@ -449,7 +453,7 @@ def test_registration_is_additive_and_both_consumers_are_in_scope():
     # the one addition, appended after every key it must not disturb.
     vanished = PRE_EXISTING_CONTRACT_KEYS - set(contract)
     assert not vanished, f"pre-existing contract keys vanished: {sorted(vanished)}"
-    assert set(contract) - PRE_EXISTING_CONTRACT_KEYS == {"registered_facts"} | POST_094_FACT_KEYS, (
+    assert set(contract) - PRE_EXISTING_CONTRACT_KEYS == {"registered_facts"} | POST_094_FACT_KEYS | POST_105_FACT_KEYS, (
         "the registration is the only change to contract.yaml (C-86); unexpected keys: "
         f"{sorted(set(contract) - PRE_EXISTING_CONTRACT_KEYS - {'registered_facts'})}")
     top_level = re.findall(r"^([a-z_]+):", contract_path.read_text(encoding="utf-8"),

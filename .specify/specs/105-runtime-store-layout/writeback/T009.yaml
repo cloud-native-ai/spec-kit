@@ -1,0 +1,5 @@
+task: T009
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: run-tests.sh tests/integration/test_init_new_layout.py tests/contract/test_runtime_store_layout.py -v exit 1 with exactly 2 failed / 5 passed — residual reds are test_repo_has_no_retired_root and test_mirror_member_set (US5 closes both); per-function results and the init tree listing in notes/red-first-evidence.md + test-evidence/t009-us1-verbose.txt + test-evidence/init-tree-t009.txt
+at: 2026-11-25T05:11:28Z

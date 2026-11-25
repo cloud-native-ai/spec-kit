@@ -1154,7 +1154,8 @@ class InitializationResultSummary:
 # Paths under project/.specify/ that constitute the shared core and should
 # be preserved when they already exist.
 _CORE_SPECIFY_ASSETS = [
-    ".specify/memory",
+    ".specify/session",
+    ".specify/knowledge",
     ".specify/templates",
     ".specify/scripts",
     ".specify/skills",
@@ -1162,6 +1163,61 @@ _CORE_SPECIFY_ASSETS = [
     ".specify/shared",
     ".specify/instructions.md",
 ]
+
+
+# ---------------------------------------------------------------------------
+# Runtime store layout (Feature 105) — the one machine owner, read through the
+# declaration layer. No second roster and no retired-root literal lives here.
+# ---------------------------------------------------------------------------
+STORE_LAYOUT_FACT = "runtime-store-layout"
+
+
+def _declaration_reader_module():
+    """The shared declaration reader shipped beside this module, or None."""
+    here = Path(__file__).resolve().parent
+    candidates = (
+        here / "scripts" / "python",               # installed package layout
+        here.parent.parent / "scripts" / "python",  # source checkout layout
+    )
+    for engine_dir in candidates:
+        if not (engine_dir / "declaration_reader.py").is_file():
+            continue
+        if str(engine_dir) not in sys.path:
+            sys.path.insert(0, str(engine_dir))
+        import declaration_reader
+
+        return declaration_reader
+    return None
+
+
+def store_layout():
+    """`(statement, label)` for the store layout fact; `({}, label)` on a degraded read."""
+    reader = _declaration_reader_module()
+    if reader is None:
+        return {}, "declaration-absent: " + STORE_LAYOUT_FACT
+    try:
+        body = reader.load_fact(
+            reader.find_repo(Path(reader.__file__).resolve()), STORE_LAYOUT_FACT
+        )["body"]
+    except reader.DeclarationError:
+        return {}, reader.absent_label(STORE_LAYOUT_FACT)
+    statement = body.get("statement")
+    if not isinstance(statement, dict) or not isinstance(statement.get("stores"), dict):
+        return {}, reader.absent_label(STORE_LAYOUT_FACT)
+    return statement, None
+
+
+def seeded_store_names(statement=None) -> List[str]:
+    """The store names `specify init` seeds, in declaration order (FR-017 / C-7)."""
+    if statement is None:
+        statement, _label = store_layout()
+    stores = statement.get("stores") or {}
+    return [
+        name
+        for name, entry in stores.items()
+        if isinstance(entry, dict)
+        and str(entry.get("seeded", "")).strip().lower() == "true"
+    ]
 
 
 def core_asset_relpaths() -> List[str]:
@@ -1520,7 +1576,7 @@ class StepTracker:
 
 def get_resource_path() -> Optional[Path]:
     """
-    Get the path containing templates/memory/scripts.
+    Get the path containing templates/seed/scripts.
     Checks MODULE_DIR first (installed package), then repo root (local dev).
 
     Precedence is load-bearing: an installed package that ships its own
@@ -1571,21 +1627,12 @@ def rewrite_paths(content: str) -> str:
     """
     import re
 
-    # Project anchors live at the `.specify/` root, not under `memory/`
-    # (2026-11-10 anchor-layout move): claim their source-form refs before the
-    # generic `memory/` prefix rule can.
-    for anchor in ("features.md", "constitution.md", "glossary.md", "register.md", "tools.md"):
-        content = re.sub(
-            rf"(?<![\w./-])memory/{re.escape(anchor)}",
-            rf".specify/{anchor}",
-            content,
-        )
-    content = re.sub(r"(?<![\w./-])memory/features/", ".specify/features/", content)
-
     # Only rewrite a segment that STARTS a path reference. The lookbehind rejects
     # any preceding path character, which covers both an existing `.specify/`
     # prefix and nested references such as `skills/<name>/templates/`.
-    for segment in ("memory", "scripts", "templates", "shared"):
+    # `memory` is deliberately absent: the retired container has no runtime form,
+    # and packaged sources carry `.specify/<store>/` paths (Feature 105).
+    for segment in ("scripts", "templates", "shared"):
         content = re.sub(rf"(?<![\w./-]){segment}/", rf".specify/{segment}/", content)
 
     # Two-branch skills layout, same lookbehind discipline: internal stays
@@ -2339,7 +2386,7 @@ def copy_tree_with_rewrite(
     Preserves ``shutil.copytree(dirs_exist_ok=True)`` merge semantics: files
     present in ``src`` are added/overwritten; existing ``dst`` files absent
     from ``src`` are never deleted. Every UTF-8-decodable file passes through
-    :func:`rewrite_paths` so source-form references (``memory/...``,
+    :func:`rewrite_paths` so source-form references (``scripts/...``,
     ``skills/external/<name>/...``, ...) land in their ``.specify/`` runtime
     form; files that fail to decode are copied byte-identical. Junk entries in
     ``ignore_names`` (default :data:`COPY_TREE_IGNORE_NAMES`) are skipped at
@@ -2400,36 +2447,36 @@ def copy_local_templates(
         specify_dir = project_path / ".specify"
         specify_dir.mkdir(exist_ok=True)
 
-        # Copy memory directory
-        if (resource_path / "memory").exists():
-            memory_src = resource_path / "memory"
-            memory_dest = specify_dir / "memory"
-            memory_dest.mkdir(exist_ok=True)
+        # Copy the packaged seed: project anchors land at the `.specify/` root and the
+        # declared seeded stores land as first-class top-level roots (Feature 105, C-7).
+        seed_src = resource_path / "seed"
+        if seed_src.exists():
+            statement, layout_label = store_layout()
+            retired_root = statement.get("retired_container")
+            seeded = seeded_store_names(statement)
 
-            # Project anchors live at the `.specify/` root, not under `memory/`
-            # (2026-11-10 anchor-layout move); only the store subdirectories stay.
-            memory_files = ["constitution.md", "features.md"]
-
-            for filename in memory_files:
-                src_file = memory_src / filename
+            # Project anchors live at the `.specify/` root, not under a store root.
+            for filename in ("constitution.md", "features.md"):
+                src_file = seed_src / filename
                 dest_file = specify_dir / filename
 
                 if src_file.exists():
                     if tracker:
                         tracker.start("local-templates", f"copying {filename}")
 
-                    # Check if destination file already exists
-                    legacy_anchor = memory_dest / filename
+                    legacy_anchor = (
+                        project_path / retired_root / filename if retired_root else None
+                    )
                     if dest_file.exists():
                         console.print(
-                            f"[yellow]Memory file {filename} already exists - skipping copy to preserve existing content[/yellow]"
+                            f"[yellow]Anchor {filename} already exists - skipping copy to preserve existing content[/yellow]"
                         )
-                    elif legacy_anchor.exists():
+                    elif legacy_anchor is not None and legacy_anchor.exists():
                         console.print(
-                            f"[yellow]Memory file {filename} exists under .specify/memory - skipping the placeholder copy; specify migrate will merge the legacy anchor[/yellow]"
+                            f"[yellow]Anchor {filename} exists under the retired store root - "
+                            f"skipping the placeholder copy; specify migrate will merge the legacy anchor[/yellow]"
                         )
                     else:
-                        # Copy the file
                         shutil.copy2(src_file, dest_file)
                         if tracker:
                             tracker.complete("local-templates", f"{filename} copied")
@@ -2439,15 +2486,20 @@ def copy_local_templates(
                             "local-templates", f"{filename} not found in source"
                         )
 
-            # Copy memory subdirectories (e.g. session/, knowledge/) so the
-            # dynamic memory-as-files scaffolding matches what ships in git.
-            # Existing files are preserved to avoid clobbering user content.
-            for sub_dir in sorted(p for p in memory_src.iterdir() if p.is_dir()):
-                dest_sub = memory_dest / sub_dir.name
+            # Seed each declared memory tier under its own top-level root. Existing files
+            # are preserved to avoid clobbering user content; a degraded declaration read
+            # prints the reader's absent label instead of inventing a tier roster (C-6).
+            if layout_label:
+                console.print(f"[yellow]{layout_label} - skipping the seeded memory tiers[/yellow]")
+            for name in seeded:
+                sub_dir = seed_src / name
+                if not sub_dir.is_dir():
+                    if tracker:
+                        tracker.skip("local-templates", f"seed/{name} not found in source")
+                    continue
+                dest_sub = specify_dir / name
                 if tracker:
-                    tracker.start(
-                        "local-templates", f"copying memory/{sub_dir.name}"
-                    )
+                    tracker.start("local-templates", f"copying seed/{name}")
                 for src_item in sub_dir.rglob("*"):
                     rel = src_item.relative_to(sub_dir)
                     dest_item = dest_sub / rel
@@ -2458,9 +2510,7 @@ def copy_local_templates(
                         shutil.copy2(src_item, dest_item)
                 dest_sub.mkdir(parents=True, exist_ok=True)
                 if tracker:
-                    tracker.complete(
-                        "local-templates", f"memory/{sub_dir.name} copied"
-                    )
+                    tracker.complete("local-templates", f"seed/{name} copied")
 
         # Copy scripts directory
         if (resource_path / "scripts").exists():
@@ -2649,7 +2699,7 @@ def copy_local_templates(
         #   skills/external/<name>/... -> .specify/skills/<name>/...   (flat)
         #   skills/internal/<name>/... -> .specify/skills/internal/<name>/... (nested)
         # Both layers go through copy_tree_with_rewrite so source-form refs
-        # (skills/external/..., skills/internal/..., memory/...) land in their
+        # (skills/external/..., skills/internal/..., seed/...) land in their
         # .specify/ runtime form. Copies are additive; user-created skills in
         # the destination are never deleted.
         skills_src = resource_path / "skills"
@@ -3497,7 +3547,7 @@ def migrate_placeholder_dir():
     resource = get_resource_path()
     if resource is None:
         return None
-    candidate = Path(resource) / "memory"
+    candidate = Path(resource) / "seed"
     return candidate if candidate.is_dir() else None
 
 
@@ -5321,7 +5371,7 @@ def init(
                 "[red]Error:[/red] Local templates not found. GitHub download is no longer supported."
             )
             raise typer.Exit(1)
-        # Ensure the features directory exists under .specify/memory for downstream workflows
+        # Ensure the features directory exists under .specify/ for downstream workflows
         features_dir = project_path / ".specify" / "features"
         try:
             features_dir.mkdir(parents=True, exist_ok=True)

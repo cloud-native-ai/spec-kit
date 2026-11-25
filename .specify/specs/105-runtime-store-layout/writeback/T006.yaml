@@ -1,0 +1,5 @@
+task: T006
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/integration/test_init_new_layout.py authored red-first; run-tests.sh exit 1 with .specify/memory must not be created by a fresh init; readings in notes/red-first-evidence.md and test-evidence/t006-red-run.txt
+at: 2026-11-25T05:11:28Z

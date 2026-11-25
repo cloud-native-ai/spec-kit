@@ -1,0 +1,125 @@
+# Feature 105 (runtime-store-layout) — contracts/store-layout.contract.md C-6; data-model.md E-10.
+#
+# The one machine-readable owner of the runtime store set: fourteen first-class top-level roots
+# under `.specify/`, the retired container, and the two legacy non-store members the closed
+# inventory classifies. Consumers that enumerate more than their own store read this file through
+# `scripts/python/declaration_reader.py`; a single-store engine keeps its own root constant, and a
+# consumer whose read degrades prints the reader's `absent_label` instead of inventing a roster.
+#
+# Paths are projections: `.specify/<name>/` is derived from `name`, and the legacy source
+# `.specify/memory/<name>/` is derived the same way by the migration engine. A second list of
+# roots anywhere is a defect (contract C-6).
+#
+# Store membership and dispositions are owned by `requirements.md` § Store Inventory (human) and
+# this file (machine); the framework map's human rows are guarded against this declaration by
+# `tests/contract/test_runtime_store_layout.py`.
+fact: runtime-store-layout
+kind: mapping
+statement:
+  stores:
+    coaching:
+      lifecycle: run-report
+      owner: skills/external/coaching-skills/SKILL.md
+      content_class: coaching run products, one directory per run
+      non_content: []
+      seeded: false
+    evidence:
+      lifecycle: runtime-record
+      owner: scripts/python/evidence-utils.py
+      content_class: evidence run findings, one run directory per record
+      non_content: []
+      seeded: false
+    exec-quant:
+      lifecycle: telemetry
+      owner: scripts/python/exec-quant.py
+      content_class: per-unit run measurements, one JSON record per unit-run
+      non_content:
+        - .write.lock
+        - aggregated/.write.lock
+      seeded: false
+    feedback:
+      lifecycle: runtime-record
+      owner: scripts/python/feedback-utils.py
+      content_class: feedback records, one Markdown entry per record plus store bookkeeping
+      non_content: []
+      seeded: false
+    housekeeping:
+      lifecycle: run-report
+      owner: skills/external/sdd-house-keeping/SKILL.md
+      content_class: housekeeping run reports, one YAML per run
+      non_content: []
+      seeded: false
+    knowledge:
+      lifecycle: memory-tier
+      owner: scripts/python/memory-utils.py
+      content_class: agent-context memory, long-term and distilled, one Markdown entry per record
+      non_content: []
+      seeded: true
+    migrate:
+      lifecycle: receipt
+      owner: src/specify_cli/__init__.py
+      content_class: migration receipts, one JSON per run
+      non_content: []
+      seeded: false
+    renumber:
+      lifecycle: runtime-record
+      owner: scripts/python/renumber-utils.py
+      content_class: renumber plans and ledgers, one file per run artifact
+      non_content: []
+      seeded: false
+    retention:
+      lifecycle: receipt
+      owner: scripts/python/record-retention.py
+      content_class: retention receipts, plans and ledgers, one file per run artifact
+      non_content: []
+      seeded: false
+    sanitize:
+      lifecycle: cache
+      owner: scripts/python/sanitize-utils.py
+      content_class: machine-regenerable findings cache and cleanup plan
+      non_content:
+        - findings.json
+        - cleanup-plan.json
+      seeded: false
+    session:
+      lifecycle: memory-tier
+      owner: scripts/python/memory-utils.py
+      content_class: agent-context memory, short-term and forgettable, one Markdown entry per record
+      non_content: []
+      seeded: true
+    todo:
+      lifecycle: queue
+      owner: skills/internal/manage-todo/SKILL.md
+      content_class: human idea queue, one Markdown entry per parked idea
+      non_content: []
+      seeded: false
+    tools:
+      lifecycle: definition-record
+      owner: scripts/python/tools-utils.py
+      content_class: tool definition records, one Markdown entry per tool
+      non_content:
+        - "*.json"
+      seeded: false
+    trigger:
+      lifecycle: telemetry
+      owner: scripts/python/trigger-utils.py
+      content_class: proactive-flow state index plus the ignored telemetry stream
+      non_content:
+        - telemetry.jsonl
+      seeded: false
+  retired_container: .specify/memory
+  legacy_non_store:
+    - git-workflow.md
+  legacy_retired:
+    - draft
+consumers:
+  - scripts/python/concurrency-check.py
+  - scripts/python/renumber-utils.py
+  - scripts/python/sanitize-utils.py
+  - scripts/python/seal-utils.py
+  - src/specify_cli/__init__.py
+former_carriers:
+  - shared/declarations/facts/non-disposable-review-surface.yaml
+  - shared/definitions/framework-map.md
+  - shared/definitions/non-disposable-definitions.md
+note: "Only `session` and `knowledge` are seeded by `specify init`; every other store is created lazily by its owner, and the retired container `.specify/memory` has no live reader outside the four declared legacy contexts (tombstone row, this declaration, anchor-layout-migrate.py, sanitize-utils.py's legacy-residue scanner). The init seeder reads the fact for the retired container and the seeded tiers; the migrate planner joins `consumers` when its reader lands, and until then this list is exactly the code files that read the fact."

@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-FEEDBACK_SUBDIR = Path(".specify") / "memory" / "feedback"
+FEEDBACK_SUBDIR = Path(".specify") / "feedback"
 EXTERNAL_PROBES_DIRNAME = "probes"
 
 if str(Path(__file__).resolve().parent) not in sys.path:

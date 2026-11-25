@@ -55,7 +55,7 @@ LANE_AVAILABLE = "available"
 LANE_PARTIAL = "partial"
 LANE_UNAVAILABLE = "unavailable"
 TARGET_RE = re.compile(r"^(skill:[a-z0-9._-]+|/speckit\.[a-z0-9._-]+|project)$")
-EVIDENCE_SUBDIR = Path(".specify") / "memory" / "evidence"
+EVIDENCE_SUBDIR = Path(".specify") / "evidence"
 ENGINE_SUBSET_REL = Path("scripts") / "js" / "better-harness"
 ENGINE_SUBSET_MIRROR_REL = Path(".specify") / "scripts" / "js" / "better-harness"
 NODE_TIMEOUT_SECONDS = 120
@@ -276,8 +276,8 @@ def action_doctor(args) -> dict:
         {"status": LANE_AVAILABLE} if (root / ".specify" / "teams").is_dir()
         else {"status": LANE_UNAVAILABLE, "reason": "no .specify/teams directory"})
     lanes["feedback"] = (
-        {"status": LANE_AVAILABLE} if (root / ".specify" / "memory" / "feedback").is_dir()
-        else {"status": LANE_UNAVAILABLE, "reason": "no .specify/memory/feedback directory"})
+        {"status": LANE_AVAILABLE} if (root / ".specify" / "feedback").is_dir()
+        else {"status": LANE_UNAVAILABLE, "reason": "no .specify/feedback directory"})
     return {
         "node": node,
         "engineSubset": {
@@ -474,9 +474,9 @@ def collect_runs_lane(root: Path) -> tuple:
 
 
 def collect_feedback_lane(root: Path) -> tuple:
-    store = root / ".specify" / "memory" / "feedback"
+    store = root / ".specify" / "feedback"
     if not store.is_dir():
-        raise LaneUnavailable("no .specify/memory/feedback directory")
+        raise LaneUnavailable("no .specify/feedback directory")
     # req 055: the feedback store carries no maintained index — entries are
     # the timestamp-named *.md files themselves (bookkeeping files such as
     # cleanup-log / backlog / probe-map are store scaffolding, not entries).
@@ -527,7 +527,7 @@ def collect_feedback_lane(root: Path) -> tuple:
     return items, envelope, status, {"entries": len(entries)}
 
 
-EVIDENCE_FEEDBACK_REL = Path(".specify") / "memory" / "feedback"
+EVIDENCE_FEEDBACK_REL = Path(".specify") / "feedback"
 
 STOPWORDS = {"the", "a", "an", "of", "for", "to", "in", "and", "or", "is", "are", "with", "on", "at"}
 

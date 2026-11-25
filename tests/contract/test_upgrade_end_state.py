@@ -32,7 +32,7 @@ def _build_fake_resource(root: Path) -> Path:
     (ext / "SKILL.md").write_text(
         "# demo-ext (new)\n"
         "See skills/internal/demo-int/SKILL.md for the internal layer.\n"
-        "Memory anchor: memory/constitution.md\n",
+        "Memory anchor: .specify/constitution.md\n",
         encoding="utf-8",
     )
     # Internal layer (installs nested): demo-int plus a REAL framework name.
@@ -49,9 +49,11 @@ def _build_fake_resource(root: Path) -> Path:
         "# requirements\nSee shared/workflow/user-input-protocol.md\n",
         encoding="utf-8",
     )
-    (r / "memory").mkdir()
-    (r / "memory" / "constitution.md").write_text("# C\n", encoding="utf-8")
-    (r / "memory" / "features.md").write_text("# F\n", encoding="utf-8")
+    (r / "seed").mkdir()
+    (r / "seed" / "constitution.md").write_text("# C\n", encoding="utf-8")
+    (r / "seed" / "features.md").write_text("# F\n", encoding="utf-8")
+    (r / "seed" / "session").mkdir()
+    (r / "seed" / "knowledge").mkdir()
     (r / "scripts").mkdir()
     return r
 

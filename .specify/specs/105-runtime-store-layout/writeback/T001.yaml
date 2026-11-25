@@ -1,0 +1,5 @@
+task: T001
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: .specify/specs/105-runtime-store-layout/notes/pre-change-measurements.md (git/sync-mirrors/regen/account-clause-coverage readings; full-suite baseline exit 0, 748 failed names at test-evidence/implement-baseline-failed.txt)
+at: 2026-11-25T05:05:41Z

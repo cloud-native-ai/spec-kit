@@ -72,6 +72,10 @@ executor-enumeration-roots: shared/declarations/facts/executor-enumeration-roots
 concurrency-contract: shared/declarations/facts/concurrency-contract.yaml
 coordinator-dispatch-verdict: shared/declarations/facts/coordinator-dispatch-verdict.yaml
 
+# Feature 105 (runtime-store-layout), contract `contracts/store-layout.contract.md` C-6: the store
+# roster is registered before any consumer reads it. Append-only, same shape as the 093 block above.
+runtime-store-layout: shared/declarations/facts/runtime-store-layout.yaml
+
 # Feature 094, contract `contracts/command-family-and-declarations.md` C-83 / C-84 / C-85
 # — the two facts registered before any consumer reads them. One entry per fact:
 # `subset_id` names the grammar the fact file is written in, `value_domain` the closed

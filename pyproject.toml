@@ -44,7 +44,7 @@ packages = ["src/specify_cli"]
 "src" = "specify_cli"
 
 [tool.hatch.build.targets.wheel.force-include]
-"memory" = "specify_cli/memory"
+"seed" = "specify_cli/seed"
 "scripts" = "specify_cli/scripts"
 "templates" = "specify_cli/templates"
 "agents" = "specify_cli/agents"

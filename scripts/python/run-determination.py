@@ -243,7 +243,7 @@ REASON_WITH_SUBSTANTIVE_VERDICT = (("satisfaction", "accepted", "red_state_undec
 GREEN_UNPROVEN_VERDICT = ("not_evaluated", "green_unproven")
 
 #: **OI-2 seam — the record's durable landing point.** Option (a) is active:
-#: through ``memory-utils.py`` into ``.specify/memory/session/``. Swap the name
+#: through ``memory-utils.py`` into ``.specify/session/``. Swap the name
 #: here and register the alternative in ``PERSISTENCE_ADAPTERS``; no axis logic,
 #: no schema field and no caller flag changes. Adapter contract:
 #: ``(workspace_root: Path, record: dict) -> {"persisted": bool, ...}``.

@@ -220,7 +220,7 @@
   anchor: skills/internal/manage-constitution/SKILL.md#Goal
 #
 # skills/internal/manage-feedback/SKILL.md — (b) the deliverable is feedback entries in
-# `.specify/memory/feedback/`
+# `.specify/feedback/`
 # carrier: scripts/python/feedback-utils.py
 - unit: skills/internal/manage-feedback/SKILL.md
   carrier: scripts/python/feedback-utils.py

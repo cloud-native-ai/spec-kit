@@ -211,8 +211,8 @@ def test_framework_map_registers_the_housekeeping_report_store():
         ROOT / ".specify" / "shared" / "definitions" / "framework-map.md",
     ):
         body = _text(path)
-        assert "`housekeeping/`" in body, (
-            f"{path} does not register .specify/memory/housekeeping/")
+        assert "`.specify/housekeeping/`" in body, (
+            f"{path} does not register .specify/housekeeping/")
 
 
 def test_framework_map_registers_the_runtime_roots():

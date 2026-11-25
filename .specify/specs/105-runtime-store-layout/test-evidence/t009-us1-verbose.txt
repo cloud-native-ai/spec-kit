@@ -1,0 +1,76 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_init_new_layout.py tests/contract/test_runtime_store_layout.py -v
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [7 items]
+
+scheduling tests via LoadScheduling
+
+tests/integration/test_init_new_layout.py::test_fresh_init_seeds_the_new_layout 
+tests/contract/test_runtime_store_layout.py::test_framework_map_rows_and_tombstone 
+tests/contract/test_runtime_store_layout.py::test_inventory_is_closed 
+tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root 
+tests/contract/test_runtime_store_layout.py::test_mirror_member_set 
+tests/contract/test_runtime_store_layout.py::test_two_writers_distinct_paths 
+tests/contract/test_runtime_store_layout.py::test_declaration_equals_inventory_and_consumer_sets 
+[gw1] [ 14%] PASSED tests/contract/test_runtime_store_layout.py::test_inventory_is_closed 
+[gw4] [ 28%] FAILED tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root 
+[gw3] [ 42%] PASSED tests/contract/test_runtime_store_layout.py::test_framework_map_rows_and_tombstone 
+[gw2] [ 57%] PASSED tests/contract/test_runtime_store_layout.py::test_declaration_equals_inventory_and_consumer_sets 
+[gw6] [ 71%] PASSED tests/contract/test_runtime_store_layout.py::test_two_writers_distinct_paths 
+[gw5] [ 85%] FAILED tests/contract/test_runtime_store_layout.py::test_mirror_member_set 
+[gw0] [100%] PASSED tests/integration/test_init_new_layout.py::test_fresh_init_seeds_the_new_layout 
+
+=================================== FAILURES ===================================
+________________________ test_repo_has_no_retired_root _________________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_repo_has_no_retired_root():
+>       assert not (REPO_ROOT / RETIRED_ROOT).exists(), (
+            f"{RETIRED_ROOT} is a retired store root; the dogfood migration (US5) must remove it"
+        )
+E       AssertionError: .specify/memory is a retired store root; the dogfood migration (US5) must remove it
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = (PosixPath('/storage/project/cloud-native-ai/spec-kit') / '.specify/memory').exists
+
+tests/contract/test_runtime_store_layout.py:302: AssertionError
+____________________________ test_mirror_member_set ____________________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_mirror_member_set():
+        proc = subprocess.run(
+            [sys.executable, "scripts/python/sync-mirrors.py", "--check"],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode in (0, 2), (
+            f"sync-mirrors --check must answer 0 (clean) or 2 (drift); rc={proc.returncode}\n"
+            f"{proc.stdout[-2000:]}\n{proc.stderr[-2000:]}"
+        )
+        assert "DIFF" in proc.stdout or "OK" in proc.stdout, (
+            f"the check printed no member list; the surface moved\n{proc.stdout[-2000:]}"
+        )
+        baseline = _members(MIRROR_BASELINE.read_text(encoding="utf-8"))
+        assert baseline, "the pinned baseline must name its drift members"
+        new_members = sorted(_members(proc.stdout) - baseline)
+>       assert not new_members, (
+            "no NEW mirror drift member is allowed before the regeneration step (US5): "
+            f"{new_members[:20]}"
+        )
+E       AssertionError: no NEW mirror drift member is allowed before the regeneration step (US5): ['.specify/scripts/python/memory-utils.py', '.specify/scripts/python/record-retention.py', '.specify/scripts/python/renumber-utils.py', '.specify/shared/declarations/facts/runtime-store-layout.yaml']
+E       assert not ['.specify/scripts/python/memory-utils.py', '.specify/scripts/python/record-retention.py', '.specify/scripts/python/renumber-utils.py', '.specify/shared/declarations/facts/runtime-store-layout.yaml']
+
+tests/contract/test_runtime_store_layout.py:335: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root
+FAILED tests/contract/test_runtime_store_layout.py::test_mirror_member_set - ...
+========================= 2 failed, 5 passed in 7.39s ==========================

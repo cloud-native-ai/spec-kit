@@ -64,11 +64,12 @@ DESTRUCTIVE_MODULE_ATTRS = {
 DESTRUCTIVE_PATH_ATTRS = {"unlink", "rmdir", "rename"}
 
 #: FR-021: stdlib-only. ``script_interface_cli`` ships beside the engine by the same
-#: ``scripts/`` mirror and is the contract-mandated guard.
+#: ``scripts/`` mirror and is the contract-mandated guard; ``declaration_reader`` ships
+#: beside it too and is the C-6 store-roster read entry (105-runtime-store-layout).
 ALLOWED_IMPORT_ROOTS = {
     "__future__", "argparse", "collections", "copy", "datetime", "hashlib", "io",
     "itertools", "json", "os", "pathlib", "re", "shutil", "subprocess", "sys",
-    "tempfile", "typing", "unicodedata", "script_interface_cli",
+    "tempfile", "typing", "unicodedata", "script_interface_cli", "declaration_reader",
 }
 
 MIRROR_CODE = "mirror-copy"

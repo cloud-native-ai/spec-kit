@@ -1,0 +1,5 @@
+task: T002
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/contract/test_runtime_store_layout.py (authored red-first); bash scripts/bash/run-tests.sh tests/contract/test_runtime_store_layout.py -q exit 1 with 5 failed / 1 passed; readings in notes/red-first-evidence.md and test-evidence/t002-red-run.txt
+at: 2026-11-25T05:05:41Z

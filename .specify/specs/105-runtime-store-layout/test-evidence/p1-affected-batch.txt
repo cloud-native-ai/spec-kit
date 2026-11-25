@@ -1,0 +1,2036 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_memory_utils.py tests/contract/test_feedback_utils_cli.py tests/contract/test_exec_quant_engine.py tests/contract/test_evidence_utils_cli.py tests/contract/test_trigger_engine.py tests/contract/test_record_retention_engine.py tests/contract/test_sanitize_engine_contract.py tests/contract/test_probe_registry_umbrella.py tests/contract/test_role_edge_engine.py tests/contract/test_seal_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 21%]
+..............F...............F.........................FF.............. [ 42%]
+...F.........................F........F....FF.F...F.F.F.FFF.F.F.......F. [ 63%]
+.F.FF...F.F...F...F......F..FF..F..F....FFF..FF.......F.FF....FF..FFF..F [ 84%]
+FFFFFF..F.FFFF.FF.......FFFFF.FFFF..F.F......FFFFFFF                     [100%]
+=================================== FAILURES ===================================
+_______________ test_knowledge_non_ascii_titles_do_not_overwrite _______________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw5/test_knowledge_non_ascii_title0')
+
+    def test_knowledge_non_ascii_titles_do_not_overwrite(tmp_path: Path):
+        common = dict(action="record", workspace_root=str(tmp_path), scope="knowledge",
+                      source="skill:x", tags="decision")
+        memory_utils.action_record(_namespace(title="统一环境变量设计决策", content="A", **common))
+        memory_utils.action_record(_namespace(title="记忆系统边界约定", content="B", **common))
+    
+        files = list((tmp_path / ".specify/memory/knowledge").glob("*.md"))
+>       assert len(files) == 2  # two distinct CJK titles -> two distinct files (no overwrite)
+        ^^^^^^^^^^^^^^^^^^^^^^
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/unit/test_memory_utils.py:102: AssertionError
+______________________ test_knowledge_upsert_merges_tags _______________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw6/test_knowledge_upsert_merges_t0')
+
+    def test_knowledge_upsert_merges_tags(tmp_path: Path):
+        common = dict(action="record", workspace_root=str(tmp_path), scope="knowledge",
+                      source="skill:study-code", title="Team convention")
+        memory_utils.action_record(_namespace(content="First", tags="style", **common))
+        result = memory_utils.action_record(_namespace(content="Second", tags="review", **common))
+    
+        knowledge_dir = tmp_path / ".specify/memory/knowledge"
+        files = list(knowledge_dir.glob("*.md"))
+>       assert len(files) == 1  # same slug -> single file (upsert)
+        ^^^^^^^^^^^^^^^^^^^^^^
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/unit/test_memory_utils.py:118: AssertionError
+________________ test_feedback_utils_probe_validate_still_green ________________
+[gw81] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_feedback_utils_probe_validate_still_green() -> None:
+        registry = probe_utils.load_probe_registry(ROOT)
+        assert registry["available"], "probe-definitions.md missing at framework root"
+>       assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"
+E       AssertionError: registry structural errors: ["object 'trigger-p1-feature-dir': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'trigger-p2-clarification-markers': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'trigger-p3-tasks-state': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'trigger-p4-feedback-threshold': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'trigger-p5-instructions-staleness': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'rd-axis-token-consumption': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'rd-axis-elapsed': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'rd-axis-artifact-correctness': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'rd-axis-satisfaction': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'rd-probe-session-store': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'rd-probe-evidence-lane': unit '.specify/scripts/python/run-determination.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'evidence-probe-node': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'evidence-probe-session-store': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'evidence-probe-platforms': unit '.specify/scripts/python/evidence-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'eq-collect-execution': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'eq-probe-host-process': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'eq-probe-host-config': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes", "object 'eq-probe-determination-link': unit '.specify/scripts/python/exec-quant.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes"]
+E       assert ["object 'tri...classes", ...] == []
+E         
+E         Left contains 18 more items, first extra item: "object 'trigger-p1-feature-dir': unit '.specify/scripts/python/trigger-utils.py' must be an engine script path (scripts/python/*.py or scripts/bash/*.sh) for scripts-slice classes"
+E         Use -v to get more diff
+
+tests/contract/test_probe_registry_umbrella.py:148: AssertionError
+______________________ test_prune_keeps_only_max_entries _______________________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw10/test_prune_keeps_only_max_entr0')
+
+    def test_prune_keeps_only_max_entries(tmp_path: Path):
+        for i in range(5):
+            memory_utils.action_record(_namespace(action="record", workspace_root=str(tmp_path),
+                                                   scope="session", source="/speckit.plan",
+                                                   title=f"note-{i}", content=f"body {i}"))
+        # ensure distinct created ordering is not required; index sorts by created desc
+        result = memory_utils.action_prune(_namespace(action="prune", workspace_root=str(tmp_path),
+                                                      scope="session", max_entries=2))
+        assert result["remaining"] == 2
+        remaining_files = list((tmp_path / ".specify/memory/session").glob("*.md"))
+>       assert len(remaining_files) == 2
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/unit/test_memory_utils.py:191: AssertionError
+_ TestCollectContract.test_collect_ignores_determination_outside_recent_window _
+[gw33] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7ffb2516c9d0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw33/test_collect_ignores_determina0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw33/test_collect_ignores_determina0/home')
+
+    def test_collect_ignores_determination_outside_recent_window(self, ws, fake_home):
+        made = make_determination(ws, "/speckit.plan", "run-stale")
+        assert made.returncode == 0, made.stderr
+>       entry = next((ws / ".specify" / "memory" / "session").glob("*run-determination*.md"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/contract/test_exec_quant_engine.py:390: StopIteration
+_______________________ test_c7_explicit_workspace_wins ________________________
+[gw106] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw106/test_c7_explicit_workspace_win0')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw106/test_c7_explicit_workspace_win0')
+
+    def test_c7_explicit_workspace_wins(ws, tmp_path):
+        other = tmp_path / "elsewhere"
+        (other / ".specify" / "templates").mkdir(parents=True)
+        (other / ".specify" / "templates" / "proactive-trigger-seed.json").write_bytes(
+            SEED.read_bytes()
+        )
+        proc = run_cli(["--action", "init", "--workspace", str(other)], ws)
+        assert proc.returncode == 0, proc.stderr
+        env = envelope_of(proc)
+        assert Path(env["workspaceRoot"]).resolve() == other.resolve(), (
+            f"explicit --workspace must win; workspaceRoot={env['workspaceRoot']}"
+        )
+>       assert (other / ".specify" / "memory" / "trigger" / "index.json").is_file()
+E       AssertionError: assert False
+E        +  where False = is_file()
+E        +    where is_file = ((((PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw106/test_c7_explicit_workspace_win0/elsewhere') / '.specify') / 'memory') / 'trigger') / 'index.json').is_file
+
+tests/contract/test_trigger_engine.py:340: AssertionError
+__________ test_c8_state_unreadable_degrades_to_suggest_only[missing] __________
+[gw108] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw108/test_c8_state_unreadable_degra0')
+breakage = 'missing'
+
+    @pytest.mark.parametrize("breakage", ["missing", "corrupt", "incompatible"])
+    def test_c8_state_unreadable_degrades_to_suggest_only(ws, breakage):
+        do_init(ws)
+        p = index_path(ws)
+        if breakage == "missing":
+>           p.unlink()
+
+tests/contract/test_trigger_engine.py:366: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw108/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json')
+missing_ok = False
+
+    def unlink(self, missing_ok=False):
+        """
+        Remove this file or link.
+        If the path is a directory, use rmdir() instead.
+        """
+        try:
+>           os.unlink(self)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw108/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1147: FileNotFoundError
+_____________________ test_c6_no_partial_file_left_behind ______________________
+[gw105] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw105/test_c6_no_partial_file_left_b0')
+
+    def test_c6_no_partial_file_left_behind(ws):
+        do_init(ws)
+>       assert index_path(ws).is_file()
+E       AssertionError: assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw105/test_c6_no_partial_file_left_b0/.specify/memory/trigger/index.json').is_file
+E        +      where PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw105/test_c6_no_partial_file_left_b0/.specify/memory/trigger/index.json') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw105/test_c6_no_partial_file_left_b0'))
+
+tests/contract/test_trigger_engine.py:319: AssertionError
+__________ test_c8_state_unreadable_degrades_to_suggest_only[corrupt] __________
+[gw109] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw109/test_c8_state_unreadable_degra0')
+breakage = 'corrupt'
+
+    @pytest.mark.parametrize("breakage", ["missing", "corrupt", "incompatible"])
+    def test_c8_state_unreadable_degrades_to_suggest_only(ws, breakage):
+        do_init(ws)
+        p = index_path(ws)
+        if breakage == "missing":
+            p.unlink()
+        elif breakage == "corrupt":
+>           p.write_text("{not json", encoding="utf-8")
+
+tests/contract/test_trigger_engine.py:368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1078: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw109/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw109/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_c19_no_write_outside_workspace_root ___________________
+[gw140] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c19_no_write_outside_work0')
+
+    def test_c19_no_write_outside_workspace_root(ws):
+        src = ENGINE.read_text(encoding="utf-8")
+        for token in ("~/.specify", "Path.home()", "expanduser"):
+            assert token not in src, (
+                f"engine references a user-global path ({token}); all writes must stay "
+                "under workspaceRoot"
+            )
+        do_init(ws)
+>       assert index_path(ws).is_file(), "init must write inside the workspace"
+E       AssertionError: init must write inside the workspace
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c19_no_write_outside_work0/.specify/memory/trigger/index.json').is_file
+E        +      where PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c19_no_write_outside_work0/.specify/memory/trigger/index.json') = index_path(PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c19_no_write_outside_work0'))
+
+tests/contract/test_trigger_engine.py:812: AssertionError
+________________ test_init_maintains_the_telemetry_ignore_entry ________________
+[gw155] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw155/test_init_maintains_the_teleme0')
+
+    def test_init_maintains_the_telemetry_ignore_entry(ws):
+        do_init(ws)
+        gi = ws / ".specify" / ".gitignore"
+        assert gi.is_file(), "init must create/extend .specify/.gitignore"
+        text = gi.read_text(encoding="utf-8")
+>       assert "memory/trigger/telemetry.jsonl" in text, (
+            "V6.9: telemetry must be ignored (it churns every turn)"
+        )
+E       AssertionError: V6.9: telemetry must be ignored (it churns every turn)
+E       assert 'memory/trigger/telemetry.jsonl' in '# proactive flow trigger: per-turn telemetry churns; learning state stays tracked\ntrigger/telemetry.jsonl\n'
+
+tests/contract/test_trigger_engine.py:1031: AssertionError
+_______ test_c8_state_unreadable_degrades_to_suggest_only[incompatible] ________
+[gw110] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw110/test_c8_state_unreadable_degra0')
+breakage = 'incompatible'
+
+    @pytest.mark.parametrize("breakage", ["missing", "corrupt", "incompatible"])
+    def test_c8_state_unreadable_degrades_to_suggest_only(ws, breakage):
+        do_init(ws)
+        p = index_path(ws)
+        if breakage == "missing":
+            p.unlink()
+        elif breakage == "corrupt":
+            p.write_text("{not json", encoding="utf-8")
+        else:
+>           data = json.loads(p.read_text(encoding="utf-8"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw110/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw110/test_c8_state_unreadable_degra0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_________________ test_c009_mirror_copy_refuses_write_actions __________________
+[gw139] linux -- Python 3.11.11 /usr/local/bin/python3
+
+engine = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/seal-utils.py')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw139/test_c009_mirror_copy_refuses_0')
+
+    def test_c009_mirror_copy_refuses_write_actions(engine, tmp_path):
+        repo = tmp_path / "repo"
+        mirror_engine = _install_copy(engine, repo / ".specify" / "scripts" / "python")
+        spec_dir = _make_spec(repo)
+        for action in WRITE_ACTIONS:
+            proc = _run(mirror_engine, ["--action", action, "--spec-dir", str(spec_dir), "--json"], repo)
+>           assert proc.returncode == 2, (
+                f"C-009: a mirror-copy write action exits 2; got {proc.returncode} for {action}"
+            )
+E           AssertionError: C-009: a mirror-copy write action exits 2; got 1 for merge-apply
+E           assert 1 == 2
+E            +  where 1 = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw139/test_c009_mirror_copy_...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').returncode
+
+tests/contract/test_seal_engine_contract.py:518: AssertionError
+________________________ test_init_writes_the_e6_shape _________________________
+[gw154] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw154/test_init_writes_the_e6_shape0')
+
+    def test_init_writes_the_e6_shape(ws):
+        do_init(ws)
+>       data = read_index(ws)
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:1015: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:179: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw154/test_init_writes_the_e6_shape0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw154/test_init_writes_the_e6_shape0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________________ test_init_is_idempotent ____________________________
+[gw153] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw153/test_init_is_idempotent0')
+
+    def test_init_is_idempotent(ws):
+        do_init(ws)
+>       first = index_path(ws).read_bytes()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:1005: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw153/test_init_is_idempotent0/.specify/memory/trigger/index.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw153/test_init_is_idempotent0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_c14_silent_turn_has_no_visible_output __________________
+[gw129] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw129/test_c14_silent_turn_has_no_vi0')
+
+    def test_c14_silent_turn_has_no_visible_output(ws):
+        do_init(ws)
+        run_cli(["--action", "assess", "--session", "squiet", "--turn-id", "squiet-01",
+                 "--stage", "non-feature"], ws)
+>       row = telemetry_rows(ws)[-1]
+              ^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_trigger_engine.py:625: IndexError
+_______________________ test_three_forms_remote_topology _______________________
+[gw113] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_three_forms_remote_topology():
+        """Desktop session as root; the remote qodercli execution as its subagent."""
+        proc, model = _report("remote-topology")
+        assert proc.returncode == 0, proc.stderr
+>       assert model["summary"]["edges"] == 1
+E       assert 0 == 1
+
+tests/contract/test_role_edge_engine.py:718: AssertionError
+____________________ test_init_does_not_revert_local_tuning ____________________
+[gw156] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw156/test_init_does_not_revert_loca0')
+
+    def test_init_does_not_revert_local_tuning(ws):
+        do_init(ws)
+>       data = read_index(ws)
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:1045: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:179: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw156/test_init_does_not_revert_loca0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw156/test_init_does_not_revert_loca0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+___________________ test_c14_assess_appends_exactly_one_row ____________________
+[gw128] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw128/test_c14_assess_appends_exactl0')
+
+    def test_c14_assess_appends_exactly_one_row(ws):
+        do_init(ws)
+        before = len(telemetry_rows(ws))
+        run_cli(["--action", "assess", "--session", "stel", "--turn-id", "stel-01",
+                 "--compliance-done", "--stage", "non-feature"], ws)
+        rows = telemetry_rows(ws)
+>       assert len(rows) == before + 1, f"expected exactly one new row, got {len(rows) - before}"
+E       AssertionError: expected exactly one new row, got 0
+E       assert 0 == (0 + 1)
+E        +  where 0 = len([])
+
+tests/contract/test_trigger_engine.py:615: AssertionError
+________________ test_c14_compliance_done_clears_the_violation _________________
+[gw131] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw131/test_c14_compliance_done_clear0')
+
+    def test_c14_compliance_done_clears_the_violation(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sord2", "--turn-id", "sord2-01",
+                        "--compliance-done", "--stage", "requirements-unclear",
+                        "--signal", "needs-clarification"], ws)
+        env = envelope_of(proc)
+        assert "ordering-violation" not in env["errors"]
+>       assert telemetry_rows(ws)[-1]["complianceDone"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_trigger_engine.py:655: IndexError
+____________ test_apply_executes_confirmed_delete_and_updates_state ____________
+[gw75] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw75/test_apply_executes_confirmed_0')
+
+    def test_apply_executes_confirmed_delete_and_updates_state(tmp_path):
+        plan = _make_plan(tmp_path, confirmed=True)
+        material = tmp_path / ".specify" / "memory" / "todo" / "example.md"
+        proc = run_engine(
+            ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+            cwd=tmp_path,
+        )
+        assert proc.returncode == 0
+        assert not material.exists(), "confirmed delete must remove the material"
+        report = out_json(proc)
+        assert report["executed"][0]["outcome"] == "ok"
+>       store = json.loads((tmp_path / STORE_REL).read_text(encoding="utf-8"))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sanitize_engine_contract.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw75/test_apply_executes_confirmed_0/.specify/memory/sanitize/findings.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw75/test_apply_executes_confirmed_0/.specify/memory/sanitize/findings.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_mirror_copy_answers_help_and_version ___________________
+[gw93] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_mirror_copy_answers_help_and_version():
+        """The runtime mirror carries the same interface (T017: pair parity is pinned here)."""
+        assert ENGINE_MIRROR.is_file(), (
+            "engine mirror missing: .specify/scripts/python/role-edge-check.py (T017)"
+        )
+        version = subprocess.run(
+            [sys.executable, str(ENGINE_MIRROR), "--version"],
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+        assert version.returncode == 0, version.stderr
+        lines = version.stdout.strip().splitlines()
+        assert len(lines) == 1
+        assert lines[0].startswith("role-edge-check.py "), lines
+    
+        help_proc = subprocess.run(
+            [sys.executable, str(ENGINE_MIRROR), "--help"],
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+        assert help_proc.returncode == 0, help_proc.stderr
+        assert "--action" in help_proc.stdout
+>       assert ENGINE_MIRROR.read_bytes() == ENGINE.read_bytes(), (
+            "the mirror copy must be byte-identical to the engine source"
+        )
+E       AssertionError: the mirror copy must be byte-identical to the engine source
+E       assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 93 diff: b'.' != b's'
+E         Use -v to get more diff
+
+tests/contract/test_role_edge_engine.py:312: AssertionError
+__________ test_c14_ordering_violation_reported_but_row_still_written __________
+[gw130] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw130/test_c14_ordering_violation_re0')
+
+    def test_c14_ordering_violation_reported_but_row_still_written(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "assess", "--session", "sord", "--turn-id", "sord-01",
+                        "--stage", "requirements-unclear", "--signal", "needs-clarification"], ws)
+        env = envelope_of(proc)
+        assert env["payload"].get("suggestion") is not None, "fixture expected a hit"
+        assert "ordering-violation" in env["errors"], (
+            "suggested=true with complianceDone=false must report ordering-violation"
+        )
+>       row = telemetry_rows(ws)[-1]
+              ^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_trigger_engine.py:642: IndexError
+__________ test_c009_read_actions_are_not_refused_by_the_mirror_guard __________
+[gw140] linux -- Python 3.11.11 /usr/local/bin/python3
+
+engine = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/seal-utils.py')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c009_read_actions_are_not0')
+
+    def test_c009_read_actions_are_not_refused_by_the_mirror_guard(engine, tmp_path):
+        repo = tmp_path / "repo"
+        mirror_engine = _install_copy(engine, repo / ".specify" / "scripts" / "python")
+        spec_dir = _make_spec(repo)
+        for action in READ_ONLY_ACTIONS:
+            proc = _run(mirror_engine, ["--action", action, "--spec-dir", str(spec_dir), "--json"], repo)
+>           payload = _payload(proc)
+                      ^^^^^^^^^^^^^^
+
+tests/contract/test_seal_engine_contract.py:533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c009_read_actions...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n')
+
+    def _payload(proc) -> dict:
+>       assert proc.stdout.strip(), (
+            f"expected a stdout payload; exit={proc.returncode} stderr={proc.stderr[-800:]!r}"
+        )
+E       AssertionError: expected a stdout payload; exit=1 stderr='Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c009_read_actions_are_not0/repo/.specify/scripts/python/seal-utils.py", line 47, in <module>\n    import declaration_reader  # noqa: E402  (import follows the sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n'
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7f2378167a60>()
+E        +    where <built-in method strip of str object at 0x7f2378167a60> = ''.strip
+E        +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw140/test_c009_read_actions...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').stdout
+
+tests/contract/test_seal_engine_contract.py:139: AssertionError
+______________________ test_c18_threshold_floor_rejected _______________________
+[gw138] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw138/test_c18_threshold_floor_rejec0')
+
+    def test_c18_threshold_floor_rejected(ws):
+        do_init(ws)
+        proc = run_cli(["--action", "config", "--threshold", "1"], ws)
+        assert proc.returncode == EXIT_CODES["EXIT_USAGE"], (
+            f"a threshold below the floor of 2 must exit {EXIT_CODES['EXIT_USAGE']}, "
+            f"got {proc.returncode}"
+        )
+        assert "threshold-below-floor" in envelope_of(proc)["errors"]
+>       assert read_index(ws)["config"]["threshold"] == 3, "a rejected value must not be stored"
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:784: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:179: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw138/test_c18_threshold_floor_rejec0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw138/test_c18_threshold_floor_rejec0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+________________ test_c20_repeat_in_same_session_is_suppressed _________________
+[gw141] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw141/test_c20_repeat_in_same_sessio0')
+
+    def test_c20_repeat_in_same_session_is_suppressed(ws):
+        do_init(ws)
+        args = ["--action", "assess", "--session", "ssup", "--compliance-done",
+                "--stage", "requirements-unclear", "--signal", "needs-clarification"]
+        first = envelope_of(run_cli([*args, "--turn-id", "ssup-01"], ws))
+        assert first["payload"].get("suggestion") is not None, "first turn should suggest"
+    
+        second = envelope_of(run_cli([*args, "--turn-id", "ssup-02"], ws))
+        assert second["payload"].get("suppressed") is True, (
+            "an unchanged situation+rule in the same session must be suppressed"
+        )
+        assert second["payload"].get("suggestion") is None
+>       row = telemetry_rows(ws)[-1]
+              ^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_trigger_engine.py:830: IndexError
+___________ test_c17_destructive_never_promotes_over_ten_acceptances ___________
+[gw136] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw136/test_c17_destructive_never_pro0')
+
+    def test_c17_destructive_never_promotes_over_ten_acceptances(ws):
+        do_init(ws)
+        for i in range(1, 11):
+            session = f"sc17-{i}"
+            proc = run_cli(["--action", "assess", "--session", session,
+                            "--turn-id", f"{session}-01", "--compliance-done",
+                            "--stage", "tasks-ready", "--signal", "open-tasks"], ws)
+            assert proc.returncode == 0, proc.stderr
+            sug = envelope_of(proc)["payload"]["suggestion"]
+            assert sug is not None and sug["ruleId"] == "r-006"
+            assert sug["autoExecute"] is False, f"turn {i}: destructive flagged autoExecute"
+            run_cli(["--action", "record", "--session", session, "--rule", "r-006",
+                     "--response", "accepted"], ws)
+>           rule = next(r for r in read_index(ws)["rules"] if r["ruleId"] == "r-006")
+                                   ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:746: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:179: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw136/test_c17_destructive_never_pro0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw136/test_c17_destructive_never_pro0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______________________ test_fr021_engine_is_stdlib_only _______________________
+[gw138] linux -- Python 3.11.11 /usr/local/bin/python3
+
+source = '#!/usr/bin/env python3\n"""Seal engine for `/speckit.seal` (requirement 099) — CLI skeleton (work package P2).\n\nOwn...T_INPUT_ERROR\n    render(payload, args.json)\n    return code\n\n\nif __name__ == "__main__":\n    sys.exit(main())\n'
+
+    def test_fr021_engine_is_stdlib_only(source):
+        roots = _import_roots(ast.parse(source))
+>       assert roots <= ALLOWED_IMPORT_ROOTS, (
+            f"FR-021: stdlib-only; unexpected imports {sorted(roots - ALLOWED_IMPORT_ROOTS)}"
+        )
+E       AssertionError: FR-021: stdlib-only; unexpected imports ['declaration_reader']
+E       assert {'__future__'..., 'json', ...} <= {'__future__'...hashlib', ...}
+E         
+E         Extra items in the left set:
+E         'declaration_reader'
+
+tests/contract/test_seal_engine_contract.py:503: AssertionError
+__________________ test_c010_json_and_human_renderings_agree ___________________
+[gw145] linux -- Python 3.11.11 /usr/local/bin/python3
+
+engine = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/seal-utils.py')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw145/test_c010_json_and_human_rende0')
+
+    def test_c010_json_and_human_renderings_agree(engine, tmp_path):
+        repo = tmp_path / "repo"
+        mirror_engine = _install_copy(engine, repo / ".specify" / "scripts" / "python")
+        spec_dir = _make_spec(repo)
+        argv = ["--action", "seal", "--spec-dir", str(spec_dir)]
+        human = _run(mirror_engine, argv, repo)
+        machine = _run(mirror_engine, argv + ["--json"], repo)
+>       assert human.returncode == machine.returncode == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw145/test_c010_json_and_hum...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').returncode
+
+tests/contract/test_seal_engine_contract.py:603: AssertionError
+____________ test_c009_an_ancestor_specify_is_not_the_mirror_signal ____________
+[gw141] linux -- Python 3.11.11 /usr/local/bin/python3
+
+engine = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/seal-utils.py')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw141/test_c009_an_ancestor_specify_0')
+
+    def test_c009_an_ancestor_specify_is_not_the_mirror_signal(engine, tmp_path):
+        """The worktree lives under `.specify/.tmp/...` — a literal component higher up
+        the path MUST NOT trigger the mirror guard (the forbidden ancestor heuristic)."""
+        repo = tmp_path / ".specify" / ".tmp" / "demo" / "repo"
+        nested_engine = _install_copy(engine, repo / "scripts" / "python")
+        spec_dir = _make_spec(repo)
+        proc = _run(nested_engine, ["--action", "merge-apply", "--spec-dir", str(spec_dir), "--json"], repo)
+>       payload = _payload(proc)
+                  ^^^^^^^^^^^^^^
+
+tests/contract/test_seal_engine_contract.py:547: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw141/test_c009_an_ancestor_...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n')
+
+    def _payload(proc) -> dict:
+>       assert proc.stdout.strip(), (
+            f"expected a stdout payload; exit={proc.returncode} stderr={proc.stderr[-800:]!r}"
+        )
+E       AssertionError: expected a stdout payload; exit=1 stderr='Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-17119/popen-gw141/test_c009_an_ancestor_specify_0/.specify/.tmp/demo/repo/scripts/python/seal-utils.py", line 47, in <module>\n    import declaration_reader  # noqa: E402  (import follows the sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n'
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x7f7924401a60>()
+E        +    where <built-in method strip of str object at 0x7f7924401a60> = ''.strip
+E        +      where '' = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw141/test_c009_an_ancestor_...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').stdout
+
+tests/contract/test_seal_engine_contract.py:139: AssertionError
+_______________ test_c16_accepted_increments_and_declined_resets _______________
+[gw134] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw134/test_c16_accepted_increments_a0')
+
+    def test_c16_accepted_increments_and_declined_resets(ws):
+        do_init(ws)
+        for i in range(1, 3):
+            session = f"sc16-{i}"
+            run_cli(["--action", "assess", "--session", session, "--turn-id", f"{session}-01",
+                     "--compliance-done", "--stage", "requirements-unclear",
+                     "--signal", "needs-clarification"], ws)
+            proc = run_cli(["--action", "record", "--session", session, "--rule", "r-001",
+                            "--response", "accepted"], ws)
+            assert proc.returncode == 0, proc.stderr
+>       rule = next(r for r in read_index(ws)["rules"] if r["ruleId"] == "r-001")
+                               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:701: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:179: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw134/test_c16_accepted_increments_a0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw134/test_c16_accepted_increments_a0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________ TestCollectContract.test_collect_writes_storage_and_record __________
+[gw28] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7f5838189210>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw28/test_collect_writes_storage_an0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw28/test_collect_writes_storage_an0/home')
+
+    def test_collect_writes_storage_and_record(self, ws, fake_home):
+        result = run_engine(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       assert records_dir(ws).is_dir()
+E       AssertionError: assert False
+E        +  where False = is_dir()
+E        +    where is_dir = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw28/test_collect_writes_storage_an0/ws/.specify/memory/exec-quant/records').is_dir
+E        +      where PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw28/test_collect_writes_storage_an0/ws/.specify/memory/exec-quant/records') = records_dir(PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw28/test_collect_writes_storage_an0/ws'))
+
+tests/contract/test_exec_quant_engine.py:322: AssertionError
+___________________ test_c16_reaching_the_threshold_promotes ___________________
+[gw135] linux -- Python 3.11.11 /usr/local/bin/python3
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw135/test_c16_reaching_the_threshol0')
+
+    def test_c16_reaching_the_threshold_promotes(ws):
+        do_init(ws)
+        for i in range(1, 4):
+            session = f"sc16p-{i}"
+            run_cli(["--action", "assess", "--session", session, "--turn-id", f"{session}-01",
+                     "--compliance-done", "--stage", "requirements-unclear",
+                     "--signal", "needs-clarification"], ws)
+            run_cli(["--action", "record", "--session", session, "--rule", "r-001",
+                     "--response", "accepted"], ws)
+>       rule = next(r for r in read_index(ws)["rules"] if r["ruleId"] == "r-001")
+                               ^^^^^^^^^^^^^^
+
+tests/contract/test_trigger_engine.py:725: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_trigger_engine.py:179: in read_index
+    return json.loads(index_path(ws).read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw135/test_c16_reaching_the_threshol0/.specify/memory/trigger/index.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw135/test_c16_reaching_the_threshol0/.specify/memory/trigger/index.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________ TestIdentityForms.test_custom_form_infers_custom_unit_type __________
+[gw41] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestIdentityForms object at 0x7f630d1c84d0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw41/test_custom_form_infers_custom0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw41/test_custom_form_infers_custom0/home')
+
+    def test_custom_form_infers_custom_unit_type(self, ws, fake_home):
+        result = run_engine(collect_args(ws, unit_id="custom:myowner/myunit"),
+                            env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       assert load_single_record(ws)["unit_type"] == "custom-unit"
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw41/test_custom_form_infers_custom0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+___________________ test_c006_refusal_report_is_rerun_stable ___________________
+[gw134] linux -- Python 3.11.11 /usr/local/bin/python3
+
+engine = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/seal-utils.py')
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw134/test_c006_refusal_report_is_re0')
+
+    def test_c006_refusal_report_is_rerun_stable(engine, tmp_path):
+        repo = tmp_path / "repo"
+        mirror_engine = _install_copy(engine, repo / ".specify" / "scripts" / "python")
+        spec_dir = _make_spec(repo)
+        argv = ["--action", "merge-apply", "--spec-dir", str(spec_dir), "--json"]
+        first = _run(mirror_engine, argv, repo)
+        second = _run(mirror_engine, argv, repo)
+>       assert first.returncode == second.returncode == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/pytest-of-agent/pytest-17119/popen-gw134/test_c006_refusal_repo...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').returncode
+
+tests/contract/test_seal_engine_contract.py:426: AssertionError
+______ TestCollectContract.test_collect_synthesized_without_determination ______
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7f864bb9e110>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw30/test_collect_synthesized_witho0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw30/test_collect_synthesized_witho0/home')
+
+    def test_collect_synthesized_without_determination(self, ws, fake_home):
+        result = run_engine(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw30/test_collect_synthesized_witho0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+______________ TestScoreAction.test_score_appends_only_to_scores _______________
+[gw61] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestScoreAction object at 0x7fbe56696310>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw61/test_score_appends_only_to_sco0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw61/test_score_appends_only_to_sco0/home')
+
+    def test_score_appends_only_to_scores(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+        before = records_snapshot(ws)
+        result = run_engine(["--action", "score", "--workspace-root", str(ws),
+                             "--unit-id", "/speckit.plan", "--run-id",
+>                            read_records(ws)[0]["run_id"],
+                             ^^^^^^^^^^^^^^^^^^^
+                             "--score", "4", "--note", "手测通过"],
+                            env_home=fake_home)
+E       IndexError: list index out of range
+
+tests/contract/test_exec_quant_engine.py:724: IndexError
+_______________________ test_c2_sync_mirrors_check_clean _______________________
+[gw98] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c2_sync_mirrors_check_clean():
+        proc = run_engine_in_process(SYNC_MIRRORS, ["--check"])
+>       assert proc.returncode == 0, f"sync-mirrors --check exit {proc.returncode}:\n{proc.stdout[-1500:]}"
+E       AssertionError: sync-mirrors --check exit 2:
+E         hared/guidelines/single-run-evidence.md
+E         DIFF .specify/shared/guidelines/temp-directory-discipline.md
+E         DIFF .specify/shared/guidelines/test-execution-efficiency.md
+E         DIFF .specify/shared/guidelines/todo-in-context.md
+E         DIFF .specify/shared/guidelines/token-efficiency.md
+E         DIFF .specify/shared/guidelines/user-facing-comprehension.md
+E         DIFF .specify/shared/patterns/explicit-implicit-pattern.md
+E         DIFF .specify/shared/patterns/interview-pattern.md
+E         DIFF .specify/shared/patterns/reconcile-pattern.md
+E         DIFF .specify/shared/patterns/self-improvement-pattern.md
+E         DIFF .specify/shared/workflow/acceptance-hardening.md
+E         DIFF .specify/shared/workflow/artifact-commit-step.md
+E         DIFF .specify/shared/workflow/best-practice-optimization.md
+E         DIFF .specify/shared/workflow/evidence-step.md
+E         DIFF .specify/shared/workflow/execution-topology.md
+E         DIFF .specify/shared/workflow/expression-gates.md
+E         DIFF .specify/shared/workflow/external-dispatch-recipes.md
+E         DIFF .specify/shared/workflow/feature-integration.md
+E         DIFF .specify/shared/workflow/feedback-step.md
+E         DIFF .specify/shared/workflow/glossary.md
+E         DIFF .specify/shared/workflow/interview-walkthrough.md
+E         DIFF .specify/shared/workflow/objective-analysis-gate.md
+E         DIFF .specify/shared/workflow/runtime-mode.md
+E         DIFF .specify/shared/workflow/self-improvement-workflow.md
+E         DIFF .specify/shared/workflow/symlink-model.md
+E         DIFF .specify/shared/workflow/target-resolution.md
+E         DIFF .specify/shared/workflow/user-input-protocol.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 2 == 0
+E        +  where 2 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/sync-mirrors.py', '--check'] returncode=2>.returncode
+
+tests/contract/test_trigger_engine.py:227: AssertionError
+----------------------------- Captured stdout call -----------------------------
+DRIFT detected:
+  .github/prompts/speckit.sanitize.prompt.md
+  .claude/commands/speckit.sanitize.md
+  .opencode/command/speckit.sanitize.md
+  .qoder/commands/speckit.sanitize.md
+______________ TestNonBlocking.test_write_failure_exits_1_cleanly ______________
+[gw74] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestNonBlocking object at 0x7fb977299750>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw74/test_write_failure_exits_1_cle0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw74/test_write_failure_exits_1_cle0/home')
+
+    def test_write_failure_exits_1_cleanly(self, ws, fake_home):
+        records_dir(ws).parent.mkdir(parents=True, exist_ok=True)
+        records_dir(ws).write_text("occupied", encoding="utf-8")
+        result = run_engine(collect_args(ws), env_home=fake_home)
+>       assert result.returncode == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/exec-quant....gw74/test_write_failure_exits_1_cle0/ws/.specify/exec-quant/records/20261125T051308720860Z-20f51532.json\n', stderr='').returncode
+
+tests/contract/test_exec_quant_engine.py:936: AssertionError
+______________________ TestScoreAction.test_score_bounds _______________________
+[gw63] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestScoreAction object at 0x7f23750ea2d0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw63/test_score_bounds0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw63/test_score_bounds0/home')
+
+    def test_score_bounds(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+>       run_id = read_records(ws)[0]["run_id"]
+                 ^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_exec_quant_engine.py:749: IndexError
+____________ TestFieldBinaryLaw.test_degraded_record_holds_the_law _____________
+[gw45] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestFieldBinaryLaw object at 0x7f0e58a89a90>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw45/test_degraded_record_holds_the0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw45/test_degraded_record_holds_the0/home')
+
+    def test_degraded_record_holds_the_law(self, ws, fake_home):
+        result = run_engine(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       assert_field_binary_law(load_single_record(ws))
+                                ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw45/test_degraded_record_holds_the0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+________ TestLLMCollection.test_missing_config_face_degrades_to_marker _________
+[gw50] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x7f45616b6c10>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw50/test_missing_config_face_degra0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw50/test_missing_config_face_degra0/home')
+
+    def test_missing_config_face_degrades_to_marker(self, ws, fake_home):
+        # fake HOME has no .qoder/ at all — the adapter finds nothing
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:572: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw50/test_missing_config_face_degra0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+___ TestCredentialDefense.test_engine_masks_credential_shaped_config_values ____
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCredentialDefense object at 0x7fc174b61bd0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw69/test_engine_masks_credential_s0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw69/test_engine_masks_credential_s0/home')
+
+    def test_engine_masks_credential_shaped_config_values(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "sk-0123456789abcdef0123",
+                      "preferences": {"sk-0123456789abcdef0123": {
+                          "contextWindow": 1000000}}}}), encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:863: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw69/test_engine_masks_credential_s0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_______________ TestSizeCap.test_normal_record_is_not_truncated ________________
+[gw67] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestSizeCap object at 0x7f6977c4c990>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw67/test_normal_record_is_not_trun0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw67/test_normal_record_is_not_trun0/home')
+
+    def test_normal_record_is_not_truncated(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+>       assert load_single_record(ws)["truncated"] == []
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:826: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw67/test_normal_record_is_not_trun0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+___ TestCollectContract.test_collect_explicit_run_id_carries_matching_record ___
+[gw32] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7f9e42906810>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw32/test_collect_explicit_run_id_c0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw32/test_collect_explicit_run_id_c0/home')
+
+    def test_collect_explicit_run_id_carries_matching_record(self, ws, fake_home):
+        made = make_determination(ws, "/speckit.plan", "run-001")
+        assert made.returncode == 0, made.stderr
+        result = run_engine(collect_args(ws, run_id="run-001"), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:383: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw32/test_collect_explicit_run_id_c0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_____ TestCollectContract.test_collect_adopts_recent_determination_run_id ______
+[gw31] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7f86fd75e3d0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw31/test_collect_adopts_recent_det0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw31/test_collect_adopts_recent_det0/home')
+
+    def test_collect_adopts_recent_determination_run_id(self, ws, fake_home):
+        made = make_determination(ws, "/speckit.plan", "run-001")
+        assert made.returncode == 0, made.stderr
+        result = run_engine(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:369: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw31/test_collect_adopts_recent_det0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_____ TestCollectContract.test_collect_counts_errors_from_declared_sources _____
+[gw34] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7ff1252e1a50>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw34/test_collect_counts_errors_fro0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw34/test_collect_counts_errors_fro0/home')
+
+    def test_collect_counts_errors_from_declared_sources(self, ws, fake_home):
+        (ws / "names-baseline.txt").write_text("", encoding="utf-8")
+        (ws / "names-current.txt").write_text(
+            "tests/contract/test_new_guard.py::test_red\n", encoding="utf-8")
+        made = make_determination(
+            ws, "/speckit.plan", "run-err",
+            extra=("--declared-check", "pytest",
+                   "--names-baseline", str(ws / "names-baseline.txt"),
+                   "--names-current", str(ws / "names-current.txt"),
+                   "--unresolved-red", "true", "--red-source", "engine_nonzero_exit"))
+        assert made.returncode == 0, made.stderr
+        result = run_engine(collect_args(ws, run_id="run-err"), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:420: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw34/test_collect_counts_errors_fro0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+__ TestCollectContract.test_collect_write_failure_exits_1_with_visible_stderr __
+[gw36] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7f33ea266e10>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw36/test_collect_write_failure_exi0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw36/test_collect_write_failure_exi0/home')
+
+    def test_collect_write_failure_exits_1_with_visible_stderr(self, ws, fake_home):
+        records_dir(ws).parent.mkdir(parents=True, exist_ok=True)
+        records_dir(ws).write_text("occupied", encoding="utf-8")  # a file where a dir must be
+        result = run_engine(collect_args(ws), env_home=fake_home)
+>       assert result.returncode == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/exec-quant....gw36/test_collect_write_failure_exi0/ws/.specify/exec-quant/records/20261125T051308852928Z-6e296553.json\n', stderr='').returncode
+
+tests/contract/test_exec_quant_engine.py:440: AssertionError
+____________ TestLLMCollection.test_qoder_adapter_reads_config_face ____________
+[gw48] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x7faf46104f50>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw48/test_qoder_adapter_reads_confi0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw48/test_qoder_adapter_reads_confi0/home')
+
+    def test_qoder_adapter_reads_config_face(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "gfmodel",
+                      "preferences": {"gfmodel": {"contextWindow": 1000000}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:544: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw48/test_qoder_adapter_reads_confi0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+__ TestCarriedConsistency.test_carried_values_match_the_determination_record ___
+[gw71] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCarriedConsistency object at 0x7fb651ecdf90>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw71/test_carried_values_match_the_0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw71/test_carried_values_match_the_0/home')
+
+    def test_carried_values_match_the_determination_record(self, ws, fake_home):
+        made = make_determination(ws, "/speckit.plan", "run-v7")
+        assert made.returncode == 0, made.stderr
+        result = run_engine(collect_args(ws, run_id="run-v7"), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       det = self._store_record(ws)
+              ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:894: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <contract.test_exec_quant_engine.TestCarriedConsistency object at 0x7fb651ecdf90>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw71/test_carried_values_match_the_0/ws')
+
+    def _store_record(self, ws: Path) -> dict:
+>       entry = next((ws / ".specify" / "memory" / "session").glob("*run-determination*.md"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/contract/test_exec_quant_engine.py:885: StopIteration
+________ TestCarriedConsistency.test_synthesized_record_carries_nothing ________
+[gw72] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCarriedConsistency object at 0x7f9f0cf7d510>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw72/test_synthesized_record_carrie0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw72/test_synthesized_record_carrie0/home')
+
+    def test_synthesized_record_carries_nothing(self, ws, fake_home):
+        run_engine(collect_args(ws), env_home=fake_home)
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:912: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw72/test_synthesized_record_carrie0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_____________ TestIdentityForms.test_skill_form_infers_skill_type ______________
+[gw40] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestIdentityForms object at 0x7fd2fbeeca90>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw40/test_skill_form_infers_skill_t0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw40/test_skill_form_infers_skill_t0/home')
+
+    def test_skill_form_infers_skill_type(self, ws, fake_home):
+        result = run_engine(collect_args(ws, unit_id="skill:study-code"),
+                            env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       assert load_single_record(ws)["unit_type"] == "skill"
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw40/test_skill_form_infers_skill_t0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_______________ TestCollectContract.test_collect_explicit_run_id _______________
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7fd60d29d310>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw29/test_collect_explicit_run_id0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw29/test_collect_explicit_run_id0/home')
+
+    def test_collect_explicit_run_id(self, ws, fake_home):
+        result = run_engine(collect_args(ws, run_id="run-x1"), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw29/test_collect_explicit_run_id0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+______ TestAgentCollection.test_version_measured_from_wrapper_host_binary ______
+[gw52] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestAgentCollection object at 0x7f71a79ff510>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw52/test_version_measured_from_wra0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw52/test_version_measured_from_wra0/home')
+
+    def test_version_measured_from_wrapper_host_binary(self, ws, fake_home):
+        # the impersonated argv[0] name resolves through PATH on hosts that have
+        # the real CLI; where absent, the probe degrades to the marker
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw52/test_version_measured_from_wra0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+____________ TestLLMCollection.test_endpoint_candidates_origin_only ____________
+[gw46] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x7f10130cfb90>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw46/test_endpoint_candidates_origi0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw46/test_endpoint_candidates_origi0/home')
+
+    def test_endpoint_candidates_origin_only(self, ws, fake_home):
+        # the whitelist is read from the HOST process environ, so the values
+        # must be planted on the impersonated host (the wrapper), not the
+        # engine's own env
+        result = run_via_host_wrapper(
+            collect_args(ws),
+            env_home=fake_home,
+            extra_env={"ANTHROPIC_BASE_URL": "https://user:pw@api.example.com/v1/path?k=1",
+                       "DASHSCOPE_API_URL": "https://dashscope.example.com/compatible/v1"},
+        )
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:517: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw46/test_endpoint_candidates_origi0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_____ TestLLMCollection.test_qoder_adapter_reads_per_model_effort_when_set _____
+[gw49] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x7f1774f5a890>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw49/test_qoder_adapter_reads_per_m0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw49/test_qoder_adapter_reads_per_m0/home')
+
+    def test_qoder_adapter_reads_per_model_effort_when_set(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "qmodel_38max",
+                      "preferences": {"qmodel_38max": {
+                          "contextWindow": 1000000,
+                          "reasoning": {"enabled": True, "effort": "xhigh"}}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       llm = load_single_record(ws)["llm"]
+              ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw49/test_qoder_adapter_reads_per_m0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_______ TestAgentCollection.test_resolved_agent_fields_from_wrapper_host _______
+[gw51] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestAgentCollection object at 0x7f06a0e67310>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw51/test_resolved_agent_fields_fro0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw51/test_resolved_agent_fields_fro0/home')
+
+    def test_resolved_agent_fields_from_wrapper_host(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+>       record = load_single_record(ws)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:584: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw51/test_resolved_agent_fields_fro0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+___________ TestLLMCollection.test_endpoint_candidates_absent_marker ___________
+[gw47] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x7fcae3058290>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw47/test_endpoint_candidates_absen0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw47/test_endpoint_candidates_absen0/home')
+
+    def test_endpoint_candidates_absent_marker(self, ws, fake_home):
+        env = {k: "" for k in ("ANTHROPIC_BASE_URL", "ANTHROPIC_URL", "OPENAI_BASE_URL",
+                               "OPENAI_URL", "DASHSCOPE_API_URL",
+                               "ALIYUN_ANTHROPIC_COMPATIBLE_URL",
+                               "ALIYUN_OPENAI_COMPATIBLE_URL",
+                               "CLAUDE_ALIBABA_BASE_URL", "CLAUDE_OFFICIAL_BASE_URL")}
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home, extra_env=env)
+        assert result.returncode == 0, result.stderr
+>       assert load_single_record(ws)["llm"]["endpoint_candidates"] == NOT_EVALUATED
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_exec_quant_engine.py:533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw47/test_endpoint_candidates_absen0/ws')
+
+    def load_single_record(ws: Path) -> dict:
+        records = read_records(ws)
+>       assert len(records) == 1, f"expected 1 record, found {len(records)}"
+E       AssertionError: expected 1 record, found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:289: AssertionError
+_________ test_record_with_schema_violation_exits_2_and_writes_nothing _________
+[gw67] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw67/test_record_with_schema_violat0')
+
+    def test_record_with_schema_violation_exits_2_and_writes_nothing(tmp_path):
+        run_engine(["--action", "collect", "--workspace-root", str(tmp_path)], cwd=tmp_path)
+        store = tmp_path / STORE_REL
+>       before = store.read_text(encoding="utf-8")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sanitize_engine_contract.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw67/test_record_with_schema_violat0/.specify/memory/sanitize/findings.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw67/test_record_with_schema_violat0/.specify/memory/sanitize/findings.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_distill_writes_receipts_and_summaries __________________
+[gw52] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw52/test_distill_writes_receipts_a0')
+
+    def test_distill_writes_receipts_and_summaries(tmp_path: Path) -> None:
+        seeded = seed(tmp_path)
+        payload = _distill(tmp_path, seeded["promotions"])
+>       assert payload["stores"]["exec-quant"]["receipts"] == 1
+E       assert 0 == 1
+
+tests/contract/test_record_retention_engine.py:168: AssertionError
+__________________ test_scan_is_read_only_and_reports_blocked __________________
+[gw51] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw51/test_scan_is_read_only_and_rep0')
+
+    def test_scan_is_read_only_and_reports_blocked(tmp_path: Path) -> None:
+        seed(tmp_path)
+        before = {p: p.stat().st_mtime_ns for p in tmp_path.rglob("*") if p.is_file()}
+        proc = _run(tmp_path, "--action", "scan")
+        assert proc.returncode == 0, proc.stderr
+        payload = _json(proc)
+        after = {p: p.stat().st_mtime_ns for p in tmp_path.rglob("*") if p.is_file()}
+        assert before == after
+>       assert payload["stores"]["exec-quant"]["total"] == 1
+E       assert 0 == 1
+
+tests/contract/test_record_retention_engine.py:158: AssertionError
+_______________________ test_apply_repair_is_state_only ________________________
+[gw71] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw71/test_apply_repair_is_state_onl0')
+
+    def test_apply_repair_is_state_only(tmp_path):
+        finding = make_finding(
+            category="dead-reference", target=".specify/memory/todo/example.md#scripts/x.py",
+            detection="programmatic", disposition="repair", severity="medium",
+            evidenceRefs=[{"kind": "path", "ref": "scripts/x.py"}],
+        )
+        todo = tmp_path / ".specify" / "memory" / "todo"
+        todo.mkdir(parents=True, exist_ok=True)
+        (todo / "example.md").write_text("x\n", encoding="utf-8")
+        store_path = tmp_path / STORE_REL
+        store_path.parent.mkdir(parents=True, exist_ok=True)
+        store_path.write_text(json.dumps({"version": 1, "updated": "x", "findings": [finding]}), encoding="utf-8")
+        plan = tmp_path / "cleanup-plan.json"
+        plan.write_text(json.dumps({
+            "created": "x", "confirmed": True,
+            "items": [{"findingId": finding["id"], "disposition": "repair", "target": finding["target"]}],
+        }), encoding="utf-8")
+        proc = run_engine(
+            ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+            cwd=tmp_path,
+        )
+>       assert proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/sanitize-ut... stdout='{"ok": false, "error": "plan rejected", "details": ["item #0: unknown findingId 3275ed166132"]}\n', stderr='').returncode
+
+tests/contract/test_sanitize_engine_contract.py:201: AssertionError
+___________________ test_apply_archive_moves_to_archive_root ___________________
+[gw72] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw72/test_apply_archive_moves_to_ar0')
+
+    def test_apply_archive_moves_to_archive_root(tmp_path):
+        finding = make_finding(
+            category="redundant", target=".specify/memory/draft/old.md",
+            severity="low", summary="superseded by /speckit.docs rewrite",
+            evidenceRefs=[{"kind": "path", "ref": ".specify/memory/todo/new.md"}],
+            detection="semantic", disposition="archive",
+        )
+        draft = tmp_path / ".specify" / "memory" / "draft"
+        draft.mkdir(parents=True, exist_ok=True)
+        (draft / "old.md").write_text("old\n", encoding="utf-8")
+        store_path = tmp_path / STORE_REL
+        store_path.parent.mkdir(parents=True, exist_ok=True)
+        store_path.write_text(json.dumps({"version": 1, "updated": "x", "findings": [finding]}), encoding="utf-8")
+        plan = tmp_path / "cleanup-plan.json"
+        plan.write_text(json.dumps({
+            "created": "x", "confirmed": True,
+            "items": [{"findingId": finding["id"], "disposition": "archive", "target": finding["target"]}],
+        }), encoding="utf-8")
+        proc = run_engine(
+            ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
+            cwd=tmp_path,
+        )
+>       assert proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/sanitize-ut... stdout='{"ok": false, "error": "plan rejected", "details": ["item #0: unknown findingId 607b088dafb7"]}\n', stderr='').returncode
+
+tests/contract/test_sanitize_engine_contract.py:229: AssertionError
+___________ TestListRecords.test_scores_joined_latest_scored_at_wins ___________
+[gw60] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestListRecords object at 0x7f25fdc7c5d0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw60/test_scores_joined_latest_scor0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw60/test_scores_joined_latest_scor0/home')
+
+    def test_scores_joined_latest_scored_at_wins(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+>       record = read_records(ws)[0]
+                 ^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_exec_quant_engine.py:699: IndexError
+____________________ TestListRecords.test_filter_by_run_id _____________________
+[gw57] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestListRecords object at 0x7efc039cd950>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw57/test_filter_by_run_id0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw57/test_filter_by_run_id0/home')
+
+    def test_filter_by_run_id(self, ws, fake_home):
+        _collect_two_units(ws, fake_home)
+        records = read_records(ws)
+>       run_id = records[0]["run_id"]
+                 ^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/contract/test_exec_quant_engine.py:670: IndexError
+______________ test_collect_creates_store_and_writes_nothing_else ______________
+[gw65] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw65/test_collect_creates_store_and0')
+
+    def test_collect_creates_store_and_writes_nothing_else(tmp_path):
+        before = {p: p.stat().st_mtime_ns for p in tmp_path.rglob("*") if p.is_file()}
+        run_engine(["--action", "collect", "--workspace-root", str(tmp_path)], cwd=tmp_path)
+        store = tmp_path / STORE_REL
+>       assert store.is_file(), "collect must persist the findings store"
+E       AssertionError: collect must persist the findings store
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw65/test_collect_creates_store_and0/.specify/memory/sanitize/findings.json').is_file
+
+tests/contract/test_sanitize_engine_contract.py:97: AssertionError
+____________ TestCollectContract.test_collect_idempotent_duplicate _____________
+[gw35] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestCollectContract object at 0x7f4a72b0eb50>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw35/test_collect_idempotent_duplic0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw35/test_collect_idempotent_duplic0/home')
+
+    def test_collect_idempotent_duplicate(self, ws, fake_home):
+        first = run_engine(collect_args(ws, run_id="dup-1"), env_home=fake_home)
+        assert first.returncode == 0, first.stderr
+        second = run_engine(collect_args(ws, run_id="dup-1"), env_home=fake_home)
+        assert second.returncode == 0, second.stderr
+        assert "duplicate" in (second.stdout + second.stderr).lower()
+>       assert len(read_records(ws)) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = len([])
+E        +    where [] = read_records(PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw35/test_collect_idempotent_duplic0/ws'))
+
+tests/contract/test_exec_quant_engine.py:433: AssertionError
+_____________________ test_apply_refuses_dirty_git_targets _____________________
+[gw57] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw57/test_apply_refuses_dirty_git_t0')
+
+    def test_apply_refuses_dirty_git_targets(tmp_path: Path) -> None:
+        seeded = seed(tmp_path)
+        _distill(tmp_path, seeded["promotions"])
+        plan = _plan(tmp_path, "feedback")
+        _confirm(plan)
+        subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+        subprocess.run(["git", "add", "."], cwd=tmp_path, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@example.com", "-c", "user.name=t",
+             "commit", "-qm", "seed"], cwd=tmp_path, check=True)
+        target = tmp_path / ".specify/memory/feedback/20260901T000000Z-speckit-plan.md"
+        target.write_text(target.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        refused = _apply(tmp_path, plan)
+>       assert refused.returncode == 2
+E       AssertionError: assert 0 == 2
+E        +  where 0 = <InProcessResult args=['/storage/project/cloud-native-ai/spec-kit/scripts/python/record-retention.py', '--action', 'ap...son', '--workspace-root', '/tmp/pytest-of-agent/pytest-17119/popen-gw57/test_apply_refuses_dirty_git_t0'] returncode=0>.returncode
+
+tests/contract/test_record_retention_engine.py:263: AssertionError
+____________ test_apply_requires_confirmation_and_conserves_counts _____________
+[gw53] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw53/test_apply_requires_confirmati0')
+
+    def test_apply_requires_confirmation_and_conserves_counts(tmp_path: Path) -> None:
+        seeded = seed(tmp_path)
+        _distill(tmp_path, seeded["promotions"])
+        plan = _plan(tmp_path)
+    
+        refused = _apply(tmp_path, plan, "--allow-unversioned")
+        assert refused.returncode == 2
+        assert "confirmed" in refused.stderr
+        assert (tmp_path / ".specify/memory/exec-quant/records/old.json").is_file()
+    
+        _confirm(plan)
+        applied = _apply(tmp_path, plan, "--allow-unversioned")
+        assert applied.returncode == 0, applied.stderr
+        payload = _json(applied)
+>       assert payload["removed"] == 4
+E       assert 0 == 4
+
+tests/contract/test_record_retention_engine.py:204: AssertionError
+________________________ test_too_young_is_not_planned _________________________
+[gw55] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw55/test_too_young_is_not_planned0')
+
+    def test_too_young_is_not_planned(tmp_path: Path) -> None:
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        seeded = seed(tmp_path, created=now)
+        _distill(tmp_path, seeded["promotions"])
+        scan = _json(_run(tmp_path, "--action", "scan", "--stores", "exec-quant"))
+>       assert scan["stores"]["exec-quant"]["too_young"] == 1
+E       assert 0 == 1
+
+tests/contract/test_record_retention_engine.py:233: AssertionError
+___________________________ test_idempotent_distill ____________________________
+[gw54] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw54/test_idempotent_distill0')
+
+    def test_idempotent_distill(tmp_path: Path) -> None:
+        seeded = seed(tmp_path)
+        first = _distill(tmp_path, seeded["promotions"])
+        second = _distill(tmp_path, seeded["promotions"])
+>       assert sum(item["receipts"] for item in first["stores"].values()) == 4
+E       assert 0 == 4
+E        +  where 0 = sum(<generator object test_idempotent_distill.<locals>.<genexpr> at 0x7ff558d89220>)
+
+tests/contract/test_record_retention_engine.py:222: AssertionError
+________________ test_two_writers_create_distinct_receipt_paths ________________
+[gw58] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw58/test_two_writers_create_distin0')
+
+    def test_two_writers_create_distinct_receipt_paths(tmp_path: Path) -> None:
+        seed(tmp_path)
+        procs = [
+            subprocess.Popen(
+                [sys.executable, str(ENGINE), "--action", "distill", "--stores",
+                 "exec-quant", "--workspace-root", str(tmp_path)],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            for _ in range(2)
+        ]
+        for proc in procs:
+            _out, err = proc.communicate(timeout=120)
+            assert proc.returncode == 0, err
+        receipts = list((tmp_path / ".specify/memory/retention/receipts").glob("*.json"))
+>       assert receipts
+E       assert []
+
+tests/contract/test_record_retention_engine.py:283: AssertionError
+__________ TestAppendOnly.test_actions_never_rewrite_existing_entries __________
+[gw66] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestAppendOnly object at 0x7f388cd48810>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw66/test_actions_never_rewrite_exi0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw66/test_actions_never_rewrite_exi0/home')
+
+    def test_actions_never_rewrite_existing_entries(self, ws, fake_home):
+        run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)
+        run_engine(collect_args(ws, unit_id="skill:study-code", run_id="v4-b"),
+                   env_home=fake_home)
+        records_before = records_snapshot(ws)
+        scores_before = scores_snapshot(ws)
+        run_engine(["--action", "list-records", "--workspace-root", str(ws)],
+                   env_home=fake_home)
+        run_engine(["--action", "score", "--workspace-root", str(ws),
+                    "--unit-id", "/speckit.plan", "--run-id", "v4-a", "--score", "3"],
+                   env_home=fake_home)
+        run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)  # duplicate
+        assert records_snapshot(ws) == records_before, \
+            "list/score/duplicate-collect must leave every record entry byte-identical"
+        scores_after = scores_snapshot(ws)
+        new_scores = set(scores_after) - set(scores_before)
+>       assert len(new_scores) == 1, "exactly one score entry file is added"
+E       AssertionError: exactly one score entry file is added
+E       assert 0 == 1
+E        +  where 0 = len(set())
+
+tests/contract/test_exec_quant_engine.py:816: AssertionError
+__________________________ test_status_is_zero_write ___________________________
+[gw66] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw66/test_status_is_zero_write0')
+
+    def test_status_is_zero_write(tmp_path):
+        run_engine(["--action", "collect", "--workspace-root", str(tmp_path)], cwd=tmp_path)
+        store = tmp_path / STORE_REL
+>       before = (store.read_bytes(), store.stat().st_mtime_ns)
+                  ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sanitize_engine_contract.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1050: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw66/test_status_is_zero_write0/.specify/memory/sanitize/findings.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw66/test_status_is_zero_write0/.specify/memory/sanitize/findings.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+_______ TestSizeCap.test_oversized_record_is_field_truncated_and_capped ________
+[gw68] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_exec_quant_engine.TestSizeCap object at 0x7fc82729a7d0>
+ws = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw68/test_oversized_record_is_field0/ws')
+fake_home = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw68/test_oversized_record_is_field0/home')
+
+    def test_oversized_record_is_field_truncated_and_capped(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home,
+                                      wrapper_args=("x" * 70000,))
+        assert result.returncode == 0, result.stderr
+        entry_files = record_files(ws)
+>       assert len(entry_files) == 1, f"expected one entry file, found {entry_files}"
+E       AssertionError: expected one entry file, found []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_exec_quant_engine.py:833: AssertionError
+__________________ test_record_accepts_valid_semantic_finding __________________
+[gw68] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw68/test_record_accepts_valid_sema0')
+
+    def test_record_accepts_valid_semantic_finding(tmp_path):
+        run_engine(["--action", "collect", "--workspace-root", str(tmp_path)], cwd=tmp_path)
+        verdicts = tmp_path / "verdicts.json"
+        verdicts.write_text(json.dumps({"findings": [make_finding()]}), encoding="utf-8")
+        proc = run_engine(
+            ["--action", "record", "--file", str(verdicts), "--workspace-root", str(tmp_path)],
+            cwd=tmp_path,
+        )
+        assert proc.returncode == 0
+>       store = json.loads((tmp_path / STORE_REL).read_text(encoding="utf-8"))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sanitize_engine_contract.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-agent/pytest-17119/popen-gw68/test_record_accepts_valid_sema0/.specify/memory/sanitize/findings.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-agent/pytest-17119/popen-gw68/test_record_accepts_valid_sema0/.specify/memory/sanitize/findings.json'
+
+/usr/lib64/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/unit/test_memory_utils.py::test_knowledge_non_ascii_titles_do_not_overwrite
+FAILED tests/unit/test_memory_utils.py::test_knowledge_upsert_merges_tags - a...
+FAILED tests/contract/test_probe_registry_umbrella.py::test_feedback_utils_probe_validate_still_green
+FAILED tests/unit/test_memory_utils.py::test_prune_keeps_only_max_entries - a...
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_ignores_determination_outside_recent_window
+FAILED tests/contract/test_trigger_engine.py::test_c7_explicit_workspace_wins
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[missing]
+FAILED tests/contract/test_trigger_engine.py::test_c6_no_partial_file_left_behind
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[corrupt]
+FAILED tests/contract/test_trigger_engine.py::test_c19_no_write_outside_workspace_root
+FAILED tests/contract/test_trigger_engine.py::test_init_maintains_the_telemetry_ignore_entry
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[incompatible]
+FAILED tests/contract/test_seal_engine_contract.py::test_c009_mirror_copy_refuses_write_actions
+FAILED tests/contract/test_trigger_engine.py::test_init_writes_the_e6_shape
+FAILED tests/contract/test_trigger_engine.py::test_init_is_idempotent - FileN...
+FAILED tests/contract/test_trigger_engine.py::test_c14_silent_turn_has_no_visible_output
+FAILED tests/contract/test_role_edge_engine.py::test_three_forms_remote_topology
+FAILED tests/contract/test_trigger_engine.py::test_init_does_not_revert_local_tuning
+FAILED tests/contract/test_trigger_engine.py::test_c14_assess_appends_exactly_one_row
+FAILED tests/contract/test_trigger_engine.py::test_c14_compliance_done_clears_the_violation
+FAILED tests/contract/test_sanitize_engine_contract.py::test_apply_executes_confirmed_delete_and_updates_state
+FAILED tests/contract/test_role_edge_engine.py::test_mirror_copy_answers_help_and_version
+FAILED tests/contract/test_trigger_engine.py::test_c14_ordering_violation_reported_but_row_still_written
+FAILED tests/contract/test_seal_engine_contract.py::test_c009_read_actions_are_not_refused_by_the_mirror_guard
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_floor_rejected
+FAILED tests/contract/test_trigger_engine.py::test_c20_repeat_in_same_session_is_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c17_destructive_never_promotes_over_ten_acceptances
+FAILED tests/contract/test_seal_engine_contract.py::test_fr021_engine_is_stdlib_only
+FAILED tests/contract/test_seal_engine_contract.py::test_c010_json_and_human_renderings_agree
+FAILED tests/contract/test_seal_engine_contract.py::test_c009_an_ancestor_specify_is_not_the_mirror_signal
+FAILED tests/contract/test_trigger_engine.py::test_c16_accepted_increments_and_declined_resets
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_writes_storage_and_record
+FAILED tests/contract/test_trigger_engine.py::test_c16_reaching_the_threshold_promotes
+FAILED tests/contract/test_exec_quant_engine.py::TestIdentityForms::test_custom_form_infers_custom_unit_type
+FAILED tests/contract/test_seal_engine_contract.py::test_c006_refusal_report_is_rerun_stable
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_synthesized_without_determination
+FAILED tests/contract/test_exec_quant_engine.py::TestScoreAction::test_score_appends_only_to_scores
+FAILED tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+FAILED tests/contract/test_exec_quant_engine.py::TestNonBlocking::test_write_failure_exits_1_cleanly
+FAILED tests/contract/test_exec_quant_engine.py::TestScoreAction::test_score_bounds
+FAILED tests/contract/test_exec_quant_engine.py::TestFieldBinaryLaw::test_degraded_record_holds_the_law
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_missing_config_face_degrades_to_marker
+FAILED tests/contract/test_exec_quant_engine.py::TestCredentialDefense::test_engine_masks_credential_shaped_config_values
+FAILED tests/contract/test_exec_quant_engine.py::TestSizeCap::test_normal_record_is_not_truncated
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_explicit_run_id_carries_matching_record
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_adopts_recent_determination_run_id
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_counts_errors_from_declared_sources
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_write_failure_exits_1_with_visible_stderr
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_config_face
+FAILED tests/contract/test_exec_quant_engine.py::TestCarriedConsistency::test_carried_values_match_the_determination_record
+FAILED tests/contract/test_exec_quant_engine.py::TestCarriedConsistency::test_synthesized_record_carries_nothing
+FAILED tests/contract/test_exec_quant_engine.py::TestIdentityForms::test_skill_form_infers_skill_type
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_explicit_run_id
+FAILED tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_version_measured_from_wrapper_host_binary
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_origin_only
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_per_model_effort_when_set
+FAILED tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_resolved_agent_fields_from_wrapper_host
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_absent_marker
+FAILED tests/contract/test_sanitize_engine_contract.py::test_record_with_schema_violation_exits_2_and_writes_nothing
+FAILED tests/contract/test_record_retention_engine.py::test_distill_writes_receipts_and_summaries
+FAILED tests/contract/test_record_retention_engine.py::test_scan_is_read_only_and_reports_blocked
+FAILED tests/contract/test_sanitize_engine_contract.py::test_apply_repair_is_state_only
+FAILED tests/contract/test_sanitize_engine_contract.py::test_apply_archive_moves_to_archive_root
+FAILED tests/contract/test_exec_quant_engine.py::TestListRecords::test_scores_joined_latest_scored_at_wins
+FAILED tests/contract/test_exec_quant_engine.py::TestListRecords::test_filter_by_run_id
+FAILED tests/contract/test_sanitize_engine_contract.py::test_collect_creates_store_and_writes_nothing_else
+FAILED tests/contract/test_exec_quant_engine.py::TestCollectContract::test_collect_idempotent_duplicate
+FAILED tests/contract/test_record_retention_engine.py::test_apply_refuses_dirty_git_targets
+FAILED tests/contract/test_record_retention_engine.py::test_apply_requires_confirmation_and_conserves_counts
+FAILED tests/contract/test_record_retention_engine.py::test_too_young_is_not_planned
+FAILED tests/contract/test_record_retention_engine.py::test_idempotent_distill
+FAILED tests/contract/test_record_retention_engine.py::test_two_writers_create_distinct_receipt_paths
+FAILED tests/contract/test_exec_quant_engine.py::TestAppendOnly::test_actions_never_rewrite_existing_entries
+FAILED tests/contract/test_sanitize_engine_contract.py::test_status_is_zero_write
+FAILED tests/contract/test_exec_quant_engine.py::TestSizeCap::test_oversized_record_is_field_truncated_and_capped
+FAILED tests/contract/test_sanitize_engine_contract.py::test_record_accepts_valid_semantic_finding
+76 failed, 264 passed in 13.00s

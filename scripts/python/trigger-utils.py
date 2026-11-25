@@ -56,10 +56,10 @@ REPO_ROOT = _HERE.parents[2]
 if REPO_ROOT.name == ".specify":
     REPO_ROOT = REPO_ROOT.parent
 
-STORE_RELPATH = Path(".specify") / "memory" / "trigger"
+STORE_RELPATH = Path(".specify") / "trigger"
 INDEX_NAME = "index.json"
 TELEMETRY_NAME = "telemetry.jsonl"
-IGNORE_ENTRY = "memory/trigger/telemetry.jsonl"
+IGNORE_ENTRY = "trigger/telemetry.jsonl"
 SEED_CANDIDATES = (
     Path(".specify") / "templates" / "proactive-trigger-seed.json",
     Path("templates") / "proactive-trigger-seed.json",
@@ -465,7 +465,7 @@ def load_seed(root: Path):
 
 def blank_state(seed) -> dict:
     return {
-        "store": ".specify/memory/trigger/",
+        "store": ".specify/trigger/",
         "schemaVersion": SCHEMA_VERSION,
         "updated": utc_now(),
         "config": dict(DEFAULT_CONFIG),
@@ -524,7 +524,7 @@ def read_index(root: Path):
         data.setdefault(key, dict(default) if isinstance(default, dict) else list(default))
     data.setdefault("lastSuggestion", {})
     data.setdefault("manualInvocations", [])
-    data.setdefault("store", ".specify/memory/trigger/")
+    data.setdefault("store", ".specify/trigger/")
     data.setdefault("updated", utc_now())
     return data, None
 

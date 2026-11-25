@@ -1,0 +1,5 @@
+task: T003
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: shared/declarations/facts/runtime-store-layout.yaml created (14 stores, retired container, legacy members, consumers, former_carriers); registered in shared/declarations/contract.yaml; declaration_reader load verified exit 0; layout test now shows test_inventory_is_closed and test_two_writers_distinct_paths green
+at: 2026-11-25T05:05:41Z

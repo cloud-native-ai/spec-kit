@@ -1,0 +1,217 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_runtime_store_layout.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+________________________ test_repo_has_no_retired_root _________________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_repo_has_no_retired_root():
+>       assert not (REPO_ROOT / RETIRED_ROOT).exists(), (
+            f"{RETIRED_ROOT} is a retired store root; the dogfood migration (US5) must remove it"
+        )
+E       AssertionError: .specify/memory is a retired store root; the dogfood migration (US5) must remove it
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = (PosixPath('/storage/project/cloud-native-ai/spec-kit') / '.specify/memory').exists
+
+tests/contract/test_runtime_store_layout.py:278: AssertionError
+_____________ test_declaration_equals_inventory_and_consumer_sets ______________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+>           fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+
+tests/contract/test_runtime_store_layout.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/storage/project/cloud-native-ai/spec-kit')
+slug = 'runtime-store-layout'
+
+    def load_fact(repo, slug):
+        """One fact declaration by slug; an absent one is the `STR-014` finding, not a silent None."""
+        for fact in load_facts(repo):
+            if str(fact["body"].get("fact", "")).strip() == slug:
+                return fact
+>       raise DeclarationError(
+            "no declaration for fact %r" % slug, template=ABSENT_FINDING, slug=slug)
+E       declaration_reader.DeclarationError: no declaration for fact 'runtime-store-layout'
+
+scripts/python/declaration_reader.py:405: DeclarationError
+
+During handling of the above exception, another exception occurred:
+
+    def test_declaration_equals_inventory_and_consumer_sets():
+>       body = _declaration()
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_runtime_store_layout.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+            fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+        except declaration_reader.DeclarationError as exc:
+>           pytest.fail(f"{declaration_reader.absent_label(DECLARATION_SLUG)}: {exc}")
+E           Failed: declaration-absent: runtime-store-layout: no declaration for fact 'runtime-store-layout'
+
+tests/contract/test_runtime_store_layout.py:84: Failed
+____________________ test_framework_map_rows_and_tombstone _____________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+>           fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+
+tests/contract/test_runtime_store_layout.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/storage/project/cloud-native-ai/spec-kit')
+slug = 'runtime-store-layout'
+
+    def load_fact(repo, slug):
+        """One fact declaration by slug; an absent one is the `STR-014` finding, not a silent None."""
+        for fact in load_facts(repo):
+            if str(fact["body"].get("fact", "")).strip() == slug:
+                return fact
+>       raise DeclarationError(
+            "no declaration for fact %r" % slug, template=ABSENT_FINDING, slug=slug)
+E       declaration_reader.DeclarationError: no declaration for fact 'runtime-store-layout'
+
+scripts/python/declaration_reader.py:405: DeclarationError
+
+During handling of the above exception, another exception occurred:
+
+    def test_framework_map_rows_and_tombstone():
+>       body = _declaration()
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_runtime_store_layout.py:238: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+            fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+        except declaration_reader.DeclarationError as exc:
+>           pytest.fail(f"{declaration_reader.absent_label(DECLARATION_SLUG)}: {exc}")
+E           Failed: declaration-absent: runtime-store-layout: no declaration for fact 'runtime-store-layout'
+
+tests/contract/test_runtime_store_layout.py:84: Failed
+___________________________ test_inventory_is_closed ___________________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+>           fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+
+tests/contract/test_runtime_store_layout.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/storage/project/cloud-native-ai/spec-kit')
+slug = 'runtime-store-layout'
+
+    def load_fact(repo, slug):
+        """One fact declaration by slug; an absent one is the `STR-014` finding, not a silent None."""
+        for fact in load_facts(repo):
+            if str(fact["body"].get("fact", "")).strip() == slug:
+                return fact
+>       raise DeclarationError(
+            "no declaration for fact %r" % slug, template=ABSENT_FINDING, slug=slug)
+E       declaration_reader.DeclarationError: no declaration for fact 'runtime-store-layout'
+
+scripts/python/declaration_reader.py:405: DeclarationError
+
+During handling of the above exception, another exception occurred:
+
+    def test_inventory_is_closed():
+>       body = _declaration()
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_runtime_store_layout.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+            fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+        except declaration_reader.DeclarationError as exc:
+>           pytest.fail(f"{declaration_reader.absent_label(DECLARATION_SLUG)}: {exc}")
+E           Failed: declaration-absent: runtime-store-layout: no declaration for fact 'runtime-store-layout'
+
+tests/contract/test_runtime_store_layout.py:84: Failed
+_______________________ test_two_writers_distinct_paths ________________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+>           fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+
+tests/contract/test_runtime_store_layout.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/storage/project/cloud-native-ai/spec-kit')
+slug = 'runtime-store-layout'
+
+    def load_fact(repo, slug):
+        """One fact declaration by slug; an absent one is the `STR-014` finding, not a silent None."""
+        for fact in load_facts(repo):
+            if str(fact["body"].get("fact", "")).strip() == slug:
+                return fact
+>       raise DeclarationError(
+            "no declaration for fact %r" % slug, template=ABSENT_FINDING, slug=slug)
+E       declaration_reader.DeclarationError: no declaration for fact 'runtime-store-layout'
+
+scripts/python/declaration_reader.py:405: DeclarationError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17105/popen-gw5/test_two_writers_distinct_path0')
+
+    def test_two_writers_distinct_paths(tmp_path: Path):
+>       body = _declaration()
+               ^^^^^^^^^^^^^^
+
+tests/contract/test_runtime_store_layout.py:360: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _declaration():
+        """The layout fact body; an absent declaration is the STR-014 finding, never a pass."""
+        try:
+            fact = declaration_reader.load_fact(
+                declaration_reader.find_repo(REPO_ROOT), DECLARATION_SLUG
+            )
+        except declaration_reader.DeclarationError as exc:
+>           pytest.fail(f"{declaration_reader.absent_label(DECLARATION_SLUG)}: {exc}")
+E           Failed: declaration-absent: runtime-store-layout: no declaration for fact 'runtime-store-layout'
+
+tests/contract/test_runtime_store_layout.py:84: Failed
+=========================== short test summary info ============================
+FAILED tests/contract/test_runtime_store_layout.py::test_repo_has_no_retired_root
+FAILED tests/contract/test_runtime_store_layout.py::test_declaration_equals_inventory_and_consumer_sets
+FAILED tests/contract/test_runtime_store_layout.py::test_framework_map_rows_and_tombstone
+FAILED tests/contract/test_runtime_store_layout.py::test_inventory_is_closed
+FAILED tests/contract/test_runtime_store_layout.py::test_two_writers_distinct_paths
+5 failed, 1 passed in 6.72s

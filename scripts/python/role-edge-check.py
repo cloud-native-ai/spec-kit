@@ -16,8 +16,7 @@ Carriers (read-only, no new store):
   ``role_edge`` object, plus the four-piece artifact set when the sidecar is absent
   (``--state-dir``);
 * ``run-agent`` dispatch record written by ``exec-quant.py --action collect-dispatch``,
-  located at the store the record shape already declares — ``<state-dir>/../memory/
-  exec-quant/records`` (``run-agent-label`` carrier); the child's artifact triplet
+  located at the store the record shape already declares — ``<state-dir>/../exec-quant/records`` (``run-agent-label`` carrier); the child's artifact triplet
   under ``--logs-dir`` confirms the dispatch took hold;
 * the line registry (``--registry-dir``) cross-checks identities only; when absent it
   is empty, never fatal.
@@ -407,7 +406,7 @@ def _parse_registry(registry_dir) -> tuple:
 
 
 def _parse_dispatch_records(state_dir: Path, triplet_labels) -> tuple:
-    store = state_dir.parent / "memory" / "exec-quant" / "records"
+    store = state_dir.parent / "exec-quant" / "records"
     rows = []
     unconfirmed = 0
     if not store.is_dir():

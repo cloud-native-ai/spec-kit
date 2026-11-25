@@ -4,7 +4,7 @@
 Recording Only: every completed execution of a covered unit (the same unit
 semantics as run-determination) lands ONE quant record — agent program fields,
 LLM detail fields, quality fields — into the engine-owned durable store
-``.specify/memory/exec-quant/``. Each entry is its own timestamp-named file
+``.specify/exec-quant/``. Each entry is its own timestamp-named file
 under ``records/`` or ``scores/``: concurrent branches then append different
 files instead of colliding on one shared tracked file. Legacy
 ``records.jsonl`` / ``scores.jsonl`` stores stay readable (read-only
@@ -160,7 +160,7 @@ RECENT_WINDOW_MINUTES = 90
 #: data-model V5: single-record serialization cap.
 RECORD_SIZE_CAP_BYTES = 64 * 1024
 
-STORAGE_REL = Path(".specify") / "memory" / "exec-quant"
+STORAGE_REL = Path(".specify") / "exec-quant"
 RECORDS_DIR_NAME = "records"
 SCORES_DIR_NAME = "scores"
 LEGACY_RECORDS_NAME = "records.jsonl"

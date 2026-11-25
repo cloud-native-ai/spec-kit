@@ -1,0 +1,29 @@
+$ find .specify -maxdepth 1 -mindepth 1 | sort
+.specify/agents
+.specify/constitution.md
+.specify/features
+.specify/features.md
+.specify/.gitignore
+.specify/knowledge
+.specify/scripts
+.specify/session
+.specify/shared
+.specify/skills
+.specify/source.json
+.specify/templates
+.specify/tools.md
+.specify/workflow
+
+$ ls .specify/session .specify/knowledge
+.specify/knowledge:
+.
+..
+.gitkeep
+
+.specify/session:
+.
+..
+.gitkeep
+
+$ test -e .specify/memory
+ABSENT
