@@ -13,10 +13,10 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 024
+**Feature Name**: Specification Workspace Versioning
 
-<!-- Binding 由 /speckit.clarify 按 Feature Integration Protocol 履行；本阶段不创建、不绑定 Feature。 -->
+**Binding basis (2026-11-25 clarify)**: 本规格是 Feature 024 的第二个子规格（首个为 097 `/speckit.migrate`）：024 owns「跨 CLI 版本的 `.specify/` 工作区结构升级与迁移」，本规格把运行期存储从 `.specify/memory/` 迁往顶层存储根并复用 `specify migrate` 的 plan → apply → 回执面。候选排除：055（Conflict-Free Stores）只 owns 逐条一文件的存储协议，且本规格 FR-025 明令该协议保持不变；015（CLI Interface）只 owns 命令面本身——二者均不覆盖「工作区布局迁移」语义。slice 行 105 以 `Draft` 登记，Feature Details 指向 `.specify/features/024-specification-workspace-versioning.md`；父行状态保持 `Ready for Review`，不回退。
 
 ## Overview
 
@@ -37,17 +37,17 @@
 | **A-3** | **无「原样保留」的子目录**：基线的每个子目录都被分类并给出唯一处置——迁往具名顶层存储，或退役。不得因为「它已存在」而静默保留；新增发现（实现期扫描到、本文表格未列）是**表格修订**，不是静默保留。 | 简报要求完整清点与分类；目录治理要求每个目录有可达含义。 |
 | **A-4** | **命名与落点**：沿用既有子目录名作为顶层存储名（`.specify/<store>/`），不新建分组目录、不改名（`session`、`knowledge` 等闭集名保持）。顶层 `.specify/tools/` 与既有 `skills` 域同构（`.specify/skills/` 目录 + `.specify/skills.md` 指南并列），因此 Tool 记录与生成清单同域共存。 | Grounded Naming：名字来自既有存储名；`tools` 有 `skills` 的现行先例。 |
 | **A-5** | **`.specify/tools/` 域合并**：Tool 定义记录（`<name>.md`，权威、受跟踪）与生成清单（`{system,shell,project}.json`，机器生成、忽略）同放 `.specify/tools/`；`.specify/.gitignore` 的 `tools/` 全目录忽略规则收窄为仅忽略生成物，记录保持受跟踪。 | 现状已是「记录在 `memory/tools/`、清单在 `.specify/tools/`」的分裂；并入一个 tools 域消除分裂，且与注册义务一致（目录即概念）。 |
-| **A-6** | **迁移归属安装/升级面**：一次性迁移由 `specify init`（既有项目刷新）与 `specify migrate`（计划 → apply → 回执）承担，不在每个引擎里做隐式懒迁移，也不做运行时旧路径回退。 | 简报要求迁移/拒绝是显式设计输出；`specify migrate` 已拥有「dry-run → apply → archive-first → 回执」的既有结构，复用优于新建。 |
-| **A-7** | **两处并存 = 冲突拒绝**：同一存储的旧位置与新位置**同时存在非空内容**时，MUST 拒绝自动合并，点名两侧路径与修复入口；MUST NOT 静默择一、覆盖或删除。旧位置存在但为空、新位置任意 ⇒ 属空残留，按 A-2 移除旧目录（不涉数据）。 | 静默合并会伪造权威；拒绝是唯一不丢数据且不复活旧路径的确定行为（fast-fail）。 |
+| **A-6** | **迁移归属安装/升级面**：一次性迁移由 `specify init`（既有项目刷新）与 `specify migrate`（计划 → apply → 回执）承担，不在每个引擎里做隐式懒迁移，也不做运行时旧路径回退。（2026-11-25 clarify：数据搬迁的唯一执行者是 `specify migrate`；`specify init` 只负责播种新布局与资产刷新，见 FR-013。） | 简报要求迁移/拒绝是显式设计输出；`specify migrate` 已拥有「dry-run → apply → archive-first → 回执」的既有结构，复用优于新建。 |
+| **A-7** | **两处并存 = 冲突拒绝**：同一存储的旧位置与新位置**同时存在非空内容**时，MUST 拒绝自动合并，点名两侧路径与修复入口；MUST NOT 静默择一、覆盖或删除。**冲突判定只统计该存储的权威条目**（2026-11-25 clarify 裁定）：机器可再生且被忽略的生成物（如 `.specify/tools/{system,shell,project}.json`）与安装器播种的占位/锚点文件不构成本义上的「内容」——迁移照常执行，且 MUST NOT 覆盖或删除它们（生成物按原 owner 再生或保留，占位留原处）。旧位置存在但为空、新位置任意 ⇒ 属空残留，按 A-2 移除旧目录（不涉数据）。 | 静默合并会伪造权威；拒绝是唯一不丢数据且不复活旧路径的确定行为（fast-fail）。若把生成物/占位计入，任何刷新过新布局的项目都会与旧数据假冲突，迁移永远无法收敛。 |
 | **A-8** | **无运行时双路径回退**：迁移完成后，引擎 MUST NOT 回读旧路径作为兼容层；旧路径字面量只允许出现在墓碑行、迁移引擎与其契约测试、以及遗留残留扫描器中。 | 简报明令「不得静默复活旧路径」；只读回退仍是第二权威，会让「数据在哪」不可判定。 |
 | **A-9** | **`todo/`、`coaching/`、`housekeeping/` 属运行期记录，迁出**：想法队列（人类 backlog）、教练运行产物、管家运行报告都不是 agent 语境记忆，迁往顶层同名存储。 | 请求把「不是人类语境下的一切需要记住的东西」列为目标；这三者正是其典型。 |
 | **A-10** | **`tools/` 不是运行期存储但是定义存储**：它不按 run 累积、不是瞬态数据；其迁出理由是「memory 不再是容器」，其落点由 A-5 决定。 | 分类的判据是语义而非清单长度；定义记录与运行记录必须各自有名。 |
 | **A-11** | **文档与词汇表只改活引用**：`docs/**` 的现行页面（concepts / reference / tutorials）与 `.specify/glossary.md`、`.specify/instructions.md`、已分发指南（`templates/tools.md` 等）更新到新路径；dated record（`docs/reference/history/**`、`docs/decisions/**`、`.specify/specs/**`、`.specify/archive/**`、记录型存储内的既有条目）**不改写**。 | 根因修复不等同于重写历史；历史文档是「当时的事实」。与 104 的 A-8 先例一致。 |
 | **A-12** | **两顶帽子**：源面是 `templates/`、`skills/`、`shared/`、`scripts/`、`src/`；本仓 `.specify/**` 的镜像与每工具命令副本由 `sync-mirrors.py` / `regen-command-copies.py` / 安装流程再生成，不手改镜像面。 | 本仓是 framework source 兼其自身客户；手改镜像会在同步时丢失。 |
-| **A-13** | **Feature 绑定留待 `/speckit.clarify`**：本阶段按 `create-requirements` 契约保持 `Related Feature: Need clarification`，不创建、不绑定 Feature。 | Feature Integration Protocol 的绑定时点在 clarify。 |
+| **A-13** | **Feature 绑定留待 `/speckit.clarify`**：本阶段按 `create-requirements` 契约保持 `Related Feature: Need clarification`，不创建、不绑定 Feature。（2026-11-25 clarify 已履行：已绑定 Feature 024，见 § Related Feature 与 § Clarifications；本条保留为 requirements 阶段的时点记录。） | Feature Integration Protocol 的绑定时点在 clarify。 |
 | **A-14** | **零新增机制**：不新增注册表、调度器、常驻进程、评分或第二注入机制；新顶层目录的「登记」复用既有框架地图行（目录治理的登记义务），不建目录索引生成器。 | 宪法 IX / XVII 与简报非目标。 |
 | **A-15** | **并发读数**：本阶段为单执行体的有界委派，按 `single-unit` 记录读数三元组（`requested` / `effective` / `effective_reason`）；改动面虽大，但文件读写与验收在同一叶内顺序完成，不构成单执行体内扇出。 | owner：`subagent-definitions.md` § The Concurrency Obligation、`serial-reason.yaml`。 |
-| **A-16** | **「Runtime Store」是新概念**：实测 `.specify/shared/definitions/` 下无该词条的 owner；本规格采用简报给出的工作分类（按 run 累积的记录、遥测、缓存、队列、回执、瞬态运行状态），并在实现期提议词汇表条目（用户确认通道），不在本文内联定义一个与既有 owner 竞争的定义。 | Concept-owner check：无 owner 的概念如实声明为新概念。 |
+| **A-16** | **「Runtime Store」是新概念**：实测 `.specify/shared/definitions/` 下无该词条的 owner；本规格采用简报给出的工作分类（按 run 累积的记录、遥测、缓存、队列、回执、瞬态运行状态），并在实现期提议词汇表条目（用户确认通道），不在本文内联定义一个与既有 owner 竞争的定义。**确认门语义（2026-11-25 clarify 裁定）**：提议文本留在该 run 的证据/笔记中；未经用户确认 MUST NOT 写入 `.specify/glossary.md`；FR-021 对 glossary 的既有活路径更新不受此门影响；无验收标准依赖该新词条，无人值守运行 MUST NOT 因等待确认而阻塞。 | Concept-owner check：无 owner 的概念如实声明为新概念；提议≠落地，且无人值守流程不得被确认门卡死。 |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -185,9 +185,9 @@
 
 #### D. 迁移、升级与客户数据安全
 
-- **FR-013**: 既有客户项目 MUST 有一条一次性迁移路径（由 `specify init` 的既有项目刷新与/或 `specify migrate` 承担，A-6），把旧布局中每个已知存储的内容移动到对应新顶层路径；迁移 MUST 幂等，且 MUST 按 run 写回执（每条目一文件，MUST NOT 写共享聚合）。
+- **FR-013**: 既有客户项目 MUST 有一条一次性迁移路径，把旧布局中每个已知存储的内容移动到对应新顶层路径；迁移 MUST 幂等，且 MUST 按 run 写回执（每条目一文件，MUST NOT 写共享聚合）。**执行者裁定（2026-11-25 clarify）**：数据搬迁的唯一执行者是 `specify migrate`（plan → apply → archive-first → 回执）；`specify init` 只负责全新工作区的布局播种与既有工作区的资产刷新，MUST NOT 搬移旧存储内容——检测到旧位置仍有内容时保持原地不动并指向 `specify migrate`（与 init 对 legacy anchor 的 skip-and-defer 先例一致，A-6、A-8）。
 - **FR-014**: 迁移中任何破坏性步骤 MUST archive-first（先归档再处置），数据零丢失，回执 MUST 记录可恢复路径；MUST NOT 以「删除旧目录」代替迁移。
-- **FR-015**: 同一存储的旧位置与新位置同时含非空内容时，迁移 MUST 拒绝自动合并（A-7）：点名两侧路径与修复入口（人工裁定合并或改配），MUST NOT 移动、覆盖或删除任何一侧；旧位置含未知项时 MUST 逐个报告并保留，删除只在用户确认后按 FR-014 进行。
+- **FR-015**: 同一存储的旧位置与新位置同时含非空内容时，迁移 MUST 拒绝自动合并（A-7）：点名两侧路径与修复入口（人工裁定合并或改配），MUST NOT 移动、覆盖或删除任何一侧；「非空内容」MUST 按 A-7 的权威条目口径判定（机器可再生的忽略生成物与安装器播种占位不计入，且 MUST NOT 被覆盖或删除）；旧位置含未知项时 MUST 逐个报告并保留，删除只在用户确认后按 FR-014 进行。
 - **FR-016**: 迁移完成后，退役根 [[STR-001]] MUST NOT 被重建或被读取；仍有未处理遗留内容的项目在下次引擎使用时 MUST 得到确定性拒绝或迁移指引，MUST NOT 得到一个掩盖旧数据的空新存储。迁移完成状态 MUST 可由现场事实判定（不依赖对话记忆）。
 - **FR-017**: 全新初始化 MUST 种出新布局（至少两个记忆存储；其余存储按需懒创建）并 MUST NOT 创建退役根；安装包种入内容与安装器核心资产保留清单 MUST 同步更新。
 
@@ -301,3 +301,10 @@
 - Q: 迁移在哪里发生，是否允许运行时旧路径回退？ → A: 由 `specify init` 刷新与 `specify migrate` 承担（A-6）；不允许运行时双路径回退（A-8）。
 - Q: 旧新并存如何处理？ → A: 一律拒绝自动合并，点名修复入口（A-7）；仅「旧空」属可安全移除的残留。
 - Q: 「临时记忆系统」与「动态注入」是否被重新定义？ → A: 不。前者是 memory 系统的 session 层（实测唯一临时记忆机制），后者是既有派发载荷 + memory-recall；本特性只改路径引用。
+
+### Session 2026-11-25（无人值守 clarify 阶段，Feature 绑定与残留歧义裁决）
+
+- Q: `Related Feature` 绑定到哪个既有 Feature？ → A: 绑定 Feature 024（Specification Workspace Versioning），以 slice 行 105 登记 `Draft`（先例：097/100/102）；父行状态保持 `Ready for Review` 不回退。候选排除：055 只 owns 逐条一文件的存储协议（FR-025 明令保持不变）、015 只 owns CLI 命令面，均不覆盖「工作区布局迁移」语义。
+- Q: 一次性迁移的执行者是 `specify init` 刷新还是 `specify migrate`（FR-013 原文「和/或」）？ → A: 数据搬迁唯一执行者 = `specify migrate`（plan → apply → archive-first → 回执）；`specify init` 只播种新布局/刷新资产并跳过旧内容，检测到旧存储内容时原地保留并指向 `specify migrate`；已落为 FR-013 的执行者裁定。
+- Q: A-7/FR-015 的「新位置含非空内容」如何对待忽略生成物与安装器占位？ → A: 冲突判定只统计各存储的权威条目；机器可再生且被忽略的生成物（如 `.specify/tools/*.json`）与安装器播种占位/锚点不构成冲突内容，迁移照常执行且不覆盖、不删除它们；已落为 A-7 的口径句与 FR-015 的引用。
+- Q: A-16 的「Runtime Store」词汇表条目何时落地、如何确认？ → A: 实现阶段产出提议文本并留在 run 证据/笔记；未经用户确认不写入 `.specify/glossary.md`；FR-021 的既有活路径更新先行；无验收标准依赖该词条，无人值守运行不因等待确认而阻塞。

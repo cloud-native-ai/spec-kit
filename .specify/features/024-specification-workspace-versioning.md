@@ -5,7 +5,7 @@
 **Description**: Version management and migration support for .specify/ workspace structure across CLI releases.  
 **Status**: Ready for Review  
 **Created**: 2026-06-05  
-**Last Updated**: 2026-11-11
+**Last Updated**: 2026-11-25（clarify：slice 105 runtime-store layout 绑定登记于 § Related Specifications；父状态保持 `Ready for Review`）
 
 ## Overview
 
@@ -52,7 +52,11 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 
 - Feature Index: .specify/features.md
 - Feature Detail: .specify/features/024-specification-workspace-versioning.md
-- Bound Sub-Spec: .specify/specs/097-speckit-migrate-command/requirements.md
+
+### Related Specifications
+
+- `.specify/specs/097-speckit-migrate-command/requirements.md` — 本 Feature 的首个子规格（slice 行 097，`Ready for Review`）：声明驱动的一次性工作区收敛（plan → apply → archive-first → 回执）。
+- `.specify/specs/105-runtime-store-layout/requirements.md` — 第二个子规格（slice 行 105，`Draft`；2026-11-25 `/speckit.clarify` 绑定）：把 session/knowledge/feedback/evidence 等运行期存储迁出 `.specify/memory/` 到顶层存储根，并复用本 Feature 的 `specify migrate` 迁移/拒绝面；父行状态保持 `Ready for Review`，不回退。
 - Cross-referenced Feature: .specify/memory/features/045.md (Framework Source Provenance, Draft 2026-08-17) — the source/provenance axis, orthogonal to this schema-version axis; its stamp must NOT take this Feature's envisioned `.specify/version` marker path.
 
 ## Status Tracking
