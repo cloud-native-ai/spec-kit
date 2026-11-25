@@ -15,6 +15,7 @@ goal: >-
 anchor_slug: 105-runtime-store-layout
 territory:
   write:
+    - .specify/specs/105-runtime-store-layout/notes/**
     - .specify/specs/105-runtime-store-layout/writeback/**
     - .specify/specs/105-runtime-store-layout/test-evidence/**
     - .specify/session/**
@@ -31,7 +32,9 @@ territory:
     - .specify/todo/**
     - .specify/tools/**
     - .specify/migrate/**
+    - .specify/memory/**
     - seed/**
+    - memory/**
     - shared/**
     - skills/**
     - scripts/**

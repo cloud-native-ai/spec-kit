@@ -28,14 +28,18 @@ T001–T043 as defined in `.specify/specs/105-runtime-store-layout/tasks.md`.
 
 The paths the crew may write, relative to the repository:
 
+- write: `.specify/specs/105-runtime-store-layout/notes/**`
 - write: `.specify/specs/105-runtime-store-layout/writeback/**`
 - write: `.specify/specs/105-runtime-store-layout/test-evidence/**`
 - write: `.specify/{session,knowledge,feedback,evidence,exec-quant,trigger,retention,renumber,sanitize,housekeeping,coaching,todo,tools,migrate}/**`
-- write: `seed/**`, `shared/**`, `skills/**`, `scripts/**`, `src/specify_cli/**`, `templates/**`, `agents/**`, `tests/**`
+- write: `seed/**`, `memory/**`, `shared/**`, `skills/**`, `scripts/**`, `src/specify_cli/**`, `templates/**`, `agents/**`, `tests/**`
+- write: `.specify/memory/**`
 - write: `docs/concepts/**`, `docs/reference/**`, `docs/tutorials/**`, `docs/tasks/**`, `docs/contribute/**`
 - write: `.specify/shared/**`, `.specify/scripts/**`, `.specify/templates/**`, `.specify/agents/templates/**`, `.specify/skills/**`
 - write: `.github/prompts/**`, `.claude/commands/**`, `.qoder/commands/**`, `.opencode/command/**`
 - write: `.specify/instructions.md`, `.specify/glossary.md`, `.specify/.gitignore`, `pyproject.toml`
+
+The `memory/**` and `.specify/memory/**` grants are migration sources only (T008 package-seed rename, T033 dogfood move-out); no seat may create new content under either retired root.
 
 The following MUST stay forbidden to every seat that carries the expansion (C-62): `requirements.md`, `tasks.md`, `verification.md`, `handoff.md`; this contract additionally forbids `plan.md`, `data-model.md`, `contracts/**`, `quickstart.md`, `research.md`, `feature-ref.md`, `checkpoints/**`, `.specify/anchoring/**`, `.specify/teams/**`, `.specify/state/**`, `.specify/features.md`, `.specify/features/024-specification-workspace-versioning.md`, and dated documentation trees (`docs/reference/history/**`, `docs/decisions/**`, `docs/archive/**`).
 
