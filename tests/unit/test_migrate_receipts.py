@@ -4,7 +4,7 @@ Red-first: authored before the receipt store exists in ``specify_cli``.
 
 Storage contract (data-model.md E-3 / migrate-engine.md C-7):
 
-* one receipt file per run at ``.specify/memory/migrate/receipts/<run-id>.json``;
+* one receipt file per run at ``.specify/migrate/receipts/<run-id>.json``;
 * run-id shape ``YYYYMMDDTHHMMSSZ-<8 hex>``;
 * ``running`` on apply start, ``completed`` on clean close;
 * two concurrent writers land on distinct paths and never touch each other's
@@ -42,7 +42,16 @@ def test_one_receipt_file_per_run_in_running_state(tmp_path):
     assert path == migrate_receipts_dir(tmp_path) / f"{run_id}.json"
     assert path.is_file()
     payload = json.loads(path.read_text(encoding="utf-8"))
-    assert payload["receiptVersion"] == 1
+    assert payload["receiptVersion"] == 2
+    # E-5 iff-rule: a v2 receipt always carries the storeLayout object.
+    assert payload["storeLayout"] == {
+        "stores": 0,
+        "resolved": 0,
+        "refused": 0,
+        "blocked": 0,
+        "container": "absent",
+        "manifestDigest": None,
+    }
     assert payload["runId"] == run_id
     assert payload["mode"] == "apply"
     assert payload["status"] == "running"
@@ -123,7 +132,7 @@ def test_dry_run_writes_no_receipt_file(tmp_path):
 
     run_id = migrate_run_id(FIXED_NOW)
     dry_receipt = {
-        "receiptVersion": 1,
+        "receiptVersion": 2,
         "runId": run_id,
         "mode": "dry-run",
         "status": "completed",

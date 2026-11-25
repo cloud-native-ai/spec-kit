@@ -1,0 +1,5 @@
+task: T011
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/integration/test_store_layout_migration_us1_us2.py authored red-first; red run `run-tests.sh ... -q` exit 1, 5 failed (test-evidence/t011-red-run.txt), reading appended to notes/red-first-evidence.md § T011
+at: 2026-11-25T05:56:00Z

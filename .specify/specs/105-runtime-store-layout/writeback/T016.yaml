@@ -1,0 +1,5 @@
+task: T016
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: package gate `run-tests.sh tests/integration/test_store_layout_migration_us1_us2.py tests/contract/test_migrate_engine_contract.py tests/unit/test_migrate_planner.py -q` exit 0 / 32 passed (test-evidence/t016-us2-gate-run.txt); dry-run zero-write, diff -r byte-identical relocation, dual refusal (exit 3, both trees unchanged, container preserved) and rerun clean/no-op readings with outcome tokens and receipt paths recorded in notes/red-first-evidence.md § T016 and test-evidence/t016-us2-readings.txt
+at: 2026-11-25T05:56:00Z

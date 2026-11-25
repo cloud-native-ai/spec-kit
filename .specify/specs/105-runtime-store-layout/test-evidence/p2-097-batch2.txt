@@ -1,0 +1,8 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_migrate_template.py tests/contract/test_migrate_distribution_assembly.py tests/contract/test_migrate_cli_surface.py tests/integration/test_migrate_us1_converge.py tests/integration/test_migrate_us3_crossversion.py tests/integration/test_migrate_us4_equivalence.py tests/integration/test_migrate_us2_safety.py tests/unit/test_migrate_receipts.py tests/unit/test_migrate_planner.py tests/contract/test_migrate_engine_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed in 14.83s

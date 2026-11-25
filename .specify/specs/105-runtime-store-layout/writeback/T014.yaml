@@ -1,0 +1,5 @@
+task: T014
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: failure surface implemented — symlink-source/symlink-target, path-collision:<relpath>, permission-denied, unknown-residue (every remaining path listed and preserved), destructive-without-recovery blocked; OSError/digest mismatch -> failed + receipt status=aborted with moved entries kept; fault-injection probe (OSError on 5th move) run1 blocked/aborted, run2 resumed from the aborted receipt to applied with zero duplicate entries and the container removed
+at: 2026-11-25T05:56:00Z

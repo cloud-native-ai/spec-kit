@@ -1,0 +1,5 @@
+task: T013
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: manifest-first executor (entries[] written to the receipt before the first move), per-entry shutil.move with digest re-check, supersede/left-in-place rows, recover via archives[] change=relocated (no byte copy under .specify/archive), empty-dir container removal, receipt v2 (receiptVersion=2 + storeLayout {stores,resolved,refused,blocked,container,manifestDigest}) at .specify/migrate/receipts with O_EXCL per run; idempotent rerun reading outcome=clean items=0 (test-evidence/t016-us2-readings.txt)
+at: 2026-11-25T05:56:00Z

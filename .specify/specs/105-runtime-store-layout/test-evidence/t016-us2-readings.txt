@@ -1,0 +1,4 @@
+DRY-RUN legacy: exit=1 outcome=planned store_items=15 tree_unchanged=True git_status_empty=True receipt_store_created=False
+APPLY legacy: exit=0 outcome=applied receiptPath=.specify/migrate/receipts/20261125T054812Z-94e8c6f3.json diff_r_rc=[0] memory_absent=True receiptVersion=2 storeLayout={"stores": 14, "resolved": 14, "refused": 0, "blocked": 0, "container": "removed", "manifestDigest": "aaa45ae9756c2f8df0454bfa318d0078f6329219df0d9ce71661dbb6a7b3009c"} status=completed
+DUAL apply: exit=3 outcome=blocked item=refuse/refused old_unchanged=True new_unchanged=True container=refuse/refused container_preserved=True
+RERUN apply: exit=0 outcome=clean items=0 receipts=['20261125T054816Z-d15cb0bd.json', '20261125T054817Z-9cef7727.json'] storeLayout={"stores": 0, "resolved": 0, "refused": 0, "blocked": 0, "container": "absent", "manifestDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"} memory_absent=True

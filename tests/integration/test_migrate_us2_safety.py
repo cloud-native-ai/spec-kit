@@ -5,7 +5,9 @@ archive-first items execute automatically in every environment; only items
 with no archive path are blocked) and contracts/migrate-engine.md C-6
 (owner-referenced destructive criteria, old/new anchors merge and preserve both
 sides, an unmergeable structural target refuses and names both candidates, user
-content is never a residue candidate and replacement archives first).
+content is never a residue candidate and replacement archives first). Amended by
+105 M-2 rule 9: an unclaimed member inside the retired container is reported as
+`unknown-residue`, preserved untouched and makes the run `blocked` (exit 3).
 
 Mutation discipline (FR-024 / SC-002 / SC-005 / SC-008): every safety
 assertion is proven red-able inside this suite. Removing the archive step,
@@ -163,15 +165,26 @@ def _digests(workspace: Path, keys) -> dict:
 
 
 def _assert_auto_applied_with_archives(result, workspace, snapshot):
-    """The C-5 reading: archive-first items execute automatically and are recoverable."""
-    payload = _json_payload(result, 0)
-    assert payload["outcome"] == "applied"
-    assert payload["exitCode"] == 0
+    """The C-5 reading as amended by 105 M-2 rule 9.
+
+    Archive-first items still execute automatically and stay recoverable, but an
+    unclaimed member inside the retired container is deterministically reported
+    as ``unknown-residue``: the container is preserved (zero deletion) and the
+    run outcome is ``blocked`` (exit 3) instead of ``applied``.
+    """
+    payload = _json_payload(result, 3)
+    assert payload["outcome"] == "blocked"
+    assert payload["exitCode"] == 3
     receipt = payload["receipt"]
     assert receipt["status"] == "completed"
-    assert all(item["status"] == "done" for item in receipt["items"]), [
-        (item["target"], item["status"]) for item in receipt["items"]
-    ]
+    refused = [item for item in receipt["items"] if item["status"] != "done"]
+    assert refused, "the unclaimed memory member produced no refusal"
+    assert all(item["disposition"] == "refuse" for item in refused), refused
+    container = next(
+        item for item in refused if item["target"] == ".specify/memory"
+    )
+    assert "unknown-residue" in container["reason"]
+    assert USER_MEMORY_FILE.as_posix() in container["reason"]
     _assert_archives_exist_and_enumerated(payload, workspace)
     _assert_user_content_intact(workspace, snapshot)
 
@@ -352,7 +365,7 @@ def test_noninteractive_apply_executes_archive_first_items_and_archives_are_reco
     assert confirm_calls == [], "an archive-first apply must not prompt"
     _assert_auto_applied_with_archives(result, workspace, snapshot)
 
-    payload = _json_payload(result, 0)
+    payload = _json_payload(result, 3)
     hand_edited_entry = next(
         entry
         for entry in payload["receipt"]["archives"]
@@ -476,9 +489,18 @@ def test_user_content_never_becomes_a_candidate_and_hand_edits_stay_recoverable(
 
     hand_edited_before = _file_sha256(workspace / HAND_EDITED_TEMPLATE)
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
-    payload = _json_payload(_apply(workspace), 0)
+    # 105 M-2 rule 9: the hand-written memory file is preserved but reported as
+    # container residue, so the run ends blocked instead of applied.
+    payload = _json_payload(_apply(workspace), 3)
 
     _assert_user_content_intact(workspace, snapshot)
+    container = next(
+        item
+        for item in payload["items"]
+        if item["target"] == ".specify/memory"
+    )
+    assert container["status"] == "refused"
+    assert USER_MEMORY_FILE.as_posix() in container["reason"]
     entry = next(
         entry
         for entry in payload["receipt"]["archives"]
@@ -611,7 +633,7 @@ def test_mutation_injecting_full_delete_turns_the_archive_and_user_content_check
     monkeypatch.setattr(specify_cli, "migrate_symlink_supported", lambda: True)
     monkeypatch.setattr(specify_cli, "_migrate_execute_item", full_delete)
 
-    payload = _json_payload(_apply(workspace), 0)
+    payload = _json_payload(_apply(workspace), 3)
 
     with pytest.raises(AssertionError):
         _assert_archives_exist_and_enumerated(payload, workspace)

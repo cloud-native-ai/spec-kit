@@ -169,7 +169,7 @@ def test_outcome_and_exit_code_table_is_restated_verbatim() -> None:
 
 def test_receipt_and_archive_pointers_are_named() -> None:
     text = _read_template()
-    assert ".specify/memory/migrate/receipts/<run-id>.json" in text, (
+    assert ".specify/migrate/receipts/<run-id>.json" in text, (
         "T-6 requires the receipt path pointer"
     )
     assert ".specify/archive/migrate/<run-id>/" in text, (

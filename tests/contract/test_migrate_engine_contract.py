@@ -177,12 +177,36 @@ def test_migrate_segment_has_no_specify_version_marker():
     )
 
 
-def test_dimension_tokens_and_order_come_from_data_model_e8():
+def test_dimension_tokens_and_order_keep_the_097_prefix_and_add_store_layout():
     text = (SPEC_DIR / "data-model.md").read_text(encoding="utf-8")
     section = text[text.index("## E-8"):text.index("## E-9")]
     e8 = tuple(re.findall(r"^\| `([a-z-]+)` \|", section, re.MULTILINE))
     assert e8, "E-8 dimension rows are not readable from data-model.md"
-    assert tuple(specify_cli.MIGRATE_DIMENSIONS) == e8
+    # 097's E-8 stays a dated record: the five original tokens remain present,
+    # unchanged and in order, as the prefix. The extension's live owner is 105
+    # contracts/migrate-store-layout.contract.md M-1, and the full set is pinned
+    # against that declaration (prefix equality + six-token set equality).
+    assert tuple(specify_cli.MIGRATE_DIMENSIONS[: len(e8)]) == e8, (
+        "the 097 dimension prefix changed: "
+        f"{tuple(specify_cli.MIGRATE_DIMENSIONS[: len(e8)])} != {e8}"
+    )
+    contract = (
+        ROOT
+        / ".specify"
+        / "specs"
+        / "105-runtime-store-layout"
+        / "contracts"
+        / "migrate-store-layout.contract.md"
+    ).read_text(encoding="utf-8")
+    match = re.search(
+        r"`(templates-generated, anchor-layout[^`]*)`", contract
+    )
+    assert match, "M-1 no longer declares the dimension token list"
+    tokens = tuple(token.strip() for token in match.group(1).split(","))
+    assert tuple(specify_cli.MIGRATE_DIMENSIONS) == tokens
+    assert len(tokens) == len(set(tokens)) == 6, (
+        f"M-1 declares {tokens!r}; the extension adds exactly one token"
+    )
 
 
 def test_disposition_domain_extracted_from_fr014_byte_for_byte():

@@ -1,6 +1,6 @@
 # `specify migrate` — Migrate Command
 
-One-shot convergence after `specify install` + `specify init`: compares a workspace against the assets of the currently installed CLI, reports every difference (dry-run, the default), and with `--apply` converges the workspace — obsolete residue is archived (recoverable), missing assets are written, edited framework files are replaced with the old content archived first, and anchor-layout drift is relocated or merged. Every destructive step is archive-first and recorded in the run receipt, so `--apply` is the single write authorization and executes in both interactive and non-interactive environments. The command performs neither install nor init.
+One-shot convergence after `specify install` + `specify init`: compares a workspace against the assets of the currently installed CLI, reports every difference (dry-run, the default), and with `--apply` converges the workspace — obsolete residue is archived (recoverable), missing assets are written, edited framework files are replaced with the old content archived first, anchor-layout drift is relocated or merged, and legacy runtime stores are relocated byte-identically into their new top-level `.specify/<store>/` roots. Every destructive step is archive-first and recorded in the run receipt, so `--apply` is the single write authorization and executes in both interactive and non-interactive environments. The command performs neither install nor init.
 
 ## Execution Flow
 
@@ -9,10 +9,10 @@ specify migrate [--dry-run | --apply] [--workspace PATH] [--format text|json]
 ```
 
 1. **Precondition** — `<workspace>/.specify/` must exist. When it is missing, the command names `specify init` as the repair entry, exits 2, and creates or modifies nothing.
-2. **Plan** — the planner compares five dimensions against the reference tree built from the installed CLI's own assets: `templates-generated`, `anchor-layout`, `compat-links`, `mirror-consistency`, `migration-residue`. Each item carries current state, expected state, the intended disposition and its evidence path.
+2. **Plan** — the planner compares six dimensions against the reference tree built from the installed CLI's own assets: `templates-generated`, `anchor-layout`, `compat-links`, `mirror-consistency`, `migration-residue`, `store-layout`. Each item carries current state, expected state, the intended disposition and its evidence path.
 3. **Dry-run (default)** — prints the plan and exits with the outcome mapping below; zero writes to the workspace tree.
-4. **Apply (`--apply`)** — enters write mode (the single authorization). Every destructive item is archive-first: the original is copied into the run's archive root before the target changes. These actions are therefore reversible and execute automatically in both interactive and non-interactive environments; no second confirmation is requested and no confirmation flag exists.
-5. **Receipt** — an apply run writes `.specify/memory/migrate/receipts/<run-id>.json` and archives every replaced, merged or removed object under `.specify/archive/migrate/<run-id>/`.
+4. **Apply (`--apply`)** — enters write mode (the single authorization). Every destructive item is archive-first: the original is copied into the run's archive root before the target changes, except `store-layout` relocations, whose `entries[]` manifest in the receipt is the archive record for a byte-preserving move. These actions are therefore reversible and execute automatically in both interactive and non-interactive environments; no second confirmation is requested and no confirmation flag exists.
+5. **Receipt** — an apply run writes `.specify/migrate/receipts/<run-id>.json` (receipt v2: `storeLayout` summary plus each store item's `entries[]` manifest) and archives every replaced, merged or removed object under `.specify/archive/migrate/<run-id>/`.
 
 ## Options
 
@@ -41,10 +41,12 @@ Input and precondition errors (`--apply --dry-run` together, an undeclared optio
 
 | Path | Content |
 |------|---------|
-| `.specify/memory/migrate/receipts/<run-id>.json` | one file per apply run: volatile fields (`runId`, `startedAt`, `finishedAt`, workspace path), per-item `disposition` / `status`, `archives[]` (with `change` and `digest`), `recover`, plus record-only source/target version fields |
+| `.specify/migrate/receipts/<run-id>.json` | one file per apply run: `receiptVersion` (`2` for new runs; version 1 receipts stay readable as resume inputs), the `storeLayout` summary (`stores`, `resolved`, `refused`, `blocked`, `container`, `manifestDigest`), volatile fields (`runId`, `startedAt`, `finishedAt`, workspace path), per-item `disposition` / `status`, each store item's `entries[]` manifest (`relpath`, `class`, `digest`, `from`→`to`, `status`), `archives[]` (with `change` and `digest`), `recover`, plus record-only source/target version fields |
 | `.specify/archive/migrate/<run-id>/<rel>` | every replaced or removed object, preserving its workspace-relative layout |
 
-Archive-not-delete: the original object is copied into the run's archive before any new content lands, and the legacy copy is removed only after its archive copy is verified, so every destructive step is recoverable. Recovery follows the receipt's `recover` field. An interrupted apply leaves a `status=running` receipt; the next run reports the interrupted stage and continues from that receipt's own archive records without moving the same object twice. A dry-run writes no receipt file — its receipt body travels in the stdout envelope only.
+Archive-not-delete: the original object is copied into the run's archive before any new content lands, and the legacy copy is removed only after its archive copy is verified, so every destructive step is recoverable. Recovery follows the receipt's `recover` field. An interrupted apply leaves a `status=running` receipt (or `aborted` after a store-layout failure); the next run reports the interrupted stage and continues from that receipt's own records without moving the same object twice. A dry-run writes no receipt file — its receipt body travels in the stdout envelope only.
+
+For `store-layout` relocation the receipt's `entries[]` manifest is the archive record: a pure move destroys no content, so no byte copy is written under `.specify/archive/migrate/`, and `superseded` non-content duplicates appear only in `entries[]`, with their preserved new-side copy as the recovery reference.
 
 ## Anchor merge
 
@@ -60,6 +62,23 @@ The `anchor-layout` dimension compares the legacy anchors (`.specify/memory/{fea
 | a non-file target (broken link, populated directory) or unreadable content | refuse, name both candidates, keep both |
 
 Every merged anchor archives both originals under `.specify/archive/migrate/<run-id>/anchor-layout/` and records the result digest in the receipt. The merge marker is deterministic (no timestamp or run id); a second run is clean. Reconcile a merged constitution or registry with its owner command (`/speckit.constitution`, `/speckit.feature`) after the run.
+
+## Store layout relocation
+
+The `store-layout` dimension moves every declared runtime store from the retired `.specify/memory/<store>/` container to its first-class top-level root `.specify/<store>/`. The store set, its generated/placeholder predicates and the retired-container name come from the machine declaration (`.specify/shared/declarations/facts/runtime-store-layout.yaml`); the planner holds only the decision predicates, never a second store list.
+
+| Situation | Action |
+|-----------|--------|
+| legacy content only | `archive` / `relocate`: the `entries[]` manifest (relpath, class, digest, from→to, status) is written to the run receipt before the first move, then every entry moves byte-identically; recovery is the reverse move of every `moved` row |
+| authoritative content exists on both sides | refuse `dual-content`, name both roots and the repair entry (human adjudication: merge manually or reconfigure); nothing moves, is overwritten or deleted on either side |
+| the same relative path exists on both sides with an old authoritative entry | refuse `path-collision:<relpath>`; the new-side object is never deleted or overwritten to make room |
+| generated/placeholder duplicates (`.gitkeep`, a declared generated artifact) | the old duplicate is `superseded` (path + digest recorded in `entries[]`); the preserved new-side copy stays untouched |
+| the old or new store path is a symbolic link | refuse `symlink-source` / `symlink-target`, name the path; never followed, never unlinked |
+| the source or target is unwritable | refuse `permission-denied`; no partial success is claimed |
+| unclaimed members remain in the retired container (`draft/`, `git-workflow.md`, user files) | refuse `unknown-residue`, list every remaining path, preserve the container (zero deletion), run outcome `blocked` (exit 3) |
+| no path remains | the container — and the empty directories left by other dimensions — is removed |
+
+A rerun after a completed relocation is `clean` with zero moves and the retired container stays absent. An interrupted apply resumes from the receipt's own records: already-moved entries are verified against their recorded digests and never moved twice; a digest mismatch (a concurrent writer changed the object) fails the run with `status=aborted`, every moved entry still recorded for resume.
 
 ## Boundaries
 

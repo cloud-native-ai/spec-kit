@@ -148,7 +148,7 @@ def _normalized_paths(root: Path) -> set[str]:
 
 
 def _receipt(workspace: Path) -> dict:
-    files = sorted((workspace / ".specify" / "memory" / "migrate" / "receipts").glob("*.json"))
+    files = sorted(specify_cli.migrate_receipts_dir(workspace).glob("*.json"))
     assert len(files) == 1, f"expected exactly one receipt, found {[p.name for p in files]}"
     return json.loads(files[0].read_text(encoding="utf-8"))
 

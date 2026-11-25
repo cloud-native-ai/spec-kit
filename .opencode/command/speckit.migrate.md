@@ -17,6 +17,8 @@ Consult the project glossary (`.specify/glossary.md`) and apply the protocol in 
 
 `/speckit.migrate` 是薄投影：探测、计划与处置全部由已安装 CLI 的 `specify migrate` 子命令完成；模板不实现任何检查、残留清单、路径改写或处置判断，也不自带第二份计划。命令把新旧混杂的工作区收敛到当前安装版本的期望态，逐项给出「当前态 → 期望态 + 拟处置 + 依据路径」。
 
+计划的维度闭集为 `templates-generated`、`anchor-layout`、`compat-links`、`mirror-consistency`、`migration-residue`、`store-layout`。第六维 `store-layout` 把旧 `.specify/memory/<store>/` 的每个已声明存储逐条搬到顶层 `.specify/<store>/`：搬迁以回执中的 `entries[]` manifest 为归档记录、逐字节 move、不向归档根复制字节；旧新两侧同时存在权威内容（`dual-content`）或同一相对路径两侧并存（`path-collision`）时拒绝并点名两侧路径与修复入口；退役容器只在无剩余路径时移除，未认领残留逐个列出并原样保留（结局 `blocked`，退出 3）。
+
 1. **Dry-run first.** 运行 `specify migrate`（人读计划）或 `specify migrate --format json`（机器可读包络；模板原样转述，不解析键集），并逐项向用户转述计划：
 
 ```bash
@@ -44,7 +46,7 @@ specify migrate --apply --format json
 
    输入或前置条件错误以 stderr 报文 + 退出 2 收束（`error` 不是 outcome token）；工作区缺少 `.specify/` 时，修复入口是 `specify init`。
 
-5. **Point at the records.** apply 后报告回执 `.specify/memory/migrate/receipts/<run-id>.json` 与归档根 `.specify/archive/migrate/<run-id>/`；恢复途径以回执的 `recover` 字段为准。
+5. **Point at the records.** apply 后报告回执 `.specify/migrate/receipts/<run-id>.json` 与归档根 `.specify/archive/migrate/<run-id>/`；回执为 v2：`storeLayout` 摘要（`stores` / `resolved` / `refused` / `blocked` / `container` / `manifestDigest`）与每个存储项的 `entries[]` manifest（relpath / class / digest / from→to / status）。恢复途径以回执的 `recover` 字段为准；`store-layout` 的纯搬迁以 manifest 为归档记录、不在归档根复制字节，`superseded` 的生成物重复项只出现在 `entries[]`、以保留的新侧副本为恢复参照。
 
 **Boundary**: neither install nor init — 本命令是 `specify install` + `specify init` 之后的一次性收尾；`/speckit.sanitize` 保留为周期复检 lane；goal/team 定义的档案迁移仍归 `/speckit.goal` 的 `migrate-archive`。
 

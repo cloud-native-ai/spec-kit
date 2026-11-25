@@ -1,0 +1,5 @@
+task: T010
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/fixtures/store-layout-105/builders.py created (build_legacy/build_seeded_legacy/build_dual/build_rerun); every store name, non-content glob and the retired-container path read from shared/declarations/facts/runtime-store-layout.yaml via specify_cli.store_layout(); probe built legacy (14 legacy store roots, 14-entry roster) / seeded / dual fixtures, exit 0
+at: 2026-11-25T05:56:00Z

@@ -20,6 +20,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC_DIR = ROOT / ".specify" / "specs" / "097-speckit-migrate-command"
+SPEC_105_DIR = ROOT / ".specify" / "specs" / "105-runtime-store-layout"
 
 
 def _e8_dimensions() -> tuple:
@@ -27,6 +28,16 @@ def _e8_dimensions() -> tuple:
     text = (SPEC_DIR / "data-model.md").read_text(encoding="utf-8")
     section = text[text.index("## E-8"):text.index("## E-9")]
     return tuple(re.findall(r"^\| `([a-z-]+)` \|", section, re.MULTILINE))
+
+
+def _m1_dimensions() -> tuple:
+    """Read the full token list from 105's live extension owner (M-1)."""
+    text = (
+        SPEC_105_DIR / "contracts" / "migrate-store-layout.contract.md"
+    ).read_text(encoding="utf-8")
+    match = re.search(r"`(templates-generated, anchor-layout[^`]*)`", text)
+    assert match, "M-1 no longer declares the dimension token list"
+    return tuple(token.strip() for token in match.group(1).split(","))
 
 
 def _item(**overrides):
@@ -52,17 +63,23 @@ def _item(**overrides):
 # ---------------------------------------------------------------------------
 
 
-def test_dimension_tokens_and_order_come_from_data_model_e8():
+def test_dimension_tokens_keep_the_097_prefix_and_match_the_105_extension():
     from specify_cli import MIGRATE_DIMENSIONS
 
-    assert _e8_dimensions() == (
+    prefix = _e8_dimensions()
+    assert prefix == (
         "templates-generated",
         "anchor-layout",
         "compat-links",
         "mirror-consistency",
         "migration-residue",
     )
-    assert tuple(MIGRATE_DIMENSIONS) == _e8_dimensions()
+    # 097's E-8 remains a dated record; 105 M-1 owns the appended token.
+    assert tuple(MIGRATE_DIMENSIONS[: len(prefix)]) == prefix
+    full = _m1_dimensions()
+    assert tuple(MIGRATE_DIMENSIONS) == full
+    assert len(full) == len(set(full)) == len(prefix) + 1
+    assert full[-1] == "store-layout"
 
 
 def test_item_id_is_sha1_prefix_of_dimension_and_target():

@@ -1,0 +1,5 @@
+task: T015
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: templates/commands/migrate.md gains the sixth-dimension paragraph and the v2 receipt/entries wording; docs/reference/commands/migrate.md syncs dimensions/receipt/recovery fields and adds the store-layout relocation table; per-tool copies regenerated with scripts/python/regen-command-copies.py (exit 0, 8 files written) and --check exit 0; no copy hand-edited
+at: 2026-11-25T05:56:00Z

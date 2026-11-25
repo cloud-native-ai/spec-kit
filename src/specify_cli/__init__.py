@@ -15,6 +15,7 @@ Or install globally:
     specify init --here
 """
 
+import fnmatch
 import hashlib
 import json
 import os
@@ -2877,12 +2878,15 @@ def copy_local_templates(
 # ---------------------------------------------------------------------------
 
 # MIGRATE-ENGINE:START — pinned migrate segment (097 contract test T013 scans it)
+# The five original tokens stay present, unchanged and in order, as the prefix;
+# ``store-layout`` is appended last (105 contracts/migrate-store-layout.md M-1).
 MIGRATE_DIMENSIONS = (
     "templates-generated",
     "anchor-layout",
     "compat-links",
     "mirror-consistency",
     "migration-residue",
+    "store-layout",
 )
 _MIGRATE_DIMENSION_INDEX = {
     name: index for index, name in enumerate(MIGRATE_DIMENSIONS)
@@ -2911,7 +2915,7 @@ MIGRATE_MECHANISMS = (
     "none",
 )
 
-MIGRATE_RECEIPT_VERSION = 1
+MIGRATE_RECEIPT_VERSION = 2
 MIGRATE_RECEIPT_STATUSES = ("running", "completed", "aborted")
 
 
@@ -2930,7 +2934,8 @@ class MigrateItem:
     """
 
     def __init__(self, dimension, target, current, expected, disposition, *,
-                 mechanism="none", evidence=None, archiveTo=None, status="", reason=None):
+                 mechanism="none", evidence=None, archiveTo=None, status="", reason=None,
+                 entries=None):
         self.dimension = dimension
         self.target = target
         self.current = current
@@ -2940,6 +2945,11 @@ class MigrateItem:
         self.evidence = list(evidence or [])
         self.archiveTo = archiveTo
         self.reason = reason or None
+        # E-4 rows: present on `store-layout` archive items (None elsewhere, so
+        # every pre-existing item keeps its exact serialized payload).
+        self.entries = (
+            [dict(row) for row in entries] if entries is not None else None
+        )
         self.status = status or {
             "refuse": "refused",
             "blocked": "blocked",
@@ -2985,7 +2995,7 @@ class MigrateItem:
         return migrate_item_id(self.dimension, self.target)
 
     def to_dict(self) -> dict:
-        return {
+        payload = {
             "id": self.id,
             "dimension": self.dimension,
             "target": self.target,
@@ -2998,6 +3008,9 @@ class MigrateItem:
             "status": self.status,
             "reason": self.reason,
         }
+        if self.entries is not None:
+            payload["entries"] = [dict(row) for row in self.entries]
+        return payload
 
 
 def make_refuse_item(dimension, target, *, current, expected, note=""):
@@ -3156,7 +3169,23 @@ def migrate_run_id(now: Optional[datetime] = None) -> str:
 
 def migrate_receipts_dir(workspace) -> Path:
     """Per-run receipt store root (one file per run, never an aggregate)."""
-    return Path(workspace) / ".specify" / "memory" / "migrate" / "receipts"
+    return Path(workspace) / ".specify" / "migrate" / "receipts"
+
+
+def migrate_legacy_receipts_dir(workspace):
+    """The pre-105 receipt location, derived from the declaration (never a literal).
+
+    Read-only transition input (M-6): before the ``migrate`` store has been
+    relocated, the resume scan may read the retired container's receipts. The
+    path is a projection of the declaration's ``retired_container`` (L-5/A-8).
+    """
+    statement, label = store_layout()
+    if label:
+        return None
+    retired = statement.get("retired_container")
+    if not isinstance(retired, str) or not retired:
+        return None
+    return Path(workspace) / retired / "migrate" / "receipts"
 
 
 def create_migrate_receipt(
@@ -3201,6 +3230,7 @@ def create_migrate_receipt(
             "items": [],
             "archives": [],
             "recover": [],
+            "storeLayout": _migrate_empty_store_layout(),
             "notes": [],
             "pointers": [],
         }
@@ -3320,29 +3350,44 @@ def migrate_target_record() -> dict:
 
 
 def load_migrate_resume_state(workspace):
-    """The nearest ``status=running`` receipt of this workspace (C-7 resume).
+    """The nearest resumable receipt of this workspace (C-7 resume / M-6).
 
-    A crashed apply leaves its receipt running; the next run continues from
-    that receipt's own items and ``archiveTo`` paths — never from paths the new
-    run computes. Read-only: the interrupted run's file is not modified.
+    A crashed apply leaves its receipt ``running`` (or ``aborted`` after a
+    store-layout failure); the next run continues from that receipt's own items
+    and ``archiveTo`` paths — never from paths the new run computes. Read-only:
+    the interrupted run's file is not modified. The pre-105 receipt location is
+    read as a declaration-derived transition input (M-6/A-8).
     """
-    receipts = migrate_receipts_dir(workspace)
-    if not receipts.is_dir():
-        return None
+    scan_dirs = [migrate_receipts_dir(workspace)]
+    legacy = migrate_legacy_receipts_dir(workspace)
+    if legacy is not None:
+        scan_dirs.append(legacy)
     candidates = []
-    for path in sorted(receipts.glob("*.json")):
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
+    seen_runs = set()
+    for receipts in scan_dirs:
+        if not receipts.is_dir():
             continue
-        if not isinstance(payload, dict) or payload.get("status") != "running":
-            continue
-        run_id = str(payload.get("runId") or path.stem)
-        started = str(payload.get("startedAt") or "")
-        candidates.append((started, run_id, path, payload))
+        for path in sorted(receipts.glob("*.json")):
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if not isinstance(payload, dict):
+                continue
+            if payload.get("status") not in ("running", "aborted"):
+                continue
+            run_id = str(payload.get("runId") or path.stem)
+            if run_id in seen_runs:
+                continue
+            seen_runs.add(run_id)
+            started = str(payload.get("startedAt") or "")
+            # A still-running receipt outranks an aborted one; within a class the
+            # most recent start wins (M-6: "the last aborted").
+            rank = 1 if payload.get("status") == "running" else 0
+            candidates.append((rank, started, run_id, path, payload))
     if not candidates:
         return None
-    started, run_id, path, payload = max(candidates, key=lambda entry: entry[:2])
+    _rank, started, run_id, path, payload = max(candidates, key=lambda entry: entry[:3])
     items = [
         item for item in (payload.get("items") or []) if isinstance(item, dict)
     ]
@@ -3357,19 +3402,30 @@ def load_migrate_resume_state(workspace):
             and isinstance(archive_to, str) and archive_to
         ):
             archives_by_path[target] = entry
+    store_entries = {}
+    for item in items:
+        if item.get("dimension") != "store-layout":
+            continue
+        target = item.get("target")
+        rows = item.get("entries")
+        if isinstance(target, str) and isinstance(rows, list):
+            store_entries[target] = [row for row in rows if isinstance(row, dict)]
     return {
         "runId": run_id,
         "receiptPath": path,
+        "status": payload.get("status"),
         "items": items,
         "itemsDone": sum(1 for item in items if item.get("status") == "done"),
         "archivesByPath": archives_by_path,
+        "storeEntries": store_entries,
     }
 
 
 def migrate_resume_note(resume) -> str:
-    """The interrupted stage, reported in plan notes and the new receipt (C-7)."""
+    """The interrupted stage, reported in plan notes and the new receipt (C-7/M-6)."""
     return (
-        f"resume: interrupted apply {resume['runId']} (status=running) — "
+        f"resume: interrupted apply {resume['runId']} "
+        f"(status={resume.get('status') or 'running'}) — "
         f"recorded stage {resume['itemsDone']}/{len(resume['items'])} items done, "
         f"{len(resume['archivesByPath'])} archived object(s) kept; "
         "continuing from that receipt"
@@ -4128,18 +4184,375 @@ def _migrate_plan_migration_residue(ctx):
     return items
 
 
+# ---------------------------------------------------------------------------
+# Store-layout dimension — declaration-driven planner (105 M-1…M-4)
+#
+# The store set, the non-content predicates and the retired-container path all
+# come from `shared/declarations/facts/runtime-store-layout.yaml` through the
+# declaration reader; a degraded read emits a blocked item instead of inventing
+# a roster (C-6 / M-1).
+# ---------------------------------------------------------------------------
+
+MIGRATE_STORE_DIMENSION = "store-layout"
+
+
+def _migrate_empty_store_layout() -> dict:
+    """The E-5 `storeLayout` object in its pre-plan shape (iff-rule: v2 always carries one)."""
+    return {
+        "stores": 0,
+        "resolved": 0,
+        "refused": 0,
+        "blocked": 0,
+        "container": "absent",
+        "manifestDigest": None,
+    }
+
+
+def _migrate_store_declaration():
+    """`(declaration, label)`; `(None, label)` when the machine owner is unreadable."""
+    statement, label = store_layout()
+    if label:
+        return None, label
+    stores = statement.get("stores")
+    retired = statement.get("retired_container")
+    if not isinstance(stores, dict) or not stores:
+        return None, "declaration-incomplete: runtime-store-layout carries no stores"
+    if not isinstance(retired, str) or not retired:
+        return (
+            None,
+            "declaration-incomplete: runtime-store-layout carries no retired_container",
+        )
+    return {"stores": stores, "retired": retired.rstrip("/")}, None
+
+
+def _migrate_store_entry_class(relpath, store_entry) -> str:
+    """`authoritative` / `generated` / `placeholder` per the declaration (E-3)."""
+    name = relpath.rsplit("/", 1)[-1]
+    if name == ".gitkeep" or name.endswith(".lock"):
+        return "placeholder"
+    for pattern in (store_entry or {}).get("non_content") or []:
+        if not isinstance(pattern, str) or not pattern:
+            continue
+        if fnmatch.fnmatch(relpath, pattern) or fnmatch.fnmatch(name, pattern):
+            return "generated"
+    return "authoritative"
+
+
+def _migrate_store_walk_files(root):
+    """Every file/symlink below `root` as a POSIX-relative path; symlinks never followed."""
+    rows = []
+    root = Path(root)
+    if not root.is_dir():
+        return rows
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dirnames.sort()
+        names = list(filenames)
+        names += [
+            name for name in dirnames if (Path(dirpath) / name).is_symlink()
+        ]
+        for name in sorted(names):
+            rows.append((Path(dirpath) / name).relative_to(root).as_posix())
+    return sorted(rows)
+
+
+def _migrate_paths_under(workspace, root):
+    """Every remaining path below `root`, workspace-relative (directories carry '/')."""
+    root = Path(root)
+    listed = []
+    rel_root = _migrate_ws_rel(workspace, root)
+    listed.append(rel_root + "/" if root.is_dir() and not root.is_symlink() else rel_root)
+    if not root.is_dir() or root.is_symlink():
+        return sorted(set(listed))
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dirnames.sort()
+        for name in sorted(dirnames):
+            path = Path(dirpath) / name
+            rel = _migrate_ws_rel(workspace, path)
+            listed.append(rel if path.is_symlink() else rel + "/")
+        for name in sorted(filenames):
+            listed.append(_migrate_ws_rel(workspace, Path(dirpath) / name))
+    return sorted(set(listed))
+
+
+def _migrate_store_writable(*paths) -> bool:
+    """Zero-write `os.access` probe: every nearest existing ancestor is writable."""
+    for value in paths:
+        probe = Path(value)
+        while not probe.exists() and not probe.is_symlink():
+            parent = probe.parent
+            if parent == probe:
+                break
+            probe = parent
+        if not os.access(str(probe), os.W_OK):
+            return False
+    return True
+
+
+def _migrate_store_prune_empty_dirs(root) -> None:
+    """Remove empty directories bottom-up (the only deletion this dimension performs)."""
+    root = Path(root)
+    if not root.is_dir() or root.is_symlink():
+        return
+    for dirpath, _dirnames, _filenames in os.walk(root, topdown=False, followlinks=False):
+        try:
+            os.rmdir(dirpath)
+        except OSError:
+            pass
+
+
+def _migrate_resume_store_rows(ctx, new_rel):
+    """The interrupted receipt's E-4 rows for one store target (M-6 resume input)."""
+    resume = getattr(ctx, "resume", None)
+    if not resume:
+        return []
+    rows = (resume.get("storeEntries") or {}).get(new_rel) or []
+    return [row for row in rows if isinstance(row, dict)]
+
+
+def _migrate_plan_store_item(ctx, name, old_rel, new_rel, store_entry, evidence):
+    """One store's M-2 classification; `None` means converged (no item)."""
+    old = ctx.workspace / old_rel
+    new = ctx.workspace / new_rel
+    if old.is_symlink():
+        return MigrateItem(
+            MIGRATE_STORE_DIMENSION, new_rel, "symlink", "relocated", "refuse",
+            evidence=evidence,
+            reason=(
+                f"symlink-source: {old_rel} is a symbolic link (current=symlink); "
+                f"expected relocated store at {new_rel} (expected=relocated); "
+                "never followed, never unlinked; repair entry: replace the link "
+                "with a real directory after review, then re-run specify migrate"
+            ),
+        )
+    if new.is_symlink():
+        return MigrateItem(
+            MIGRATE_STORE_DIMENSION, new_rel, "symlink", "relocated", "refuse",
+            evidence=evidence,
+            reason=(
+                f"symlink-target: {new_rel} is a symbolic link (current=symlink); "
+                f"expected a regular relocated store at {new_rel} "
+                "(expected=relocated); never followed, never unlinked; repair "
+                "entry: replace the link with a real directory after review, "
+                "then re-run specify migrate"
+            ),
+        )
+
+    resume_rows = _migrate_resume_store_rows(ctx, new_rel)
+    rows = []
+    for relpath in _migrate_store_walk_files(old):
+        rows.append(
+            {
+                "relpath": relpath,
+                "class": _migrate_store_entry_class(relpath, store_entry),
+                "digest": _migrate_digest(old / relpath),
+                "from": f"{old_rel}/{relpath}",
+                "to": f"{new_rel}/{relpath}",
+                "status": "planned",
+            }
+        )
+    fresh = {row["relpath"] for row in rows}
+    resume_moved = {}
+    for row in resume_rows:
+        relpath = row.get("relpath")
+        if not isinstance(relpath, str) or not relpath or not isinstance(row.get("digest"), str):
+            continue
+        status = row.get("status")
+        if status == "moved":
+            resume_moved[relpath] = row["digest"]
+        if relpath in fresh or status not in ("moved", "planned"):
+            continue
+        # The previous run recorded this entry as moved/planned and the old copy is
+        # gone: keep it in the manifest and verify it against the preserved digest.
+        rows.append(
+            {
+                "relpath": relpath,
+                "class": row.get("class")
+                or _migrate_store_entry_class(relpath, store_entry),
+                "digest": row["digest"],
+                "from": f"{old_rel}/{relpath}",
+                "to": f"{new_rel}/{relpath}",
+                "status": "moved",
+            }
+        )
+    rows.sort(key=lambda row: row["relpath"])
+
+    own_receipt = (
+        f".specify/migrate/receipts/{ctx.run_id}.json" if ctx.run_id else None
+    )
+    resume_receipt = None
+    resume = getattr(ctx, "resume", None)
+    if resume and resume.get("receiptPath") is not None:
+        resume_receipt = _migrate_ws_rel(ctx.workspace, resume["receiptPath"])
+    new_authoritative = []
+    for relpath in _migrate_store_walk_files(new):
+        if _migrate_store_entry_class(relpath, store_entry) != "authoritative":
+            continue
+        ws_rel = f"{new_rel}/{relpath}"
+        if own_receipt and ws_rel == own_receipt:
+            continue
+        if resume_receipt and ws_rel == resume_receipt:
+            continue
+        if relpath in resume_moved and _migrate_digest(new / relpath) == resume_moved[relpath]:
+            continue
+        new_authoritative.append(relpath)
+
+    old_authoritative = [
+        row
+        for row in rows
+        if row["class"] == "authoritative" and row["status"] != "moved"
+    ]
+    if old_authoritative and new_authoritative:
+        return MigrateItem(
+            MIGRATE_STORE_DIMENSION, new_rel, "dual-content", "relocated", "refuse",
+            evidence=evidence,
+            reason=(
+                f"dual-content: both {old_rel} and {new_rel} hold authoritative "
+                "entries (current=dual-content); expected a single relocated store "
+                f"at {new_rel} (expected=relocated); nothing moves, is overwritten "
+                "or deleted on either side; repair entry: human adjudication: merge "
+                "manually or reconfigure the workspace, then re-run specify migrate"
+            ),
+        )
+    for row in old_authoritative:
+        if (new / row["relpath"]).exists() or (new / row["relpath"]).is_symlink():
+            collision = row["relpath"]
+            return MigrateItem(
+                MIGRATE_STORE_DIMENSION, new_rel, f"path-collision:{collision}",
+                "relocated", "refuse",
+                evidence=evidence,
+                reason=(
+                    f"path-collision:{collision} — the relative path exists on both "
+                    f"sides (current=path-collision:{collision}); expected "
+                    f"{new_rel} to receive the old authoritative entry "
+                    "(expected=relocated); the new-side object is never deleted or "
+                    "overwritten; repair entry: move or remove the new-side object "
+                    "manually, then re-run specify migrate"
+                ),
+            )
+    if not rows:
+        return None
+    if not _migrate_store_writable(
+        old, new if (new.exists() or new.is_symlink()) else new.parent
+    ):
+        return MigrateItem(
+            MIGRATE_STORE_DIMENSION, new_rel, "unreadable", "relocated", "refuse",
+            evidence=evidence,
+            reason=(
+                f"permission-denied: {old_rel} or {new_rel} is not writable "
+                "(current=unreadable); expected relocated store at "
+                f"{new_rel} (expected=relocated); no partial move will be "
+                "performed; repair entry: grant write permission and re-run "
+                "specify migrate"
+            ),
+        )
+    item = MigrateItem(
+        MIGRATE_STORE_DIMENSION, new_rel, "legacy-content", "relocated", "archive",
+        mechanism="relocate", evidence=evidence, entries=rows,
+    )
+    item._store_meta = {"name": name, "old": old_rel, "entry": store_entry}
+    return item
+
+
+def _migrate_plan_store_layout(ctx):
+    declaration, label = _migrate_store_declaration()
+    if declaration is None:
+        return [
+            MigrateItem(
+                MIGRATE_STORE_DIMENSION, ".specify",
+                "declaration-absent", "store roster from the declaration",
+                "blocked", reason=label,
+            )
+        ]
+    retired = declaration["retired"]
+    stores = declaration["stores"]
+    items = []
+    for name in sorted(stores):
+        store_entry = stores[name] if isinstance(stores[name], dict) else {}
+        item = _migrate_plan_store_item(
+            ctx,
+            name,
+            f"{retired}/{name}",
+            f".specify/{name}",
+            store_entry,
+            [
+                "contracts/migrate-store-layout.contract.md#M-2",
+                f"shared/declarations/facts/runtime-store-layout.yaml#stores.{name}",
+            ],
+        )
+        if item is not None:
+            items.append(item)
+
+    container = ctx.workspace / retired
+    prior_items = getattr(ctx, "prior_items", None) or []
+    claimed = {f"{retired}/{name}" for name in stores}
+    claimed |= {
+        item.target for item in prior_items if item.dimension == "anchor-layout"
+    }
+    if container.is_symlink():
+        item = MigrateItem(
+            MIGRATE_STORE_DIMENSION, retired, "symlink", "container-absent",
+            "refuse",
+            reason=(
+                f"symlink-target: {retired} is a symbolic link (current=symlink); "
+                "expected container-absent after relocation "
+                "(expected=container-absent); never followed, never unlinked; "
+                "repair entry: replace the link with a real directory after "
+                "review, then re-run specify migrate"
+            ),
+        )
+        item._store_container = True
+        items.append(item)
+        return items
+    if container.is_dir():
+        unknown = [
+            child
+            for child in sorted(container.iterdir())
+            if _migrate_ws_rel(ctx.workspace, child) not in claimed
+        ]
+        if unknown:
+            listing = []
+            for child in unknown:
+                listing.extend(_migrate_paths_under(ctx.workspace, child))
+            item = MigrateItem(
+                MIGRATE_STORE_DIMENSION, retired, "unknown-residue",
+                "container-absent", "refuse",
+                reason=(
+                    f"unknown-residue: the retired container holds "
+                    f"{len(set(listing))} unclaimed path(s) "
+                    "(current=unknown-residue); expected container-absent at "
+                    f"{retired} (expected=container-absent); every remaining path "
+                    "is preserved (zero deletion): " + ", ".join(sorted(set(listing)))
+                    + "; repair entry: move or remove these objects manually after "
+                    "review, then re-run specify migrate"
+                ),
+            )
+        else:
+            item = MigrateItem(
+                MIGRATE_STORE_DIMENSION, retired, "empty-residue",
+                "container-absent", "archive", mechanism="none",
+                evidence=["contracts/migrate-store-layout.contract.md#M-4"],
+            )
+        item._store_container = True
+        items.append(item)
+    return items
+
+
 _MIGRATE_DIMENSION_PLANNERS = {
     "templates-generated": _migrate_plan_templates_generated,
     "anchor-layout": _migrate_plan_anchor_layout,
     "compat-links": _migrate_plan_compat_links,
     "mirror-consistency": _migrate_plan_mirror_consistency,
     "migration-residue": _migrate_plan_migration_residue,
+    "store-layout": _migrate_plan_store_layout,
 }
 
 
 def plan_migrate_items(ctx):
     items = []
     for dimension in MIGRATE_DIMENSIONS:
+        # Later dimensions may need the earlier items as claim records; the
+        # container pass claims anchor-relocated paths through this handoff.
+        ctx.prior_items = list(items)
         items.extend(_MIGRATE_DIMENSION_PLANNERS[dimension](ctx))
     return migrate_normalize_items(items)
 
@@ -4473,6 +4886,9 @@ def _migrate_execute_item(ctx, item):
         return
     if item.dimension == "anchor-layout" or item.mechanism == "mirror-engine":
         return
+    if item.dimension == MIGRATE_STORE_DIMENSION:
+        # Store items execute in the dedicated manifest-first pass (M-4).
+        return
     if migrate_is_destructive(item) and item.mechanism == "none":
         item.status = "blocked"
         item.reason = (
@@ -4517,6 +4933,302 @@ def _migrate_execute_item(ctx, item):
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Store-layout executor — manifest first, per-entry move, container pass (M-4)
+# ---------------------------------------------------------------------------
+
+
+def _migrate_store_remove_entry(path) -> None:
+    """Remove one superseded non-content duplicate (its new-side copy is preserved)."""
+    path = Path(path)
+    if path.is_symlink() or path.is_file():
+        path.unlink()
+        return
+    raise IsADirectoryError(
+        f"refusing to remove a directory as a superseded duplicate: {path}"
+    )
+
+
+def _migrate_execute_store_item(ctx, item) -> None:
+    if item.status != "planned" or item.disposition != "archive":
+        return
+    meta = getattr(item, "_store_meta", {}) or {}
+    old_rel = meta.get("old")
+    if not old_rel:
+        item.status = "failed"
+        item.reason = "store item carries no legacy source path"
+        return
+    old = ctx.workspace / old_rel
+    new = ctx.workspace / item.target
+    if not _migrate_store_writable(
+        old, new if (new.exists() or new.is_symlink()) else new.parent
+    ):
+        item.disposition = "refuse"
+        item.status = "refused"
+        item.current = "unreadable"
+        item.reason = (
+            f"permission-denied: {old_rel} or {item.target} is not writable "
+            "(current=unreadable); expected relocated store at "
+            f"{item.target} (expected=relocated); no partial move was performed; "
+            "repair entry: grant write permission and re-run specify migrate"
+        )
+        return
+
+    for row in item.entries or []:
+        relpath = row.get("relpath")
+        from_path = ctx.workspace / str(row.get("from"))
+        to_path = ctx.workspace / str(row.get("to"))
+        try:
+            from_exists = from_path.exists() or from_path.is_symlink()
+            to_exists = to_path.exists() or to_path.is_symlink()
+            if row.get("status") == "moved":
+                # Resume row: the interrupted run recorded the move; verify the
+                # preserved digest instead of moving again (M-4 step 2 / M-6).
+                if not to_exists or _migrate_digest(to_path) != row.get("digest"):
+                    item.status = "failed"
+                    item.reason = (
+                        f"digest mismatch on resume for {row.get('to')}: the "
+                        "interrupted receipt recorded this entry as moved, but "
+                        "the target is missing or differs; a concurrent writer "
+                        "may have changed the store"
+                    )
+                    return
+                ctx.archives.append(
+                    {
+                        "path": row.get("from"),
+                        "archiveTo": row.get("to"),
+                        "change": "relocated",
+                        "digest": row.get("digest"),
+                    }
+                )
+                continue
+            if not from_exists:
+                if to_exists and _migrate_digest(to_path) == row.get("digest"):
+                    row["status"] = "moved"
+                    ctx.archives.append(
+                        {
+                            "path": row.get("from"),
+                            "archiveTo": row.get("to"),
+                            "change": "relocated",
+                            "digest": row.get("digest"),
+                        }
+                    )
+                    continue
+                item.status = "failed"
+                item.reason = f"planned entry missing at both ends: {relpath}"
+                return
+            digest_now = _migrate_digest(from_path)
+            if digest_now != row.get("digest"):
+                item.status = "failed"
+                item.reason = (
+                    f"digest mismatch for {row.get('from')}: planned "
+                    f"{row.get('digest')}, found {digest_now}; a concurrent "
+                    "writer changed the store since planning"
+                )
+                return
+            if to_exists:
+                if row.get("class") == "authoritative":
+                    item.status = "failed"
+                    item.reason = (
+                        f"path-collision at execution: {row.get('to')} appeared "
+                        "after planning; an authoritative entry is never "
+                        "overwritten or silently resolved"
+                    )
+                    return
+                # M-3 supersede: record path+digest (already in the row) and
+                # remove only the old duplicate; the new-side copy is never touched.
+                _migrate_store_remove_entry(from_path)
+                row["status"] = "superseded"
+                continue
+            to_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(from_path), str(to_path))
+            row["status"] = "moved"
+            ctx.archives.append(
+                {
+                    "path": row.get("from"),
+                    "archiveTo": row.get("to"),
+                    "change": "relocated",
+                    "digest": row.get("digest"),
+                }
+            )
+        except OSError as exc:
+            item.status = "failed"
+            item.reason = f"execution failed for {row.get('from')}: {exc}"
+            return
+
+    store_entry = meta.get("entry") or {}
+    known = {row.get("relpath") for row in item.entries or []}
+    for relpath in _migrate_store_walk_files(old):
+        if relpath in known:
+            continue
+        item.entries.append(
+            {
+                "relpath": relpath,
+                "class": _migrate_store_entry_class(relpath, store_entry),
+                "digest": _migrate_digest(old / relpath),
+                "from": f"{old_rel}/{relpath}",
+                "to": f"{item.target}/{relpath}",
+                "status": "left-in-place",
+            }
+        )
+    for row in item.entries or []:
+        if row.get("status") == "planned":
+            row["status"] = "left-in-place"
+    _migrate_store_prune_empty_dirs(old)
+    item.status = "done"
+    item.archiveTo = None
+
+
+def _migrate_store_container_refuse(plan, container_item, retired, ctx, paths) -> None:
+    listing = ", ".join(paths)
+    reason = (
+        f"unknown-residue: the retired container still holds {len(paths)} path(s) "
+        "(current=unknown-residue); expected container-absent at "
+        f"{retired} (expected=container-absent); every remaining path is listed "
+        f"and preserved (zero deletion): {listing}; repair entry: move or remove "
+        "these objects manually after review, then re-run specify migrate"
+    )
+    if container_item is None:
+        container_item = MigrateItem(
+            MIGRATE_STORE_DIMENSION, retired, "unknown-residue",
+            "container-absent", "refuse", reason=reason,
+        )
+        container_item._store_container = True
+        plan.items = migrate_normalize_items(list(plan.items) + [container_item])
+        return
+    container_item.disposition = "refuse"
+    container_item.status = "refused"
+    container_item.current = "unknown-residue"
+    container_item.reason = reason
+
+
+def _migrate_execute_store_container(ctx, plan, container_item) -> None:
+    declaration, label = _migrate_store_declaration()
+    if declaration is None:
+        return
+    retired = declaration["retired"]
+    container = ctx.workspace / retired
+    if not (container.exists() or container.is_symlink()):
+        if container_item is not None and container_item.status == "planned":
+            container_item.status = "done"
+        return
+    if container.is_symlink():
+        _migrate_store_container_refuse(
+            plan, container_item, retired, ctx,
+            [_migrate_ws_rel(ctx.workspace, container)],
+        )
+        return
+    container_rel = _migrate_ws_rel(ctx.workspace, container)
+    blocking = _migrate_store_walk_files(container)
+    if blocking:
+        paths = [
+            path
+            for path in _migrate_paths_under(ctx.workspace, container)
+            if path.rstrip("/") != container_rel
+        ]
+        _migrate_store_container_refuse(plan, container_item, retired, ctx, paths)
+        return
+    _migrate_store_prune_empty_dirs(container)
+    if container_item is not None:
+        container_item.status = "done"
+
+
+def _migrate_store_layout_summary(plan, workspace=None) -> dict:
+    """The E-5 `storeLayout` object for the current plan/execution state."""
+    store_items = [
+        item
+        for item in plan.items
+        if item.dimension == MIGRATE_STORE_DIMENSION
+        and not getattr(item, "_store_container", False)
+    ]
+    container_item = next(
+        (item for item in plan.items if getattr(item, "_store_container", False)),
+        None,
+    )
+    manifest = []
+    for item in sorted(store_items, key=lambda candidate: candidate.target):
+        for row in item.entries or []:
+            manifest.append(
+                [
+                    item.target,
+                    row.get("relpath"),
+                    row.get("digest"),
+                    row.get("status"),
+                ]
+            )
+    manifest_digest = hashlib.sha256(
+        json.dumps(manifest, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    container = "absent"
+    if workspace is not None:
+        declaration, _label = _migrate_store_declaration()
+        if declaration is not None and (
+            (Path(workspace) / declaration["retired"]).exists()
+            or (Path(workspace) / declaration["retired"]).is_symlink()
+        ):
+            container = "preserved"
+        elif container_item is not None:
+            container = "removed"
+    elif container_item is not None:
+        container = "preserved"
+    return {
+        "stores": len(store_items),
+        "resolved": sum(1 for item in store_items if item.status == "done"),
+        "refused": sum(
+            1
+            for item in plan.items
+            if item.dimension == MIGRATE_STORE_DIMENSION
+            and item.status == "refused"
+        ),
+        "blocked": sum(
+            1
+            for item in plan.items
+            if item.dimension == MIGRATE_STORE_DIMENSION
+            and item.status == "blocked"
+        ),
+        "container": container,
+        "manifestDigest": manifest_digest,
+    }
+
+
+def _migrate_execute_store_layout(ctx, plan, receipt_file=None) -> str:
+    """Manifest-first store pass plus the container pass (M-4 steps 1–5)."""
+    store_items = [
+        item
+        for item in plan.items
+        if item.dimension == MIGRATE_STORE_DIMENSION
+        and not getattr(item, "_store_container", False)
+    ]
+    container_item = next(
+        (item for item in plan.items if getattr(item, "_store_container", False)),
+        None,
+    )
+    if not store_items and container_item is None:
+        return "absent"
+
+    def _snapshot_receipt():
+        if receipt_file is None:
+            return
+        update_migrate_receipt(
+            receipt_file,
+            items=[entry.to_dict() for entry in plan.items],
+            archives=list(ctx.archives),
+            storeLayout=_migrate_store_layout_summary(plan),
+        )
+
+    # M-4 step 1: every entries[] manifest lands in the receipt before the first move.
+    _snapshot_receipt()
+    for item in sorted(store_items, key=lambda candidate: candidate.target):
+        _migrate_execute_store_item(ctx, item)
+        _snapshot_receipt()
+        if item.status == "failed":
+            # M-4 step 6: the run aborts; already-moved entries stay recorded.
+            return "aborted"
+    _migrate_execute_store_container(ctx, plan, container_item)
+    _snapshot_receipt()
+    return "done"
+
+
 def _migrate_dry_outcome(plan):
     if plan.items:
         return "planned", MIGRATE_OUTCOME_EXIT_CODES["planned"]
@@ -4548,13 +5260,14 @@ def _migrate_recover_lines(archives):
 
 
 def _migrate_receipt_payload(plan, run_id, outcome, exit_code, archives,
-                            started_at=None, resumed_from=None):
+                            started_at=None, resumed_from=None,
+                            status="completed", store_layout=None):
     now = _migrate_utc_iso()
     return {
         "receiptVersion": MIGRATE_RECEIPT_VERSION,
         "runId": run_id,
         "mode": plan.mode,
-        "status": "completed",
+        "status": status,
         "startedAt": started_at or now,
         "finishedAt": now,
         "workspace": str(Path(plan.workspace).resolve()),
@@ -4566,6 +5279,7 @@ def _migrate_receipt_payload(plan, run_id, outcome, exit_code, archives,
         "items": [item.to_dict() for item in plan.items],
         "archives": list(archives),
         "recover": _migrate_recover_lines(archives),
+        "storeLayout": store_layout or _migrate_empty_store_layout(),
         "notes": list(plan.notes),
         "pointers": list(plan.pointers),
     }
@@ -4634,27 +5348,36 @@ def _migrate_plan_and_run(ctx, *, apply_mode, receipt_file, started_at):
         receipt = _migrate_receipt_payload(
             plan, migrate_run_id(), outcome, exit_code, [],
             resumed_from=resumed_from,
+            store_layout=_migrate_store_layout_summary(plan),
         )
         return plan, outcome, exit_code, receipt, None
 
     _migrate_execute_anchor(ctx, plan)
     _migrate_execute_mirror(ctx, plan)
-    for item in plan.items:
-        _migrate_execute_item(ctx, item)
-        update_migrate_receipt(
-            receipt_file,
-            items=[entry.to_dict() for entry in plan.items],
-            archives=list(ctx.archives),
-        )
+    store_status = _migrate_execute_store_layout(ctx, plan, receipt_file)
+    if store_status != "aborted":
+        for item in plan.items:
+            _migrate_execute_item(ctx, item)
+            update_migrate_receipt(
+                receipt_file,
+                items=[entry.to_dict() for entry in plan.items],
+                archives=list(ctx.archives),
+            )
 
     outcome, exit_code = _migrate_apply_outcome(plan)
+    receipt_status = "aborted" if store_status == "aborted" else "completed"
+    store_layout = _migrate_store_layout_summary(plan, ctx.workspace)
     receipt = _migrate_receipt_payload(
         plan, ctx.run_id, outcome, exit_code, ctx.archives,
         started_at=started_at,
         resumed_from=resumed_from,
+        status=receipt_status,
+        store_layout=store_layout,
     )
-    complete_migrate_receipt(
+    update_migrate_receipt(
         receipt_file,
+        status=receipt_status,
+        finishedAt=receipt["finishedAt"],
         outcome=outcome,
         exitCode=exit_code,
         resumedFrom=receipt["resumedFrom"],
@@ -4663,6 +5386,7 @@ def _migrate_plan_and_run(ctx, *, apply_mode, receipt_file, started_at):
         items=receipt["items"],
         archives=receipt["archives"],
         recover=receipt["recover"],
+        storeLayout=receipt["storeLayout"],
         notes=receipt["notes"],
         pointers=receipt["pointers"],
     )

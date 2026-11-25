@@ -1,0 +1,5 @@
+task: T012
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: MIGRATE_DIMENSIONS appends store-layout last (five-token ordered prefix kept); M-2 state table (symlink/dual/path-collision/permission/legacy-only/empty/no-old/container), M-3 authoritative-only predicate with supersede, M-9 mapping implemented in src/specify_cli/__init__.py; the two 097 dimension pins re-pointed to prefix+six-token guards (097 E-8 unchanged); `run-tests.sh tests/contract/test_migrate_engine_contract.py tests/unit/test_migrate_planner.py -q` exit 0
+at: 2026-11-25T05:56:00Z

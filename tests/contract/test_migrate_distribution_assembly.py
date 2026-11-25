@@ -108,7 +108,7 @@ def test_command_doc_page_carries_the_required_faces() -> None:
         f"expected {OUTCOME_EXIT!r}, parsed {rows!r}"
     )
 
-    assert ".specify/memory/migrate/receipts/<run-id>.json" in text, (
+    assert ".specify/migrate/receipts/<run-id>.json" in text, (
         "the reference page must name the receipt landing point"
     )
     assert ".specify/archive/migrate/<run-id>/" in text, (

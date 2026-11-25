@@ -1,0 +1,287 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_store_layout_migration_us1_us2.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_____________________ test_fresh_init_plans_no_store_items _____________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17402/popen-gw1/test_fresh_init_plans_no_store0')
+
+    def test_fresh_init_plans_no_store_items(tmp_path):
+        workspace = tmp_path / "fresh"
+        specify_cli.copy_local_templates(
+            workspace, "qoder", "sh", is_current_dir=False
+        )
+    
+        payload = _json_payload(_dry_run(workspace), 0)
+    
+        assert payload["outcome"] == "clean"
+        assert _store_items(payload) == []
+>       assert payload["summary"]["byDimension"]["store-layout"] == 0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'store-layout'
+
+tests/integration/test_store_layout_migration_us1_us2.py:149: KeyError
+__________ test_rerun_after_success_is_clean_with_one_receipt_per_run __________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17402/popen-gw4/test_rerun_after_success_is_cl0')
+
+    def test_rerun_after_success_is_clean_with_one_receipt_per_run(tmp_path):
+        builders = _builders()
+>       workspace = builders.build_rerun(tmp_path / "rerun")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_store_layout_migration_us1_us2.py:334: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+dest = PosixPath('/tmp/pytest-of-agent/pytest-17402/popen-gw4/test_rerun_after_success_is_cl0/rerun')
+
+    def build_rerun(dest) -> Path:
+        """`build_legacy` after one successful `specify migrate --apply`."""
+        dest = build_legacy(dest)
+        with contextlib.redirect_stdout(io.StringIO()):
+            exit_code = specify_cli._run_migrate(dest, apply_mode=True, output_format="json")
+        if exit_code != 0:
+            raise RuntimeError(f"fixture apply failed with exit {exit_code}")
+        if (dest / retired_rel()).exists():
+>           raise RuntimeError("fixture apply left the retired container in place")
+E           RuntimeError: fixture apply left the retired container in place
+
+tests/fixtures/store-layout-105/builders.py:160: RuntimeError
+_______ test_dual_content_refuses_with_both_paths_and_leaves_both_trees ________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17402/popen-gw3/test_dual_content_refuses_with0')
+
+    def test_dual_content_refuses_with_both_paths_and_leaves_both_trees(tmp_path):
+        builders = _builders()
+        workspace = builders.build_dual(tmp_path / "dual", store="feedback")
+        old_root = workspace / ".specify" / "memory" / "feedback"
+        new_root = workspace / ".specify" / "feedback"
+        old_before = _store_files(old_root)
+        new_before = _store_files(new_root)
+        assert old_before and new_before
+    
+>       payload = _json_payload(_apply(workspace), 3)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_store_layout_migration_us1_us2.py:295: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <Result okay>, expected_code = 3
+
+    def _json_payload(result, expected_code):
+>       assert result.exit_code == expected_code, (
+            f"exit {result.exit_code}, expected {expected_code}\n{result.output}"
+        )
+E       AssertionError: exit 0, expected 3
+E         {
+E           "planVersion": 1,
+E           "mode": "apply",
+E           "workspaceKind": "client",
+E           "outcome": "clean",
+E           "exitCode": 0,
+E           "items": [],
+E           "summary": {
+E             "total": 0,
+E             "byDimension": {
+E               "templates-generated": 0,
+E               "anchor-layout": 0,
+E               "compat-links": 0,
+E               "mirror-consistency": 0,
+E               "migration-residue": 0
+E             },
+E             "byDisposition": {}
+E           },
+E           "notes": [
+E             "compat-links: instruction target .specify/instructions.md absent; skipped QODER.md"
+E           ],
+E           "pointers": [
+E             {
+E               "topic": "goal-team-archive-migration",
+E               "ownerCommand": "/speckit.anchor",
+E               "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+E               "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+E             }
+E           ],
+E           "receipt": {
+E             "receiptVersion": 1,
+E             "runId": "20261125T054123Z-326c7cd2",
+E             "mode": "apply",
+E             "status": "completed",
+E             "startedAt": "2026-11-25T05:41:23Z",
+E             "finishedAt": "2026-11-25T05:41:24Z",
+E             "workspace": "/tmp/pytest-of-agent/pytest-17402/popen-gw3/test_dual_content_refuses_with0/dual",
+E             "resumedFrom": null,
+E             "source": {
+E               "stampFile": null,
+E               "frameworkCommit": "unavailable",
+E               "stampedAt": null,
+E               "reason": ".specify/source.json absent (pre-043 workspace)"
+E             },
+E             "target": {
+E               "cliVersion": "0.0.22",
+E               "frameworkCommit": "5b445e916c1288a025b02590ffaa542312da5ccc",
+E               "origin": "git"
+E             },
+E             "outcome": "clean",
+E             "exitCode": 0,
+E             "items": [],
+E             "archives": [],
+E             "recover": [],
+E             "notes": [
+E               "compat-links: instruction target .specify/instructions.md absent; skipped QODER.md"
+E             ],
+E             "pointers": [
+E               {
+E                 "topic": "goal-team-archive-migration",
+E                 "ownerCommand": "/speckit.anchor",
+E                 "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+E                 "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+E               }
+E             ]
+E           },
+E           "receiptPath": ".specify/memory/migrate/receipts/20261125T054123Z-326c7cd2.json"
+E         }
+E         
+E       assert 0 == 3
+E        +  where 0 = <Result okay>.exit_code
+
+tests/integration/test_store_layout_migration_us1_us2.py:50: AssertionError
+_______ test_legacy_apply_moves_bytes_identically_and_removes_old_roots ________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17402/popen-gw2/test_legacy_apply_moves_bytes_0')
+
+    def test_legacy_apply_moves_bytes_identically_and_removes_old_roots(tmp_path):
+        builders = _builders()
+        workspace = builders.build_legacy(tmp_path / "legacy-apply")
+        roster = builders.store_names()
+        preserved = tmp_path / "preserved"
+        for name in roster:
+            shutil.copytree(
+                workspace / ".specify" / "memory" / name,
+                preserved / name,
+                symlinks=True,
+            )
+    
+        payload = _json_payload(_apply(workspace), 0)
+    
+>       assert payload["outcome"] == "applied"
+E       AssertionError: assert 'clean' == 'applied'
+E         
+E         - applied
+E         + clean
+
+tests/integration/test_store_layout_migration_us1_us2.py:218: AssertionError
+___________ test_legacy_dry_run_writes_nothing_and_plans_every_store ___________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-17402/popen-gw0/test_legacy_dry_run_writes_not0')
+
+    def test_legacy_dry_run_writes_nothing_and_plans_every_store(tmp_path):
+        builders = _builders()
+        workspace = builders.build_legacy(tmp_path / "legacy")
+        roster = builders.store_names()
+        _git_commit_fixture(workspace)
+        before = _tree_digest(workspace)
+        status_before = _git_status(workspace)
+        receipt_store = workspace / ".specify" / "migrate"
+    
+>       first = _json_payload(_dry_run(workspace), 1)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_store_layout_migration_us1_us2.py:166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <Result okay>, expected_code = 1
+
+    def _json_payload(result, expected_code):
+>       assert result.exit_code == expected_code, (
+            f"exit {result.exit_code}, expected {expected_code}\n{result.output}"
+        )
+E       AssertionError: exit 0, expected 1
+E         {
+E           "planVersion": 1,
+E           "mode": "dry-run",
+E           "workspaceKind": "client",
+E           "outcome": "clean",
+E           "exitCode": 0,
+E           "items": [],
+E           "summary": {
+E             "total": 0,
+E             "byDimension": {
+E               "templates-generated": 0,
+E               "anchor-layout": 0,
+E               "compat-links": 0,
+E               "mirror-consistency": 0,
+E               "migration-residue": 0
+E             },
+E             "byDisposition": {}
+E           },
+E           "notes": [
+E             "compat-links: instruction target .specify/instructions.md absent; skipped QODER.md"
+E           ],
+E           "pointers": [
+E             {
+E               "topic": "goal-team-archive-migration",
+E               "ownerCommand": "/speckit.anchor",
+E               "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+E               "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+E             }
+E           ],
+E           "receipt": {
+E             "receiptVersion": 1,
+E             "runId": "20261125T054125Z-b3d538e6",
+E             "mode": "dry-run",
+E             "status": "completed",
+E             "startedAt": "2026-11-25T05:41:25Z",
+E             "finishedAt": "2026-11-25T05:41:25Z",
+E             "workspace": "/tmp/pytest-of-agent/pytest-17402/popen-gw0/test_legacy_dry_run_writes_not0/legacy",
+E             "resumedFrom": null,
+E             "source": {
+E               "stampFile": null,
+E               "frameworkCommit": "unavailable",
+E               "stampedAt": null,
+E               "reason": ".specify/source.json absent (pre-043 workspace)"
+E             },
+E             "target": {
+E               "cliVersion": "0.0.22",
+E               "frameworkCommit": "5b445e916c1288a025b02590ffaa542312da5ccc",
+E               "origin": "git"
+E             },
+E             "outcome": "clean",
+E             "exitCode": 0,
+E             "items": [],
+E             "archives": [],
+E             "recover": [],
+E             "notes": [
+E               "compat-links: instruction target .specify/instructions.md absent; skipped QODER.md"
+E             ],
+E             "pointers": [
+E               {
+E                 "topic": "goal-team-archive-migration",
+E                 "ownerCommand": "/speckit.anchor",
+E                 "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+E                 "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+E               }
+E             ]
+E           },
+E           "receiptPath": null
+E         }
+E         
+E       assert 0 == 1
+E        +  where 0 = <Result okay>.exit_code
+
+tests/integration/test_store_layout_migration_us1_us2.py:50: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_store_layout_migration_us1_us2.py::test_fresh_init_plans_no_store_items
+FAILED tests/integration/test_store_layout_migration_us1_us2.py::test_rerun_after_success_is_clean_with_one_receipt_per_run
+FAILED tests/integration/test_store_layout_migration_us1_us2.py::test_dual_content_refuses_with_both_paths_and_leaves_both_trees
+FAILED tests/integration/test_store_layout_migration_us1_us2.py::test_legacy_apply_moves_bytes_identically_and_removes_old_roots
+FAILED tests/integration/test_store_layout_migration_us1_us2.py::test_legacy_dry_run_writes_nothing_and_plans_every_store
+5 failed in 9.35s
