@@ -53,7 +53,7 @@ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixt
 
 ## Scenario 5 — Audit reconstruction (planned surface)
 
-Given a fixture decision set spanning four carrier types (requirements, plan, checkpoint, run report), reconstruct FR-014's fields from the register + carriers only; delete one field → M-01 red (`decision_id` unresolvable also hits M-04); break one evidence pointer → M-09 red.
+Given a fixture decision set spanning four carrier types (requirements, plan, checkpoint, run report), reconstruct each record's applicable-layer fields (the base layer + the conditional families whose triggers hold; all four carriers are non-transmission producers, so no transmission timepoint is judged) from the register + carriers only; delete one applicable-layer mandatory field → M-01 red (`decision_id` unresolvable also hits M-04); break one evidence pointer → M-09 red.
 
 ```bash
 git -C . diff --numstat 08b59695c..HEAD -- .specify/register.md .specify/specs/107-decision-governance/checkpoints .specify/specs/107-decision-governance/plan.md

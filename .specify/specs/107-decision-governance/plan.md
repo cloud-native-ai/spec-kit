@@ -31,7 +31,7 @@ Deliver one normative owner page for general AI-agent decision items (`shared/de
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every landing file traces to an FR: owner page ([[STR-001]]) ← FR-001; instruction section ← FR-010/FR-026; checker ← FR-022; payload ← FR-018/FR-019 (this plan § Project Structure) |
 | II | Feature-Centric Development | ✅ Pass | Feature 107 row advances Draft → Planned with its detail updated in the same change (§ Phase 1 backfill, Feature Integration); no other feature changes status |
 | III | Intent-Driven Development | ✅ Pass | What/why precede how: `research.md` records measured carriers, `contracts/` state normative interfaces, § Decision Tensions state trade-offs and reopening conditions |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | Each M rule names a red-first fixture and a reverse sample (§ Enforcement below, `contracts/enforcement-boundary.contract.md`); tests precede implementation in the tasks plan |
+| IV | Test-First & Contract-Driven Implementation | ✅ Pass | Each M rule names a red-first fixture and a reverse sample (§ Project Structure test map; `contracts/enforcement-boundary.contract.md` C-401/C-403); tests precede implementation in the tasks plan |
 | V | AI Agent Integration Standards | ✅ Pass | The payload addition rides `run-agent` / `run-team`; supported agent roster and tiers untouched; no new provider or config key |
 | VI | Continuous Quality & Observability | ✅ Pass | Root-cause discipline: guards that can go red, legacy reported rather than skipped; no `.bak` copies; machine/behavior split kept honest |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | Plan set produced from the validated spec; feature registry updated; status ceiling `Planned` respected (no `Implemented`) |
@@ -139,7 +139,7 @@ docs/concepts/spec-driven.md                      # + one pointer line to the ow
 
 tests/fixtures/decision-governance/               # red-first fixtures + reverse samples (per-feature fixture dir)
 tests/unit/test_validate_decisions.py             # checker unit tests + M-01/M-03/M-04 reverse samples
-tests/contract/test_decision_governance_guards.py # M-02/M-05/M-06/M-07/M-08 + legacy/bridge fixtures
+tests/contract/test_decision_governance_guards.py # M-02/M-05/M-06/M-07/M-08/M-09 + legacy/bridge fixtures
 tests/contract/test_decision_governance_contracts.py # owner-page/pointer/field-closure/instruction-section guards
 tests/contract/test_decision_governance_migration_map.py # BC-01…BC-06 row→test mapping closure
 tests/integration/test_decision_governance_migrate_dryrun.py # specify migrate dry-run convergence + zero rewrite

@@ -112,7 +112,7 @@ Not a store: the union of `{producer × existing carrier}` plus the register ind
 | I-05 | Every evidence pointer resolves; a broken pointer is a defect (no memory backfill) | FR-016 |
 | I-06 | A load-bearing decision's record cross-references its `T-NNN` and does not copy the six tension fields | FR-017 |
 | I-07 | A human-interactive record carries the human choice signal in the existing signal vocabulary (pointer: `confirmation-gates.md`) | FR-013, A-4 |
-| I-08 | An ai-autonomous record's chosen option is deterministically replayable from the recorded inputs + decision predicate | FR-013, M-… replay |
+| I-08 | An ai-autonomous record's chosen option is deterministically replayable from the recorded inputs + decision predicate | FR-013, C-107 |
 | I-09 | A decision block carries all five fields; a decision-backed dispatch without one is refused | FR-018, M-06 |
 | I-10 | A receipt carries all four fields; a missing item makes the return incomplete and the parent must not consume it | FR-019, M-05 |
 | I-11 | The audit chain record → dispatch attempt → receipt is fully resolvable; a broken link is an explicit anomaly | FR-021, M-07 |

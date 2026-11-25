@@ -1,0 +1,51 @@
+# plan re-review integrity + consistency readings — 2026-11-25T17:33:44Z — HEAD 62815af79
+
+== plan template-integrity ==
+residual_UPPER_SNAKE_placeholders: 0
+H1_Implementation_Plan_headings: 1
+Requirement_to_Feature_stamp: 1
+template_note_remaining: 0
+
+== closed-set / row counts (plan-owned vs requirements authority) ==
+constitution_principles(live): 23  constitution_rows(plan): 23
+decision_tension_records(plan): 3  register_map: T-019..T-021
+execution_premises_rows: 7
+BC_rows(plan): 6
+M_rules(requirements): 9  M_rows_C-401: 9
+B_rules(requirements): 6  P_rows: 12
+FR_count: 30  SC_count: 10  STR_rows: 9
+contract_files: 5  contract_clauses: 38
+data_model_E2_rows: base=10 condition=6 total=16
+data_model_invariants: 14
+field_ownership_rows: base=10 conditional=8 dimension=1 total=19
+delivery_files(feature-ref decl): 21
+landing_files(plan, non-test): 21  test_suites(plan): 6
+
+== stale sweep over plan-owned artifacts (expect 0; not-yet = prohibition sentence only) ==
+four timestamps => 0
+四个时点 => 0
+ten mandatory => 0
+十个必填 => 0
+three conditional => 0
+M-01…M-08 => 0
+8 machine rules => 0
+八个机器 => 0
+§ Enforcement below => 0
+M-… => 0
+three actions => 0
+not-yet => 1 (the one hit is the explicit prohibition sentence in research.md R-2)
+
+== grammar alignment (repaired authority vs plan projections) ==
+FR-014 base enumeration phrase: 1
+FR-014 conditional families (同名族/取代族/传递族): 19 mentions
+C-202 'ten fields' + three families: 1 / 6 family mentions
+C-401 M-01 red-condition covers layered grammar + status domain + phase: 1
+I-03 layered presence rule: 1
+
+== containment reading (C-502) vs 08b59695c, corpus paths ==
+deleted_lines(corpus): 0
+deleted_files(--diff-filter=D): 0
+numstat register/plan: 3	0	.specify/register.md 217	0	.specify/specs/107-decision-governance/plan.md 
+
+== base duality (disclosed in analyze-repair round 1; unchanged by design) ==
+requirements base fbac/SC: fbab7a45c; plan C-502/EP-006 base: 08b59695c; implementation zero-rewrite test follows C-502 per analyze-repair-2026-11-26 § 5(3)

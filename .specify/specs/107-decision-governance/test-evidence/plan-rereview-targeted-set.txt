@@ -1,0 +1,69 @@
+# targeted-set-v1 — stage_base=62815af79 — 2026-11-25T17:34:18Z
+## input: changed_paths (diff + porcelain union)
+.specify/specs/107-decision-governance/data-model.md
+.specify/specs/107-decision-governance/plan.md
+.specify/specs/107-decision-governance/quickstart.md
+.specify/specs/107-decision-governance/research.md
+.specify/specs/107-decision-governance/test-evidence/plan-rereview-integrity.txt
+.specify/specs/107-decision-governance/test-evidence/plan-rereview-pre-analyze-plan.txt
+.specify/specs/107-decision-governance/test-evidence/plan-rereview-targeted-set.txt
+.specify/specs/107-decision-governance/test-evidence/plan-rereview-validate-decision-tensions.txt
+.specify/specs/107-decision-governance/test-evidence/workspace-plan-rereview-before.json
+
+## candidates: tests/{unit,contract,integration,scenarios}/test_*.py
+586
+
+## (a) changed path / module-stem matches (grep -lF fixed strings over candidate files)
+239
+
+## (b) delivery-surface contract/integration tests (short name 'decision-governance' + declared paths)
+31
+
+## (c) fixture changes
+none (no tests/fixtures path changed)
+
+## classification
+executable-or-test changed paths: 0
+## selection (deduped, informational when executable-or-test = 0)
+256
+## selected_paths[] (first 40 shown; full count above)
+tests/contract/test_085_disposal_table.py
+tests/contract/test_acceptance_premises.py
+tests/contract/test_acceptance_review_composition.py
+tests/contract/test_acceptance_schema_ownership.py
+tests/contract/test_acceptance_state_machine.py
+tests/contract/test_agents_run_docs_contract.py
+tests/contract/test_agents_run_scope_contract.py
+tests/contract/test_anchor_layout_migrate.py
+tests/contract/test_archive_migration.py
+tests/contract/test_bilingual_expression.py
+tests/contract/test_binding_model.py
+tests/contract/test_checker_form.py
+tests/contract/test_checkpoint_protocol.py
+tests/contract/test_clarify_semantic_completeness.py
+tests/contract/test_clause_coverage.py
+tests/contract/test_clause_forms.py
+tests/contract/test_cleanup_obsolete_assets.py
+tests/contract/test_client_guard_sweep.py
+tests/contract/test_client_improve_loop.py
+tests/contract/test_client_package_exclusion.py
+tests/contract/test_closure_acceptance_check.py
+tests/contract/test_coaching_reporting_duty.py
+tests/contract/test_coaching_run_contract.py
+tests/contract/test_coaching_wiring_contract.py
+tests/contract/test_code_review_skill_contract.py
+tests/contract/test_concurrency_disposal.py
+tests/contract/test_concurrency_high_order.py
+tests/contract/test_concurrency_real_run_evidence.py
+tests/contract/test_concurrency_reproduction_092.py
+tests/contract/test_concurrency_units.py
+tests/contract/test_constitution_double_landing.py
+tests/contract/test_coverage_receipt.py
+tests/contract/test_criterion_vocabulary_scan.py
+tests/contract/test_decision_tension_contract.py
+tests/contract/test_decision_tension_validator.py
+tests/contract/test_declaration_facts.py
+tests/contract/test_derive_command_surface.py
+tests/contract/test_directory_governance.py
+tests/contract/test_doc_consistency_checker.py
+tests/contract/test_docs_command_template.py

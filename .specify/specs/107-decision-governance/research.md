@@ -38,7 +38,7 @@ Legacy discriminator: only `^### D-\d{3}` headings carrying the field grammar ar
 
 ### R-3 — Checker engine (feeds T-003)
 
-One new read-only engine `scripts/python/validate-decisions.py` (stdlib, Python ≥3.8, `--help`/`--version`, undeclared options rejected, exit 0/1/2) with three actions:
+One new read-only engine `scripts/python/validate-decisions.py` (stdlib, Python ≥3.8, `--help`/`--version`, undeclared options rejected, exit 0/1/2) with four actions:
 - `--action records` (default): scan a spec dir's formal carriers (`requirements.md`, `plan.md`, `checkpoints/*.md`, `research.md`, `feature-ref.md`, `contracts/*`) plus `--carrier PATH` for run reports; judge M-01, M-02, M-03, M-04, M-08, M-09.
 - `--action payload`: judge M-06 on a dispatch-payload fixture; `--action chain`: judge M-05 + M-07 on record+dispatch+receipt fixtures.
 - `--action inventory`: compare the declared producer set (owner page table) with a code-face scan output supplied by the caller (SC-001 observation set); emit `observed == declared ± exempt` verdict.
