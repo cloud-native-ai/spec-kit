@@ -1,0 +1,9 @@
+{
+  "id": "20261125T114609Z-speckit-requirements",
+  "path": ".specify/feedback/20261125T114609Z-speckit-requirements.md",
+  "duplicate": false,
+  "count_since_submission": 556,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
