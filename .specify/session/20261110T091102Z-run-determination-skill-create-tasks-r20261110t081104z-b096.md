@@ -21,7 +21,7 @@ skill:create-tasks run=r20261110T081104Z-b096 token=not_evaluated elapsed=not_ev
   "feature": "096-sdd-observer-agent",
   "feature_id": "096",
   "determined_at": "2026-11-10T09:11:02Z",
-  "settled_at": null,
+  "settled_at": "2026-11-25T14:32:14Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -84,7 +84,7 @@ skill:create-tasks run=r20261110T081104Z-b096 token=not_evaluated elapsed=not_ev
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -163,8 +163,8 @@ skill:create-tasks run=r20261110T081104Z-b096 token=not_evaluated elapsed=not_ev
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -194,7 +194,7 @@ skill:create-tasks run=r20261110T081104Z-b096 token=not_evaluated elapsed=not_ev
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
