@@ -1,0 +1,5 @@
+# overlap-check.py — clarify U4 — 2026-11-25 — branch: 107-decision-governance
+# command: python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py --spec-dir .specify/specs/107-decision-governance --repo /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance
+overlap-check: current=107-decision-governance checked=1 overlaps=0 decision=clear
+{"decision": "clear", "current_spec": "107-decision-governance", "checked_specs": ["107-decision-governance"], "overlaps": [], "note": "current feature has no declaration artifact", "checked_at": "2026-11-25T14:05:47Z"}
+exit: 0

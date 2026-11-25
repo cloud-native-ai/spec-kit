@@ -13,8 +13,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 107
+**Feature Name**: Decision Governance（AI Agent 决策项治理）
 
 ## Overview
 
@@ -50,7 +50,7 @@
 | **A-9** | **机器可判/行为类边界沿用既有分野**：机器可判 = 在场性、形态、闭集取值、引用可解析、集合封闭、id 可解析；行为类 = 名称是否真的足够完整、定位维度是否真的足够区分、可读性、严谨性、后果与理由是否真实充分、类别是否选对。机器类 MUST 有能转红的守卫（含逆向样本）；行为类 MUST 有具名评审承接面，MUST NOT 声称被机器覆盖。 | 与 `053-machine-decidable-artifacts` 的判据一脉相承：程序只判可机械判定的结构命题，语义仍归 analyze/clarify/review。 |
 | **A-10** | **兼容策略 = 新记录新形态、旧记录只读**：新契约只约束本特性落地后创建的决策记录；旧记录保持可解析并报告为 `legacy`，不被判为无效、不被改写。任何使既有载体或载荷不再成立的变更 MUST 在 `/speckit.migrate` 中有迁移或确定性拒绝，plan MUST 维护封闭的不兼容变更清单（先例：105 的 § Backward-Incompatible Change Inventory）。 | 简报约束「Preserve existing sentinel literals … unless a recorded ruling justifies a change」与「no retroactive rewrite」。 |
 | **A-11** | **词汇表提案只提议不写入**：`Decision Item`、`Decision Class`、`Human-Interactive Decision`、`AI-Autonomous Decision`、`Decision Record`、`Implementation Receipt` 等新词以 `origin=auto`、`status=proposed` 形态记录在 run 证据中；未获用户确认前不写 `.specify/glossary.md`（先例：105 A-16）。无验收标准依赖写入动作。 | `shared/workflow/glossary.md` § 冲突与用户优先；无人值守运行不因等待确认而阻塞。 |
-| **A-12** | **Related Feature 保持 `Need clarification`**，绑定推迟到 `/speckit.clarify`（Feature Integration Protocol）。本仓的 `101` 条张力记录、`125` 个检查点、`43` 份 run report 与 register 决策行仅作**基线语料**，不构成绑定。 | `create-requirements` 步骤 5.3/6 明令；binding 不是本次运行的职责。 |
+| **A-12** | **Related Feature 保持 `Need clarification`**，绑定推迟到 `/speckit.clarify`（Feature Integration Protocol）。本仓的 `101` 条张力记录、`125` 个检查点、`43` 份 run report 与 register 决策行仅作**基线语料**，不构成绑定。（已结清：2026-11-25 的 `/speckit.clarify` 绑定为 **Feature 107**，见 § Clarifications；本条保留为 requirements 阶段的时点裁定。） | `create-requirements` 步骤 5.3/6 明令；binding 不是本次运行的职责。 |
 | **A-13** | **instruction 段为指针形并声明字节上限**：新段「Decision Items（决策项）」在 `templates/instructions-template.md` 中以「两三条最低规则 + 指向所有者页」的形态存在，声明 `**本节字节上限：1,500 B**`（判据 = 声明上限 + 生成后实测增量）；MUST NOT 复制所有者页的判据表或模板全文。 | 同 `templates/instructions-template.md` 既有段落的形态与字节预算纪律；避免指令膨胀与第二定义点。 |
 | **A-14** | **守卫程序优先、复用既有检查器**：优先扩展既有 `validate-*`/契约测试面；若需新引擎，MUST 遵守 `shared/definitions/script-interface-definitions.md`（`--help`/`--version`、拒绝未声明选项、只读/写入面声明）。守卫经唯一测试入口 `scripts/bash/run-tests.sh` 执行；本特性不新增第三方依赖。 | Program-First + Script Interface Contract + 单一测试入口。 |
 
@@ -246,7 +246,7 @@
 - **FR-027**: MUST 在同一变更内再生成 `.specify/` 镜像与每工具命令副本：`regen-command-copies.py --check` MUST rc 0；`sync-mirrors.py --check` 的漂移成员集 MUST 相对基线无新增成员（绝对读数如实报告）；MUST NOT 手改镜像面。
 - **FR-028**: 新契约只约束本特性落地后创建的决策记录；base `fbab7a45c` 的既有记录（`T-NNN`、检查点、run report、register 行、Clarifications、review/analyze 报告正文）MUST NOT 被改写；旧形态记录 MUST 保持可解析并报告为 `legacy`，MUST NOT 被判无效。
 - **FR-029**: 任何**向后不兼容的记录形态变更**（使既有载体/载荷/编号/instruction 面在新版本下不再成立的变更）MUST 在 `/speckit.migrate` 中有可执行迁移逻辑或确定性拒绝；plan MUST 维护封闭的 § Backward-Incompatible Change Inventory，每行具名迁移/拒绝行为与证据指针；MUST NOT 只依赖运行时双路径回退或人工操作说明。
-- **FR-030**: MUST 更新框架文档与登记面：框架地图为所有者页 [[STR-001]] 新增一行（owner/生命周期/内容）；docs 以指针抵达所有者页、MUST NOT 复述规则；glossary 提案按 FR-005 留证；`ready-for-clarify` 的 Feature 绑定仍由 `/speckit.clarify` 完成。
+- **FR-030**: MUST 更新框架文档与登记面：框架地图为所有者页 [[STR-001]] 新增一行（owner/生命周期/内容）；docs 以指针抵达所有者页、MUST NOT 复述规则；glossary 提案按 FR-005 留证；`Related Feature` 绑定已由 2026-11-25 的 `/speckit.clarify` 完成（Feature 107，见 § Clarifications）。
 
 ### Key Entities
 
@@ -274,7 +274,7 @@
 | actor | `superagent-definitions.md`（边身份）/ run 身份 | 各载体 | 谁持有/实施了该决策 |
 | timestamps | `decision-definitions.md`（创建/传递/确认/实施四个时点） | 各载体自己的时间格式 | 四个时点必须齐全 |
 | `transmission_status` | `decision-definitions.md`（值域在其页声明） | run report / 角色边载体 | 传递与确认状态 |
-| implementation status | `decision-definitions.md`（值域在其页声明） | 实施回执 + 产物 | 由回执驱动 |
+| implementation status | `decision-definitions.md`（值域在其页声明） | 实施回执 + 产物 | 由回执驱动；是 [[STR-007]] 状态面承载的实施结果维度，不是第 11 个记录字段（FR-014 封闭集不变；见 § Clarifications 2026-11-25） |
 
 ### Enforcement Boundary (closed)
 
@@ -384,3 +384,10 @@
 - Q: 词汇表新词是否直接写入？ → A: 只提议（`origin=auto`、`status=proposed`），未确认不写（A-11、FR-005）。
 - Q: `Related Feature` 绑定？ → A: 保持 `Need clarification`，由 `/speckit.clarify` 绑定（A-12）；本规格的基线语料不构成绑定。
 - Q: 本阶段脚手架若脚本会派生新编号分支怎么办？ → A: 本规格必须使用编号 107；因当前已在 `107-decision-governance` 分支且脚本的编号推导会把当前分支计入而派生 108，按简报「不得创建第二个分支、在当前分支继续并记录偏差」的裁定，采用等价的手工脚手架（复制 `.specify/templates/requirements-template.md` 并替换输入描述），偏差记录于 `test-evidence/requirements-stage-2026-11-25.md`。
+
+### Session 2026-11-25（无人值守 clarify 阶段，自行裁决并记录）
+
+- Q: `Related Feature` 绑定到哪个既有 Feature，还是新建？ → A: 新建 **Feature 107 Decision Governance**。候选 046 / 076 / 053 / 095 / 090 逐一核对：均只拥有相邻窄面（门控分类、承重取舍六字段、机器可判边界、角色边载荷、重载与处置），无既有 Feature 承担一般决策项契约；本规格 A-2 声明新概念与新所有者页 `shared/definitions/decision-definitions.md`；各候选的 sibling 规格集均仅 1 份，绑定先例指向 create。编号 107 与分支名、`REQUIREMENT_ID` 一致，106 已被并行线 `106-background-silent-failure` 占用。
+- Q: 本规格与上述候选是什么父子/切片关系？ → A: **独立特性，不是任何候选的切片**；五处相邻所有者只新增指针行与交叉引用（FR-002），不承担父级归属。归属裁决与交叉引用记录于 `.specify/features/107-decision-governance.md` § Overview / § Related Files；索引行与 `Total Features` 同批更新，邻接 Feature 076 详情新增反向交叉引用。
+- Q: `implementation status` 是否属于决策记录封闭字段集？（FR-014 闭集未列；§ Decision Record Field Ownership 列出该行；FR-019 要求回执更新记录的 `transmission_status` 实施状态） → A: 不新增第 11 个记录字段。FR-014 的封闭集是成员资格权威（「缺任一字段即缺陷」）；`implementation status` 是记录 `transmission_status` 状态面承载的实施结果维度（值域由所有者页声明、由实施回执驱动、由 M-05 回执守卫覆盖），不单独成为记录字段；已在 § Decision Record Field Ownership 该行 说明 中写明，排除第 11 字段读法。
+- Q: FR-030 末句「`ready-for-clarify` 的 Feature 绑定仍由 `/speckit.clarify` 完成」在本次绑定后如何收口？ → A: 按实际结果更新为「`Related Feature` 绑定已由 2026-11-25 的 `/speckit.clarify` 完成（Feature 107）」；不保留悬而未决的绑定义务，避免 plan/tasks 派生幻影任务。

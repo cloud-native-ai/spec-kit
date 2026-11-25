@@ -103,6 +103,7 @@ spec-kit 的改进侧已有「批评和自我批评」纪律：SI-3C 要求每�
 - 任务清单: .specify/specs/076-decision-tension-contract/tasks.md
 - 条款覆盖基线: .specify/specs/076-decision-tension-contract/coverage-baseline.txt
 - 设计调研：08_工具开发 `artifacts/designs/speckit-decision-dialectic/research-report.md`
+- Cross-referenced Feature: .specify/features/107-decision-governance.md — 一般决策项/记录/传递契约（Decision Governance）；它以交叉引用消费本文的 `T-NNN` 六字段，不重定义（107 FR-017），归属不发生转移
 
 ## 附：内部别名映射（仅供理解，不进用户界面）
 
