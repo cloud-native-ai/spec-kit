@@ -67,7 +67,7 @@ Closed-set rules: no empty set; no duplicate labels; `other` without `path` is i
 | `implementation_constraints` | list | constraints the child must honor | owner page |
 | `archive_pointer` | pointer | carrier path + heading anchor of the record | owner page |
 
-Carried inside the existing dispatch payload; the seven role fields and the four injections keep their owners (`superagent-definitions.md`) and are unchanged (A-7).
+Carried inside the existing dispatch payload; the seven role fields and the four injections keep their owners (`superagent-definitions.md`) and are unchanged (A-7). `decision_class` is copied from the source record unchanged — a human-held decision delegated for implementation stays `human-interactive`; transmission never re-classes a decision (A-4, P-09, FR-018).
 
 ### E5 — Acknowledgement（确认）
 
@@ -82,7 +82,7 @@ A child return item: echoes the `decision_id` and states that the block was acce
 | `evidence` | pointer[] | resolvable implementation evidence | owner page |
 | `divergence` | enum + reason | `none` / `diverged` + reason | owner page |
 
-Receipt presence updates the record's `transmission_status` (implementation-result dimension). Missing any item ⇒ the return is incomplete; the parent MUST NOT consume or backfill (existing uplink rule).
+Receipt presence updates the record's `transmission_status` (implementation-result dimension). A receipt is not a second decision record: the decision item keeps exactly one record (I-01), and the receipt updates that record's state and the audit chain (FR-014, FR-019). Missing any item ⇒ the return is incomplete; the parent MUST NOT consume or backfill (existing uplink rule).
 
 ### E7 — Decision Producer（决策生产者）
 
@@ -113,7 +113,7 @@ Not a store: the union of `{producer × existing carrier}` plus the register ind
 | I-10 | A receipt carries all four fields; a missing item makes the return incomplete and the parent must not consume it | FR-019, M-05 |
 | I-11 | The audit chain record → dispatch attempt → receipt is fully resolvable; a broken link is an explicit anomaly | FR-021, M-07 |
 | I-12 | Supersession preserves the old record and receipt; the old record gains `superseded_by`; nothing is deleted or rewritten | A-6, edge case |
-| I-13 | Legacy records (pre-existing `### D-…` headings in non-`D-NNN` forms, register rows in non-`D-NNN` forms) are readable, reported `legacy`, never rewritten, never judged | FR-028, A-10 |
+| I-13 | Legacy records (pre-existing `### D-…` headings without the record field grammar; register rows that are not a new-form record's birth registration — including the id-shaped `D-001` row) are readable, reported `legacy`, never rewritten, never judged. New form = `^### D-\d{3}` heading **with** the field grammar; the id shape alone never qualifies | FR-028, A-10, C-206 |
 | I-14 | No record, block, receipt or inventory lives outside the existing carriers + register; no second store exists | FR-004, A-3 |
 
 ## Relationships

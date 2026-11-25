@@ -53,13 +53,13 @@ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixt
 
 ## Scenario 5 — Audit reconstruction (planned surface)
 
-Given a fixture decision set spanning four carrier types (requirements, plan, checkpoint, run report), reconstruct FR-014's fields from the register + carriers only; delete one field or break one evidence pointer → M-01/M-04 red.
+Given a fixture decision set spanning four carrier types (requirements, plan, checkpoint, run report), reconstruct FR-014's fields from the register + carriers only; delete one field → M-01 red (`decision_id` unresolvable also hits M-04); break one evidence pointer → M-09 red.
 
 ```bash
-git -C . diff --name-only 08b59695c..HEAD -- .specify/register.md .specify/specs/107-decision-governance/checkpoints .specify/specs/107-decision-governance/plan.md
+git -C . diff --numstat 08b59695c..HEAD -- .specify/register.md .specify/specs/107-decision-governance/checkpoints .specify/specs/107-decision-governance/plan.md
 ```
 
-**Executed today**: this exact command returns empty (no legacy carrier was rewritten) — the C-502 reading at plan time.
+**Executed today (2026-11-26)**: every listed line carries a `0` deleted column — `.specify/register.md` shows `3	0` (appended `T-019…T-021` rows) and every other path is a file added after the base (the new `plan.md`, the 107 checkpoints created by later stages), each with deleted column `0`; `--diff-filter=D` is empty. The C-502 reading is **line-level containment** (`--numstat` deleted column = 0 for every pre-existing file, plus an empty `--diff-filter=D`), never an empty diff — later legitimate commits keep adding lines.
 **Premises (per planned example)**: the reconstruction runbook is the checker's `--action records` output plus the register fixture; the four-carrier fixture set lives under `tests/fixtures/decision-governance/reconstruct/`. **Pinned by**: `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` and `::test_broken_pointer_red`.
 
 ## Scenario 6 — Legacy read and mirror closure (executed today)

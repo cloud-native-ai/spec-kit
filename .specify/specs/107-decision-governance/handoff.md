@@ -23,7 +23,7 @@ None.
 
 ## Task Reference
 
-T001–T056 as defined in `.specify/specs/107-decision-governance/tasks.md`.
+T001–T056 as defined in `.specify/specs/107-decision-governance/tasks.md`. T056's crew-side deliverable is `.specify/specs/107-decision-governance/test-evidence/verification-input.md`; `verification.md` is derived spec-side from that input and is never a crew write.
 
 ## Territory
 
@@ -39,7 +39,7 @@ The paths the crew may write, relative to the repository:
 - write: `.github/prompts/**`, `.claude/commands/**`, `.qoder/commands/**`, `.opencode/command/**`
 - write: `.specify/instructions.md`, `.specify/glossary.md`, `.specify/.gitignore`, `pyproject.toml`
 
-The following MUST stay forbidden to every seat that carries the expansion (C-62): `requirements.md`, `tasks.md`, `verification.md`, `handoff.md`; plus `plan.md`, `data-model.md`, `contracts/**`, `quickstart.md`, `research.md`, `feature-ref.md`, `checkpoints/**`, `.specify/anchoring/**`, `.specify/teams/**`, `.specify/state/**`, `.specify/features.md`, `.specify/features/107-decision-governance.md`, and dated documentation trees.
+The following MUST stay forbidden to every seat that carries the expansion (C-62): `requirements.md`, `tasks.md`, `verification.md`, `handoff.md`; plus `plan.md`, `data-model.md`, `contracts/**`, `quickstart.md`, `research.md`, `feature-ref.md`, `checkpoints/**`, `.specify/anchoring/**`, `.specify/teams/**`, `.specify/state/**`, `.specify/features.md`, `.specify/features/107-decision-governance.md`, and dated documentation trees. `verification.md` stays forbidden because it is derived spec-side from the crew's `test-evidence/verification-input.md`, not written by a seat.
 
 ## Acceptance Criteria
 

@@ -160,7 +160,7 @@ Every seat resolves to an existing template under `.specify/agents/templates/`.
 
 ## Dynamic Structure
 
-Pattern: **serial** (quality-first). `implement → verify → integrate`; the reporter observes without gating. One writeback record per completed task at `.specify/specs/107-decision-governance/writeback/<T-NNN>.yaml`. The design face is read-only to the crew.
+Pattern: **serial** (quality-first). `implement → verify → integrate`; the reporter observes without gating. One writeback record per completed task at `.specify/specs/107-decision-governance/writeback/<T-NNN>.yaml`. The design face is read-only to the crew. The crew assembles its close-out input at `.specify/specs/107-decision-governance/test-evidence/verification-input.md` (inside its write territory); `verification.md` is derived spec-side from that input and remains forbidden to every seat.
 
 ## Self-Improvement Contract
 

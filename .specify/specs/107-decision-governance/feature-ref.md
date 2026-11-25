@@ -16,7 +16,7 @@ Feature 107 was created at `/speckit.clarify` (2026-11-25) as a **standalone** f
 | Producer surfaces | `skills/internal/run-agent/SKILL.md`; `skills/internal/run-team/SKILL.md`; `skills/external/sdd-loop-driver/references/{checkpoint-protocol,dispatch-recipes,stage-prompts}.md`; `skills/internal/{analyze-artifacts,review-feature-quality,review-sdd-process}/SKILL.md` | P-04/P-05/P-06/P-09 carriers and B-rule review surfaces |
 | Ambient instruction section | `templates/instructions-template.md` → generated `.specify/instructions.md` | Two production rules + class emphasis + owner pointer, ≤1,500 B (A-13) |
 | Budget ruling | `scripts/bash/generate-instructions.sh` | `INSTRUCTIONS_BUDGET_BYTES` 38,912 → 40,960 (T-001) |
-| Deterministic checker (new) | `scripts/python/validate-decisions.py` | M-01…M-08 judge; read-only; script-interface contract |
+| Deterministic checker (new) | `scripts/python/validate-decisions.py` | M-01…M-09 judge; read-only; script-interface contract |
 | Docs pointer | `docs/concepts/spec-driven.md` | One pointer line to the owner page (FR-030) |
 | Guard suites (new) | `tests/fixtures/decision-governance/`; `tests/unit/test_validate_decisions.py`; `tests/contract/test_decision_governance_{guards,contracts,migration_map}.py`; `tests/integration/test_decision_governance_migrate_dryrun.py` | Red-first M-rule fixtures with reverse samples; BC-row mapping; migrate dry-run |
 

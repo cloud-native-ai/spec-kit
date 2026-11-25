@@ -1,0 +1,5 @@
+# validate-tasks.py — 2026-11-25T16:20:18Z — spec 107 tasks.md
+# command: python3 .specify/scripts/python/validate-tasks.py .specify/specs/107-decision-governance/tasks.md
+
+PASS: .specify/specs/107-decision-governance/tasks.md — 0 error(s), 0 warning(s)
+rc=0

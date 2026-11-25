@@ -1,0 +1,39 @@
+# analyze-repair derived readings — 2026-11-25T16:20:35Z
+
+## counts
+M rows: 9
+B rows: 6
+P rows: 12
+BC rows (plan): 6
+contract clauses: 38
+checklist items: 39
+
+## zero-rewrite line-level containment (C-502 path set)
+$ git diff --numstat 08b59695c -- .specify/register.md '.specify/specs/*/checkpoints' '.specify/specs/*/plan.md'
+3	0	.specify/register.md
+217	0	.specify/specs/107-decision-governance/plan.md
+$ git diff --diff-filter=D --name-only 08b59695c -- <same paths>
+(empty above = no deleted file)
+
+## quickstart Scenario 5 exact pathspec
+$ git diff --numstat 08b59695c -- .specify/register.md .specify/specs/107-decision-governance/checkpoints .specify/specs/107-decision-governance/plan.md
+3	0	.specify/register.md
+31	0	.specify/specs/107-decision-governance/checkpoints/03-plan.md
+31	0	.specify/specs/107-decision-governance/checkpoints/04-tasks.md
+34	0	.specify/specs/107-decision-governance/checkpoints/05-goal-team-activation.md
+26	0	.specify/specs/107-decision-governance/checkpoints/06-checklist.md
+217	0	.specify/specs/107-decision-governance/plan.md
+
+## advisory composition (pre-analyze tasks capture)
+     48 "check": "external-clause"
+     79 "check": "missing-path"
+
+## quickstart Scenario 5 exact pathspec (re-measured after quickstart wording fix)
+3	0	.specify/register.md
+31	0	.specify/specs/107-decision-governance/checkpoints/03-plan.md
+31	0	.specify/specs/107-decision-governance/checkpoints/04-tasks.md
+34	0	.specify/specs/107-decision-governance/checkpoints/05-goal-team-activation.md
+26	0	.specify/specs/107-decision-governance/checkpoints/06-checklist.md
+217	0	.specify/specs/107-decision-governance/plan.md
+$ git diff --diff-filter=D --name-only 08b59695c -- .specify/register.md .specify/specs/107-decision-governance/checkpoints .specify/specs/107-decision-governance/plan.md
+(empty = no deleted file)

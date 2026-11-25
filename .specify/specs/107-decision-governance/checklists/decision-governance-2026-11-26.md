@@ -3,7 +3,7 @@
 **Purpose**: 检验 Feature 107 需求文本（`requirements.md`）的**写作质量**——决策项文本与选项集是否按类规定到可判定、封闭决策生产者清单与既有载体归档投影是否闭合到可重建、superagent→subagent 的决策块/确认/实施回执是否把结果钉回 `decision_id`、两类决策的强调与 M/B 强制边界是否诚实分离、迁移与旧记录保全是否闭包、以及每条需求与成功标准是否可追溯到条款与证据。每条都是对需求文本（或它点名的 owner 行 / 条款行）的提问，**不是**对实现行为的检验：凡只有跑一遍产品才能回答的条目，本身就是本清单的缺陷。
 **Created**: 2026-11-26
 **Feature (Requirement Scope)**: Feature 107 Decision Governance（AI Agent 决策项治理）— `.specify/features.md` 行 107（详情 `.specify/features/107-decision-governance.md`），状态 `Planned`。本清单位于 `/speckit.implement` 之前，按 Feature Integration Protocol 不发起 `Implemented → Ready for Review` 迁移，也不代评 code-segment 结论。
-**Requirements (What)**: [../requirements.md](../requirements.md) — 本轮机械读数（2026-11-25T16:04Z @ `a954f64a3`；`validate-requirements.py` 逐字输出见 `../test-evidence/checklist-requirements-validator.txt`）：`status: ok`，**0 error / 0 warning**，**394 行 / 40 definition rows / 9 shared strings**；实测 **30 FR**（FR-001…FR-030）、**10 SC**（SC-001…SC-010；final 7 / supporting 3）、**9 Shared Strings**（STR-001…STR-009）、**14 条假设裁定**（A-1…A-14）、**6 个用户故事**、**12 行封闭 Decision Producer Inventory**（P-01…P-12）、**8 条 M 规则 / 6 条 B 规则**、**11 条 Edge Cases**。全部计数读数见 `../test-evidence/checklist-spec-readings.txt`。
+**Requirements (What)**: [../requirements.md](../requirements.md) — 本轮机械读数（2026-11-25T16:04Z @ `a954f64a3`；`validate-requirements.py` 逐字输出见 `../test-evidence/checklist-requirements-validator.txt`）：`status: ok`，**0 error / 0 warning**，**394 行 / 40 definition rows / 9 shared strings**；实测 **30 FR**（FR-001…FR-030）、**10 SC**（SC-001…SC-010；final 7 / supporting 3）、**9 Shared Strings**（STR-001…STR-009）、**14 条假设裁定**（A-1…A-14）、**6 个用户故事**、**12 行封闭 Decision Producer Inventory**（P-01…P-12）、**9 条 M 规则 / 6 条 B 规则**（analyze 修复 2026-11-26 由 8 条扩为 9 条：新增 M-09 evidence 指针可解析）、**11 条 Edge Cases**。全部计数读数见 `../test-evidence/checklist-spec-readings.txt`。
 **Specifications (How, context only)**: [../plan.md](../plan.md)（**6 行**封闭 § Backward-Incompatible Change Inventory，BC-01…BC-06；T-001…T-003 张力；EP-001…EP-007）、[../tasks.md](../tasks.md)（**56** 任务行）、[../contracts/](../contracts/)（**38 条款**：C-101…C-109 / C-201…C-208 / C-301…C-308 / C-401…C-407 / C-501…C-506）、[../data-model.md](../data-model.md)（E1…E9 / I-01…I-14）——**只**用于暴露需求的缺口、歧义与冲突，从不替 plan/tasks 自身打分。
 **Readers**: 需要判定「107 的需求是否足以从 checklist 放行进 analyze / implement」的复核者——`/speckit.analyze` 的检测者、`/speckit.implement` 的协调者与后续接手本线的编写者；他们依据本清单、被引用的需求行与 `test-evidence/` 的机读读数取结论。
 **Reading scenario**: 复核者打开本文件，决定三件事：(1) 哪几条需求缺陷必须在 analyze / implement 之前修掉；(2) 哪些项可登记为「已裁定、由下游承载」而放行；(3) 哪些项因判据依赖尚未落地的机制（owner page、`validate-decisions.py`）而保持 `not_evaluated`。按条末的 `[Req §…]` / 条款 ID / `plan §…` 锚回到正文逐字核对。
@@ -36,7 +36,7 @@
 - [ ] CHK014 - 记录字段闭包是否权威（FR-014 的十个必填字段），每个条件字段的触发条件是否精确（`same_name_conflict` + `resource_locator` 在 C-103 触发条件成立时；`superseded_by` 在被取代时），四个时间点的在场与形态义务是否写明？[Completeness, Req §FR-014, C-202, SC-005, data-model.md E2]
 - [ ] CHK015 - 字段→所有者表是否给每个记录字段**恰一个**定义所有者，且 clarify 裁定（implementation status 是 `transmission_status` 状态面的实施结果维度、不是第 11 个记录字段）是否在 FR-014、FR-019 与字段表三处一致？[Consistency, Req §FR-002, Req §FR-014, Req §Decision Record Field Ownership, Req §Clarifications]
 - [ ] CHK016 - 编号可判定性是否从头到尾写清——`D-NNN` 三位形态、按载体密集且唯一、不复用、诞生时登记、跨载体重复的语义（同一决策的两次投影，还是两个决策允许撞号）、密度计算的"载体"单位、以及"载体 + 区间"分组 register 行在 M-04 下如何保持可解析？[Ambiguity, Consistency, Req §FR-015, Req §A-6, Req §Edge Cases, C-203, Req §Enforcement Boundary M-04]
-- [ ] CHK017 - 可重建性是否定义到可测量——要重建的字段全集、指针解析基准与允许的指针形态、evidence 指针全部可解析、不得以对话记忆补足——并且给定 A-9 把"引用可解析"划入机器可判集、FR-016 把不可解析指针定为缺陷，封闭 M 表（M-01…M-08）是否有规则承接指针可解析性（现无该行）？[Measurability, Gap, Req §FR-016, Req §FR-022, Req §A-9, Req §Enforcement Boundary, C-204, SC-005]
+- [ ] CHK017 - 可重建性是否定义到可测量——要重建的字段全集、指针解析基准与允许的指针形态、evidence 指针全部可解析、不得以对话记忆补足——并且给定 A-9 把"引用可解析"划入机器可判集、FR-016 把不可解析指针定为缺陷，封闭 M 表（M-01…M-09）由 M-09 承接指针可解析性（只判解析、不判充分性）？[Measurability, Gap, Req §FR-016, Req §FR-022, Req §A-9, Req §Enforcement Boundary, C-204, SC-005]
 - [ ] CHK018 - 承重决策是否被写成"只交叉引用"——记录引用对应 `T-NNN`、六个张力字段不复制——且六字段以所有者指针抵达而不是在决策契约里成为第二定义点？[Consistency, Req §FR-017, C-205]
 
 ## 四、superagent→subagent 传递与实施
@@ -50,7 +50,7 @@
 
 ## 五、强制边界：M 规则、B 规则与行为保持
 
-- [ ] CHK025 - 八条 M 规则是否逐条各配**恰一个**确定性判定器与一个转红条件，每条守卫有逆向样本，全部经唯一测试入口执行，且守卫清单与两张表逐行一致（表—守卫等价）？[Completeness, Req §FR-022, Req §FR-024, C-401, C-403, C-404, C-407, SC-007]
+- [ ] CHK025 - 九条 M 规则是否逐条各配**恰一个**确定性判定器与一个转红条件，每条守卫有逆向样本，全部经唯一测试入口执行，且守卫清单与两张表逐行一致（表—守卫等价）？[Completeness, Req §FR-022, Req §FR-024, C-401, C-403, C-404, C-407, SC-007]
 - [ ] CHK026 - 六条 B 规则是否逐条点名评审承接面（analyze / review 段 / 人工决策评审），文档与测试是否都不得声称其中任何一条被机器覆盖？[Coverage, Req §FR-023, C-402, SC-007]
 - [ ] CHK027 - 机器/行为分野是否按 A-9 一致施加——每处"缺陷"措辞都有对应的 M 或 B 承接面——尤其 M-08 的"已登记 variant"是否与术语只做 `status=proposed` 提案的规则（FR-005 / A-11）相容（"已登记"是否包含未确认的提案条目）？[Consistency, Req §A-9, Req §FR-005, Req §FR-022 (M-08), Req §A-11]
 - [ ] CHK028 - FR-025 的保全命题（既有哨兵字面量、watcher verdict/退出码、两槽测试预算"保持不变"）是否给出基线参照物与可导出的允许差异集（closed-set claims 判据），"除非有记录在案的裁定"是否规定了裁定的记录位置与形态？[Measurability, Req §FR-025, SC-007]
@@ -71,7 +71,7 @@
 
 - [ ] CHK035 - 封闭清单命题是否可判定——声明集（本规格 §Decision Producer Inventory）、观测集（实现期代码面扫描的具体路径与命令）、允许差异（显式 `exempt` 行）三者齐备，清单外生产者产出决策项即缺陷，扩展只能以修订清单/所有者页进行？[Completeness, Measurability, Req §FR-003, Req §SC-001, C-406]
 - [ ] CHK036 - 每行生产者的义务与类别单元格是否能解析到封闭取值——`record` / `record-when-decision` / `exempt` 三值各自的判据是否齐全（`record-when-decision` 行是否都给出"何时算决策"的判据），`record（显式呈现的取舍）` 这类带限定的 `record` 是否应读作 `record-when-decision`，`通常 ai-autonomous` 与 `由持有者定` 是否是类列允许的取值？[Consistency, Clarity, Req §FR-003, Req §A-4, Req §Decision Producer Inventory P-03]
-- [ ] CHK037 - P-09（superagent→subagent 传递决策）的类列固定为 `ai-autonomous`，与"类别看持有者"规则（A-4）在"人已批准/选择的决策被交办实施"情形下是否冲突——该情形应归哪一行、哪个类？[Conflict, Req §A-4, Req §Decision Producer Inventory P-09, Req §FR-018]
+- [ ] CHK037 - P-09（superagent→subagent 传递决策）的类列是否随被传递决策记录的类别（A-4）——人已批准/选择的决策被交办实施仍为 `human-interactive`，父侧无人值守自主交办为 `ai-autonomous`——且传递与回执不生成第二条决策记录（FR-014、FR-018）？[Conflict, Req §A-4, Req §Decision Producer Inventory P-09, Req §FR-018]
 
 ## 九、可追溯性、可测量性与依赖
 
@@ -88,7 +88,7 @@
 - **覆盖矩阵（SC）**：SC-001 CHK035；SC-002 CHK002；SC-003 CHK001,005,006,007；SC-004 CHK008,010；SC-005 CHK014,017；SC-006 CHK019,020,021,022,023,024；SC-007 CHK025,026,029；SC-008 CHK029,030,031；SC-009 CHK033,034；SC-010 CHK002,030。**10/10** 覆盖。
 - **覆盖矩阵（契约条款）**：C-101 CHK001；C-102 CHK002,003；C-103 CHK004；C-104 CHK005；C-105 CHK006；C-106 CHK008,009；C-107 CHK010；C-108 CHK010；C-109 CHK007；C-201 CHK011；C-202 CHK014；C-203 CHK016；C-204 CHK017；C-205 CHK018；C-206 CHK033；C-207 CHK013；C-208 CHK013；C-301 CHK019；C-302 CHK020；C-303 CHK021；C-304 CHK021；C-305 CHK020,023；C-306 CHK024；C-307 CHK024；C-308 CHK023；C-401 CHK025；C-402 CHK026；C-403 CHK025；C-404 CHK025；C-405 CHK029；C-406 CHK035；C-407 CHK025；C-501 CHK034；C-502 CHK033；C-503 CHK034；C-504 CHK020,034；C-505 CHK034；C-506 CHK031。**38/38** 条款被至少一条 CHK 引用。
 - **新增而非覆盖**：本文件为 checklist 阶段**新增**清单；requirements 阶段产出的 `checklists/requirements.md` 保持原样（未被覆盖、未刷新）。同轮不生成 recheck 文件（本阶段无「回答早前条目」的动作）。
-- **机械读数（2026-11-25T16:04Z @ `a954f64a3`）**：`validate-requirements.py` → `status: ok`，0 error / 0 warning，394 行 / 40 definition rows / 9 shared strings（逐字：`../test-evidence/checklist-requirements-validator.txt`）；requirements 实测 30 FR / 10 SC（final 7 / supporting 3）/ 9 STR / 14 A / 6 US / 12 P / 8 M / 6 B / 11 Edge Cases；`plan.md` 实测 6 行 BC（BC-01…BC-06）；`tasks.md` 实测 56 任务行；`contracts/` 实测 5 份 / 38 条款（9+8+8+7+6）。全部命令与输出：`../test-evidence/checklist-spec-readings.txt`。
+- **机械读数（2026-11-25T16:04Z @ `a954f64a3`）**：`validate-requirements.py` → `status: ok`，0 error / 0 warning，394 行 / 40 definition rows / 9 shared strings（逐字：`../test-evidence/checklist-requirements-validator.txt`）；requirements 实测 30 FR / 10 SC（final 7 / supporting 3）/ 9 STR / 14 A / 6 US / 12 P / 9 M（analyze 修复 2026-11-26 加入 M-09）/ 6 B / 11 Edge Cases；`plan.md` 实测 6 行 BC（BC-01…BC-06）；`tasks.md` 实测 56 任务行；`contracts/` 实测 5 份 / 38 条款（9+8+8+7+6）。全部命令与输出：`../test-evidence/checklist-spec-readings.txt`。
 - **same-author 检测门**：不成立（见 Detection path）；未派发 fresh-context 检测代理（本派发明令不得再派发），检测路径如实记录，不以委托路径冒充直接读。
 - **Feature 状态**：本轮位于 `/speckit.implement` 之前，按 Feature Integration Protocol，checklist 不发起 `Implemented → Ready for Review` 迁移，仅产出清单；`features.md` 行 107 维持 `Planned`。
 - **PLAN-EDIT**：无。本阶段未改动任何 plan-owned 路径（plan.md / data-model.md / contracts/ / quickstart.md / research.md / feature-ref.md 均只读）。

@@ -42,7 +42,7 @@
 | **A-1** | **Flow Class = `execution`**：交付物是规则所有者页、模板段、载荷契约、守卫与契约测试；缺陷只在解析、断言或执行时暴露。`Flow Type` 写 `-`。 | 按验收 oracle 判定（`shared/declarations/facts/flow-class-basis.yaml` 的既有判据），而非按文本介质。 |
 | **A-2** | **单一所有者页 = `shared/definitions/decision-definitions.md`（新概念）**：本仓不存在「决策项一般契约」的所有者，因此按 `create-requirements` 的概念-所有者检查如实声明为**新概念**，由本特性创建；既有相邻所有者（`confirmation-gates.md`、`decision-tension.md`、`fast-fail.md`、`register.md`、`superagent-definitions.md`、`goal-definitions.md`、`anchor-definitions.md`、checkpoint 协议、analyze/review 技能）保留各自事实，只新增**指针行**指向新页；新页 MUST NOT 复述它们的判据表。命名按最近同型兄弟（`superagent-definitions.md`、`goal-definitions.md`、`anchor-definitions.md`）取 `decision-definitions.md`。 | Grounded Naming + One Source Of Truth：新概念必须有所有者；已有事实不搬家，避免第二定义点。 |
 | **A-3** | **归档即投影（archive-as-projection）**：决策档案不是新存储，而是「封闭生产者清单 × 既有载体」的投影；`.specify/register.md` 仍是持久编号的唯一索引。每个决策记录的载体由其生产者决定（如 requirements 裁决 → `requirements.md` § Clarifications；承重取舍 → `plan.md` § Decision Tensions；阶段裁决 → 检查点文件；传递 → run report/派发载荷）。没有载体的生产者 MUST 走清单修订，MUST NOT 静默丢弃记录。 | 简报明令「No second registry: reuse/extend the register, decision-tension, goal/anchor/checkpoint and execution-record surfaces」。 |
-| **A-4** | **两类决策的判定看持有者**：`human-interactive` = 决策由人持有（交互式决策门的用户选择、人工评审处置、人对选项的选择）；`ai-autonomous` = 决策由 agent 在无用户在场时持有（无人值守裁决、被委派的实施取舍、运行内自裁）。同一个生产者可产出两类（如确认门在交互运行是前者、无人值守运行是后者）。类缺失、类混合或类与持有者不符是缺陷（类不符的**判定**属行为类，B-06）。 | 简报的两类区分是「核心考量不同」；用持有者定义可判定且与 `confirmation-gates.md` 的授权级别轴正交，不复制其取值域。 |
+| **A-4** | **两类决策的判定看持有者**：`human-interactive` = 决策由人持有（交互式决策门的用户选择、人工评审处置、人对选项的选择）；`ai-autonomous` = 决策由 agent 在无用户在场时持有（无人值守裁决、被委派的实施取舍、运行内自裁）。同一个生产者可产出两类（如确认门在交互运行是前者、无人值守运行是后者）。类缺失、类混合或类与持有者不符是缺陷（类不符的**判定**属行为类，B-06）。**传递不改变类别**：被交办实施的决策在其决策块中沿用其记录的类别——人持有的决策被交办仍为 `human-interactive`，父侧无人值守自主交办才是 `ai-autonomous`（P-09、FR-018）。 | 简报的两类区分是「核心考量不同」；用持有者定义可判定且与 `confirmation-gates.md` 的授权级别轴正交，不复制其取值域。 |
 | **A-5** | **「每个决策」的外延 = 封闭生产者清单**：清单内生产者产出的**决策项**必须留记录；`fast-fail` 意义上的 in-passing correction 不是决策；未显式呈现、未被传递、未被评审的普通设计细节不是决策项；清单外生产者若产出决策项即缺陷（应补入清单）。清单扩展 MUST 以修订所有者页/本规格清单的形式进行。 | 把「每个决策」变成可判定命题，同时不把一切思考都变成记录负担；纠正/裁定判据归 `fast-fail.md`，不复述。 |
 | **A-6** | **决策编号 = `D-NNN`（三位、按载体密集），登记于 register**：沿用 ID Register 已列出的 `D-…` 编号族（先例：087 的 `D-001`），不发明新前缀；同一载体内的 `D-NNN` 唯一且连续，跨载体允许重复出现但引用 MUST 同时给出**载体指针**；编号不复用，被取代的决策保留原记录并标 `superseded`。register 行可逐条或按「载体 + 区间」分组登记（先例：`D1–D9` 分组行）。 | Grounded Naming + ID Register 纪律：编号在诞生时登记；一处编号只有一个定义点。 |
 | **A-7** | **传递复用既有载荷通道**：决策块搭乘 `superagent-definitions.md` 已拥有的派发载荷通道下行；七角色字段与四项既有注入**保持不变**，决策块是任务权威内容而不是第八个角色字段；若实现需要改变字段数或注入清单，MUST 有记录在案的裁定（brief 约束）。 | 简报要求「transmission（role_edge + payload）」；既有契约的改动面应最小、可审计。 |
@@ -68,7 +68,7 @@
 | P-06 | review 发现处置 | review report（`review.md` 与分段报告） | record-when-decision（处置的接受/修复/拒绝是决策；纯观察不是） | 由持有者定（人工评审 = `human-interactive`；自动分段 = `ai-autonomous`） | `skills/internal/review-feature-quality/SKILL.md`、`skills/internal/review-sdd-process/SKILL.md`、`shared/workflow/acceptance-hardening.md` § Review Composition |
 | P-07 | fast-fail 裁定 | fast-fail 上送件 + 处置回执（执行报告） | record-when-decision（裁定是决策；异常报告本身不是） | 由持有者定（用户裁定 = `human-interactive`；无人值守按矩阵自裁 = `ai-autonomous`） | `shared/guidelines/fast-fail.md` |
 | P-08 | goal / anchor / team 决策 | `.specify/goals/<slug>/goal.md`、`.specify/anchoring/<slug>/anchor.md`、`.specify/teams/<slug>/team.md` 的既有决策/History 面 | record | 由持有者定（用户裁定 = `human-interactive`；团队/引擎裁决 = `ai-autonomous`） | `shared/definitions/goal-definitions.md`、`anchor-definitions.md`、`agent-definitions.md` |
-| P-09 | superagent → subagent 传递决策 | 派发载荷（决策块）+ run report / 角色边载体 | record + 传递 + 实施回执 | `ai-autonomous`（决策由父侧持有；子侧实施） | `shared/definitions/superagent-definitions.md`、`skills/internal/run-agent/SKILL.md`、`skills/internal/run-team/SKILL.md` |
+| P-09 | superagent → subagent 传递决策 | 派发载荷（决策块）+ run report / 角色边载体 | record（被传递的决策项 MUST 有记录——即该决策在产出载体的那条唯一记录；传递动作与实施回执 MUST NOT 生成第二条决策记录，只更新该记录的 [[STR-007]] 与审计链三段）+ 传递 + 实施回执 | 随被传递决策记录的类别（A-4）：父侧无人值守自主交办 = `ai-autonomous`；人持有的决策被交办实施仍为 `human-interactive`（`decision_class` MUST 与其记录一致，FR-018） | `shared/definitions/superagent-definitions.md`、`skills/internal/run-agent/SKILL.md`、`skills/internal/run-team/SKILL.md` |
 | P-10 | probe / feedback 处置 | `.specify/feedback/` 条目 + probe 注册面 | record-when-decision（阈值提示不是决策；接受/延后/拒绝处置是决策） | 通常 `ai-autonomous` | `shared/definitions/probe-definitions.md`、`shared/workflow/feedback-step.md` |
 | P-11 | run determination（运行判定） | session 记忆中的判定记录（`run-determination.py`） | exempt —— 它是对已完成运行的**测量/评估**，不是「在选项间选择」的决策项 | n/a | `shared/workflow/feedback-step.md` § Run Determination |
 | P-12 | 确定性检查器/门的 verdict（pass/fail、split-required、校验退出码） | 检查器输出 / 检查点引用 | exempt —— 结果由规则唯一决定，没有选项集；围绕它的处置归 P-04/P-05 | n/a | 各检查器与 `shared/workflow/acceptance-hardening.md` § Gates |
@@ -170,7 +170,7 @@
 
 **Why this priority**: 只在源树写文档、不发到客户项目等于没做；改写旧记录或靠双路径回退会制造静默漂移。
 
-**Independent Test**: 镜像检查 + 命令副本再生成检查；空客户项目 init 夹具断言 instruction 段与规则存在；旧规格记录 diff 为空；不兼容变更逐行跑 migrate dry-run/refusal。
+**Independent Test**: 镜像检查 + 命令副本再生成检查；空客户项目 init 夹具断言 instruction 段与规则存在；旧规格记录零改写（行级零删除读数，允许追加）；不兼容变更逐行跑 migrate dry-run/refusal。
 
 **Acceptance Scenarios**:
 
@@ -221,21 +221,21 @@
 
 **归档与审计**
 
-- **FR-014**: 每个决策项 MUST 在决策完成时恰产生一条决策记录，落在其生产者在清单中对应的既有载体；记录字段闭集：[[STR-009]]、[[STR-002]]、context、options、chosen option、rationale、evidence pointers、actor、timestamps（创建/传递/确认/实施）、[[STR-007]]；缺任一字段即缺陷。字段名以所有者页与本规格 Shared Strings 为准，生产面 MUST NOT 改名。
+- **FR-014**: 每个决策项 MUST 在决策完成时恰产生一条决策记录，落在其生产者在清单中对应的既有载体；记录字段闭集：[[STR-009]]、[[STR-002]]、context、options、chosen option、rationale、evidence pointers、actor、timestamps（创建/传递/确认/实施）、[[STR-007]]；缺任一字段即缺陷。字段名以所有者页与本规格 Shared Strings 为准，生产面 MUST NOT 改名。传递动作与实施回执 MUST NOT 生成第二条决策记录——一条决策项恰一条记录；回执只更新该记录的 [[STR-007]] 与审计链（FR-019、FR-021）。
 - **FR-015**: 决策编号 MUST 取 `D-NNN`（三位、按载体密集、不复用），并 MUST 在编号诞生时登记于 `.specify/register.md`（可逐条或按载体+区间分组）；跨载体引用 MUST 同时携带载体指针；被取代的编号保留并标 `superseded`，MUST NOT 重用或删除。
-- **FR-016**: 决策记录 MUST 可只凭既有载体 + register 重建；evidence 指针 MUST 全部可解析；无法重建（缺字段、断指针、无记录）即缺陷，MUST NOT 以对话记忆补足。
+- **FR-016**: 决策记录 MUST 可只凭既有载体 + register 重建；evidence 指针 MUST 全部可解析（可由机器判定解析性的是 M-09：指针指向的载体路径/锚必须存在且可读；证据是否充分属评审）；无法重建（缺字段、断指针、无记录）即缺陷，MUST NOT 以对话记忆补足。
 - **FR-017**: 承重决策 MUST 同时满足 `decision-tension.md` 的六字段，并由决策记录交叉引用对应 `T-NNN`；决策记录 MUST NOT 复制 `antithesis`/`binding_constraints`/`discriminating_evidence`/`expected_sacrifice`/`revision_trigger` 的内容（单一定义点）。
 
 **传递与实施（superagent → subagent）**
 
-- **FR-018**: 交办实施的决策 MUST 以**决策块**搭乘既有派发载荷通道下行：块内 MUST 含 `decision_id`、`decision_class`、选中项（完整标签）、实施约束、档案指针；缺项 MUST 拒绝派发；七角色字段与四项既有注入保持不变（A-7）。
+- **FR-018**: 交办实施的决策 MUST 以**决策块**搭乘既有派发载荷通道下行：块内 MUST 含 `decision_id`、`decision_class`、选中项（完整标签）、实施约束、档案指针；缺项 MUST 拒绝派发；`decision_class` MUST 与被传递决策记录的 `decision_class` 一致（传递不改变类别；人持有的决策被交办实施仍为 `human-interactive`）；七角色字段与四项既有注入保持不变（A-7）。
 - **FR-019**: 子代理回传 MUST 含决策确认与 [[STR-008]]：[[STR-009]]、实施摘要、证据指针、偏离声明（`none` 或 `diverged` + 理由）；回执 MUST 更新记录的 [[STR-007]] 实施状态；缺任一项即回传不完整，父侧 MUST NOT 消费或补齐（沿用 `superagent-definitions.md` 上行规则）。
 - **FR-020**: 子代理 MUST NOT 静默重决：上下文变化导致决策失效时 MUST 停在异常点并以 fast-fail 上送；无决策记录/编号的决策 MUST NOT 被派发实施；无法解析的 `decision_id` MUST NOT 被实施。
 - **FR-021**: 每条传递决策 MUST 留下可审计链：决策记录 → 派发尝试（角色边 identity / run report）→ 实施回执；断链 MUST 是可上报的显式异常，MUST NOT 沉默。
 
 **强制**
 
-- **FR-022**: MUST 为机器可判子集提供守卫，且每个守卫 MUST 能转红：M-01 记录字段/类取值/时间戳形态；M-02 [[STR-006]] 为 true 时 [[STR-005]] 存在且具名维度数达下限；M-03 选项闭集（空集/重复标签/`other` 无 `path`/五要素缺失）；M-04 `D-NNN` 形态、密集性与 register 可解析；M-05 [[STR-008]] 存在且 [[STR-009]] 可解析；M-06 决策 backed 派发的决策块完整性；M-07 审计链三段在场；M-08 结构化决策主体命中 glossary 已登记 variant（canonical 存在）时转红（只覆盖已登记词）。
+- **FR-022**: MUST 为机器可判子集提供守卫，且每个守卫 MUST 能转红：M-01 记录字段/类取值/时间戳形态；M-02 [[STR-006]] 为 true 时 [[STR-005]] 存在且具名维度数达下限；M-03 选项闭集（空集/重复标签/`other` 无 `path`/五要素缺失）；M-04 新式记录（`^### D-\d{3}` 标题且携带记录字段文法）的 `D-NNN` 形态、同载体密集性与 register 可解析（legacy 标题与 register 行不判）；M-05 [[STR-008]] 存在且 [[STR-009]] 可解析；M-06 决策 backed 派发的决策块完整性；M-07 审计链三段在场；M-08 结构化决策主体命中 glossary 已登记 variant（canonical 存在）时转红（只覆盖已登记词）；M-09 evidence 指针可解析（指向的载体路径/锚不存在或不可读即转红；只判解析不判充分性）。
 - **FR-023**: 行为类规则 MUST 点名评审承接面并 MUST NOT 冒充机器覆盖：B-01 完整名称是否足够完整；B-02 定位维度是否足够区分；B-03 人工可读性与后果/可逆陈述的真实性；B-04 AI 决策谓词/假设/确定性是否成立；B-05 理由是否充分；B-06 类别是否选对。承接面至少覆盖 `/speckit.analyze`（产物一致性）、`/speckit.review`（产物/实现/代码段）与人工决策评审。
 - **FR-024**: 每个守卫 MUST 配一个逆向/变异样本（把被检查对象改坏后守卫转红），无逆向样本的守卫视为缺陷；守卫 MUST 经唯一测试入口执行；新增脚本若存在 MUST 满足 `script-interface-definitions.md`。
 - **FR-025**: 本特性 MUST NOT 新增阻塞式确认门控；`scan-confirmation-gates.py` 的治理后复扫 MUST 零新增命中；既有哨兵字面量、watcher verdict/退出码与两槽测试预算 MUST 保持不变，除非有记录在案的裁定。
@@ -283,11 +283,12 @@
 | M-01 | 决策记录字段/类取值/时间戳形态 | 确定性守卫 | 缺字段、类值域外、四个时点缺失或形态错 | 机器覆盖 |
 | M-02 | 同名冲突的定位信息 | 确定性守卫 | `same_name_conflict: true` 且 `resource_locator` 空或具名维度数低于下限 | 机器覆盖（只判在场与维度数） |
 | M-03 | 选项闭集 | 确定性守卫 | 空集、重复标签、`other` 无 `path`、五要素缺失 | 机器覆盖 |
-| M-04 | 决策编号 | 确定性守卫 | `D-NNN` 形态错、同载体不密集、register 不可解析 | 机器覆盖 |
+| M-04 | 决策编号（只判新式记录） | 确定性守卫 | 新式记录（`^### D-\d{3}` 标题且携带记录字段文法）的 `D-NNN` 形态错、同载体不密集、register 不可解析；legacy 标题与 register 行不判 | 机器覆盖 |
 | M-05 | 实施回执 | 确定性守卫 | 回执缺失、`decision_id` 缺失或不可解析 | 机器覆盖 |
 | M-06 | 派发决策块 | 确定性守卫 | 决策 backed 派发缺决策块或块缺字段 | 机器覆盖 |
 | M-07 | 审计链 | 确定性守卫 | 记录/派发/回执三段任一缺失或编号不一致 | 机器覆盖 |
 | M-08 | 已登记简称 | 确定性守卫 | 主体命中 glossary variant 且 canonical 存在 | 机器覆盖（只覆盖已登记词） |
+| M-09 | evidence 指针可解析 | 确定性守卫 | 任一 evidence 指针不可解析（指向的载体路径/锚不存在或不可读） | 机器覆盖（只判可解析，不判证据是否充分） |
 | B-01 | 名称完整性 | `/speckit.review` 产物段 + 人工决策评审 | 未登记简称或名称不足以指认 | 行为类，不声称机器覆盖 |
 | B-02 | 定位充分性 | `/speckit.review` 产物段 + 人工决策评审 | 维度不足以区分同名对象 | 行为类 |
 | B-03 | 人工可读性/后果真实性 | 人工决策评审 + `/speckit.review` 产物段 | 行话无解释、后果/可逆性陈述失真 | 行为类 |
@@ -331,11 +332,11 @@
 - **SC-002**: 两条生产事故被挡住：夹具 A（同名资源，[[STR-006]] 为 true 但无 [[STR-005]]）触发 M-02 转红，补业务资源组 + region id 后转绿；夹具 B（主体命中已登记 glossary variant）触发 M-08 转红，改完整名称后转绿；两条规则同时出现在生成的 instruction 与所有者页。**Path**: final
 - **SC-003**: 两类决策分离：类缺失/值域外触发 M-01 转红；`human-interactive` 夹具含 FR-008 的全部要素并通过 B-03 评审；`ai-autonomous` 夹具含 FR-009 的全部要素并通过 B-04 评审；类别与持有者不符触发 B-06 评审发现。**Path**: final
 - **SC-004**: 选项闭集：空选项集、重复标签、`other` 无 `path`、五要素缺失分别触发 M-03 转红；补齐后转绿；`ai-autonomous` 的选中项经记录输入 + 谓词重放一致。**Path**: final
-- **SC-005**: 归档可重建：对夹具决策集（覆盖 requirements/plan/checkpoint/run report 四类载体），仅用 register + 载体即可重建 FR-014 的全部字段；删任一字段或改坏任一 evidence 指针触发 M-01/M-04 转红；承重决策的记录不含六字段副本且 `T-NNN` 可解析。**Path**: final
+- **SC-005**: 归档可重建：对夹具决策集（覆盖 requirements/plan/checkpoint/run report 四类载体），仅用 register + 载体即可重建 FR-014 的全部字段；删任一字段触发 M-01（`decision_id` 不可解析时另由 M-04 判）转红，改坏任一 evidence 指针触发 M-09 转红；承重决策的记录不含六字段副本且 `T-NNN` 可解析。**Path**: final
 - **SC-006**: 传递与实施可审计：决策 backed 派发含完整决策块（M-06 绿），回传含确认与 [[STR-008]]（M-05 绿），三段链可解析（M-07 绿）；静默改选夹具产生显式异常；无记录决策派发被拒绝；缺 [[STR-009]] 的回执使 M-05 转红。**Path**: final
 - **SC-007**: 强制诚实：§ Enforcement Boundary 的每条 M 规则都有对应守卫与一个逆向样本，逐条 mutation 演练全部转红且定位到规则；每条 B 规则都有具名承接面；守卫清单与两表逐行一致，缺一即红。**Path**: supporting
 - **SC-008**: 落地与镜像干净：`regen-command-copies.py --check` rc 0；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员（绝对读数如实报告）；instruction 模板与活副本的「Decision Items」段逐字一致且在声明的字节上限内；`scan-confirmation-gates.py` 零新增门控命中；空客户项目 init 夹具收到该段。**Path**: supporting
-- **SC-009**: 兼容与迁移闭包：base `fbab7a45c` 的既有决策记录正文零改写（按文件 diff）；旧形态记录被报告为 `legacy` 且可解析；plan § Backward-Incompatible Change Inventory 的每一行都映射到一条被测试的迁移或确定性拒绝行为，未映射行使守卫转红。**Path**: supporting
+- **SC-009**: 兼容与迁移闭包：base `fbab7a45c` 的既有决策记录正文零改写（行级零删除读数：既有记录行零删除、零改写，追加与新增文件允许）；旧形态记录被报告为 `legacy` 且可解析；plan § Backward-Incompatible Change Inventory 的每一行都映射到一条被测试的迁移或确定性拒绝行为，未映射行使守卫转红。**Path**: supporting
 - **SC-010**: instruction 最低门槛生效：生成的 `.specify/instructions.md`（含每工具兼容副本）包含「Decision Items」指针段、两条生产规则与两类强调，且在 A-13 声明的字节上限内。**Path**: final
 
 ### Measurement Sources & Collection Methods
@@ -344,11 +345,11 @@
 - **SC-002 Source**: 两个生产事故夹具（结构化记录 + 生成的 instruction 文本）；M-02/M-08 的退出码与消息；`grep` 指令面命中；评审 B-01 的发现记录。实现与 review 各一次。
 - **SC-003 Source**: 两类模板夹具与评审记录（B-03/B-04/B-06）；M-01 的退出码。实现与 review 各一次。
 - **SC-004 Source**: 选项集夹具（空/重复/`other`/缺要素）与 M-03 输出；AI 决策重放脚本输出。实现一次。
-- **SC-005 Source**: 四类载体夹具 + register 夹具；重建脚本/runbook 输出；M-01/M-04 输出；`T-NNN` 交叉引用检查结果。实现与 review 各一次。
+- **SC-005 Source**: 四类载体夹具 + register 夹具；重建脚本/runbook 输出；M-01/M-04/M-09 输出；`T-NNN` 交叉引用检查结果。实现与 review 各一次。
 - **SC-006 Source**: 派发载荷快照、回传快照、run report；M-05/M-06/M-07 输出；fast-fail 上送件样例。实现与 review 各一次。
 - **SC-007 Source**: mutation 演练记录（逐守卫的逆向样本执行输出）；§ Enforcement Boundary 与守卫清单的对照表；评审承接面清单。实现与 review 各一次。
 - **SC-008 Source**: `regen-command-copies.py --check` 的 rc 与输出；`sync-mirrors.py --check` 的 rc、输出与相对基线 `test-evidence/sync-mirrors-baseline.txt` 的成员集差值；instruction 模板/活副本 `cmp` 与字节计数；`scan-confirmation-gates.py` 的 `violations` 输出；空项目 init 的树与指令片段。实现与 review 各一次。
-- **SC-009 Source**: `git diff <base>..HEAD -- <既有记录路径集>` 的空输出；旧记录解析夹具与 `legacy` 报告；plan § Backward-Incompatible Change Inventory + `/speckit.migrate` dry-run/apply/refuse 读数。实现与 review 各一次。
+- **SC-009 Source**: `git diff --numstat <base>..HEAD -- <既有记录路径集>` 的零删除读数（既有文件删除列 = 0、无删除文件；追加与新增文件允许）；旧记录解析夹具与 `legacy` 报告；plan § Backward-Incompatible Change Inventory + `/speckit.migrate` dry-run/apply/refuse 读数。实现与 review 各一次。
 - **SC-010 Source**: `.specify/instructions.md` 与每工具副本的段抽取；字节计数（`wc -c`）；模板与活副本的 `cmp`。实现一次。
 
 ## Shared Strings
@@ -391,3 +392,9 @@
 - Q: 本规格与上述候选是什么父子/切片关系？ → A: **独立特性，不是任何候选的切片**；五处相邻所有者只新增指针行与交叉引用（FR-002），不承担父级归属。归属裁决与交叉引用记录于 `.specify/features/107-decision-governance.md` § Overview / § Related Files；索引行与 `Total Features` 同批更新，邻接 Feature 076 详情新增反向交叉引用。
 - Q: `implementation status` 是否属于决策记录封闭字段集？（FR-014 闭集未列；§ Decision Record Field Ownership 列出该行；FR-019 要求回执更新记录的 `transmission_status` 实施状态） → A: 不新增第 11 个记录字段。FR-014 的封闭集是成员资格权威（「缺任一字段即缺陷」）；`implementation status` 是记录 `transmission_status` 状态面承载的实施结果维度（值域由所有者页声明、由实施回执驱动、由 M-05 回执守卫覆盖），不单独成为记录字段；已在 § Decision Record Field Ownership 该行 说明 中写明，排除第 11 字段读法。
 - Q: FR-030 末句「`ready-for-clarify` 的 Feature 绑定仍由 `/speckit.clarify` 完成」在本次绑定后如何收口？ → A: 按实际结果更新为「`Related Feature` 绑定已由 2026-11-25 的 `/speckit.clarify` 完成（Feature 107）」；不保留悬而未决的绑定义务，避免 plan/tasks 派生幻影任务。
+
+### Session 2026-11-26（无人值守 analyze 修复，自行裁决并记录）
+
+- Q: A-9 把「引用可解析」划入机器可判集、FR-016 把不可解析 evidence 指针定为缺陷，但封闭 M 表（M-01…M-08）没有承接行，SC-005 却把「改坏指针」映射到 M-01/M-04——怎么办？ → A: 新增 **M-09**（evidence 指针可解析：确定性守卫，只判解析不判充分性），封闭 M 表扩为 M-01…M-09；M-01/M-04 的转红条件不变，SC-005 的指针破坏读数改映射到 M-09。折叠进 M-01 的读法被拒：那会改变 M-01 已声明的转红条件（字段在场/类取值/时间戳形态），且仍无具名规则承接 A-9 的「引用可解析」。
+- Q: P-09 把 superagent→subagent 传递的类别固定为 `ai-autonomous` 且义务写作 `record`，与 A-4（类别看持有者）和 FR-014（一条决策项恰一条记录）如何一致？ → A: 传递不产生新决策项——被传递决策的**唯一**记录是其在产出载体的记录；决策块的 `decision_class` MUST 与该记录一致（人持有的决策被交办实施仍为 `human-interactive`）；传递与实施回执 MUST NOT 生成第二条记录，只更新该记录的 `transmission_status` 与审计链（FR-014、FR-018、FR-019、FR-021）。
+- Q: C-502 的零改写验收读数（`08b59695c..HEAD` 文件级空 diff）在 plan 落地后已不可满足，如何重述？ → A: 改为**行级包含**读数：既有记录路径上 `git diff --numstat` 的删除列为 0、无删除文件，追加与新增文件（如 register 的 `T-019…T-021` 行、新 `plan.md`）允许且属预期；文件级空 diff 只适用于本特性未触碰的记录路径（与 tasks § Notes「零改写读数」一致）。

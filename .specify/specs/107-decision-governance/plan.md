@@ -6,7 +6,7 @@
 
 ## Summary
 
-Deliver one normative owner page for general AI-agent decision items (`shared/definitions/decision-definitions.md`) that owns the closed vocabulary, the two by-holder decision classes and their presentation templates, the option-set contract, the decision-record field closure and serialization grammar, the archive-as-projection producer inventory, the superagent→subagent decision block with acknowledgement and `implementation_receipt`, the M/B enforcement boundary, and the legacy/migration rules. The feature lands as framework sources: one new page, pointer lines in adjacent owners, one whole ambient instruction section (≤1,500 B, with a recorded total-budget ruling), one read-only deterministic checker (`validate-decisions.py`), producer-surface additions in `run-agent` / `run-team` / the driver references, and red-first guard fixtures for M-01…M-08. No second registry, queue, store or scheduler is added; `.specify/register.md` remains the sole id index; legacy records are readable, reported `legacy`, never rewritten.
+Deliver one normative owner page for general AI-agent decision items (`shared/definitions/decision-definitions.md`) that owns the closed vocabulary, the two by-holder decision classes and their presentation templates, the option-set contract, the decision-record field closure and serialization grammar, the archive-as-projection producer inventory, the superagent→subagent decision block with acknowledgement and `implementation_receipt`, the M/B enforcement boundary, and the legacy/migration rules. The feature lands as framework sources: one new page, pointer lines in adjacent owners, one whole ambient instruction section (≤1,500 B, with a recorded total-budget ruling), one read-only deterministic checker (`validate-decisions.py`), producer-surface additions in `run-agent` / `run-team` / the driver references, and red-first guard fixtures for M-01…M-09. No second registry, queue, store or scheduler is added; `.specify/register.md` remains the sole id index; legacy records are readable, reported `legacy`, never rewritten.
 
 ## Technical Context
 
@@ -18,7 +18,7 @@ Deliver one normative owner page for general AI-agent decision items (`shared/de
 **Project Type**: CLI / documentation framework — no application runtime
 **Performance Goals**: N/A — the checker is one read-only pass over text files; no service, no resident process
 **Constraints**: A-13 section cap 1,500 B; total instructions budget ruling 38,912 → 40,960 B (T-001); zero new `scan-confirmation-gates.py` hits; `regen-command-copies.py --check` stays rc 0; no new mirror drift against the measured baseline; checker is read-only with `--help` / `--version`; no second registry
-**Scale/Scope**: 12 producers (P-01…P-12), 8 machine rules (M-01…M-08), 6 behavior rules (B-01…B-06), 6 backward-incompatible rows, 1 new owner page, 21 landing files plus mirrors, 5 contracts
+**Scale/Scope**: 12 producers (P-01…P-12), 9 machine rules (M-01…M-09), 6 behavior rules (B-01…B-06), 6 backward-incompatible rows, 1 new owner page, 21 landing files plus mirrors, 5 contracts
 
 ## Constitution Check
 
@@ -109,7 +109,7 @@ Plan-local ids; registered globally as `T-019`…`T-021` in `.specify/register.m
 ├── feature-ref.md       # Phase 1 output
 ├── test-evidence/       # Gate captures, baselines, stage records, glossary proposal
 ├── tasks.md             # Phase 2 output (/speckit.tasks — NOT created by /speckit.plan)
-└── verification.md     # Implementation output (/speckit.implement)
+└── verification.md     # Derived spec-side from test-evidence/verification-input.md (/speckit.implement)
 ```
 
 ### Source Code (repository root)
@@ -170,7 +170,7 @@ tests/integration/test_decision_governance_migrate_dryrun.py # specify migrate d
 | EP-003 | The existing deterministic checker surface can host the M guards, and gate neutrality is achievable by wording because the new owner page sits inside the gate scanner's `shared` scan dir | `scripts/python/scan-confirmation-gates.py` (`SCAN_DIRS`, `BLOCKING_PATTERNS`); measured baseline 31 gates / 0 violations at `test-evidence/scan-confirmation-gates-baseline.txt` | verified | — |
 | EP-004 | The instruction generator + mirror/copy toolchain can deliver the new whole section to initialized projects and keep mirrors and command copies green | `scripts/bash/generate-instructions.sh` (whole-section reconcile); `MIRROR_PAIRS`; rc-0 baselines at `test-evidence/sync-mirrors-baseline.txt` and `test-evidence/regen-copies-baseline.txt` | verified | — |
 | EP-005 | Adding the two production rules as bullets inside an existing instruction section would reach already-initialized projects | Constitution Sync Impact Report 1.13.0 follow-up (b): `generate-instructions.sh` reconciles only WHOLE sections | falsified | resolve-in-scope |
-| EP-006 | The legacy corpus (101 `T-NNN` headings / 127 checkpoint files / 43 run reports / register `D-…` rows) is present and readable at base `08b59695c`, and no carrier uses the new three-digit record form | Commands M-9 / M-10 in `research.md`; `git diff 08b59695c..HEAD -- .specify/register.md .specify/specs/*/checkpoints .specify/specs/*/plan.md` is empty | verified | — |
+| EP-006 | The legacy corpus (101 `T-NNN` headings / 127 checkpoint files / 43 run reports / register `D-…` rows) is present and readable at base `08b59695c`, and no carrier uses the new three-digit record form | Commands M-9 / M-10 in `research.md`; line-level containment reading over the base-corpus paths: `git diff --numstat 08b59695c..HEAD -- <paths>` shows zero deleted lines and no deleted file (measured 2026-11-26: `.specify/register.md` +3/−0 appended `T-019…T-021` rows; `.specify/specs/107-decision-governance/plan.md` +217/−0 as a new file — additions allowed and expected) | verified | — |
 | EP-007 | The instructions total budget has no headroom for a new section (live 38,894 B; budget 38,912 B; the generator reports `over` at `size >= budget`) | `wc -c .specify/instructions.md`; `scripts/bash/generate-instructions.sh:107,160-167` | verified | — |
 
 EP-005 is a known-bad fact recorded with its decision (`resolve-in-scope` = land a whole new section), not parked: it is the measured reason for T-001's chosen form.
@@ -195,11 +195,11 @@ Adopts the requirements § Landing & Compatibility Inventory candidates BC-01…
 
 | BC ID | Change | Resolution (closed) | Migration / refusal behavior | Evidence / test (planned) |
 |-------|--------|--------------------|------------------------------|---------------------------|
-| BC-01 | 既有载体新增决策记录块 | `compatibility-bridge` | 无 `D-\d{3}` 记录块 = `legacy`：可读、不判错、不重写；只有新式块进入 M 检查 | `tests/contract/test_decision_governance_guards.py`（legacy 夹具）；`git diff 08b59695c..HEAD -- <既有记录路径>` 为空 |
+| BC-01 | 既有载体新增决策记录块 | `compatibility-bridge` | 无「`^### D-\d{3}` 标题 + C-201 记录字段文法」块 = `legacy`：可读、不判错、不重写；只有新式块进入 M 检查（id 形态单凭 `D-001` 之类 register 行不判新式） | `tests/contract/test_decision_governance_guards.py`（legacy 夹具）；行级包含读数：`git diff --numstat 08b59695c..HEAD -- <既有记录路径>` 删除列为 0、无删除文件（追加允许） |
 | BC-02 | 派发载荷新增 `decision_block` | `compatibility-bridge` + deterministic refusal | 非决策派发无块合法；决策 backed 派发无块/缺字段 → payload 构造处拒绝（M-06）；旧载荷不重写 | `tests/unit/test_validate_decisions.py`（M-06 逆向样本）；`tests/contract/test_decision_governance_guards.py`（拒绝分支） |
-| BC-03 | 新增 `D-NNN` 编号族行 | `compatibility-bridge` | 与 `D1–D9` / `D-001` 并存，按载体+区间分组登记；同载体内重复即红；冲突修复走 `/speckit.sanitize --lane renumber`，不静默改号 | `test_decision_governance_guards.py`（同载体重复 id 夹具）+ register 夹具 |
+| BC-03 | 新增 `D-NNN` 编号族行 | `compatibility-bridge` | 与 `D1–D9` / `D-001` 并存，按载体+区间分组登记；`D-001` 是 legacy register 行（id 形态相符但无记录字段文法，不因形态被当作新式记录）；同载体内重复即红；冲突修复走 `/speckit.sanitize --lane renumber`，不静默改号 | `test_decision_governance_guards.py`（同载体重复 id 夹具）+ register 夹具 |
 | BC-04 | instruction 模板新增段 | `compatibility-bridge` | `/speckit.migrate` 的既有 `templates-generated` 维度把 `.specify/instructions.md` 收敛到含新段；自定义内容保留；不新增第七维度 | `tests/integration/test_decision_governance_migrate_dryrun.py`：`specify migrate --format json` 干跑列出该生成物的收敛项并断言不触碰记录正文 |
-| BC-05 | 新守卫面对旧记录 | `compatibility-bridge` | 守卫只判新式块；旧记录报告 `legacy`；守卫对 base 语料不得转红 | 同 BC-01 的 legacy 夹具 + `git diff` 空读数 |
+| BC-05 | 新守卫面对旧记录 | `compatibility-bridge` | 守卫只判新式块；旧记录报告 `legacy`；守卫对 base 语料不得转红 | 同 BC-01 的 legacy 夹具 + `--numstat` 零删除读数（无删除行、无删除文件） |
 | BC-06 | 两条生产规则生效 | `compatibility-bridge` | 只约束落地后新建决策；既有决策文本由评审按 B-01/B-02 报告为 legacy，不追溯改写 | `test_decision_governance_contracts.py`（评审承接面指针在场）+ legacy 夹具 |
 
 Row-set closure guard: `tests/contract/test_decision_governance_migration_map.py` asserts the declared set equals `{BC-01…BC-06}` and that every row's named test exists (SC-009's "未映射行使守卫转红").

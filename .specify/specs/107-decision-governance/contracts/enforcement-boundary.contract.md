@@ -8,18 +8,19 @@
 
 ## 条款
 
-- **C-401** (machine rules, one judge each): the eight machine rules MUST each name exactly one deterministic judge action and one red condition:
+- **C-401** (machine rules, one judge each): the nine machine rules MUST each name exactly one deterministic judge action and one red condition:
 
   | Rule | Judge (`validate-decisions.py`) | Red condition | Reverse sample |
   |------|----------------------------------|---------------|----------------|
   | M-01 | `--action records` | missing mandatory field, class outside the closed set, missing/malformed timestamp point | `fixtures/m01/*` |
   | M-02 | `--action records` | `same_name_conflict: true` with an empty `resource_locator` or fewer than two named dimensions | `fixtures/m02/*` |
   | M-03 | `--action records` | empty set, duplicate label, `other` without `path`, a missing option element | `fixtures/m03/*` |
-  | M-04 | `--action records` | `D-NNN` form error, non-dense per carrier, id unresolvable in the register | `fixtures/m04/*` |
+  | M-04 | `--action records` | new-form record (`^### D-\d{3}` heading carrying the record field grammar): `D-NNN` form error, non-dense per carrier, id unresolvable in the register; legacy headings and register rows are never judged | `fixtures/m04/*` |
   | M-05 | `--action chain` | receipt missing, `decision_id` missing or unresolvable | `fixtures/m05/*` |
   | M-06 | `--action payload` | decision-backed dispatch missing the block or a block field | `fixtures/m06/*` |
   | M-07 | `--action chain` | any of the three chain segments missing or ids inconsistent | `fixtures/m07/*` |
   | M-08 | `--action records` | the structured decision subject matches a registered glossary variant whose canonical exists | `fixtures/m08/*` |
+  | M-09 | `--action records` | any evidence pointer unresolvable (the referenced carrier path/anchor does not exist or is unreadable) | `fixtures/m09/*` |
 
   (FR-022)
 - **C-402** (behavior rules, named surfaces, never machine-claimed): the six behavior rules MUST each name a review surface — B-01/B-02/B-03/B-06 → `/speckit.review` artifact segment + human decision review; B-04/B-05 → `/speckit.analyze` + `/speckit.review`; documentation and tests MUST NOT claim machine coverage for any of them. (FR-023)

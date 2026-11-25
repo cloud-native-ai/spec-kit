@@ -4,7 +4,7 @@
 **Requirement Key**: `107-decision-governance`
 **Related Feature**: 107 Decision Governance（AI Agent 决策项治理） — `.specify/features.md` 行 107；本阶段维持 `Planned`，不推进生命周期
 **Input**: Design documents from `.specify/specs/107-decision-governance/`
-**Prerequisites**: plan.md（技术路线 / Project Structure / Mirror Obligations / BC-01…BC-06 / EP-001…EP-007 / T-001…T-003）、requirements.md（30 FR / 10 SC / 9 STR / A-1…A-14 / P-01…P-12 / M-01…M-08 / B-01…B-06）、research.md（M-1…M-16 / R-1…R-8）、data-model.md（E1…E9 / I-01…I-14）、contracts/ ×5（C-101…C-109 / C-201…C-208 / C-301…C-308 / C-401…C-407 / C-501…C-506）、quickstart.md（6 scenarios）、feature-ref.md
+**Prerequisites**: plan.md（技术路线 / Project Structure / Mirror Obligations / BC-01…BC-06 / EP-001…EP-007 / T-001…T-003）、requirements.md（30 FR / 10 SC / 9 STR / A-1…A-14 / P-01…P-12 / M-01…M-09 / B-01…B-06）、research.md（M-1…M-16 / R-1…R-8）、data-model.md（E1…E9 / I-01…I-14）、contracts/ ×5（C-101…C-109 / C-201…C-208 / C-301…C-308 / C-401…C-407 / C-501…C-506）、quickstart.md（6 scenarios）、feature-ref.md
 
 **Tests Mode**: ON（Constitution Principle IV "Test-First & Contract-Driven Implementation" 为测试强制原则；本特性交付可执行检查器 `scripts/python/validate-decisions.py` 与守卫夹具，测试形态为 unit / contract / integration 运行时测试。文档面（owner page、instruction 段、指针行）按宪法 VII 的 template-only 条款由结构契约测试承接，不冒充运行时测试。migration/regression 例外两处：C-502 的零改写读数与 BC 行映射守的是既有语料与已落地迁移面，其红能力由实现后语料与变异演练证明；其余新行为测试一律红先。）
 
@@ -14,14 +14,14 @@
 
 ## Definition of Done (DoD)
 
-- DoD-1: 全部任务行为 `[X]`；若出现 `[~]`，其理由逐条记录在 `.specify/specs/107-decision-governance/verification.md` 的 `deferred_tasks=`。
+- DoD-1: 全部任务行为 `[X]`；若出现 `[~]`，其理由逐条记录在 `.specify/specs/107-decision-governance/test-evidence/verification-input.md` 的 `deferred_tasks=`（`verification.md` 由 spec 侧从该输入派生）。
 - DoD-2: 交付面齐备——新所有者页 `shared/definitions/decision-definitions.md`、只读检查器 `scripts/python/validate-decisions.py`、五支测试模块、instruction 新段（≤1,500 B）与总预算 40,960、相邻所有者指针行、`docs/concepts/spec-driven.md` 与框架地图行、镜像与副本再生成。
-- DoD-3: M-01…M-08 每条都有能转红的守卫与逆向样本，并逐条经唯一测试入口执行；B-01…B-06 每条都有具名评审承接面，文档与测试均不声称机器覆盖。
+- DoD-3: M-01…M-09 每条都有能转红的守卫与逆向样本，并逐条经唯一测试入口执行；B-01…B-06 每条都有具名评审承接面，文档与测试均不声称机器覆盖。
 - DoD-4: FR-014 字段闭集、`D-NNN` 编号与 register 登记语义、四类载体重建、旧记录 `legacy` 报告与零改写均可实测复现。
 - DoD-5: 传递面完整——决策块五字段、确认、`implementation_receipt` 四字段、缺席拒绝、静默重决上送、三段审计链与多跳同号规则均有夹具与守卫。
 - DoD-6: 镜像 / 副本 / instruction 收敛——`sync-mirrors.py --check` 相对基线无新增漂移成员、`regen-command-copies.py --check` rc 0、模板与活副本段逐字一致且在字节上限内、空客户项目 init 收到该段、`scan-confirmation-gates.py` 零新增命中。
 - DoD-7: BC-01…BC-06 每行都映射到一条被测试的迁移或确定性拒绝行为与证据；无只依赖运行时双路径回退或人工说明的行。
-- DoD-8: `verification.md` 逐条记录 SC-001…SC-010 的状态、命令与证据指针；`final` 路径判据记 `pass` 并带 smoke 记录。
+- DoD-8: `.specify/specs/107-decision-governance/test-evidence/verification-input.md`（crew 可写的收口输入）逐条记录 SC-001…SC-010 的状态、命令与证据指针；`final` 路径判据记 `pass` 并带 smoke 记录；`verification.md` 由 spec 侧从该输入派生，crew MUST NOT 直接写（handoff/team 禁止面）。
 
 **DoD Status**: pending
 
@@ -33,7 +33,7 @@
 - GATE-4: final 路径成功判据 + smoke 记录 — check: `verification.md` 中 `**Path**` 为 `final` 的 SC-001…SC-006 与 SC-010 全部 `pass`，且 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（存在且非空）齐备（条件集 owner：`shared/workflow/acceptance-hardening.md` § Gates）。
 - GATE-5: 镜像、副本与指令收敛 — check: `python3 scripts/python/sync-mirrors.py --check` 的漂移成员集相对 `test-evidence/sync-mirrors-baseline.txt` 无新增成员；`python3 scripts/python/regen-command-copies.py --check` exit 0；`cmp` 抽取段为空且段字节 ≤1,500 B、总量 <40,960 B。
 - GATE-6: 门控中性 — check: `python3 scripts/python/scan-confirmation-gates.py --summary` 相对 `test-evidence/scan-confirmation-gates-baseline.txt`（31 blocking / 0 violations）零新增命中。
-- GATE-7: 旧记录零改写 — check: `git diff 08b59695c..HEAD` 在既有记录路径上只有新增行、无删除或原地改写（行级包含读数，见 § Notes）。
+- GATE-7: 旧记录零改写 — check: `git diff --numstat 08b59695c..HEAD -- <既有记录路径>` 对既有文件删除列 = 0、`--diff-filter=D` 为空；追加与新增文件允许（行级包含读数，见 § Notes）。
 - GATE-8: 无未完成任务 — check: `grep -cE '^- \[[ >]\]' .specify/specs/107-decision-governance/tasks.md` 返回 0。
 
 ## Environment Prerequisites
@@ -53,13 +53,13 @@
 
 ### Task State Sigil (REQUIRED)
 
-- `- [ ]` — Open；`- [>]` — Claimed（多代理运行用）；`- [X]` — Closed；`- [~]` — Deferred（理由记录在 `verification.md` 的 `deferred_tasks=`）。
+- `- [ ]` — Open；`- [>]` — Claimed（多代理运行用）；`- [X]` — Closed；`- [~]` — Deferred（理由记录在 `test-evidence/verification-input.md` 的 `deferred_tasks=`，spec 侧派生进 `verification.md`）。
 
 ## Path Conventions
 
 - **框架源（编辑面）**: `shared/`、`skills/`、`scripts/`、`templates/`、`docs/`。
 - **生成面（MUST NOT 手改）**: `.specify/shared/**`、`.specify/skills/**`、`.specify/scripts/**`、`.specify/templates/**`（由 `sync-mirrors.py` 投影）；每工具命令副本（由 `regen-command-copies.py` 生成）；`.specify/instructions.md`（由 `generate-instructions.sh` 产出）。
-- **证据落点（本特性）**: `.specify/specs/107-decision-governance/` 下的 `notes/pre-change-measurements.md`、`notes/red-first-evidence.md`、`notes/us1-green.txt`…`notes/us6-green.txt`、`notes/quickstart-run.md`、`test-evidence/mutation-drill.md`、`test-evidence/migration-closure.md`、`test-evidence/gate-neutrality.txt`、`test-evidence/preservation-sweep.txt`、`verification.md`。
+- **证据落点（本特性）**: `.specify/specs/107-decision-governance/` 下的 `notes/pre-change-measurements.md`、`notes/red-first-evidence.md`、`notes/us1-green.txt`…`notes/us6-green.txt`、`notes/quickstart-run.md`、`test-evidence/mutation-drill.md`、`test-evidence/migration-closure.md`、`test-evidence/gate-neutrality.txt`、`test-evidence/preservation-sweep.txt`、`test-evidence/verification-input.md`（crew 收口输入；`verification.md` 由 spec 侧派生）。
 - **只读面（零修改）**: `.specify/specs/107-decision-governance/{plan.md,data-model.md,contracts/,quickstart.md,research.md,feature-ref.md}`（plan-owned，仅小修须 `PLAN-EDIT:` 声明）；`docs/reference/history/**`、`docs/decisions/**`、`.specify/archive/**`、其他规格的 `.specify/specs/**` 与 `.specify/register.md` 的既有行。
 - **共享写入面（串行）**: `shared/definitions/decision-definitions.md`（六个故事阶段依次追加章节）、`scripts/python/validate-decisions.py`（四个 action 依次加入）。
 
@@ -69,7 +69,7 @@
 |---------|-----------------------|-------------|
 | 需求条目计数（FR / SC / STR） | `grep -cE '^\- \*\*FR-[0-9]+\*\*:' .specify/specs/107-decision-governance/requirements.md`；同法 `SC-`；`grep -cE '^\| \`STR-[0-9]+\`' …/requirements.md` | **30 / 10 / 9** |
 | 契约条款数（逐文件） | `grep -cE '^\- \*\*C-[0-9]+\*\*' .specify/specs/107-decision-governance/contracts/*.md` | text **9** / archive **8** / transmission **8** / enforcement **7** / migration **6**；合计 **38**。**陷阱形**：`grep -c 'C-'` 会把正文引用一并算入；计量单位是行首 `- **C-NNN**` 条款定义行 |
-| 生产者 / M / B / BC 行 | `grep -c '^| P-' …/requirements.md`；`grep -cE '^\| M-[0-9]+' …`；`grep -cE '^\| B-[0-9]+' …`；`grep -cE '^\| BC-[0-9]+' .specify/specs/107-decision-governance/plan.md` | **12 / 8 / 6 / 6** |
+| 生产者 / M / B / BC 行 | `grep -c '^| P-' …/requirements.md`；`grep -cE '^\| M-[0-9]+' …`；`grep -cE '^\| B-[0-9]+' …`；`grep -cE '^\| BC-[0-9]+' .specify/specs/107-decision-governance/plan.md` | **12 / 9 / 6 / 6** |
 | 新交付物当前状态 | 逐个 `test -e`（owner page ×2 含镜像、checker ×2 含镜像、fixture 根、五支测试模块） | **10/10 ABSENT**（红先的前提） |
 | 编辑 / 读取目标在位 | 逐个 `test -e`（15 个指针 / 生产者面 + 模板、生成器、框架地图、docs、register、glossary、既有测试与入口共 40 个路径） | **40/40 OK** |
 | 指令活副本与预算 | `wc -c .specify/instructions.md`；`grep -n INSTRUCTIONS_BUDGET_BYTES scripts/bash/generate-instructions.sh`；`grep -c '^## ' templates/instructions-template.md` | live **38,894 B**；budget **38,912**（line 107）；top-level sections **38**；段上限先例 `**本节字节上限：2,000 B**`（line 57，唯一一处段上限字面量） |
@@ -160,9 +160,9 @@
 
 **Purpose**: 先建立夹具与证据落点，并冻结实现前的可执行基线。
 
-- [ ] T001 Create the fixture tree `tests/fixtures/decision-governance/` with `m01`, `m02`, `m03`, `m04`, `m05`, `m06`, `m07`, `m08`, `reconstruct`, `legacy`, `payload`, `chain` subdirectories (each with `.gitkeep`) and the evidence directory `.specify/specs/107-decision-governance/notes/`.
+- [ ] T001 Create the fixture tree `tests/fixtures/decision-governance/` with `m01`, `m02`, `m03`, `m04`, `m05`, `m06`, `m07`, `m08`, `m09`, `reconstruct`, `legacy`, `payload`, `chain` subdirectories (each with `.gitkeep`) and the evidence directory `.specify/specs/107-decision-governance/notes/`.
 - [ ] T002 [blockedBy: T001] Capture the pre-change side of every diff premise in `.specify/specs/107-decision-governance/notes/pre-change-measurements.md`: `wc -c .specify/instructions.md` (38894), `grep -n INSTRUCTIONS_BUDGET_BYTES scripts/bash/generate-instructions.sh` (line 107, 38912), `grep -rn '^### D-' .specify/specs --include='*.md' | wc -l` (39; three-digit form 0), plus the readings of `python3 scripts/python/sync-mirrors.py --check`, `python3 scripts/python/regen-command-copies.py --check`, `python3 scripts/python/scan-confirmation-gates.py --summary` and `python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/107-decision-governance` — command, reading and capture date per row.
-- [ ] T003 [blockedBy: T001] Create the red-first evidence skeleton `.specify/specs/107-decision-governance/notes/red-first-evidence.md` with one slot per planned red-first test (M-01…M-08 reverse samples, C-102 four-surface, C-107 replay, C-204/C-205/C-206 guards, the payload/chain fixtures); each slot records command, real output and exit status; the failing-test baseline name list is captured by `/speckit.implement`'s `**Test runs**` owner and is referenced, never restated.
+- [ ] T003 [blockedBy: T001] Create the red-first evidence skeleton `.specify/specs/107-decision-governance/notes/red-first-evidence.md` with one slot per planned red-first test (M-01…M-09 reverse samples, C-102 four-surface, C-107 replay, C-204/C-205/C-206 guards, the payload/chain fixtures); each slot records command, real output and exit status; the failing-test baseline name list is captured by `/speckit.implement`'s `**Test runs**` owner and is referenced, never restated.
 
 **Checkpoint**: fixture tree and evidence skeleton exist; every pre-change value is frozen before any edit.
 
@@ -241,7 +241,7 @@
 ### Tests for User Story 3 (MANDATORY)
 
 - [ ] T023 [P] [US3] Author the US3 red-first unit tests and fixtures: `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` (missing mandatory field, class outside the closed set, missing or malformed timestamp point) and `::test_m04_id_density_register` (bad `D-NNN` form, non-dense per carrier, id unresolvable in the register stub), with `tests/fixtures/decision-governance/m01/` and `tests/fixtures/decision-governance/m04/` including a register stub.
-- [ ] T024 [P] [US3] Author the US3 red-first guard tests and fixtures: `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (C-204), `::test_no_tension_field_copy` (C-205), `::test_legacy_two_digit_reported_legacy` (C-206) and `::test_reconstruct_from_register_and_carriers` over the four-carrier fixture set `tests/fixtures/decision-governance/reconstruct/` (requirements, plan, checkpoint, run report), with `tests/fixtures/decision-governance/legacy/` carrying one/two-digit legacy headings and legacy register rows.
+- [ ] T024 [P] [US3] Author the US3 red-first guard tests and fixtures: `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (C-204, M-09: an unresolvable evidence pointer turns red, a resolvable one stays green), `::test_no_tension_field_copy` (C-205), `::test_legacy_two_digit_reported_legacy` (C-206) and `::test_reconstruct_from_register_and_carriers` over the four-carrier fixture set `tests/fixtures/decision-governance/reconstruct/` (requirements, plan, checkpoint, run report), with `tests/fixtures/decision-governance/legacy/` carrying one/two-digit legacy headings and legacy register rows (including `D-001`) and `tests/fixtures/decision-governance/m09/` carrying a resolvable and a broken-pointer record pair (M-09 reverse sample).
 - [ ] T025 [P] [US3] Author the US3 red-first contract tests in `tests/contract/test_decision_governance_contracts.py`: `test_record_line_grammar` (C-201), `test_no_second_store` (C-207), `test_read_only_disposition_carrier` (C-208).
 
 ### Implementation for User Story 3
@@ -249,7 +249,7 @@
 - [ ] T026 [US3] [blockedBy: T019] Author `shared/definitions/decision-definitions.md` § Decision Record: the serialization grammar (`### D-NNN — <title>`, one `- **<field>**: <value>` line per field, indented option sub-lines, ≥2-space continuations, fenced blocks excluded), FR-014's ten mandatory fields, the three conditional fields (`same_name_conflict`, `resource_locator`, `superseded_by`), the four timestamps (`created_at` ISO-8601 UTC mandatory; the other three ISO-8601 UTC or `not-yet`), supersession (old record retained and marked), id rules (`D-NNN`, dense per carrier, never reused, registered at birth, cross-carrier references carry the carrier pointer) and the reconstruction duty (no conversation-memory backfill).
 - [ ] T027 [US3] [blockedBy: T026] Author `shared/definitions/decision-definitions.md` § Archive as Projection and the normative Decision Producer Inventory (P-01…P-12 with obligation `record` / `record-when-decision` / `exempt`, carrier, class posture and owner); state archive-as-projection (union of producer × carrier plus the register index; no second registry, queue, store or scheduler), the read-only-disposition rule (a read-only command's disposition lands in its own report, never by editing the analyzed artifact) and the inventory-revision duty.
 - [ ] T028 [US3] [blockedBy: T027] Add one pointer line each to the record-side adjacent owners (pointer-only, no criteria table copied): `shared/guidelines/confirmation-gates.md` (P-01), `shared/guidelines/decision-tension.md` (P-03: a load-bearing decision appends a decision record cross-referencing its `T-NNN`, six fields not copied), `shared/guidelines/fast-fail.md` (P-07: after an adjudication the record and transmission obligations apply), `shared/definitions/goal-definitions.md`, `shared/definitions/anchor-definitions.md`, `shared/definitions/agent-definitions.md` (P-08) and `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` (P-04).
-- [ ] T029 [US3] [blockedBy: T020,T023] Implement the `--action records` legs M-01 (ten mandatory fields present, class inside the closed set, four timestamp points present and well-formed) and M-04 (`D-NNN` form, dense and unique per carrier, id resolvable in the register) plus the legacy discriminator (only a `^### D-\d{3}` heading carrying the field grammar is new-form; every other pre-existing heading and register row is reported `legacy`, never judged or rewritten) in `scripts/python/validate-decisions.py`.
+- [ ] T029 [US3] [blockedBy: T020,T023] Implement the `--action records` legs M-01 (ten mandatory fields present, class inside the closed set, four timestamp points present and well-formed), M-04 (`D-NNN` form, dense and unique per carrier, id resolvable in the register) and M-09 (every evidence pointer resolves to an existing carrier path/anchor; only resolvability is judged, not sufficiency) plus the legacy discriminator (only a `^### D-\d{3}` heading carrying the field grammar is new-form; every other pre-existing heading and register row — including the id-shaped `D-001` row — is reported `legacy`, never judged or rewritten) in `scripts/python/validate-decisions.py`.
 - [ ] T030 [US3] [blockedBy: T027,T028,T029] Regenerate and verify the US3 mirror pairs: `python3 scripts/python/sync-mirrors.py --write` then `--check` with no NEW drift; `cmp` the owner page and every pointer-file pair (`shared/guidelines/{confirmation-gates,decision-tension,fast-fail}.md`, `shared/definitions/{goal,anchor,agent}-definitions.md`, `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` against their `.specify/` mirrors).
 - [ ] T031 [US3] Run the US3 phase tests through the single entry `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh` against `tests/unit/test_validate_decisions.py` (read-only), `tests/contract/test_decision_governance_guards.py` (read-only) and `tests/contract/test_decision_governance_contracts.py` (read-only); record the four-carrier reconstruction output, the `legacy` report, the broken-pointer red and the M-01/M-04 reverse outputs in `notes/red-first-evidence.md` and `notes/us3-green.txt`. [green: contracts/archive-and-audit.contract.md#C-201] [green: contracts/archive-and-audit.contract.md#C-202] [green: contracts/archive-and-audit.contract.md#C-203] [green: contracts/archive-and-audit.contract.md#C-204] [green: contracts/archive-and-audit.contract.md#C-205] [green: contracts/archive-and-audit.contract.md#C-206] [green: contracts/archive-and-audit.contract.md#C-207] [green: contracts/archive-and-audit.contract.md#C-208] [blockedBy: T023,T024,T025,T026,T027,T028,T029,T030]
 
@@ -289,7 +289,7 @@
 ### Tests for User Story 5 (MANDATORY)
 
 - [ ] T039 [US5] [blockedBy: T036] Author the US5 enforcement tests in `tests/contract/test_decision_governance_guards.py` and `tests/contract/test_decision_governance_contracts.py`: `::test_every_guard_has_reverse_sample` (C-403), `::test_inventory_closure` (C-406: declared producer set from the owner page against the documented code-face scan output, verdict `observed == declared ± exempt`, FR-022/FR-024/FR-025), `::test_table_guard_parity` (C-407), `test_behavior_surfaces_named` (C-402, B-01…B-06), `test_gate_neutrality` (C-405, FR-025) and `test_review_surfaces_named` (C-109).
-- [ ] T040 [US5] [blockedBy: T033] Author `shared/definitions/decision-definitions.md` § Enforcement Boundary: the M table (M-01…M-08 each with exactly one deterministic judge action and one red condition) and the B table (B-01…B-06 each with its named review surface and the explicit no-machine-coverage statement), plus the table–guard parity duty and the gate-neutrality duty (no new blocking gate; FR-022).
+- [ ] T040 [US5] [blockedBy: T033] Author `shared/definitions/decision-definitions.md` § Enforcement Boundary: the M table (M-01…M-09 each with exactly one deterministic judge action and one red condition) and the B table (B-01…B-06 each with its named review surface and the explicit no-machine-coverage statement), plus the table–guard parity duty and the gate-neutrality duty (no new blocking gate; FR-022).
 - [ ] T041 [US5] [blockedBy: T040] Add the B-rule review-surface pointers: `skills/internal/analyze-artifacts/SKILL.md` (B-04/B-05), `skills/internal/review-feature-quality/SKILL.md` and `skills/internal/review-sdd-process/SKILL.md` (B-01…B-06); pointer-only, no rule text copied (FR-023).
 - [ ] T042 [US5] [blockedBy: T027,T036] Implement `--action inventory` in `scripts/python/validate-decisions.py`: parse the declared producer set from the owner page's inventory table, accept the observation set from the documented code-face scan output supplied by the caller, and emit `observed == declared ± exempt` with a red verdict on any unregistered producer that yields a decision item (FR-022, SC-001).
 - [ ] T043 [US5] [blockedBy: T041,T042] Run the gate-neutrality scan and record it: `python3 scripts/python/scan-confirmation-gates.py --summary` compared to `test-evidence/scan-confirmation-gates-baseline.txt` (31 blocking / 0 violations, zero NEW hits) into `test-evidence/gate-neutrality.txt`; assert by read-only `git diff` that sentinel literals, watcher verdicts/exit codes, the five-item uplink and the two-slot test budget files are untouched (FR-025).
@@ -330,9 +330,9 @@
 - [ ] T053 Verify the glossary proposal-only discipline: `.specify/glossary.md` carries no new Decision term (read-only `git diff d05c3a350..HEAD -- .specify/glossary.md` empty) and the proposal evidence (`test-evidence/glossary-proposal.md`, `test-evidence/glossary-proposal-plan-2026-11-25.md`) remains the only glossary deliverable; no write without user confirmation (FR-005).
 - [ ] T054 [blockedBy: T052] Run the preservation regression sweep through the single entry: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_watch_iteration.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_role_transition_payload.py tests/contract/test_fast_fail_discipline.py tests/contract/test_decision_tension_contract.py -q`; record the zero-new-failure reading and the unchanged sentinel/watcher/payload/two-slot statements in `test-evidence/preservation-sweep.txt`.
 - [ ] T055 [blockedBy: T052] Execute every scenario in `.specify/specs/107-decision-governance/quickstart.md` exactly as written (the executed-today commands re-run; the planned-surface commands run after landing) and record command, output and exit status per scenario in `notes/quickstart-run.md`, teardown included.
-- [ ] T056 [blockedBy: T052,T053,T054,T055] Assemble `verification.md`: record SC-001…SC-010 each with status, command and evidence pointer; the `final`-path criteria (SC-001…SC-006, SC-010) carry `pass` plus the smoke record (`smoke_command=`, `smoke_exit_code=0`, `smoke_evidence_path=` existing and non-empty); the supporting criteria (SC-007…SC-009) record their drill/mirror/migration evidence.
+- [ ] T056 [blockedBy: T052,T053,T054,T055] Assemble the crew-side close-out input `.specify/specs/107-decision-governance/test-evidence/verification-input.md`: record SC-001…SC-010 each with status, command and evidence pointer; the `final`-path criteria (SC-001…SC-006, SC-010) carry `pass` plus the smoke record (`smoke_command=`, `smoke_exit_code=0`, `smoke_evidence_path=` existing and non-empty); the supporting criteria (SC-007…SC-009) record their drill/mirror/migration evidence. `verification.md` is derived spec-side from this input and MUST NOT be written by the crew (handoff/team forbidden list).
 
-**Checkpoint**: 词汇表未变；受保护面零新增失败；quickstart 有实录；`verification.md` 可直接进入 review。
+**Checkpoint**: 词汇表未变；受保护面零新增失败；quickstart 有实录；`test-evidence/verification-input.md` 可直接派生 `verification.md` 进入 review。
 
 ---
 
@@ -412,7 +412,7 @@ Task: "Author grammar/no-second-store/read-only contract tests in tests/contract
 - **FR-002 的 `register.md` 读法**：plan § Project Structure 的落地面是封闭清单，其中不含 `register.md`；`.specify/register.md` 保持编号登记事实，由所有者页与测试以指针抵达，本特性不向 register 添加指针行（也不改写既有行）。新增 `D-NNN` 行只会在将来真实决策记录诞生时按 FR-015 追加。
 - **C-102 的四面对读法**：四面对 = 所有者页、instruction 段、决策项模板（所有者页 §3）、守卫/评审面；其中评审面在 US1 由所有者页点名的 B-01/B-02 承接，US5 把它接进 `analyze-artifacts` / `review-*` 技能（C-402），因此 C-102 的绿点可诚实落在 T017。
 - **client-init 测试的落点**：为保持 plan 的封闭测试文件清单，`test_client_init_receives_section` 落在 `tests/contract/test_decision_governance_contracts.py`，复用既有 `specify init --here … --no-git` 夹具形态（`tests/integration/test_init_new_layout.py` 为先例）。
-- **零改写读数**：`08b59695c` 以来 `.specify/register.md` 已由 plan 阶段追加 T-019…T-021 三行；因此 C-502 的判定是**行级包含**（既有无一行被删除或改写，允许追加），不是文件级空 diff。文件级空 diff 只适用于本特性未触碰的记录路径。
+- **零改写读数**：`08b59695c` 以来 `.specify/register.md` 已由 plan 阶段追加 T-019…T-021 三行；因此 C-502 的判定是**行级包含**（既有无一行被删除或改写，允许追加；`git diff --numstat` 删除列 = 0 且无删除文件），不是文件级空 diff。文件级空 diff 只适用于本特性未触碰的记录路径。
 - **绿点分区**：38 条全部由六个阶段验证行认领，测试编写行不带 `[green:]`；`validate-tasks.py` 的四项 green 检查应零 ERROR，出现的 WARN 逐条裁定并记录在 `test-evidence/tasks-validator.txt`。
 - **测量陷阱**：条款计数单位是行首 `- **C-NNN**` 定义行（`grep -c 'C-'` 会误计正文引用）；`T-NNN` 标题现值 104 = 既有 101 + 本特性 plan 新增 3；旧式 `D-` 判别只对标题行计数，register 行另由 legacy 夹具覆盖。
 - **门控中性**：所有者页与 instruction 段都位于 `scan-confirmation-gates.py` 的扫描面（`shared`、`templates/*.md`），措辞 MUST 避开 `BLOCKING_PATTERNS`（例如不得出现 `confirmation gate` / `确认门控/确认门禁` 字面量）。
