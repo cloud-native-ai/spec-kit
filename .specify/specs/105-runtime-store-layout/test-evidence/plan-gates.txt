@@ -1,0 +1,102 @@
+# Plan-stage gate and measurement readings — 2026-11-25
+
+## flow-class lookup
+unit_id: spec:105-runtime-store-layout
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0
+
+## baseline inventory (commit 23938f22e)
+040000 tree a2f1ecaf2066518465c828ebcadc1af8cdf0d101	coaching
+040000 tree c0807237e7de9d6bdab02105f49470e6e606352c	evidence
+040000 tree c4c9f61cfde1adeede6178203b0c30f4c7965f68	exec-quant
+040000 tree ccfc6a5f93f1ad75444bd3f0dbf73f6282c767d5	feedback
+040000 tree d0da05a5a93d5bacb46f704068890d8d8f0813b9	housekeeping
+040000 tree 7e5597c0a36d3b1561884bee334fea2dc305d22e	knowledge
+040000 tree c94744f56159061469ada558d7d260a8414ff915	renumber
+040000 tree 7fdea5528286614d6e4656664c8cf4e3813dd26c	retention
+040000 tree 53136a3d83060c8297574cec2fd845f16293c6dd	session
+040000 tree 4d927e0b07ba91c7767c9e6eec779893fe973bc8	todo
+040000 tree c96de145f3e73741d87fdf964d57883cc70708fe	tools
+040000 tree 6d9f54c01c7b13bf3a7d82cf23551c81516d015c	trigger
+-- top-level files:
+-- tracked paths:
+2971
+-- files on disk:
+2973
+-- size:
+18M	.specify/memory
+-- per-store tracked:
+   1630 exec-quant
+    568 feedback
+    526 session
+    146 evidence
+     45 retention
+     26 coaching
+     10 tools
+     10 knowledge
+      4 renumber
+      3 todo
+      2 housekeeping
+      1 trigger
+-- ignored:
+!! .specify/memory/exec-quant/.write.lock
+!! .specify/memory/exec-quant/aggregated/.write.lock
+
+## ignore readings
+.specify/.gitignore:23:memory/sanitize/	.specify/memory/sanitize/findings.json
+.specify/.gitignore:27:memory/trigger/telemetry.jsonl	.specify/memory/trigger/telemetry.jsonl
+.specify/.gitignore:16:tools/	.specify/tools/system.json
+
+## mirror baseline (full output: sync-mirrors-baseline.txt)
+# first run used the profile python3, whose regen subprocess lacks typer; the authoritative re-run used /usr/local/bin/python3
+DIFF[projected] 6
+DIFF 444
+DRIFT 1
+ok 1
+rc(typer-capable re-run)=2; members=450; MISS=0; ORPHAN=0
+OK: all per-tool command copies match the source templates.
+regen rc=0
+
+## test entry baseline
+...............                                                          [100%]
+15 passed in 6.47s
+............                                                             [100%]
+12 passed in 6.23s
+
+## migrate dry-run (full payload: plan-migrate-dryrun.json)
+command: PYTHONPATH=src /usr/local/bin/python3 -c "from specify_cli import main; main()" migrate --workspace . --format json
+outcome: planned exitCode: 1 workspaceKind: framework-source
+summary: {'total': 450, 'byDimension': {'templates-generated': 282, 'anchor-layout': 0, 'compat-links': 0, 'mirror-consistency': 168, 'migration-residue': 0}, 'byDisposition': {'replace': 450}}
+
+## plan pre-analyze gate (full: pre-analyze-plan.json)
+command: python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/105-runtime-store-layout --json-out .specify/specs/105-runtime-store-layout/test-evidence/pre-analyze-plan.json
+reading: decision=pass errors=0 advisories=112 waived=0; fr=26 sc=8 clauses=8 files=11
+note: all 112 advisories are missing-path for the new roots / new files this feature will create (expected creation targets, not defects)
+
+## plan integrity checks
+top-level '# Implementation Plan:' headings: 1
+Requirement -> Feature stamp: 1
+residual [UPPER_SNAKE] tokens: 0
+constitution rows vs headings: 23 rows / 23 headings OK
+
+## workspace status (this stage touched only spec 105 artifacts + feature registry)
+ M .specify/features.md
+ M .specify/features/024-specification-workspace-versioning.md
+?? .specify/specs/105-runtime-store-layout/contracts/
+?? .specify/specs/105-runtime-store-layout/data-model.md
+?? .specify/specs/105-runtime-store-layout/feature-ref.md
+?? .specify/specs/105-runtime-store-layout/plan.md
+?? .specify/specs/105-runtime-store-layout/quickstart.md
+?? .specify/specs/105-runtime-store-layout/research.md
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-baseline-memory-tests.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-baseline-migrate-tests.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-gates.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-migrate-dryrun.err
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-migrate-dryrun.json
+?? .specify/specs/105-runtime-store-layout/test-evidence/pre-analyze-plan.json
+?? .specify/specs/105-runtime-store-layout/test-evidence/sync-mirrors-baseline.txt

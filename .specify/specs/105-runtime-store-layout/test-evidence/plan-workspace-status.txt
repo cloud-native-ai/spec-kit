@@ -1,0 +1,16 @@
+ M .specify/features.md
+ M .specify/features/024-specification-workspace-versioning.md
+?? .specify/specs/105-runtime-store-layout/contracts/
+?? .specify/specs/105-runtime-store-layout/data-model.md
+?? .specify/specs/105-runtime-store-layout/feature-ref.md
+?? .specify/specs/105-runtime-store-layout/plan.md
+?? .specify/specs/105-runtime-store-layout/quickstart.md
+?? .specify/specs/105-runtime-store-layout/research.md
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-baseline-memory-tests.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-baseline-migrate-tests.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-gates.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-migrate-dryrun.err
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-migrate-dryrun.json
+?? .specify/specs/105-runtime-store-layout/test-evidence/plan-workspace-status.txt
+?? .specify/specs/105-runtime-store-layout/test-evidence/pre-analyze-plan.json
+?? .specify/specs/105-runtime-store-layout/test-evidence/sync-mirrors-baseline.txt

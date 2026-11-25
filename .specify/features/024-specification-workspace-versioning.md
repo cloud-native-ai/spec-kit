@@ -5,7 +5,7 @@
 **Description**: Version management and migration support for .specify/ workspace structure across CLI releases.  
 **Status**: Ready for Review  
 **Created**: 2026-06-05  
-**Last Updated**: 2026-11-25（clarify：slice 105 runtime-store layout 绑定登记于 § Related Specifications；父状态保持 `Ready for Review`）
+**Last Updated**: 2026-11-25（plan：slice 105 runtime-store layout 产出 plan/design 工件并推进 `Draft → Planned`；父状态保持 `Ready for Review`）
 
 ## Overview
 
@@ -22,6 +22,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 2026-11-10 (review-repair r1, 097): the blocking defect and the eight P1 findings were repaired. The zero-write probe test is now an observable guard (sentinel transient directory + workspace chdir, plus a fifth red-ability mutation; two-variant red-base drill in `test-evidence/red-base-probe-guard-2026-11-10.txt`); the smoke record was re-executed verbatim (105 passed, `final-suite.txt`); C-1/docs/template converged to `--help`; the receipt `workspace` key landed (C-4/E-2/E-3); SC-002/SC-007/DoD-4 wording, quickstart status and tasks DoD status refreshed. `closure-acceptance-check.py` on the repaired tree: verdict `accept`, reasons none, `final_path` pass 4/4, all four `Planned → Implemented` conditions true → **`Planned → Implemented` landed** (registry row and this detail agree). `Implemented → Ready for Review` remains pending a re-run of `/speckit.review` against this tree.
 
 2026-11-11 (review r2, `/speckit.review` 097): full re-run of the four segments + Acceptance Reality Check against `da34a3d44`; every round-1 P0/P1 repair anchor re-verified (status flip, zero-write probe guard with both red variants, smoke literal byte-identical to the executed command, SC-007 pointer, `--help`/-h convergence, receipt `workspace` key). Segment conclusions: process **P1×3 / P2×4** (framework-level recommendations, no P0), artifact **pass** (9/9, A1–A9 closed), implementation **pass** (smoke 105 passed / exit 0 / `final-suite.txt`), code record **`not-evaluated`** with 0 `blocking` / 0 `important` / 6 `suggestion` / 1 `nitpick` / 1 `praise` (147 changed / 107 judged / 40 generated-skipped / 0 gap; gate `allow`). ARC: claim `Implemented`, verdict `accept`, `final_path` pass 4 / blocked 0 / deferred 0 / partial 0 / fail 0 / unknown 0 / total 4. `Implemented → Ready for Review` **landed** (all four conjunctive conditions hold; no waiver). Process report `review.md`, archived round-1 records `review-097-speckit-migrate-command.md` and `code-review-20261110T161419Z.md`.
+
+2026-11-25 (plan, 105): second sub-spec planned — runtime stores leave `.specify/memory/` for top-level `.specify/<store>/` roots and the container is retired. Design: one new `store-layout` dimension appended to `specify migrate` (five 097 tokens kept as the ordered prefix; 097's dated E-8 not rewritten), per-store manifest-first relocation with digest/from→to recovery, dual-content refusal through the clarified authoritative-entry predicate, receipt v2, and a single machine declaration (`runtime-store-layout.yaml`) replacing seven per-consumer root lists. Artifacts: `.specify/specs/105-runtime-store-layout/` — 4 contracts, 10 entities, 15 work packages, 8 quickstart scenarios; six Decision Tensions recorded in its `plan.md` (dimension extension, seed rename, SC-007 baseline reading, docs dated boundary, manifest-as-archive, declaration ownership).
 
 ## Key Changes
 
@@ -56,7 +58,7 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 ### Related Specifications
 
 - `.specify/specs/097-speckit-migrate-command/requirements.md` — 本 Feature 的首个子规格（slice 行 097，`Ready for Review`）：声明驱动的一次性工作区收敛（plan → apply → archive-first → 回执）。
-- `.specify/specs/105-runtime-store-layout/requirements.md` — 第二个子规格（slice 行 105，`Draft`；2026-11-25 `/speckit.clarify` 绑定）：把 session/knowledge/feedback/evidence 等运行期存储迁出 `.specify/memory/` 到顶层存储根，并复用本 Feature 的 `specify migrate` 迁移/拒绝面；父行状态保持 `Ready for Review`，不回退。
+- `.specify/specs/105-runtime-store-layout/requirements.md` — 第二个子规格（slice 行 105，`Planned`；2026-11-25 `/speckit.plan`）：把 session/knowledge/feedback/evidence 等运行期存储迁出 `.specify/memory/` 到顶层存储根，并复用本 Feature 的 `specify migrate` 迁移/拒绝面（新增 `store-layout` 维度）；父行状态保持 `Ready for Review`，不回退。
 - Cross-referenced Feature: .specify/memory/features/045.md (Framework Source Provenance, Draft 2026-08-17) — the source/provenance axis, orthogonal to this schema-version axis; its stamp must NOT take this Feature's envisioned `.specify/version` marker path.
 
 ## Status Tracking
