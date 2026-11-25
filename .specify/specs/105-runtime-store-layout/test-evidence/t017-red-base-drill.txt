@@ -1,0 +1,24 @@
+# T017 red-base drill — revert the memory engine root (2026-11-25)
+
+Purpose: replace the previous green-only authoring claim for T017 with a real red-ability demonstration (review A1 fix: mutation/revert drill, the US6/T042 pattern).
+
+Subject: scripts/python/memory-utils.py
+sha256 before: 600794270599e1d44943371d4a4d2976342e59e643124bdaa3da3a7f0f9e5309
+Mutation: MEMORY_ROOT = Path(".specify")  ->  Path(".specify") / "memory"  (one line)
+
+Red run:
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_memory_preservation.py -q
+exit 1 — 5 failed in 6.49s
+FAILED tests/integration/test_memory_preservation.py::test_knowledge_record_recall_upsert_by_slug
+FAILED tests/integration/test_memory_preservation.py::test_session_record_recall_roundtrip_under_new_root
+FAILED tests/integration/test_memory_preservation.py::test_prune_bounds_under_new_root
+FAILED tests/integration/test_memory_preservation.py::test_reindex_retires_only_the_legacy_index
+FAILED tests/integration/test_memory_preservation.py::test_determination_persists_into_session_and_history_reads_it
+
+Restore: /bin/cp -f backup; cmp identical; sha256 after matches before (6007942…e5309).
+
+Green run (restored tree):
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_memory_preservation.py -q
+exit 0 — 5 passed in 6.49s
+
+Note: a bare 'cp' alias prompted and did not overwrite; the explicit /bin/cp -f was used and the checksum verified. The engine was never left mutated.

@@ -23,7 +23,7 @@
 - DoD-7: dogfood 完成——`.specify/memory/` 不再存在；受跟踪条目全部位于新顶层存储；每个存储的迁移回执为 v2 逐 run 一文一件；`git log --follow` 可追溯被移动条目；本仓无引擎重建退役根。
 - DoD-8: `verification.md` 逐条记录 SC-001…SC-009 的状态、命令与证据指针；`final` 路径的 SC-001…SC-005 与 SC-009 记 `pass` 并带 smoke 记录（`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=` 存在且非空）；dated record（`docs/reference/history/**`、`docs/decisions/**`、`.specify/specs/**`、`.specify/archive/**` 与记录型存储内既有条目）逐字未改。
 
-**DoD Status**: pending
+**DoD Status**: done (43/43 rows [X]; closure `accept`; see verification.md)
 
 ## Completion Gate
 

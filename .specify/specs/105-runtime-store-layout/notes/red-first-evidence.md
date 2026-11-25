@@ -185,18 +185,17 @@ RERUN apply: exit=0 outcome=clean items=0 receipts=['20261125T054816Z-d15cb0bd.j
 - Date: 2026-11-25
 - Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_memory_preservation.py -q`
 - Exit code: **0** — `5 passed in 6.49s` (full log `test-evidence/t017-authoring-run.txt`)
-- Reading — honest disclosure, not a fabricated red: the five assertions (session record→recall
-  round-trip under `.specify/session/`, knowledge upsert-by-slug under `.specify/knowledge/`, prune
-  age/count bounds, reindex legacy-index retirement, determination persistence + history + pinned
-  schema keys) went green at authoring time because **P1's T004 front-loaded this substance** — the
-  memory engine's root constants were re-pointed to `.specify/<scope>/` in the foundational phase,
-  and `run-determination` persists through that engine (P-2 wiring unchanged). The red capability of
-  the root move itself is already on record: the P1 live-target set (`test-evidence/p1-final-failed.txt`,
-  404 names incl. `tests/unit/test_memory_utils.py`, which asserts the old literal and is owned by
-  T029) is exactly the suite that goes red when the root flips. Per the front-loading-closure
-  discipline this row is closed by re-verifying the assertion set against the current tree, not by
-  reverting-then-rewriting; the assertions discriminate (path prefix + retired-root absence would
-  fail if the engine still wrote under `.specify/memory/`).
+- Reading — honest disclosure: the five assertions (session record→recall round-trip under
+  `.specify/session/`, knowledge upsert-by-slug under `.specify/knowledge/`, prune age/count bounds,
+  reindex legacy-index retirement, determination persistence + history + pinned schema keys) went
+  green at authoring time because P1's T004 front-loaded this substance — the memory engine's root
+  constants were already re-pointed to `.specify/<scope>/` in the foundational phase, and
+  `run-determination` persists through that engine (P-2 wiring unchanged). Because the subject
+  landed before its test, the red-ability obligation is met by a **revert drill** (the US6/T042
+  mutation pattern), not by a claim of a special discipline: `scripts/python/memory-utils.py` was
+  temporarily reverted to `MEMORY_ROOT = Path(".specify") / "memory"`, the module went red (5 failed,
+  exit 1), and the engine was restored with sha256 equality before the green re-run. Full record:
+  `test-evidence/t017-red-base-drill.txt`. The assertions genuinely discriminate the root move.
 - Residual surface this file does NOT cover: the two memory skills' path text — that red belongs to
   T018's authoring run below and is what T019 fixes.
 
