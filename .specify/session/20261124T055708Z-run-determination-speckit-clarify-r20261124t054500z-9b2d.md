@@ -21,7 +21,7 @@ summary: "/speckit.clarify run=r20261124T054500Z-9b2d token=not_evaluated elapse
   "feature": "104-agents-run",
   "feature_id": "019",
   "determined_at": "2026-11-24T05:57:08Z",
-  "settled_at": null,
+  "settled_at": "2026-11-25T11:54:45Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -88,7 +88,7 @@ summary: "/speckit.clarify run=r20261124T054500Z-9b2d token=not_evaluated elapse
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -174,8 +174,8 @@ summary: "/speckit.clarify run=r20261124T054500Z-9b2d token=not_evaluated elapse
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -205,7 +205,7 @@ summary: "/speckit.clarify run=r20261124T054500Z-9b2d token=not_evaluated elapse
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
