@@ -1,0 +1,307 @@
+{
+  "decision": "overlap",
+  "current_spec": "105-runtime-store-layout",
+  "checked_specs": [
+    "105-runtime-store-layout",
+    "001-unify-command-handoffs",
+    "006-add-qoder-support",
+    "009-claude-code-support",
+    "012-skill-home-workdir",
+    "013-portable-skill-creation",
+    "016-refactor-tools-command",
+    "018-cli-priority-support",
+    "020-speckit-todo-command",
+    "021-agent-specific-config",
+    "023-agent-framework-redesign",
+    "024-agent-env-config",
+    "025-agent-skill-enablement",
+    "027-feedback-mechanism",
+    "028-sdd-workflow-refactor",
+    "029-glossary-mechanism",
+    "030-summarize-project",
+    "031-task-complexity-rubric",
+    "032-dogfooding-practice",
+    "033-docs-command",
+    "034-evidence-infra",
+    "035-token-efficiency",
+    "036-team-summary",
+    "037-goal-registry",
+    "038-goal-target",
+    "039-session-export",
+    "040-agent-metadata-portability",
+    "041-refactor-feedback-probe",
+    "042-goal-team-creation",
+    "043-init-commit-stamp",
+    "044-reduce-confirmation-flows",
+    "045-sanitize-command",
+    "047-feedback-introspection",
+    "048-derive-command",
+    "049-docs-reconcile",
+    "050-proactive-flow-trigger",
+    "051-user-facing-comprehension",
+    "052-fast-fail-principle",
+    "053-machine-decidable-artifacts",
+    "055-conflict-free-stores",
+    "056-probe-handler-system",
+    "057-decompose-command-skills",
+    "058-sdd-loop-driver",
+    "059-exec-quant-recording",
+    "060-decompose-subagent-dispatch",
+    "061-subagent-cli-config",
+    "062-humanize-command",
+    "063-review-p1-governance",
+    "064-subagent-concurrency",
+    "065-loop-interruption-recovery",
+    "067-loop-efficiency-hardening",
+    "068-exec-quant-feedback-channel",
+    "069-execution-expression-sdd",
+    "070-subagent-task-teams",
+    "071-review-code-integration",
+    "072-client-self-improvement",
+    "073-record-retention-and-housekeeping",
+    "074-goal-team-sdd-unification",
+    "075-sdd-loop-efficiency",
+    "076-decision-tension-contract",
+    "077-doc-sdd-integration",
+    "078-coaching-skills",
+    "079-bilingual-expression",
+    "080-humanize-run-output",
+    "081-acceptance-hardening",
+    "082-self-explanatory-integration",
+    "083-mechanism-policy-separation",
+    "084-harness-triple-structure",
+    "085-sdd-temporary-goal-team",
+    "086-efficient-test-execution",
+    "087-arch-diagram-docs",
+    "088-speckit-visualization",
+    "089-script-interface-contract",
+    "090-re-anchoring",
+    "091-auto-git-closeout",
+    "093-concurrency-by-default",
+    "094-goal-team-parallel",
+    "095-superagent-role",
+    "096-sdd-observer-agent",
+    "097-speckit-migrate-command",
+    "098-suite-speed-optimizations",
+    "099-speckit-seal",
+    "100-seal-slice-archive",
+    "101-anchor-goal-realignment",
+    "102-line-registry-registration",
+    "103-team-view",
+    "104-agents-run"
+  ],
+  "current_paths": [
+    ".specify/shared/guidelines/decision-tension.md",
+    "agents/sdd-debt-governor.agent.md",
+    "docs/concepts/documentation-model.md",
+    "docs/reference/commands/migrate.md",
+    "src/specify_cli/__init__.py"
+  ],
+  "overlaps": [
+    {
+      "other_spec": "006-add-qoder-support",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "009-claude-code-support",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "018-cli-priority-support",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "023-agent-framework-redesign",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "025-agent-skill-enablement",
+      "relation": "nested-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli"
+    },
+    {
+      "other_spec": "027-feedback-mechanism",
+      "relation": "nested-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli"
+    },
+    {
+      "other_spec": "028-sdd-workflow-refactor",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "nested-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared"
+    },
+    {
+      "other_spec": "033-docs-command",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "035-token-efficiency",
+      "relation": "nested-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared"
+    },
+    {
+      "other_spec": "040-agent-metadata-portability",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "042-goal-team-creation",
+      "relation": "nested-path",
+      "current_path": "docs/reference/commands/migrate.md",
+      "other_path": "docs/reference/commands"
+    },
+    {
+      "other_spec": "043-init-commit-stamp",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "048-derive-command",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "049-docs-reconcile",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "nested-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared"
+    },
+    {
+      "other_spec": "056-probe-handler-system",
+      "relation": "nested-path",
+      "current_path": "docs/reference/commands/migrate.md",
+      "other_path": "docs/reference"
+    },
+    {
+      "other_spec": "061-subagent-cli-config",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "067-loop-efficiency-hardening",
+      "relation": "nested-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli"
+    },
+    {
+      "other_spec": "076-decision-tension-contract",
+      "relation": "same-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared/guidelines/decision-tension.md"
+    },
+    {
+      "other_spec": "078-coaching-skills",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "079-bilingual-expression",
+      "relation": "nested-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared"
+    },
+    {
+      "other_spec": "079-bilingual-expression",
+      "relation": "same-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared/guidelines/decision-tension.md"
+    },
+    {
+      "other_spec": "080-humanize-run-output",
+      "relation": "same-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared/guidelines/decision-tension.md"
+    },
+    {
+      "other_spec": "080-humanize-run-output",
+      "relation": "nested-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli"
+    },
+    {
+      "other_spec": "081-acceptance-hardening",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    },
+    {
+      "other_spec": "085-sdd-temporary-goal-team",
+      "relation": "nested-path",
+      "current_path": "docs/reference/commands/migrate.md",
+      "other_path": "docs/reference"
+    },
+    {
+      "other_spec": "087-arch-diagram-docs",
+      "relation": "same-path",
+      "current_path": "docs/concepts/documentation-model.md",
+      "other_path": "docs/concepts/documentation-model.md"
+    },
+    {
+      "other_spec": "088-speckit-visualization",
+      "relation": "nested-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared"
+    },
+    {
+      "other_spec": "089-script-interface-contract",
+      "relation": "nested-path",
+      "current_path": "docs/reference/commands/migrate.md",
+      "other_path": "docs/reference"
+    },
+    {
+      "other_spec": "091-auto-git-closeout",
+      "relation": "same-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared/guidelines/decision-tension.md"
+    },
+    {
+      "other_spec": "094-goal-team-parallel",
+      "relation": "nested-path",
+      "current_path": ".specify/shared/guidelines/decision-tension.md",
+      "other_path": ".specify/shared"
+    },
+    {
+      "other_spec": "097-speckit-migrate-command",
+      "relation": "same-path",
+      "current_path": "docs/reference/commands/migrate.md",
+      "other_path": "docs/reference/commands/migrate.md"
+    },
+    {
+      "other_spec": "097-speckit-migrate-command",
+      "relation": "same-path",
+      "current_path": "src/specify_cli/__init__.py",
+      "other_path": "src/specify_cli/__init__.py"
+    }
+  ],
+  "checked_at": "2026-11-25T03:17:00Z"
+}

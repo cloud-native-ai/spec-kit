@@ -74,3 +74,22 @@
 - 依赖 097 的 `specify migrate` 已落地（Ready for Review，无 deferred/blocked 记录；见 `plan.md` § Inherited Blockers）。
 - 本规格不改写 097 的 dated 记录；扩展关系记录在本计划 T-001 与本规格契约 M-1。
 - 不依赖 055（只复用逐条一文件协议，不改）、015（命令面本身）。
+
+## Overlap Adjudication — 2026-11-25 (driver U4)
+
+**Trigger**: `overlap-check.py --spec-dir .specify/specs/105-runtime-store-layout --repo <repo>` returned `overlap` (87 specs checked; 52 path relations on the plan fallback declaration, 34 on the final `feature-ref.md` declaration recorded at `test-evidence/overlap-plan.json`). The clarify-time check was vacuous because no declaration artifact existed before plan; this adjudication is recorded before tasks dispatch.
+
+**Ownership ruling**: this is a time-sliced, non-concurrent ownership decision. No other line has a live executor writing these paths during this run. Feature 105 is the sole writer for the migration edits; prior features retain ownership of their already-delivered behavior and their dated records are not rewritten. No prior scope is removed or narrowed.
+
+| Current delivery path | Current-write owner | Historical owner / boundary |
+|---|---|---|
+| `src/specify_cli/__init__.py` (and the directory declaration in plan) | Feature 105 for the `store-layout` migration dimension and seed/init path changes | the CLI command families that already own their behavior; 105 MUST NOT change their contracts |
+| `.specify/shared/guidelines/decision-tension.md` | Feature 105 only for the live path references in this migration | the decision-tension contract remains owned by Feature 076 |
+| `agents/sdd-debt-governor.agent.md` | Feature 105 only for its read-scope path reference | the debt-governor capability remains owned by Feature 103 |
+| `docs/concepts/documentation-model.md` | Feature 105 only for the live path references | the documentation model remains owned by the docs/SDD documentation line |
+| `docs/reference/commands/migrate.md` | Feature 105 for the store-layout dimension and receipt wording | the base `specify migrate` command remains owned by Feature 097 / parent Feature 024 |
+| Parent Feature 024 / 097 shared migration surface | Feature 105 for the new sixth `store-layout` dimension | Feature 097 owns the existing plan → apply → archive-first → receipt mechanism; 105 reuses it without replacing it |
+
+**Checker limitation**: `overlap-check.py` compares the current declaration against the *historical delivered file set* of every sibling spec. For a migration that intentionally touches the CLI and live docs, historical completed features therefore remain in the overlap set by construction. The decision above is the required ownership adjudication; the engine cannot return `clear` without either falsifying the delivery surface or deleting historical ownership, both of which are forbidden. This is recorded as a named residual (`overlap=52, historical/non-concurrent`) in the line state spine, not silently treated as a clear gate.
+
+**No second writer**: the overlap check's other specs are completed/Ready historical specifications; only this line has a live executor. If a future concurrent line activates, this adjudication MUST be revisited before implementation writes resume.
