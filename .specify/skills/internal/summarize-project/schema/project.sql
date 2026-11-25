@@ -13,7 +13,7 @@
 -- 【最常见的坑】SQLite 默认**关闭**外键强制（`PRAGMA foreign_keys` 默认 OFF），
 -- 关闭时 FOREIGN KEY 只是注释、断裂引用可以静默写入。因此：
 --   1. 本文件开头就 `PRAGMA foreign_keys = ON;`；
---   2. `scripts/project-db.py` **每建立一个连接**都重新执行该 PRAGMA（PRAGMA 是
+--   2. `.specify/scripts/project-db.py` **每建立一个连接**都重新执行该 PRAGMA（PRAGMA 是
 --      连接级设置、不随数据库文件持久化，也在事务内无效）；
 --   3. `--check` 会回读 `PRAGMA foreign_keys` 并在关闭时直接报错。
 --
@@ -341,7 +341,7 @@ CREATE TABLE IF NOT EXISTS status_map (
 -- ============================================================================
 -- 视图（预置查询的可复用形态；一切呈现所需的读取都走 SQL，不在 Markdown 里推算）
 -- 与基准日相关的查询（延期天数、逾期判定、today 偏移）需要参数，写在
--- scripts/project-db.py 与 scripts/progress-engine.py 的参数化 SQL 里，不做成视图。
+-- .specify/scripts/project-db.py 与 .specify/scripts/progress-engine.py 的参数化 SQL 里，不做成视图。
 -- ============================================================================
 
 DROP VIEW IF EXISTS v_work_items;

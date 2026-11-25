@@ -9,7 +9,7 @@
 
 | It is | It is not |
 |-------|-----------|
-| A runtime capability the target uses **between** improvement loops: each attempt deposits knowledge, and later attempts start from it | Self-Improvement（自我提升）— that model owns definition-change loops and stays owned by `shared/definitions/self-improvement-definitions.md`; do not redefine or rename it here |
+| A runtime capability the target uses **between** improvement loops: each attempt deposits knowledge, and later attempts start from it | Self-Improvement（自我提升）— that model owns definition-change loops and stays owned by `.specify/shared/definitions/self-improvement-definitions.md`; do not redefine or rename it here |
 | Control of **baseline capability**: which path a later run takes, what it must record, when it must stop trusting an old path | Structural churn in the target Skill — no section rewriting, no workflow renumbering, no runtime mutation of `SKILL.md` |
 | A deterministic knowledge layer (state machine + records + distilled knowledge + evidence) | A process log, a changelog, or a self-reported success diary |
 

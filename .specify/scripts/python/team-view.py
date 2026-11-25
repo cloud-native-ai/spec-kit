@@ -73,7 +73,7 @@ except ImportError:  # pragma: no cover - the helper ships beside this file
 def resolve_repo_root(explicit: str | None) -> Path:
     """The repository root: the explicit option, or derived from this file's own path.
 
-    Two Hats rule (`shared/definitions/dogfooding-definitions.md` § 2.1): self-location
+    Two Hats rule (`.specify/shared/definitions/dogfooding-definitions.md` § 2.1): self-location
     may fire only on a literal ``.specify`` component of this file's own resolved path
     (the mirror copy). The framework-source copy `<repo>/scripts/python/team-view.py`
     takes the plain three-level parent instead; walking up to "any ancestor containing

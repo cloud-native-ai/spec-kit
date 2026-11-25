@@ -17,7 +17,7 @@ classification: external
 
 # Database Utilities
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Overview
 
@@ -34,9 +34,9 @@ other, and neither is optional.
 
 Three entry points share one command surface:
 
-- `scripts/query.py` — the dispatcher. Resolves the entry and routes to a protocol handler.
-- `scripts/query_mysql.py` — the MySQL-protocol handler, also usable on its own.
-- `scripts/query_postgres.py` — the PostgreSQL-protocol handler, also usable on its own.
+- `.specify/scripts/query.py` — the dispatcher. Resolves the entry and routes to a protocol handler.
+- `.specify/scripts/query_mysql.py` — the MySQL-protocol handler, also usable on its own.
+- `.specify/scripts/query_postgres.py` — the PostgreSQL-protocol handler, also usable on its own.
 
 ## Reachable Servers
 
@@ -280,9 +280,9 @@ Every script path above is written against `${SKILL_HOME}` so the skill stays po
 
 ## Resources
 
-- `scripts/query.py` — dispatcher: entry selection and protocol routing.
-- `scripts/query_mysql.py` — MySQL-protocol handler.
-- `scripts/query_postgres.py` — PostgreSQL-protocol handler.
+- `.specify/scripts/query.py` — dispatcher: entry selection and protocol routing.
+- `.specify/scripts/query_mysql.py` — MySQL-protocol handler.
+- `.specify/scripts/query_postgres.py` — PostgreSQL-protocol handler.
 - `references/setup-and-usage.md` — installation, registry authoring and worked invocations.
 - `connections.example.json` — one example entry per reachable server family.
 - `requirements.txt` — the two drivers.

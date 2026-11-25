@@ -1,6 +1,6 @@
 # hermes — CLI Capability Profile
 
-> Profile owner: `index.md`. Skeleton only: every dimension is explicitly `unknown`; no value below is a guess or training-knowledge assertion. **CAPABILITY_MATRIX 矩阵缺口**: the 061 matrix (`scripts/python/execution-config.py`) has no `hermes` entry, so dispatch eligibility is undefined until its owner adds one — this profile must not change the matrix.
+> Profile owner: `index.md`. Skeleton only: every dimension is explicitly `unknown`; no value below is a guess or training-knowledge assertion. **CAPABILITY_MATRIX 矩阵缺口**: the 061 matrix (`.specify/scripts/python/execution-config.py`) has no `hermes` entry, so dispatch eligibility is undefined until its owner adds one — this profile must not change the matrix.
 
 ## Dimensions
 

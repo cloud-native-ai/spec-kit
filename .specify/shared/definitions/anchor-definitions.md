@@ -8,7 +8,7 @@ Canonical definition of the **Anchor** (锚点) concept in Spec Kit. This file i
 4. **the lifecycle** — the shared value set and its transition discipline;
 5. **Target decomposition and the Anchor–Team binding** — the two mechanics that hang off an Anchor.
 
-The **action-level Goal** is a different concept with its own owner: `shared/definitions/goal-definitions.md`. That file defines what a Goal is, how it is composed and where it lives; it cites this file by path for the binding record and the lifecycle and MUST NOT restate either. The engine's action signatures and exit codes are owned by `scripts/python/goal-utils.py` and are cited, never restated here. The **team side** of the model — the team's application of the binding, its lifecycle value pair, `handoff_ref`, and the construction-crew notion — is owned by `skills/internal/create-team/references/conceptual-model.md`; this file cites it by path and section. It sits alongside the other concept owners: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.
+The **action-level Goal** is a different concept with its own owner: `.specify/shared/definitions/goal-definitions.md`. That file defines what a Goal is, how it is composed and where it lives; it cites this file by path for the binding record and the lifecycle and MUST NOT restate either. The engine's action signatures and exit codes are owned by `.specify/scripts/python/goal-utils.py` and are cited, never restated here. The **team side** of the model — the team's application of the binding, its lifecycle value pair, `handoff_ref`, and the construction-crew notion — is owned by `.specify/skills/internal/create-team/references/conceptual-model.md`; this file cites it by path and section. It sits alongside the other concept owners: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.
 
 ## What an Anchor Is
 
@@ -38,7 +38,7 @@ Two operating properties follow:
 
 **GD-3 — Subordinate, not independent.** A decomposition candidate must be a slice of its parent objective. A candidate that would stand as a meaningful end state of its own is a separate Anchor — split it, do not nest it.
 
-**Scope of GD-2**: it binds the Anchor only. An action-level Goal carries executable guidance and MAY be step-shaped; its owner (`shared/definitions/goal-definitions.md`) declares that difference and no GD-2 check runs on a Goal's guidance.
+**Scope of GD-2**: it binds the Anchor only. An action-level Goal carries executable guidance and MAY be step-shaped; its owner (`.specify/shared/definitions/goal-definitions.md`) declares that difference and no GD-2 check runs on a Goal's guidance.
 
 ### Archive Layers
 
@@ -48,22 +48,22 @@ A definition lives in exactly one of three **archive layers** — never in a spe
 |-------|-----------------|-------|
 | **Anchor archive** | `anchor.md` ([[STR-001]]) | `.specify/anchoring/<anchor-slug>/anchor.md` |
 | **Goal archive** | `goal.md` ([[STR-002]]) | `.specify/goals/<goal-slug>/goal.md` |
-| **Team archive** | `team.md` (team side owned by `skills/internal/create-team/references/conceptual-model.md`) | `.specify/teams/<slug>/team.md` |
+| **Team archive** | `team.md` (team side owned by `.specify/skills/internal/create-team/references/conceptual-model.md`) | `.specify/teams/<slug>/team.md` |
 
 - **Position is not ownership.** A definition's owner is answered by the binding record below, never by the directory it sits in. `.specify/specs/` carries no definition subdirectory as a current store; a leftover spec-local tree is a migration source, not a layer.
-- **The run scratch area is not an archive layer.** `.specify/.tmp/` is the timed work area owned by `shared/guidelines/temp-directory-discipline.md`; no definition ever lands there.
+- **The run scratch area is not an archive layer.** `.specify/.tmp/` is the timed work area owned by `.specify/shared/guidelines/temp-directory-discipline.md`; no definition ever lands there.
 - **The scope value set.** The values the engine accepts for `--scope` are the **closed four members** `anchor` / `teams` / `goals` / `auto` ([[STR-004]]). `anchor`, `teams` and `goals` name the three archive rows above (not directories, which is why each member keeps its definition-file name after any directory rename); `auto` is the read-only resolver that picks the single layer containing the requested identity and exits 2 (`scope-ambiguous` / `not-found`) when that is not decidable. This list is the sole enumeration of that set: the engine's parser domain is its execution projection and its `--help` cites this section by path, and no second document enumerates it. The retired member `goal` is an **invalid value** (exit 2), not an alias — no silent fallback exists. The same holds for the historical members `global` / `spec`.
-- **Creation timing is declared, not restated.** Whether a run creates an Anchor or a team, and when, is read from `shared/declarations/facts/goal-team-handoff-threshold.yaml`: a direct run creates none, a handoff run creates both after `tasks` U4, and a command run declares its own creation moment in its command template (`templates/commands/<command>.md`). This file does not carry the threshold or the timing labels.
+- **Creation timing is declared, not restated.** Whether a run creates an Anchor or a team, and when, is read from `.specify/shared/declarations/facts/goal-team-handoff-threshold.yaml`: a direct run creates none, a handoff run creates both after `tasks` U4, and a command run declares its own creation moment in its command template (`.specify/templates/commands/<command>.md`). This file does not carry the threshold or the timing labels.
 
 ### The Binding Record
 
 Every Anchor, every action-level Goal and every team carries exactly one **binding record** in its YAML frontmatter under the key `binding`, with exactly three keys. This section is its **sole owner**; the Goal owner cites it by path. It is the only answer to "who owns this definition":
 
 - **`owner`** — who created it, from the closed set `sdd-run` / `command-run` / `human`. Any other value is an input error naming the value and the set.
-- **`owner_id`** — which run: a token in the state-spine `run_id` shape (grammar owner: `skills/external/sdd-loop-driver/references/state-awareness.md`; the engine validates the shape only). `owner: human` may use `owner_id: human`.
+- **`owner_id`** — which run: a token in the state-spine `run_id` shape (grammar owner: `.specify/skills/sdd-loop-driver/references/state-awareness.md`; the engine validates the shape only). `owner: human` may use `owner_id: human`.
 - **`origin`** — `null`, or the basename of the spec directory the definition directly came from. The migration action sets it to the direct source; a definition that was deliberately authored outside a spec carries `null`. `origin` records the direct source only — it never rebuilds a cross-definition lineage. It is also the **only** cross-reference between an action-level Goal and anything upstream: no other key may name an Anchor.
 
-The record is **written only by the engine** (`scripts/python/goal-utils.py`); no command template, skill or driver instructs a direct edit, and a hand-edited block is reported rather than trusted. A definition without a complete record is **uninterpretable** — the engine refuses it instead of defaulting an ownership. Writability follows from the record and the archive layer, not from a prohibition text: a team definition is writable by its own owner; an Anchor definition is writable by `human` always, and by any other owner only while no team in any layer names it; an action-level Goal definition is never writable by a team, because no team can name it.
+The record is **written only by the engine** (`.specify/scripts/python/goal-utils.py`); no command template, skill or driver instructs a direct edit, and a hand-edited block is reported rather than trusted. A definition without a complete record is **uninterpretable** — the engine refuses it instead of defaulting an ownership. Writability follows from the record and the archive layer, not from a prohibition text: a team definition is writable by its own owner; an Anchor definition is writable by `human` always, and by any other owner only while no team in any layer names it; an action-level Goal definition is never writable by a team, because no team can name it.
 
 ### Lifecycle
 
@@ -75,7 +75,7 @@ This section is the **sole owner** of the lifecycle value set and the transition
 | `achieved` | the end state or completion condition has been reached |
 | `abandoned` | deliberately given up |
 
-Transitions: `active` → `achieved` | `abandoned`. Both terminal states are **absorbing** for ordinary actions and **retained on disk**: never deleted, never relocated. Re-opening a terminal definition back to `active` requires the explicit `reopen` lifecycle action, is permitted only for `owner: human`, and appends a history line — it is never a side effect of another action. The **team lifecycle is a different value pair**, owned by `skills/internal/create-team/references/conceptual-model.md`; these three values MUST NOT be imposed on a team.
+Transitions: `active` → `achieved` | `abandoned`. Both terminal states are **absorbing** for ordinary actions and **retained on disk**: never deleted, never relocated. Re-opening a terminal definition back to `active` requires the explicit `reopen` lifecycle action, is permitted only for `owner: human`, and appends a history line — it is never a side effect of another action. The **team lifecycle is a different value pair**, owned by `.specify/skills/internal/create-team/references/conceptual-model.md`; these three values MUST NOT be imposed on a team.
 
 ## Anchor Dimensions (illustrative, not a closed taxonomy)
 
@@ -153,7 +153,7 @@ Success-shaped statements exist in both worlds; their authority is disjoint (dec
 
 ### 第二个解析器的处置
 
-`skills/internal/create-team/scripts/build-summary-input.py` 有自己的**本地**判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
+`.specify/skills/internal/create-team/scripts/build-summary-input.py` 有自己的**本地**判据读取器,其 `load_goal_definition` 的注释明写:该脚本与 `.specify/scripts/python/goal-utils.py` 分属两棵镜像树(`skills/` 与 `.specify/scripts/`)且相对深度不同,跨树 import 在安装到消费项目后即断,故刻意本地解析。**处置:让它同样理解指代形**——就地做同一导出,并把指代形渲染成成员名再交给总结,使读者不会看到一个自己无从解析的裸标记;MUST NOT 靠加一个 import 来解决。**代价明示**:于是仓内并存两处导出实现,二者的一致性由 `tests/contract/test_criterion_subject.py` 对同一输入断言两侧成员一致来钉住,而不是靠人记得同步——把同步交给记忆,正是本节要消灭的失效模式。
 
 ### 退出码约定在本仓并不统一
 
@@ -196,7 +196,7 @@ Four defining properties:
 
 ### Target concurrency (目标并发 — the only concurrency paragraph this file adds)
 
-Independent **Targets** are advanced **concurrently by default**: when two or more Targets are independent — their work's write domains (file-level path sets) do not intersect and none of FR-005's other conditions binds them — they MUST be advanced concurrently; a serial advancement MUST name a reason code from the closed vocabulary owned by `shared/declarations/facts/serial-reason.yaml`, with that code's declared evidence form, and the run records the `requested` / `effective` / `effective_reason` reading (fields owned by `shared/declarations/facts/effective-concurrency.yaml`; `not_evaluated` where intervals are absent). Anchor completion stays "all Targets reached" — concurrency never relaxes it — and a failed Target leaves unrelated sibling Targets uncancelled while dependents stay blocked with a recorded reason. Anchor slices belong to the `partition-required` class, whose obligation text and condition set are owned by `shared/declarations/facts/concurrency-class.yaml` and FR-005/FR-006; this section restates neither, and it changes no part of the Anchor/Target model above (Targets still carry no dependency edges between them).
+Independent **Targets** are advanced **concurrently by default**: when two or more Targets are independent — their work's write domains (file-level path sets) do not intersect and none of FR-005's other conditions binds them — they MUST be advanced concurrently; a serial advancement MUST name a reason code from the closed vocabulary owned by `.specify/shared/declarations/facts/serial-reason.yaml`, with that code's declared evidence form, and the run records the `requested` / `effective` / `effective_reason` reading (fields owned by `.specify/shared/declarations/facts/effective-concurrency.yaml`; `not_evaluated` where intervals are absent). Anchor completion stays "all Targets reached" — concurrency never relaxes it — and a failed Target leaves unrelated sibling Targets uncancelled while dependents stay blocked with a recorded reason. Anchor slices belong to the `partition-required` class, whose obligation text and condition set are owned by `.specify/shared/declarations/facts/concurrency-class.yaml` and FR-005/FR-006; this section restates neither, and it changes no part of the Anchor/Target model above (Targets still carry no dependency edges between them).
 
 ## Anchoring Archive
 
@@ -208,7 +208,7 @@ Independent **Targets** are advanced **concurrently by default**: when two or mo
 
 - A team references its Anchor by **one-way identity**: the team frontmatter declares **`anchor_slug`** ([[STR-003]]); the binding is **N teams : 1 Anchor**. The team side stores the identity only — never a copy of the Anchor's objective or criteria.
 - **Resolution**: the named slug MUST exist as `.specify/anchoring/<anchor_slug>/anchor.md`. A slug that exists only under `.specify/goals/` MUST NOT resolve — an action-level Goal never becomes an Anchor identity, and no team may bind it.
-- **Anchor–Team binding** therefore means *the reference* — which Anchor this team serves. Team evaluators measure progress against the referenced Anchor's criteria. The team's own side of this record (its binding application, its lifecycle value pair, `handoff_ref`, and the construction-crew notion) is owned by `skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model; this file cites it and does not restate it.
+- **Anchor–Team binding** therefore means *the reference* — which Anchor this team serves. Team evaluators measure progress against the referenced Anchor's criteria. The team's own side of this record (its binding application, its lifecycle value pair, `handoff_ref`, and the construction-crew notion) is owned by `.specify/skills/internal/create-team/references/conceptual-model.md` § The Team Definition and the Binding Model; this file cites it and does not restate it.
 - **Field rename**: the retired team key `goal_slug` ([[STR-008]]) is replaced by `anchor_slug`. The rename is a structural, one-line edit; every other byte of `team.md` is preserved. The retired key MUST NOT survive in any live team definition, frontmatter or body.
 - **Migration fallback**: teams created before Anchor management existed may still carry an inline goal in `team.md`; wherever an Anchor definition exists, the definition is authoritative and the inline copy is legacy.
 - **Run-level Target assignment**: the binding axis stays team ↔ Anchor and stays static. The run-sized variable is the **Target**: a run may select one Target **inside the bound Anchor** — this never rebinds the team, never alters Anchor identity resolution, and never relocates the summary delivery directory. See Target Decomposition.
@@ -221,8 +221,8 @@ Four terms are close enough to be confused and MUST stay distinct in every live 
 |------|-----------|-----|
 | **Anchor** (锚点) | The persistent project-level entity defined in this file | not a run-ephemeral note; not the directory; not an action-level Goal |
 | **anchoring archive** (锚点档案) | The `.specify/anchoring/` **directory** holding Anchor definitions | not the entity; not the Re-Anchoring discipline |
-| **Re-Anchoring** (重新锚定) | The in-run discipline by which an agent reloads its direction anchor and the rules in force (`shared/definitions/re-anchoring-definitions.md`) | not an Anchor; not a directory; it defines no entity |
-| **action-level Goal** (行动级目标) | The short-horizon executable guidance defined by `shared/definitions/goal-definitions.md`, stored under `.specify/goals/` | not an Anchor; not project-level; not a control-hierarchy member |
+| **Re-Anchoring** (重新锚定) | The in-run discipline by which an agent reloads its direction anchor and the rules in force (`.specify/shared/definitions/re-anchoring-definitions.md`) | not an Anchor; not a directory; it defines no entity |
+| **action-level Goal** (行动级目标) | The short-horizon executable guidance defined by `.specify/shared/definitions/goal-definitions.md`, stored under `.specify/goals/` | not an Anchor; not project-level; not a control-hierarchy member |
 
 The bare word "anchoring" MUST NOT be used to mean an action-level Goal, and the bare word "goal" MUST NOT be used to mean an Anchor.
 
@@ -230,13 +230,13 @@ The bare word "anchoring" MUST NOT be used to mean an action-level Goal, and the
 
 - "Temporary Goal" / "临时 goal" → an Anchor in the anchor archive (earlier spellings: "temporary goal", "run-scoped goal"). No Anchor carries a lifetime property; the archive position is not an ownership either.
 - "Global Goal" → an Anchor in `.specify/anchoring/`.
-- "Temporary Team" / "临时 team" → a team in the **team archive**. The team lifecycle pair is owned by `skills/internal/create-team/references/conceptual-model.md`.
+- "Temporary Team" / "临时 team" → a team in the **team archive**. The team lifecycle pair is owned by `.specify/skills/internal/create-team/references/conceptual-model.md`.
 - The retired scope values `global` / `spec` / `goal` → the closed scope value set `anchor` / `teams` / `goals` / `auto` defined in § Archive Layers. There is no alias.
 - The retired definition filename `goal.md` **inside `.specify/anchoring/`** → `anchor.md` ([[STR-001]]). The filename `goal.md` remains correct in the Goal archive — the two are different layers.
 
 **Legacy state-spine keys (one-time alias, declared removal point):** `temp_goal_slug` / `temp_team_slug` / `temp_scope_spec_dir` remain readable only through the engine's migration alias (read the old key, write `anchor_slug` / `team_slug` / `origin_spec_dir`). **The alias is removed at the first minor release after 094.** A legacy key that does not resolve fails as `legacy-key-dangling` — never silently ignored, never treated as absent.
 
-**Action signatures are not here.** The engine's actions, flags and exit codes (`scripts/python/goal-utils.py`) are owned by the engine; this document defines what the words mean and cites the engine for how to call it.
+**Action signatures are not here.** The engine's actions, flags and exit codes (`.specify/scripts/python/goal-utils.py`) are owned by the engine; this document defines what the words mean and cites the engine for how to call it.
 
 | Term | Meaning | Where defined |
 |------|---------|---------------|
@@ -248,12 +248,12 @@ The bare word "anchoring" MUST NOT be used to mean an action-level Goal, and the
 | **Anchoring Archive** | The `.specify/anchoring/` tree — current & historical Anchor entries, terminal ones retained | here |
 | **Anchor–Team Binding** | One-way `anchor_slug` reference, N teams : 1 Anchor, identity-only | here |
 | **Team Anchor** | A team's reference to the Anchor it serves | here; declared in `.specify/teams/<slug>/team.md` |
-| **Re-Anchoring** | In-run reload of the direction anchor and the rules in force | `shared/definitions/re-anchoring-definitions.md` |
-| **Action-level Goal** | Short-horizon executable guidance with completion conditions; parallel to SDD and Team, not a control-hierarchy member | `shared/definitions/goal-definitions.md` |
+| **Re-Anchoring** | In-run reload of the direction anchor and the rules in force | `.specify/shared/definitions/re-anchoring-definitions.md` |
+| **Action-level Goal** | Short-horizon executable guidance with completion conditions; parallel to SDD and Team, not a control-hierarchy member | `.specify/shared/definitions/goal-definitions.md` |
 | **Requirement** | Feature-bound spec of testable clauses (FR/SC) driving plan → tasks → implement → verification | `.specify/specs/<ID>-<slug>/requirements.md`; `/speckit.requirements` |
 | **Feature** | Long-lived capability entry in the feature index | `.specify/features.md` |
 | **Success Criteria (SC-xxx)** | Per-feature measurable outcomes — authority limited to their Feature | requirements spec of that Feature |
-| **Team** | Multi-agent structure organized around (exactly one) Anchor; its own concept side is the team owner's | `skills/internal/create-team/references/conceptual-model.md` |
+| **Team** | Multi-agent structure organized around (exactly one) Anchor; its own concept side is the team owner's | `.specify/skills/internal/create-team/references/conceptual-model.md` |
 | **Target** (this document) | Run-assignable sub-outcome (scope slice) under exactly one Anchor — an annex to the definition, unordered, authored via the anchor actions | here; persisted in that Anchor's `anchor.md` (`## Targets`) |
 | **`target_ref`** | A ledger work item's attribution to a Target (`T-<nnn>`) | `items.jsonl` contract (`skills/internal/create-team`, summary mapping) |
 | **"target" elsewhere** | `optimization_target` / `co_targets` (the artifact an iteration loop mutates), a territory entry's `target` field, the `--target` flags of the evidence/interview engines — all **unrelated** to Anchor Targets | their owning docs; glossary disambiguation |

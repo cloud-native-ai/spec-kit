@@ -11,7 +11,7 @@
 #   - branch   = the submodule's current branch (must NOT be detached)
 # Run from the parent repo root.
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _script_interface_guard() {
@@ -46,8 +46,8 @@ _script_interface_guard() {
 _script_interface_guard "$@"
 
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its bash half by
-# `scripts/bash/script-interface.sh` and `scripts/python/sync-mirrors.py`. No rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its bash half by
+# `.specify/scripts/bash/script-interface.sh` and `.specify/scripts/python/sync-mirrors.py`. No rule of its own.)
 _sig_usage() {
     printf 'usage: %s\n' 'record-bump.sh [arguments]'
     printf 'options:\n'

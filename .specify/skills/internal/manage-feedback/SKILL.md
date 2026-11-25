@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-feedback/SKILL.md>"
 
 # manage-feedback
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -21,7 +21,7 @@ explicitly-requested § Probe Injection capability. The owning command is
 its own wrap-up Feedback / Documentation / Handoffs steps) and delegates everything
 below to this skill.
 
-Canonical extraction source: `templates/commands/feedback.md` § Routing flow
+Canonical extraction source: `.specify/templates/commands/feedback.md` § Routing flow
 (steps 1–10), § Path A (A1–A6 + behavior rules), § Path B (steps 1–6),
 § Probe Injection, and § Behavior Rules. The routing judgment lives in this SKILL.md;
 the two execution paths and the probe capability live in `references/`. The engine
@@ -173,8 +173,8 @@ prompt MUST NOT recommend it.
   follow-up carrier** from the closed set of three (todo Park mode as the named
   default, a new requirements specification, or one subject loop of the
   improvement command — boundaries owned by
-  `shared/guidelines/todo-in-context.md`, `templates/commands/requirements.md`,
-  and `shared/workflow/self-improvement-workflow.md`, cited never restated):
+  `.specify/shared/guidelines/todo-in-context.md`, `.specify/templates/commands/requirements.md`,
+  and `.specify/shared/workflow/self-improvement-workflow.md`, cited never restated):
   one row per entry in `.specify/memory/feedback/backlog.md`, listed in the
   digest report; an undecidable entry is reported `undecided` and kept for the
   next digest, never silently dropped. The digest report carries this run's hat

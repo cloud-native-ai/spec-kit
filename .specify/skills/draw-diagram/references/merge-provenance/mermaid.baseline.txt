@@ -209,10 +209,10 @@ ${SKILL_WORKDIR}/.specify/
 /etc/cert.pem
 /extend
 /extend/generalization
-/external/draw-mermaid/scripts/measure-svg-layout.py # path rewritten to skills/external/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py; destination verified present
-/external/draw-mermaid/scripts/render-mermaid.sh # path rewritten to skills/external/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh; destination verified present
-/external/draw-mermaid/server # path rewritten to skills/external/draw-diagram/references/types/mermaid/server; destination verified present
-/external/draw-mermaid/server/docker-run.sh # path rewritten to skills/external/draw-diagram/references/types/mermaid/server/docker-run.sh; destination verified present
+/external/draw-mermaid/scripts/measure-svg-layout.py # path rewritten to .specify/skills/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py; destination verified present
+/external/draw-mermaid/scripts/render-mermaid.sh # path rewritten to .specify/skills/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh; destination verified present
+/external/draw-mermaid/server # path rewritten to .specify/skills/draw-diagram/references/types/mermaid/server; destination verified present
+/external/draw-mermaid/server/docker-run.sh # path rewritten to .specify/skills/draw-diagram/references/types/mermaid/server/docker-run.sh; destination verified present
 /flowchart
 /fontFamily/fontSize
 /gRPC/MQ
@@ -746,9 +746,9 @@ run_id
 sankey
 sankey-beta
 scheduleChanged
-scripts/measure-svg-layout.py
-scripts/render-mermaid.sh
-scripts/svg-to-png-cjk.cjs
+.specify/scripts/measure-svg-layout.py
+.specify/scripts/render-mermaid.sh
+.specify/scripts/svg-to-png-cjk.cjs
 secondaryColor
 section
 sectionFontSize

@@ -8,20 +8,20 @@
 | 面 | 所有者 | 内容 |
 |----|--------|------|
 | **策略（声明）** | `.specify/workflow/git.md` 的 `GIT_WORKFLOW` 托管块 | 工作流模型、分支结构、同步/合并关系、收口策略——只经 Bootstrap 与用户确认变更 |
-| **策略骨架（初始文件）** | 框架源 `templates/workflow/git.md` | `specify init` 在目标缺失时播种为 `.specify/workflow/git.md` |
-| **机制（观测）** | `scripts/python/git-workflow-observe.py`（运行态 `.specify/scripts/python/`） | 只刷新 `GIT_OBSERVED` 标记间的机器观测小节 |
+| **策略骨架（初始文件）** | 框架源 `.specify/templates/workflow/git.md` | `specify init` 在目标缺失时播种为 `.specify/workflow/git.md` |
+| **机制（观测）** | `.specify/scripts/python/git-workflow-observe.py`（运行态 `.specify/scripts/python/`） | 只刷新 `GIT_OBSERVED` 标记间的机器观测小节 |
 
 三条硬规则：
 
 1. **观测不等于声明**：观测小节只记录可从仓库/状态文件直接读到的事实；模型与分支声明
    （`GIT_WORKFLOW` 标记之间）**永不**由观测动作写入。
 2. **托管块渲染模板唯一**：托管块的渲染模板是 `${SKILL_HOME}/assets/git-workflow-block.md`；
-   `templates/workflow/git.md` 只是文件级骨架（文件头 + `None yet.` 占位块），不分叉块内容。
+   `.specify/templates/workflow/git.md` 只是文件级骨架（文件头 + `None yet.` 占位块），不分叉块内容。
 3. **单数据源不变**：分支名仍只在 `GIT_WORKFLOW` 托管块；观测小节不成为第二个数据源。
 
 ## 1. 初始化模板（specify init）
 
-- 源：`templates/workflow/git.md`；`specify init` 在 `.specify/workflow/git.md` **缺失时**播种，
+- 源：`.specify/templates/workflow/git.md`；`specify init` 在 `.specify/workflow/git.md` **缺失时**播种，
   已存在时**永不覆盖**（升级/重跑安全——既有文件是项目策略）。
 - 骨架内容：机器维护文件头 + `GIT_WORKFLOW_START/END` 标记 + `- **Workflow model**: None yet.`
   占位行——这正是 Bootstrap 作用域的判定依据。
@@ -29,11 +29,11 @@
 
 ## 2. 钩子（probe + handler 机制，056 二期）
 
-注册表行（`shared/definitions/probe-definitions.md`，运行时镜像 `.specify/shared/definitions/`）：
+注册表行（`.specify/shared/definitions/probe-definitions.md`，运行时镜像 `.specify/shared/definitions/`）：
 
 | 面 | 行 |
 |----|----|
-| Handler | `h-git-workflow-observe` · kind=engine · action=`observe` · non-blocking · order 20 · behavior_owner `scripts/python/git-workflow-observe.py` |
+| Handler | `h-git-workflow-observe` · kind=engine · action=`observe` · non-blocking · order 20 · behavior_owner `.specify/scripts/python/git-workflow-observe.py` |
 | HandlerBinding | `h-git-workflow-observe` · `@point:situation` · scope `all` |
 
 **运行期派发**（实测事实）：`@point:situation` 是声明性订阅（无编译面）；情境引擎

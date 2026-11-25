@@ -2,14 +2,14 @@
 #
 # The one machine-read copy of the execution-quantification record's schema: its schema version, the
 # closed provenance / unit-type / resolution vocabularies, the eleven config-group fields, and the
-# per-action argument manifest. The engine `scripts/python/exec-quant.py` reads it through
-# `scripts/python/declaration_reader.py`; the carrier reaches it by
-# `shared/declarations/facts/quant-record-schema.yaml#/statement`.
+# per-action argument manifest. The engine `.specify/scripts/python/exec-quant.py` reads it through
+# `.specify/scripts/python/declaration_reader.py`; the carrier reaches it by
+# `.specify/shared/declarations/facts/quant-record-schema.yaml#/statement`.
 #
 # Authority order: code > generated > authored. The engine's constants and the carrier's class
 # registration agreed on 2026-11-05.
 #
-# Carrier correction: the roster names `shared/definitions/probe-definitions.md` as this row's
+# Carrier correction: the roster names `.specify/shared/definitions/probe-definitions.md` as this row's
 # carrier, and that file does register the `exec-quant` class — but it does not state the schema
 # version, the vocabularies or the field lists (measured 2026-11-05: none of `SCHEMA_VERSION`,
 # `PROVENANCES`, `CONFIG_FIELDS` appears there). The fact's second face is the test-pinned literal
@@ -84,7 +84,7 @@ statement:
         - "--workspace-root"
         - "--format"
 consumers:
-  - scripts/python/exec-quant.py
-  - shared/definitions/probe-definitions.md
+  - .specify/scripts/python/exec-quant.py
+  - .specify/shared/definitions/probe-definitions.md
 former_carriers: []
 note: "Every sequence here is ordered: `config_fields` is the write order of the eleven config-group fields (061 C-EQ-04), and the argument manifest's `required` / `source` lists are the order a caller reads them. `arg_manifest` is the closed per-action face the manifest action reports; a new action is a contract change, not a local addition. The values themselves are unchanged from the pre-migration engine constants — this row moves their home, not their content."

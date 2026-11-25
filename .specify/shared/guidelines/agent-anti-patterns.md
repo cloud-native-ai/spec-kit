@@ -2,7 +2,7 @@
 
 > **Owner**: this file owns the shared registry of operations an agent MUST avoid when it acts on a repository.
 > The instruction document of every project carries only a POINTER to this file (see the final `## Agent
-> Anti-Patterns` section of `templates/instructions-template.md`); never restate an entry there.
+> Anti-Patterns` section of `.specify/templates/instructions-template.md`); never restate an entry there.
 >
 > **How the list grows (feedback accumulation)**: a new anti-pattern enters through the feedback mechanism —
 > an observed misexecution is recorded via the project's feedback store (`/speckit.feedback`, engine

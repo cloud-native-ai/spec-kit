@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/clarify-artifact/SKILL.md>"
 
 # clarify-artifact
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -18,7 +18,7 @@ phase artifact and leaves it self-consistent, or — when the user has re-scoped
 feature — executes the Scope Revision Protocol instead of a clarification run.
 
 Owning command: `/speckit.clarify`. Canonical extraction source:
-`templates/commands/clarify.md` — content moved here verbatim in substance; the command
+`.specify/templates/commands/clarify.md` — content moved here verbatim in substance; the command
 template keeps entry, wiring, and lifecycle delegation only.
 
 ## Input Contract
@@ -29,7 +29,7 @@ template keeps entry, wiring, and lifecycle delegation only.
   to integrate, or an explicit target artifact naming a mode override (below). They are
   never standalone instructions.
 - **Script**: run the command's declared prerequisite script — the `{SCRIPT}` slot,
-  `scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once; parse
+  `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` — from repo root once; parse
   JSON for `REPO_ROOT`, `BRANCH`, `REQUIREMENT_ID`, `REQUIREMENTS_DIR`, `FEATURE_SPEC`,
   `IMPL_PLAN`, `TASKS`.
 

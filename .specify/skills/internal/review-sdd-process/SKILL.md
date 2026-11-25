@@ -1,13 +1,13 @@
 ---
 name: review-sdd-process
-description: Critically review the SDD process behind a completed feature — the spec/plan/tasks artifacts and the workflow that produced them, never the code they produced — and produce a self-contained, improvement-focused report for the spec-kit framework maintainers. Captures portable project context with commit-reachability verification, reconstructs the process execution history from git (with working-tree fallbacks when commits are missing or ungrouped), diagnoses friction, ambiguity, cargo-cult boilerplate, drift risks and process gaps, validates every P0 finding through an independent read-only subagent wave with evidence snapshots at diagnosis time, and fills the review report template. Owns the `P0`/`P1`/`P2` severity family that every non-code review segment emits. Its judgment object is distinct from the code-review skill's — that one judges a committed code delta, this one judges the SDD process that produced the feature — and `/speckit.review` composes it with three sibling segments in one fixed order — process, then artifact, then implementation, then code — whose only owner is `shared/workflow/acceptance-hardening.md` § Review Composition, so this skill's process segment runs first. Use this when the user mentions ["review SDD process", "process review", "SDD 过程评审", "过程评审", "评审 SDD 过程", "review report", "评审报告", "improvement report", "改进报告", "framework friction", "process gaps", "过程改进", "process retrospective", "/speckit.review"].
+description: Critically review the SDD process behind a completed feature — the spec/plan/tasks artifacts and the workflow that produced them, never the code they produced — and produce a self-contained, improvement-focused report for the spec-kit framework maintainers. Captures portable project context with commit-reachability verification, reconstructs the process execution history from git (with working-tree fallbacks when commits are missing or ungrouped), diagnoses friction, ambiguity, cargo-cult boilerplate, drift risks and process gaps, validates every P0 finding through an independent read-only subagent wave with evidence snapshots at diagnosis time, and fills the review report template. Owns the `P0`/`P1`/`P2` severity family that every non-code review segment emits. Its judgment object is distinct from the code-review skill's — that one judges a committed code delta, this one judges the SDD process that produced the feature — and `/speckit.review` composes it with three sibling segments in one fixed order — process, then artifact, then implementation, then code — whose only owner is `.specify/shared/workflow/acceptance-hardening.md` § Review Composition, so this skill's process segment runs first. Use this when the user mentions ["review SDD process", "process review", "SDD 过程评审", "过程评审", "评审 SDD 过程", "review report", "评审报告", "improvement report", "改进报告", "framework friction", "process gaps", "过程改进", "process retrospective", "/speckit.review"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/review-sdd-process/SKILL.md>"
 ---
 
 # review-sdd-process
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -21,7 +21,7 @@ business merits. Owning command: `/speckit.review`. The report MUST:
 2. Prioritize problems, friction, ambiguities in the SDD process
 3. Focus on process/tooling quality, not business merits
 
-Canonical extraction source: `templates/commands/review.md` § Goal, § Operating Constraints,
+Canonical extraction source: `.specify/templates/commands/review.md` § Goal, § Operating Constraints,
 and § Outline 1–6 including §4.5. Content moved here verbatim in substance; the command
 template keeps entry + delegation only.
 
@@ -50,13 +50,13 @@ template keeps entry + delegation only.
 
 The `P0`/`P1`/`P2` family is **owned here**: three levels, three tokens, no fourth, and no consumer may
 rename, add, reorder or reinterpret one of them. What each level **means** in a review report is written
-once, in `templates/review-template.md` § Findings Summary's severity table; this section owns the family
+once, in `.specify/templates/review-template.md` § Findings Summary's severity table; this section owns the family
 and its closure, not a second copy of those meanings.
 
 A consumer of the family cites these tokens and defines none of them — the artifact and implementation
 segments of `/speckit.review` are such consumers, and they reach this section instead of inventing a
 scale. A consumer that needs a different scale owns a **different** family: the code segment's six-level
-family belongs to `skills/internal/code-review/SKILL.md`, and the two families are never mapped,
+family belongs to `.specify/skills/internal/code-review/SKILL.md`, and the two families are never mapped,
 converted, weighted or scored together.
 
 ## Workflow
@@ -184,9 +184,9 @@ category), top 3 recommendations.
   runs four segments in one fixed order — process → artifact → implementation → code — followed by
   the Acceptance Reality Check, which is a deterministic check and not a fifth segment. The order,
   the per-segment boundary sentences and the artifact segment's denominator rule are owned by
-  `shared/workflow/acceptance-hardening.md` § Review Composition; this skill **cites** that section
+  `.specify/shared/workflow/acceptance-hardening.md` § Review Composition; this skill **cites** that section
   and describes no composition of its own. The Acceptance Reality Check's count record and verdict
-  values are machine facts owned by `shared/declarations/facts/arc-verdict-mapping.yaml#/statement`;
+  values are machine facts owned by `.specify/shared/declarations/facts/arc-verdict-mapping.yaml#/statement`;
   this skill reaches them by that pointer and never restates the bucket or verdict sets. It carries
   the **process** segment and only that one: the
   artifact and implementation segments judge the slice's artifacts and its `base..head` delta against
@@ -205,7 +205,7 @@ category), top 3 recommendations.
   SDD-flow review of one feature's process. The boundary is owned by
   `.specify/shared/workflow/feedback-step.md` § *Mechanism boundary*.
 - **Remediation is not this skill.** It produces findings and recommendations; applying
-  improvements to templates/commands/scripts, or iterating requirements/plan, is a
+  improvements to .specify/templates/commands/scripts, or iterating requirements/plan, is a
   follow-up the maintainer or a later run performs.
 
 ## Wrap-up

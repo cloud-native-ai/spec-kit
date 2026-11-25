@@ -10,8 +10,8 @@ deliverables. Two features that claim the same path, or nested paths, will
 collide during implementation. The check reports each overlap with its relation
 (``same-path`` or ``nested-path``).
 
-Only shared, repo-visible delivery roots are compared (skills/, shared/,
-scripts/, templates/, src/, agents/, docs/); feature-internal artifacts under
+Only shared, repo-visible delivery roots are compared (skills/, .specify/shared/,
+.specify/scripts/, .specify/templates/, src/, agents/, docs/); feature-internal artifacts under
 the spec directory never count as overlaps. A missing specs root or a
 spec directory with no declared paths is not an error.
 
@@ -39,7 +39,7 @@ BACKTICK = re.compile(r"`([^`\n]+)`")
 PATH_TOKEN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+/?$")
 LINE_PATH = re.compile(r"^\s*([A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+)")
 PATH_ROOTS = (
-    "skills/", "shared/", "scripts/", "templates/",
+    "skills/", ".specify/shared/", ".specify/scripts/", ".specify/templates/",
     "src/", "agents/", "docs/",
 )
 
@@ -223,7 +223,7 @@ def main(argv=None):
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -279,8 +279,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -292,7 +292,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/external/sdd-loop-driver/scripts/overlap-check.py'
+_SIG_SCRIPT = '.specify/skills/sdd-loop-driver/scripts/overlap-check.py'
 _SIG_DECLARED = ('--json-out', '--repo', '--spec-dir', '--specs-root')
 _SIG_HELP = (
     'usage: overlap-check.py [options]\n'

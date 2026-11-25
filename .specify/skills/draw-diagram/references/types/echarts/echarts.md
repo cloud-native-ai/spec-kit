@@ -10,7 +10,7 @@ ECharts uses a declarative `option` object to configure charts. Every visualizat
 ### 2. Self-Contained Output
 The output must be a **single HTML file** with all ECharts configuration and styles inline. No external dependencies beyond the pinned ECharts script. The file should work by simply opening in a browser.
 
-**Version pinning & offline reproducibility**: always load a **pinned** ECharts version (e.g. `echarts@5.6.0`), never a floating `echarts@5` tag — floating tags break reproducibility (CDN behavior, ECharts changes). For **offline-critical or long-lived deliverables, the local copy must be REAL**: place `vendor/echarts.min.js` into the deliverable (use `scripts/vendor-echarts.sh <dir>` which downloads and verifies the file) — never ship a loader that references a file you did not actually place, and never ship an empty `vendor/` stub (it renders a blank canvas offline). The HTML loader references the vendored copy first and falls back to the pinned CDN via a dynamic `onerror` loader — **no `document.write`** (deprecated, blocking, CSP-hostile). For complex, regenerable deliverables, separate data and the `option` config into a `config.json` (single canonical format) with a generated `config.js` wrapper (see `scripts/sync-config.mjs`), so regeneration only edits the config (see Step 4).
+**Version pinning & offline reproducibility**: always load a **pinned** ECharts version (e.g. `echarts@5.6.0`), never a floating `echarts@5` tag — floating tags break reproducibility (CDN behavior, ECharts changes). For **offline-critical or long-lived deliverables, the local copy must be REAL**: place `vendor/echarts.min.js` into the deliverable (use `.specify/scripts/vendor-echarts.sh <dir>` which downloads and verifies the file) — never ship a loader that references a file you did not actually place, and never ship an empty `vendor/` stub (it renders a blank canvas offline). The HTML loader references the vendored copy first and falls back to the pinned CDN via a dynamic `onerror` loader — **no `document.write`** (deprecated, blocking, CSP-hostile). For complex, regenerable deliverables, separate data and the `option` config into a `config.json` (single canonical format) with a generated `config.js` wrapper (see `.specify/scripts/sync-config.mjs`), so regeneration only edits the config (see Step 4).
 
 ### 3. ECharts Best Practices
 Use a pinned ECharts 5.x version (e.g. `echarts@5.6.0`). Leverage built-in features: responsive resize, tooltip, legend, toolbox (save as image, data view). Use `dataset` for data management when data is tabular. See [echarts-guide.md](references/echarts-guide.md) for configuration patterns, including graph/state-machine recipes and label-overlap avoidance.
@@ -61,7 +61,7 @@ ECharts provides built-in interactivity (tooltip, legend toggle, zoom, data high
 ### 义务与产物形态
 
 1. **链路闭合**：每个声明 form 必须组件/事件注册 → 状态变化 → `setOption`/`dispatchAction` 生效三环齐全；缺环 = 该 form 未实现（"控件在而无效不算实现"）。
-2. **库加载按交付契约 § D7.1 三选一并声明**：既有 pinned 版本 + vendor-first loader（`scripts/vendor-echarts.sh` 真实落盘、`scripts/verify-deliverable.mjs` 校验）即「本地 vendor」策略的既定实现；仅在线查看可选 CDN（仍须固定版本）。声明与实际一致性并入 D6 自检。
+2. **库加载按交付契约 § D7.1 三选一并声明**：既有 pinned 版本 + vendor-first loader（`.specify/scripts/vendor-echarts.sh` 真实落盘、`.specify/scripts/verify-deliverable.mjs` 校验）即「本地 vendor」策略的既定实现；仅在线查看可选 CDN（仍须固定版本）。声明与实际一致性并入 D6 自检。
 3. **动画不是交互**：ECharts 默认 `animation` 是输入无关的入场动效，**不得作为任何 form 的达标形态**；判据认的是输入驱动的状态变化。
 4. **toolbox「保存为图片」不计为 form 实现**：它是既有默认 + 静态渲染证据通道（与 Step 5 静态快照义务衔接），声明 `dashboard` 时 toolbox 是组合件之一，但单靠它不构成 dashboard 判据。
 5. **交付说明**：列出实际具备的交互与触发方式（使用说明不属于交付契约 D4 禁止的图例式解说；其余文字规则 D3–D5 照常适用）。
@@ -160,7 +160,7 @@ Package everything into a self-contained HTML file using the base template struc
   <title>[Chart Title]</title>
   <script>
     // ECharts loader: vendored local copy first (offline-capable), pinned CDN fallback.
-    // The local copy MUST exist — run: bash scripts/vendor-echarts.sh <deliverable-dir>
+    // The local copy MUST exist — run: bash .specify/scripts/vendor-echarts.sh <deliverable-dir>
     // Never use document.write for this loader.
     (function () {
       var s = document.createElement('script');
@@ -190,7 +190,7 @@ Package everything into a self-contained HTML file using the base template struc
 
 Key requirements:
 - ECharts loaded from **pinned** CDN: `https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js` (never a floating `echarts@5` tag); keep the version in a code comment. Where practical, add `integrity`/`crossorigin` (SRI) attributes for the pinned script
-- **Offline-critical deliverables MUST ship a real `vendor/echarts.min.js`** (download + verify with `scripts/vendor-echarts.sh <dir>`); the loader references the local copy first and only falls back to CDN — no `document.write`
+- **Offline-critical deliverables MUST ship a real `vendor/echarts.min.js`** (download + verify with `.specify/scripts/vendor-echarts.sh <dir>`); the loader references the local copy first and only falls back to CDN — no `document.write`
 - For quick online-only charts, the CDN-primary order is acceptable, but never reference `vendor/` unless the file actually exists (an empty `vendor/` stub renders a blank canvas offline)
 - All CSS inline in `<style>` block
 - All JavaScript inline in `<script>` block
@@ -199,8 +199,8 @@ Key requirements:
 - Use [template.html](assets/template.html) as the starting point
 
 For external-config deliverables:
-- Keep ONE canonical format (`*.config.json`); generate the `*.config.js` wrapper with `node scripts/sync-config.mjs <file>.config.json` — never hand-sync two copies (they drift)
-- Before delivery, run `node scripts/verify-deliverable.mjs <file>.html` for structural checks (vendor presence, loader, config sync, layout)
+- Keep ONE canonical format (`*.config.json`); generate the `*.config.js` wrapper with `node .specify/scripts/sync-config.mjs <file>.config.json` — never hand-sync two copies (they drift)
+- Before delivery, run `node .specify/scripts/verify-deliverable.mjs <file>.html` for structural checks (vendor presence, loader, config sync, layout)
 
 For multi-chart dashboards:
 - Use CSS Grid for layout (e.g., `grid-template-columns: 1fr 1fr`)
@@ -217,7 +217,7 @@ For dark theme:
 ### Step 5: Save & Verify
 
 1. Save the HTML file to the user's specified path (or suggest a reasonable default like `./output/chart.html`)
-2. **Structural verification (program-first, no browser needed)**: run `node scripts/verify-deliverable.mjs <file>.html` — it checks (a) any referenced `vendor/echarts.min.js` actually exists and is non-empty, (b) the ECharts loader does not use `document.write`, (c) `*.config.js`/`*.config.json` pairs are in sync, (d) fixed-layout graph coordinates have no out-of-bounds nodes or overlaps (canvas size from config `meta.canvasWidth/Height`). Fix all reported problems before delivery
+2. **Structural verification (program-first, no browser needed)**: run `node .specify/scripts/verify-deliverable.mjs <file>.html` — it checks (a) any referenced `vendor/echarts.min.js` actually exists and is non-empty, (b) the ECharts loader does not use `document.write`, (c) `*.config.js`/`*.config.json` pairs are in sync, (d) fixed-layout graph coordinates have no out-of-bounds nodes or overlaps (canvas size from config `meta.canvasWidth/Height`). Fix all reported problems before delivery
 3. **Local open verification (渲染证明)**: open the HTML in a browser and confirm the chart actually renders (canvas is not blank, no console errors). For offline-critical deliverables, re-open with network disabled (or `file://` with no CDN access) to prove the vendored copy renders. If a headless browser is available, capture a screenshot, e.g. `chromium --headless --screenshot=out.png --window-size=<w>,<h> <file>.html` — the window height (content height **plus** a margin) and the clipping judgement are owned by the delivery contract's D6「渲染证据几何」row ([../draw-diagram/references/delivery-contract.md](../../delivery-contract.md)); the margin value is not restated here, and a non-blank PNG alone is **not** render evidence
 4. **Static snapshot export**: for offline-critical or review-facing deliverables, export a static PNG/SVG of each chart (toolbox "保存为图片", or `chart.getDataURL({ type: 'png', pixelRatio: 2 })`, or the headless screenshot) and deliver it **alongside the HTML** as render evidence — reviewers without a browser or network can verify the actual visual result offline
 5. Provide a brief explanation of:
@@ -230,7 +230,7 @@ For dark theme:
 
 - **Delivery contract (read first; rules owned by the front door)**: [../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) — D1/D2 delivery form, D3–D5 user-facing text rules (**in-chart labels and the HTML prose obey the same rules**), D6 pre-delivery self-check. **The rule text and its examples live only in the contract; they are not restated here.** The items below are this engine's **mechanics**; the contract wins on conflict.
 - Output as a **single `.html` file** (self-contained, no external dependencies except the pinned ECharts script; offline-critical output ships a REAL local `vendor/echarts.min.js`, never an empty stub)
-- **Offline-critical / review-facing deliverables**: `vendor/echarts.min.js` present and non-empty (verified by `scripts/vendor-echarts.sh` / `scripts/verify-deliverable.mjs`) AND a static PNG/SVG snapshot of each chart delivered alongside the HTML as render evidence
+- **Offline-critical / review-facing deliverables**: `vendor/echarts.min.js` present and non-empty (verified by `.specify/scripts/vendor-echarts.sh` / `.specify/scripts/verify-deliverable.mjs`) AND a static PNG/SVG snapshot of each chart delivered alongside the HTML as render evidence
 - ECharts version: **pinned 5.x** (e.g. `https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js`), never a floating `@5` tag
 - Canvas-based rendering by default (use SVG renderer only if requested)
 - Responsive: works on both desktop and mobile viewports
@@ -259,14 +259,14 @@ For dark theme:
 |-------|---------|  
 | [template.html](assets/template.html) | Base HTML template with offline-first ECharts loader (vendored copy + CDN fallback, no `document.write`), responsive setup, and standard initialization pattern |
 
-### Scripts (`scripts/`)
+### Scripts (`.specify/scripts/`)
 
 | Script | Purpose |
 |--------|---------|
-| [vendor-echarts.sh](scripts/vendor-echarts.sh) | Download a pinned `echarts.min.js` into the deliverable's `vendor/` and verify it (non-empty, version marker, JS syntax) — makes offline rendering real, not a stub |
-| [sync-config.mjs](scripts/sync-config.mjs) | Generate the `*.config.js` wrapper from the canonical `*.config.json` (or reverse); `--check` mode fails when the pair drifted — no more hand-syncing two copies |
-| [check-layout.mjs](scripts/check-layout.mjs) | Coordinate hygiene for fixed-layout graph configs: out-of-bounds nodes/zones and pairwise node overlaps (canvas size from `meta.canvasWidth/Height`) |
-| [verify-deliverable.mjs](scripts/verify-deliverable.mjs) | Pre-delivery structural checks per HTML: vendor file presence, no `document.write` loader, config js/json sync, layout checks (program-first; the visual check is Step 5) |
+| [vendor-echarts.sh](.specify/scripts/vendor-echarts.sh) | Download a pinned `echarts.min.js` into the deliverable's `vendor/` and verify it (non-empty, version marker, JS syntax) — makes offline rendering real, not a stub |
+| [sync-config.mjs](.specify/scripts/sync-config.mjs) | Generate the `*.config.js` wrapper from the canonical `*.config.json` (or reverse); `--check` mode fails when the pair drifted — no more hand-syncing two copies |
+| [check-layout.mjs](.specify/scripts/check-layout.mjs) | Coordinate hygiene for fixed-layout graph configs: out-of-bounds nodes/zones and pairwise node overlaps (canvas size from `meta.canvasWidth/Height`) |
+| [verify-deliverable.mjs](.specify/scripts/verify-deliverable.mjs) | Pre-delivery structural checks per HTML: vendor file presence, no `document.write` loader, config js/json sync, layout checks (program-first; the visual check is Step 5) |
 
 ## Quality Checklist
 
@@ -274,7 +274,7 @@ Before delivering the final HTML file, verify:
 - [ ] HTML file opens correctly in a browser without errors
 - [ ] Browser console shows no JavaScript errors
 - [ ] **Local open verification passed**: chart actually renders (canvas non-blank); for offline-critical output, re-opened with network disabled and still renders
-- [ ] `scripts/verify-deliverable.mjs` reports no problems (vendor presence, no `document.write`, config sync, layout)
+- [ ] `.specify/scripts/verify-deliverable.mjs` reports no problems (vendor presence, no `document.write`, config sync, layout)
 - [ ] **Offline-critical**: `vendor/echarts.min.js` exists and is non-empty (real file, not an empty stub); static PNG/SVG snapshot of each chart delivered alongside the HTML
 - [ ] ECharts CDN link is present and correct (pinned version)
 - [ ] No external file dependencies (all data is inline) — or config is external with a single canonical format + generated wrapper (no hand-synced js/json pair)

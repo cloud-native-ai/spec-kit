@@ -2,12 +2,12 @@
 """closure-acceptance-check.py — the one deterministic answer to
 "may this feature be called `Implemented`?".
 
-Program-First discipline (`shared/guidelines/token-efficiency.md`): the question has a fixed,
+Program-First discipline (`.specify/shared/guidelines/token-efficiency.md`): the question has a fixed,
 decidable answer, so a program produces it and prints a verdict. No caller may decide it another
 way — not a model judgement, not a different script, not an ad-hoc grep (contract
 `contracts/gate-wiring.contract.md` GW-04).
 
-Schema owner: `shared/workflow/acceptance-hardening.md` — § Closure Verdict (this program's
+Schema owner: `.specify/shared/workflow/acceptance-hardening.md` — § Closure Verdict (this program's
 verdict, closed reason set, exit codes and `final_path` counts), § Verification Vocabulary (the
 status set, the five measurement-ladder fields, the smoke record), § Feature Status (the claimed
 status). This script **implements** those schemas; it never redefines them.
@@ -46,7 +46,7 @@ The external-source extraction landed in 081b (contract C-13 / C-17 / C-18): the
 class's three shapes, the prose-declaration rule, the `signed-contract` `Contract` cell, the
 dependency-feature extraction over the closed three-source set, the `Source row` join key and the
 `inherited` carrier's three limbs. Its sibling is
-`skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`, which judges the same closed set at
+`.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py`, which judges the same closed set at
 the stage gates; `tests/contract/test_acceptance_premises.py` asserts the two name the same reason
 instance, so the pair cannot drift into two spellings.
 
@@ -55,9 +55,9 @@ declared output file, it is written only when a payload exists, and in audit mod
 the audited root is refused, so the mode stays zero-write by construction (C-11).
 
 Usage:
-  python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/<key>
-  python3 scripts/python/closure-acceptance-check.py --spec-dir <dir> --feature-registry <path> --json
-  python3 scripts/python/closure-acceptance-check.py --audit-existing --repo <root>
+  python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/<key>
+  python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <dir> --feature-registry <path> --json
+  python3 .specify/scripts/python/closure-acceptance-check.py --audit-existing --repo <root>
 """
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ REQUIRED_INPUTS = ("requirements.md", "plan.md", "tasks.md", "verification.md")
 
 # --- the `Path` closed set (batch 1 row 9; owner: the declaration layer) ---------------------- #
 # Feature 084 moved this two-member domain out of the checker: the members and their order live in
-# `shared/declarations/facts/success-criterion-path-values.yaml`, read here through the shared read
+# `.specify/shared/declarations/facts/success-criterion-path-values.yaml`, read here through the shared read
 # entry. The refusal text below is unchanged — it still names the two members, and an out-of-domain
 # marker is still an input error (`InputError`), never a `block` (V-3 / AS-04).
 #
@@ -149,7 +149,7 @@ if not FLOW_CLASSES:
 
 # --- the `ARC verdict mapping` (batch 2; owner: the declaration layer) ------------------------ #
 # Feature 084 moved the `final_path` record's key set and the verdict's value set out of this
-# engine: they live in `shared/declarations/facts/arc-verdict-mapping.yaml` and are read here
+# engine: they live in `.specify/shared/declarations/facts/arc-verdict-mapping.yaml` and are read here
 # through the same shared read entry. The criteria below are untouched — which conditions produce a
 # `block` is the owner doc's judgement, and C-051 forbids a migration from moving a frozen gate's
 # criteria or exit codes.
@@ -243,7 +243,7 @@ LADDER_FIELDS = (
 SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path", "smoke_comparison")
 #: `final_path` is a closed count record (C-08): six status buckets plus the total. The set is the
 #: owner doc's (`§ Closure Verdict`), and since feature 084 its machine-read copy is the declaration
-#: `shared/declarations/facts/arc-verdict-mapping.yaml` — read above as `FINAL_PATH_BUCKETS` /
+#: `.specify/shared/declarations/facts/arc-verdict-mapping.yaml` — read above as `FINAL_PATH_BUCKETS` /
 #: `FINAL_PATH_TOTAL_KEY`, never spelled here again. `unknown` means *no status row exists*, while
 #: `partial` is a measured status and is therefore counted as itself.
 

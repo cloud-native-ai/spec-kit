@@ -10,7 +10,7 @@
 
 其他任何位置——宪法模板、本仓宪法、指令模板与 `instructions.md`、生成器的 MUST include 清单、检查器、测试——
 MUST 以「摘要 + 路径」引用本文档,MUST NOT 复制本文档的必备内容标签清单或分类步骤清单。检查器
-`scripts/python/script-interface-check.py` 的 `--emit-rule` 输出与本文档 MUST 在标签集与类别词汇上双向一致;
+`.specify/scripts/python/script-interface-check.py` 的 `--emit-rule` 输出与本文档 MUST 在标签集与类别词汇上双向一致;
 不一致是缺陷,不是可选配法。
 
 **适用范围**:本规则适用于框架自身脚本、下游项目脚本与第三方脚本三者,不因脚本由谁分发而失效。下游项目在自己的
@@ -20,11 +20,11 @@ MUST 以「摘要 + 路径」引用本文档,MUST NOT 复制本文档的必备�
 
 | 主题 | 所有者 |
 |------|--------|
-| 一条条款的语法、正文边界与引用组 | `shared/definitions/contract-clause-definitions.md` |
-| 确认门分类与「存疑从严」判据 | `shared/guidelines/confirmation-gates.md` |
-| 临时目录的可用根与清理 | `shared/guidelines/temp-directory-discipline.md` |
-| 镜像投影机制与 `MIRROR_PAIRS` | `scripts/python/sync-mirrors.py`(其声明表) |
-| 一次执行的全量捕获纪律 | `shared/guidelines/single-run-evidence.md` |
+| 一条条款的语法、正文边界与引用组 | `.specify/shared/definitions/contract-clause-definitions.md` |
+| 确认门分类与「存疑从严」判据 | `.specify/shared/guidelines/confirmation-gates.md` |
+| 临时目录的可用根与清理 | `.specify/shared/guidelines/temp-directory-discipline.md` |
+| 镜像投影机制与 `MIRROR_PAIRS` | `.specify/scripts/python/sync-mirrors.py`(其声明表) |
+| 一次执行的全量捕获纪律 | `.specify/shared/guidelines/single-run-evidence.md` |
 
 ---
 
@@ -161,9 +161,9 @@ bash 侧的可实施形态是唯一的一种:在 source 任何共享库之前、
 独立的 `.specify/` 副本(下游项目、投射镜像)可能找不到共享库。此时块 MUST 仍能回答:`bash-version-guard`
 投射形态把版本行函数的**函数体**经 `__SCRIPT_INTERFACE_VERSION_BODY__` 哨兵内联进块内,因此镜像不 `source`
 任何东西也能给出 `--version`;`-h` / `--help` 的正文由块自身按第 2 节的四个内容标签给出。哨兵只有两处提及:
-本节与产出它的 `scripts/python/sync-mirrors.py`;手写脚本 MUST NOT 携带哨兵,块由投射规则生成,不由人手抄。
+本节与产出它的 `.specify/scripts/python/sync-mirrors.py`;手写脚本 MUST NOT 携带哨兵,块由投射规则生成,不由人手抄。
 
-检查入口:`scripts/python/script-interface-check.py` 的逐候选探针(第 3 节的执行体)在受测树副本上执行四个
+检查入口:`.specify/scripts/python/script-interface-check.py` 的逐候选探针(第 3 节的执行体)在受测树副本上执行四个
 标志,任一次出现写入即判该候选零副作用不成立;插入位置由同一批探针与 `tests/contract/test_script_interface_contract.py`
 的 `T073` 断言共同判定。
 
@@ -182,8 +182,8 @@ python 侧:版本标志 MUST 在**每条子命令上**可解析(顶层 `action="
 
 | path | skill | unsatisfied clause | handling |
 |------|-------|--------------------|----------|
-| skills/external/document-utils/scripts/office/validate.py | document-utils | probe-inconclusive: the optional third-party modules (defusedxml / pypdf / python-docx) are not installed on the probe host | install the optional extras and re-probe; the script's entry layer already answers its flags |
-| skills/external/document-utils/scripts/pdf/create_validation_image.py | document-utils | probe-inconclusive: the optional third-party modules (pypdf / Pillow) are not installed on the probe host | install the optional extras and re-probe; the script's entry layer already answers its flags |
+| .specify/skills/document-utils/scripts/office/validate.py | document-utils | probe-inconclusive: the optional third-party modules (defusedxml / pypdf / python-docx) are not installed on the probe host | install the optional extras and re-probe; the script's entry layer already answers its flags |
+| .specify/skills/document-utils/scripts/pdf/create_validation_image.py | document-utils | probe-inconclusive: the optional third-party modules (pypdf / Pillow) are not installed on the probe host | install the optional extras and re-probe; the script's entry layer already answers its flags |
 
 **复算判据**(检查器逐条复算,不成立即报 `exception-unverifiable` 并以退出码 1 结束,不是默认放行):
 
@@ -194,7 +194,7 @@ python 侧:版本标志 MUST 在**每条子命令上**可解析(顶层 `action="
 
 **处置列取值**:保留在入口层 · 停止分发该脚本 · 待上游修复。三者之外 MUST NOT 自造第四种。
 
-**读取者**:唯一读取器是 `scripts/python/script-interface-check.py`。不在本表中的第三方候选 MUST 按普通候选判红,
+**读取者**:唯一读取器是 `.specify/scripts/python/script-interface-check.py`。不在本表中的第三方候选 MUST 按普通候选判红,
 MUST NOT 自动豁免。**维护者**:人与 `/speckit.implement` 都能改;本表是据以放行的凭据,由引入该例外的特性维护。
 **下游投影**:下游项目把同一章节放在其 `.specify/shared/definitions/` 的同名文件里。
 
@@ -202,7 +202,7 @@ MUST NOT 自动豁免。**维护者**:人与 `/speckit.implement` 都能改;本�
 
 ## 投影声明形态与消费方
 
-本契约的镜像侧不被手改:`.specify/scripts/` 与 `.specify/skills/` 下的副本由 `scripts/python/sync-mirrors.py`
+本契约的镜像侧不被手改:`.specify/scripts/` 与 `.specify/skills/` 下的副本由 `.specify/scripts/python/sync-mirrors.py`
 唯一产出。当源与镜像不能逐字节相同时,差异 MUST 是一个**已声明**的投射,且只声明一次。本特性消费两种投射形态,
 形态名与锚点在此固定,新增第三种 MUST 先修订本节:
 
@@ -227,16 +227,16 @@ MUST NOT 合并成一句「镜像一致」。逐对严格性旗标(`strict_extra
 
 | 消费方 | 消费什么 |
 |--------|----------|
-| `scripts/python/script-interface-check.py` | 全部五节;`--emit-rule` 输出本节第 2 节所列八键,`--check-projection` 输出末节的投射判定 |
-| `scripts/python/script_interface_cli.py` | 第 2 节的版本行形态与版本源,以及第 4 节的拒绝退出码 |
-| `scripts/bash/script-interface.sh` | 第 3 节与第 4 节的 bash 可实施形态 |
+| `.specify/scripts/python/script-interface-check.py` | 全部五节;`--emit-rule` 输出本节第 2 节所列八键,`--check-projection` 输出末节的投射判定 |
+| `.specify/scripts/python/script_interface_cli.py` | 第 2 节的版本行形态与版本源,以及第 4 节的拒绝退出码 |
+| `.specify/scripts/bash/script-interface.sh` | 第 3 节与第 4 节的 bash 可实施形态 |
 | `tests/contract/test_script_interface_contract.py` | 本页与 `--emit-rule` 的双向一致性、以及五处落点的指针纪律 |
 | 宪法模板 / 本仓宪法 / 指令模板 / `instructions.md` / 生成器 MUST include 清单 | 摘要一句话 + 本页路径;不复制本页内容 |
 
 ## 本文档不拥有什么
 
-- **条款语法**:一条条款怎么写、正文到哪、引用组在哪,归 `shared/definitions/contract-clause-definitions.md`。
+- **条款语法**:一条条款怎么写、正文到哪、引用组在哪,归 `.specify/shared/definitions/contract-clause-definitions.md`。
 - **确认门与临时目录**:归各自 owner;本文档只按路径引用。
 - **逐脚本判定结果**:适用集与豁免集的成员是检查器一次运行的产物,不是本文档的一份名单。本文档给判据,不给结论。
-- **投射的实现**:投射表与 `--check-projection` 的实现在 `scripts/python/sync-mirrors.py` 与检查器;本文档只固定
+- **投射的实现**:投射表与 `--check-projection` 的实现在 `.specify/scripts/python/sync-mirrors.py` 与检查器;本文档只固定
   形态名与锚点这两件被声明的契约。

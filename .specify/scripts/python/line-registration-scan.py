@@ -4,7 +4,7 @@
 The machine-readable owner of the long-task criterion is the constant block below
 (requirements A-15); every other surface reaches it by ``import`` or by path, never by
 restating the members. The human criterion and its adjudication boundary are owned by
-``shared/guidelines/reporting-obligations.md`` § 九.
+``.specify/shared/guidelines/reporting-obligations.md`` § 九.
 
 Contract: ``.specify/specs/102-line-registry-registration/contracts/line-registration-scan.contract.md``
 
@@ -22,14 +22,14 @@ LONG_TASK_MARKERS = (
 )
 SELF_DECLARATION_MARKER = "# line-run-required"
 COMPLIANT_INVOCATIONS = (
-    "scripts/bash/line-run.sh",
+    ".specify/scripts/bash/line-run.sh",
     ("line-registry.py", "register"),
     ("line-registry.py", "update"),
     ("line-registry.py", "deregister"),
 )
 DEFAULT_SCAN_ROOTS = (
-    "scripts/bash",
-    "scripts/python",
+    ".specify/scripts/bash",
+    ".specify/scripts/python",
     "skills",
 )
 

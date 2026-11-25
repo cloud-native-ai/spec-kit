@@ -4,7 +4,7 @@
 
 **This file owns** four fact groups; each has a landing section below: the closed set of accepted forms (§ Accepted forms); **the normalization order** and the output shape (§ Normalization); **the disambiguation rules** (§ Disambiguation rules); **the failure semantics** (§ Failure semantics).
 
-**This file does not own** (reach the owner, never restate it): **the position ladder** — which location wins when a name is resolved — → `skills/internal/run-skills/SKILL.md` § 1（the position ladder）; `scripts/python/sync-mirrors.py` owns **mirror generation**.
+**This file does not own** (reach the owner, never restate it): **the position ladder** — which location wins when a name is resolved — → `.specify/skills/internal/run-skills/SKILL.md` § 1（the position ladder）; `.specify/scripts/python/sync-mirrors.py` owns **mirror generation**.
 
 ## Accepted forms
 
@@ -16,7 +16,7 @@ consumer in place. The `form` column is literal (it is the value the matrix fixt
 | slash reference | `/improve-skills` | that Skill's **slash-command surface** — not an instruction to invoke it directly |
 | at reference | `@merge-skills` | host-style mention of the same Skill |
 | labelled reference | `skill:merge-skills` | the same Skill behind the `skill:` label |
-| canonical path | `skills/external/merge-skills/SKILL.md` | a path ending in `SKILL.md` |
+| canonical path | `.specify/skills/merge-skills/SKILL.md` | a path ending in `SKILL.md` |
 | directory path | `skills/external/merge-skills` | a Skill directory (a trailing `/` is allowed) |
 
 Every example above MUST have a row with an expected output in the normalization matrix.
@@ -120,9 +120,9 @@ unreachable in the cli form". Do not invent a syntax to rescue it.
 
 ## Boundary
 
-- The **position ladder** is not inlined here — which location wins is `skills/internal/run-skills/SKILL.md` § 1, reached by reference. This file never states a directory priority and never adds a location.
+- The **position ladder** is not inlined here — which location wins is `.specify/skills/internal/run-skills/SKILL.md` § 1, reached by reference. This file never states a directory priority and never adds a location.
 - No other owner's rule literals appear here. The directories in the accepted-form examples are *examples*, not priority claims.
-- **No new machinery**: no new command, gate script, directory root, environment variable or second classification data file. The only executable form of this grammar is a test-only implementation under `tests/`, never under `scripts/`, never a gate.
+- **No new machinery**: no new command, gate script, directory root, environment variable or second classification data file. The only executable form of this grammar is a test-only implementation under `tests/`, never under `.specify/scripts/`, never a gate.
 
 ## Change Log
 

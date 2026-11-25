@@ -98,4 +98,4 @@
 - **证据与来源的边界**：只有本轮 `read` 的来源可进来源清单；`not-read` / `unavailable` 的来源按 § Risks & Limits 声明缺失，MUST NOT 用「看起来相关」的来源填空。
 - **表达层**：只应用四维度自然化中适用的部分（去套话、补过渡、格式可读、语言一致），并服从 `--tone` / `--audience`；表达层 MUST NOT 改变事实层，也 MUST NOT 覆盖保真底线。语气或受众请求与保真冲突时，保真优先，并把该限制写进 `## Risks & Limits`。
 - **检测器诚实**：报告 MUST NOT 承诺、暗示或优化任何 AI 内容检测器结果；「更难被识别」「更像人写」一类表述只能描述表达特征，MUST NOT 被写成对检测结果的保证。
-- **面向读者可理解**：报告面遵守 `shared/guidelines/user-facing-comprehension.md`（术语白名单/黑名单与上下文上下界）；内部引擎调用形式（命令、脚本参数、探针名等实现细节）MUST NOT 出现在给读者的正文里，必要信息以平凡语言与指针表述。
+- **面向读者可理解**：报告面遵守 `.specify/shared/guidelines/user-facing-comprehension.md`（术语白名单/黑名单与上下文上下界）；内部引擎调用形式（命令、脚本参数、探针名等实现细节）MUST NOT 出现在给读者的正文里，必要信息以平凡语言与指针表述。

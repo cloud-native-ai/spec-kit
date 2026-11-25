@@ -70,7 +70,7 @@ the host's confirmation-gate convention:
   source, not the target).
 - Description-caching registries **refreshed** (app may need restart to reload).
 - **No declaration still names the retired slug**, and the host's skill-enablement /
-  obsolete-asset contract checks pass (spec-kit: `bash scripts/bash/run-tests.sh tests/contract/ -q -k
+  obsolete-asset contract checks pass (spec-kit: `bash .specify/scripts/bash/run-tests.sh tests/contract/ -q -k
   "skill_enablement or obsolete_assets"`).
 - **No residual reference** to the source skill name anywhere in the target's docs or the
   host's topology docs (grep the source name; expect only intentional "merged into …" notes).
@@ -84,8 +84,8 @@ and `skills/internal/` are canonical, mirroring to `.specify/skills/<name>/` and
 hand-copy, which is how the two trees silently diverge:
 
 ```bash
-python3 scripts/python/sync-mirrors.py --write  --only skills/<layer>/<target>
-python3 scripts/python/sync-mirrors.py --check  --only skills/<layer>/<target>   # must report no drift
+python3 .specify/scripts/python/sync-mirrors.py --write  --only skills/<layer>/<target>
+python3 .specify/scripts/python/sync-mirrors.py --check  --only skills/<layer>/<target>   # must report no drift
 ```
 
 `<layer>` is the layer the **target** lives in — `external` or `internal`. `--only` matches mirror

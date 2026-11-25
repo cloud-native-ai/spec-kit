@@ -14,7 +14,7 @@
 
 ## 机制矩阵维度定义（S1）
 
-`scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
+`.specify/scripts/mechanism-inventory.py` 对 `<project-dir>/.specify/` 输出以下维度（每个 ok/missing）：
 
 | 维度 | 判定 | 对应机制 |
 |------|------|----------|
@@ -108,7 +108,7 @@ house-keeping H5 的**未处理清单**。**不执行** sanitize、history、res
 | 6 | `/speckit.agents` / `/speckit.team` | **按需**：用户明确需要 | 代理/团队定义；未使用则保持 `not-configured` |
 
 **Carrier**：本地每个命令的派发 MUST 缺省用 **fork 承载**（同族 `qodercli` 子进程经
-`skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**
+`.specify/skills/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**
 （该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现
 为一个选项。远端每个命令经 run-agent 在
 `<project-dir>` 下执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；subagent CLI 缺省

@@ -68,7 +68,7 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 
 ### Step 5: 渲染
 
-用 [render-excalidraw.sh](scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG（默认远端：`EXCALIDRAW_BACKEND=server` + `EXCALIDRAW_SERVER`；服务不可达时脚本给出指引，须先询问用户）。Mermaid 桥接路径先把 Mermaid 转成场景（`/mermaid-to-scene`）存为 `.excalidraw`，再走同一渲染脚本——保证两条路径交付物一致且源文件可编辑。
+用 [render-excalidraw.sh](.specify/scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG（默认远端：`EXCALIDRAW_BACKEND=server` + `EXCALIDRAW_SERVER`；服务不可达时脚本给出指引，须先询问用户）。Mermaid 桥接路径先把 Mermaid 转成场景（`/mermaid-to-scene`）存为 `.excalidraw`，再走同一渲染脚本——保证两条路径交付物一致且源文件可编辑。
 
 → [04-rendering-and-output.md](references/howto/04-rendering-and-output.md)
 
@@ -86,7 +86,7 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 
 - **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
 - 输出为单个 HTML 文档：渲染图为主体；原始场景 JSON 不嵌入正文，仅放入可折叠「复现性附录」`<details>` 块（默认收起），附录内容必须与磁盘实际渲染的 `.excalidraw` 逐字节一致
-- 图表通过 [render-excalidraw.sh](scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG
+- 图表通过 [render-excalidraw.sh](.specify/scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG
 - **默认优先选用 PNG** 引用/嵌入图片；仅当图表过大需无损缩放时用 SVG
 - **嵌入 Markdown 文档时**：PNG 与 SVG 引用须用同一机制——首选全内联 HTML（`<a href=x.svg target=_blank rel=noopener><img src=x.png></a>`），渲染器剥 HTML 时回退全纯 Markdown
 - PNG/SVG 与 HTML 同目录，HTML 相对路径引用图片
@@ -95,7 +95,7 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 
 ## 渲染服务部署
 
-渲染服务（[scripts/server/](scripts/server)）是本技能的配套后端，部署方式（本机 Node 直跑 / Docker / 远端服务器）与 API 详见 [server-deployment.md](references/guide/server-deployment.md)。首次使用且服务未部署时，先读该文档与用户确认部署方式。
+渲染服务（[.specify/scripts/server/](.specify/scripts/server)）是本技能的配套后端，部署方式（本机 Node 直跑 / Docker / 远端服务器）与 API 详见 [server-deployment.md](references/guide/server-deployment.md)。首次使用且服务未部署时，先读该文档与用户确认部署方式。
 
 ## 参考文档
 

@@ -4,7 +4,7 @@
 
 ## Stage Prompt Skeleton（三段骨架，每阶段一次）
 
-每阶段把以下三段完整指令交给阶段子代理：远端外部派发写入提示词文件（`prompt-<line>-<stage>.md`）；本地 **fork 承载**经 `scripts/stage-runner.sh` 以 stdio/提示词文件传入（形态见 `dispatch-recipes.md`；同族 `qodercli` 子进程），异构 agent 走 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）。阶段名替换 `<STAGE>`。
+每阶段把以下三段完整指令交给阶段子代理：远端外部派发写入提示词文件（`prompt-<line>-<stage>.md`）；本地 **fork 承载**经 `.specify/scripts/stage-runner.sh` 以 stdio/提示词文件传入（形态见 `dispatch-recipes.md`；同族 `qodercli` 子进程），异构 agent 走 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）。阶段名替换 `<STAGE>`。
 
 **红线（反嵌套拓扑）**：提示词是子代理的**全部输入**，三段骨架之外不得夹带驱动机制本身——反嵌套义务真源已上收 run-agent 派发治理（不引用驱动/循环技能、不指示加载技能、不含循环逻辑；派发前拦截），本行保留提醒并引用、不复述义务全文（analyze C-28）。
 
@@ -38,7 +38,7 @@
 - 仓库既有脏文件不提交不还原。
 - 不要 push（除非明确授权）——远程推送属破坏性操作。
 - 只推进当前阶段；下一阶段由主代理派发，不要自行越阶段。
-- 测试执行唯一入口是 `scripts/bash/run-tests.sh`（缺省 xdist 形态 `-n <effective> --dist load`；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
+- 测试执行唯一入口是 `.specify/scripts/bash/run-tests.sh`（缺省 xdist 形态 `-n <effective> --dist load`；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
 ```
 
 > 上列前四条为 G5 默认纪律的**逐字纪律行**（对齐框架 fast-fail 与 confirmation-gates 两份判据文件的英文真源；执行侧以本文件的行文为准，不解析框架文档）。
@@ -162,7 +162,7 @@ skipped; only the checklist quality-list step is absent.
 
 ```text
 TEST BUDGET: before the first task, run exactly one full suite:
-  bash scripts/bash/run-tests.sh --full --names-out <spec-dir>/baseline-failed.txt
+  bash .specify/scripts/bash/run-tests.sh --full --names-out <spec-dir>/baseline-failed.txt
 Write the E2 baseline row into the state-spine fence at STATE_SPINE_PATH
 (seq=1, slot=baseline, stage=implement, selection_basis=full-suite, command,
 rc, passed/failed, failed_names_path, evidence_ptr; merge_source/merged_at=na
@@ -177,13 +177,13 @@ EVIDENCE_DIR.
 
 表达类特性线的 implement 按 plan 的章节树落文，并在 U4 通过以下 blocking 判定（缺一即该阶段未完成）：
 
-- **① 门禁输出的四面**：`reader` / `evidence` / `duplicate` / `count`——取值集归 `scripts/python/doc-consistency-check.py` 的 `FACES` 常量（本文件只引用、不重定义）；落文文档的读者声明仍按「前 40 个非空行」窗口判。
+- **① 门禁输出的四面**：`reader` / `evidence` / `duplicate` / `count`——取值集归 `.specify/scripts/python/doc-consistency-check.py` 的 `FACES` 常量（本文件只引用、不重定义）；落文文档的读者声明仍按「前 40 个非空行」窗口判。
 - **② 结构子步**：章节树语法与两向比对——复用既有 `--path` 作落文输入（`--action structure --spec-dir <dir> --path <落文>`），不是第五个 CLI 面。
 - **③ 站点层的构建子行**：站点层存在时检查站点构建，结论并入 `G-implement-structure` 的 `face=build` 面级子行，不另立算子；站点层不存在时记 `not-applicable`（显式，面级单列）。
 - **不通过即未完成**：任一面、子步或子行为 `not-evaluated` MUST NOT 计为通过。
 - **「四面」的唯一读法**：四面指 CLI 输出面，不是算子表的四行——U4(a) 的计数分母取算子表（表达类 implement 仅 `G-implement-structure` 一行），四个 CLI 面由同一份门禁输出文件承载。
 - **唯一证据来源**：四面结果与结构子步落在同一份门禁输出文件（`<spec-dir>/test-evidence/`），作为该阶段 SC 证据的唯一来源——`verification.md` 的 `SC-NNN_value=` 记逐面 `面=verdict` 摘要，证据记录沿用既有四键（`sample_id` / `evidence_path` / `evidence_sha256` / `verdict`）；某面 `not-evaluated` → 该 SC 记 `unknown` 并点名面与原因，MUST NOT 记 `pass`。
-- **边界**：结构面通过 MUST NOT 被援引为内容正确性的证据——它只是必要条件（owner：`shared/workflow/expression-gates.md` § 结构/链接/构建只是必要条件）。表达类 implement 的 Test-First MAY 按宪法 VII 的 template-only 条款判 `Partial (justified)`，justification 写明替代验证是四项文档门禁输出。
+- **边界**：结构面通过 MUST NOT 被援引为内容正确性的证据——它只是必要条件（owner：`.specify/shared/workflow/expression-gates.md` § 结构/链接/构建只是必要条件）。表达类 implement 的 Test-First MAY 按宪法 VII 的 template-only 条款判 `Partial (justified)`，justification 写明替代验证是四项文档门禁输出。
 
 ### 中间阶段与 review block（clarify / plan / tasks / checklist / analyze / review）
 
@@ -203,7 +203,7 @@ from the completeness denominator.
 ```text
 TEST BUDGET CLOSURE: after review passes and before merge, run the closure full
 suite:
-  bash scripts/bash/run-tests.sh --full --names-out <spec-dir>/final-failed.txt
+  bash .specify/scripts/bash/run-tests.sh --full --names-out <spec-dir>/final-failed.txt
 Compare by name: comm -13 baseline-failed.txt final-failed.txt. Append the E2
 closure row to the SAME state spine (baseline_compare must be the name-level
 diff; never a count comparison), then audit:
@@ -301,7 +301,7 @@ sleep turn and do not start any resident service.
 
 - **程序**：U0 入口声明时、U2 派发前、U3 收到终止判定时、U4 校验后、U5 停线时**先写状态、后做动作**——续环与重入只读状态脊，零上下文可接手；循环 MUST NOT 依赖会话记忆。
 - **重入**：任何新会话接手该线时，从状态脊读取断点判定与已试次数，先跑一次 `watch-target.sh --once` 快照；终止判定在即按 U4/U5 续环，否则从对应阶段续跑或恢复监听窗口。
-- **观察者记录节**：observer 记录节由 driver 追加写入状态脊，键与形状的唯一 owner 是 `skills/external/sdd-loop-driver/SKILL.md` § SDD Observer；本节只给指针，不复述其键集。
+- **观察者记录节**：observer 记录节由 driver 追加写入状态脊，键与形状的唯一 owner 是 `.specify/skills/sdd-loop-driver/SKILL.md` § SDD Observer；本节只给指针，不复述其键集。
 
 ## Line Registration, Envelope & Message Ingress（线路登记、归属与消息入口，064）
 
@@ -453,7 +453,7 @@ CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`reference
 
 ### U6 收尾（生命周期）
 
-- 特性线闭合处的 **closure 判定**由集成序列的质量门给出：`scripts/python/closure-acceptance-check.py` 在该线闭合时运行一次，`block` 把该线标 `blocked`（先在 `completed` 态记录 `integration-record --result failed` 的命名原因，随后转态——线不是也不得再是 `completed`）。判定时点是**特性线闭合**：一条线承载一个特性的全部切片，MUST NOT 被读作「每个切片合并都要过一次 closure 判定」——切片合并由 review 门判定。封闭原因集、退出码与 `final_path` 形态的真源：`shared/workflow/acceptance-hardening.md` § Closure Verdict（按路径 + 章节锚引用，本文件不复述）。
+- 特性线闭合处的 **closure 判定**由集成序列的质量门给出：`.specify/scripts/python/closure-acceptance-check.py` 在该线闭合时运行一次，`block` 把该线标 `blocked`（先在 `completed` 态记录 `integration-record --result failed` 的命名原因，随后转态——线不是也不得再是 `completed`）。判定时点是**特性线闭合**：一条线承载一个特性的全部切片，MUST NOT 被读作「每个切片合并都要过一次 closure 判定」——切片合并由 review 门判定。封闭原因集、退出码与 `final_path` 形态的真源：`.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict（按路径 + 章节锚引用，本文件不复述）。
 - U6 在 `integration_result`（merged|failed）记录之后执行；只读线阶段完成直接 U6；写线集成前显式放弃以 `last_event=abandoned` 关闭。
 - U6 注销 Registry（`closed` + `closed_at`）、释放 reservation 与 lease、按保留策略归档证据；不得留下 `active` 残留。
 - worktree 的移除只由集成序列在合并成功后执行；未合并（failed/放弃）时保留并置 `worktree_retained=true`。

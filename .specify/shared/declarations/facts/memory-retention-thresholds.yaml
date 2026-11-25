@@ -1,10 +1,10 @@
 # Batch 3 (contracts/migration-batches.contract.md C-045).
 #
 # The one machine-read copy of the record-retention thresholds: the default grace window and the
-# closed store roster a retention run may scan. The engine `scripts/python/record-retention.py`
-# reads it through `scripts/python/declaration_reader.py` (`DEFAULT_GRACE_DAYS`, `STORES`), so the
+# closed store roster a retention run may scan. The engine `.specify/scripts/python/record-retention.py`
+# reads it through `.specify/scripts/python/declaration_reader.py` (`DEFAULT_GRACE_DAYS`, `STORES`), so the
 # `--grace-days` default and the store validation come from here; the carriers reach it by
-# `shared/declarations/facts/memory-retention-thresholds.yaml#/statement`.
+# `.specify/shared/declarations/facts/memory-retention-thresholds.yaml#/statement`.
 #
 # Authority order: code > generated > authored. `DEFAULT_GRACE_DAYS = 30` and the four-store roster
 # agreed with every carrier on 2026-11-05, so nothing had drifted.
@@ -23,7 +23,7 @@ statement:
     - run-determination
     - session-note
 consumers:
-  - scripts/python/record-retention.py
+  - .specify/scripts/python/record-retention.py
 former_carriers:
   - docs/reference/skills/memory.md
   - docs/reference/skills/feedback.md

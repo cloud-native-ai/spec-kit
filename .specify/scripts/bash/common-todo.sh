@@ -27,7 +27,7 @@ set -euo pipefail
 # script-interface: the sourceable guard block (086) lives in script-interface.sh
 # It sits above this script's own parsing and above `source common.sh`: a shared
 # library's top-level checks would otherwise turn `--help` into a non-zero exit, and
-# the flags must win over any write. Authority: shared/definitions/
+# the flags must win over any write. Authority: .specify/shared/definitions/
 # script-interface-definitions.md section 4.
 SCRIPT_INTERFACE_LIB="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/script-interface.sh"
 if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
@@ -127,7 +127,7 @@ main() {
             # corrupting the JSON.
             # Hardening shape adapted-from: 2e55bdd3f279849a4e499a4a7c1a0d63d39f117b
             # (control characters must be encoded, never dropped or passed through).
-            # Note: scripts/bash/common.sh publishes the host-owned `json_escape`
+            # Note: .specify/scripts/bash/common.sh publishes the host-owned `json_escape`
             # (cws-lib-bash profile.d/04_format.sh) for scripts that source common.sh.
             # This file is standalone and does not source it, so the python3 path
             # above stays this helper's own implementation.

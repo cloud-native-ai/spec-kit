@@ -27,7 +27,7 @@ Use this checklist to validate a newly created Skill before reporting completion
 ## Resource Organization
 
 - [ ] Resource paths use relative form (e.g., `./scripts/x.py`, `./references/details.md`)
-- [ ] `scripts/`, `references/`, `assets/` contents are relevant when checked in; empty standard directories are acceptable
+- [ ] `.specify/scripts/`, `references/`, `assets/` contents are relevant when checked in; empty standard directories are acceptable
 - [ ] No unrelated documents (README.md, CHANGELOG.md, INSTALLATION_GUIDE.md)
 
 ## Discoverability (no registry)

@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-agent/SKILL.md>"
 
 # run-agent
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -18,7 +18,7 @@ arguments — tells the user what exists and what would be worth doing next. Thi
 owns the **authoring baseline** (the frontmatter vocabulary and validation rules) that the
 `create-agent` / `improve-agent` authoring skills enforce.
 
-Canonical extraction source: `templates/commands/agents.md` § Run Mode, § Default Behavior
+Canonical extraction source: `.specify/templates/commands/agents.md` § Run Mode, § Default Behavior
 (No Arguments), and the authoring-baseline block (Authoring Rules / Frontmatter Baseline /
 Valid File Locations / Validation). Content moved here verbatim in substance; the command
 template keeps entry + delegation only.
@@ -119,7 +119,7 @@ MUST NOT merge or normalize configuration itself:
    ⚠️ External CLI dispatch MUST follow that document's **Visibility Contract** (stream-json +
    compact filter + `.live.log` / `.jsonl` / `.status` triplet) — never redirect print-mode
    output into a silent log. The Execution works autonomously within its defined scope.
-   For an **external** dispatch, reuse `skills/internal/create-team/scripts/dispatch.sh`:
+   For an **external** dispatch, reuse `.specify/skills/internal/create-team/scripts/dispatch.sh`:
    `DISPATCH_CLI=<cli> DISPATCH_LOG_DIR=<absolute-log-dir> bash <dispatch.sh> <label>
    <workdir> <prompt-file> -- <cli_args...>`. Pass the engine's `cli_args` array verbatim
    after `--` — never reorder, re-quote, or filter them. `DISPATCH_LOG_DIR` MUST be absolute
@@ -134,11 +134,11 @@ MUST NOT merge or normalize configuration itself:
    `.specify/shared/definitions/superagent-definitions.md` § The super↔sub Protocol and are
    never copied here. A missing field blocks the dispatch.
    **Four pre-existing injections (by pointer)**: the same payload carries the fast-fail
-   clause (`shared/guidelines/fast-fail.md` § 子代理派发注入, injected verbatim — see the
+   clause (`.specify/shared/guidelines/fast-fail.md` § 子代理派发注入, injected verbatim — see the
    dispatch-time injection below), the concurrency obligation
-   (`shared/definitions/subagent-definitions.md` § The Concurrency Obligation), the
-   reporting duty (`shared/guidelines/reporting-obligations.md`) and the re-anchoring anchor
-   digest (`shared/definitions/re-anchoring-definitions.md`).
+   (`.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation), the
+   reporting duty (`.specify/shared/guidelines/reporting-obligations.md`) and the re-anchoring anchor
+   digest (`.specify/shared/definitions/re-anchoring-definitions.md`).
 4. **Collect (external only)** — after `dispatch.sh` returns, invoke
    `python3 .specify/scripts/python/exec-quant.py --action collect-dispatch --unit-id
    agent:<slug> --run-id <label> --snapshot <snapshot> --config-id <config_id>
@@ -231,7 +231,7 @@ from the declarations, not from the prompt's wording. Provenance: the sdd-loop-d
 Topology defect fix (2026-10-16); obligation declared in
 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation.
 
-**Multi-unit duties route to a capable body (FR-024)**: a duty whose honest partition is `N >= 2` concurrent units MUST NOT be handed to a body that cannot dispatch. Before dispatch, judge the recipient's dispatch capability from its **existing** `capability-tools` frontmatter key (the `capability` action of `scripts/python/concurrency-check.py` reads the same list; no frontmatter key is introduced here). When the recipient is incapable, the framework MUST route the duty to a capable executor — the orchestrator/main agent itself, a capable sibling, or the driver — and **record the routing decision** (recipient, capability reading, routed-to, reason) in the run record. A coordinator whose own toolset lacks dispatch still emits its partition (each package naming its scope, inputs and output path) so the capable executor can run the packages without re-deriving them; a duty silently serialised inside an incapable body is a defect, not a degradation. The candidate carrier for any dispatched execution is one of the two legal process carriers named by `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes (fork for same-family agents, subprocess for heterogeneous agents); the host-internal in-process subagent path is not a concurrency carrier.
+**Multi-unit duties route to a capable body (FR-024)**: a duty whose honest partition is `N >= 2` concurrent units MUST NOT be handed to a body that cannot dispatch. Before dispatch, judge the recipient's dispatch capability from its **existing** `capability-tools` frontmatter key (the `capability` action of `.specify/scripts/python/concurrency-check.py` reads the same list; no frontmatter key is introduced here). When the recipient is incapable, the framework MUST route the duty to a capable executor — the orchestrator/main agent itself, a capable sibling, or the driver — and **record the routing decision** (recipient, capability reading, routed-to, reason) in the run record. A coordinator whose own toolset lacks dispatch still emits its partition (each package naming its scope, inputs and output path) so the capable executor can run the packages without re-deriving them; a duty silently serialised inside an incapable body is a defect, not a degradation. The candidate carrier for any dispatched execution is one of the two legal process carriers named by `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes (fork for same-family agents, subprocess for heterogeneous agents); the host-internal in-process subagent path is not a concurrency carrier.
 
 **Scope boundary**: Run mode executes a **single** agent on a **single** task. One run MUST
 NOT fan out multiple agents; multiple runs are multiple command invocations — concurrency is
@@ -242,7 +242,7 @@ and MUST NOT estimate. For multi-agent orchestration (parallel dispatch, serial 
 iteration loops, long-running loops), use `/speckit.team` — not this skill.
 
 **Team parameters（团队参数冲突）**: the team-command option class is closed by the owner
-`templates/commands/team.md` (measured members `--target` / `--scope` / `--spec-dir`). A run
+`.specify/templates/commands/team.md` (measured members `--target` / `--scope` / `--spec-dir`). A run
 request carrying any of them — or any unlisted `--` option in option position — reports the
 named conflict sentence `team parameter not accepted by run: <option>` and points at
 `/speckit.team`; it is never silently dropped and never rewritten into a team run. Task text

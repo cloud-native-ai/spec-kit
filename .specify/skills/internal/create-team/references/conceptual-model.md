@@ -1,13 +1,13 @@
 # Conceptual Model: Role × Stage × Type + Team/Loop
 
-**Owner**: the team domain (`create-team` / `/speckit.team`). This file is the **single source of truth** for the multi-agent conceptual model (FR-011, FR-012, SC-006) and for the **team side of the binding model** — the team's binding application, its lifecycle value pair, `handoff_ref`, and the construction-crew notion. The **binding record's meaning** (its keys, value domains, `origin` semantics) and the anchor-side lifecycle are owned by `shared/definitions/anchor-definitions.md` § Archive Layers / § The Binding Record; this file cites them by path and section and must not restate them. Single-agent skills (`create-agent`, `improve-agent`) MUST link here rather than re-defining any part of this model.
+**Owner**: the team domain (`create-team` / `/speckit.team`). This file is the **single source of truth** for the multi-agent conceptual model (FR-011, FR-012, SC-006) and for the **team side of the binding model** — the team's binding application, its lifecycle value pair, `handoff_ref`, and the construction-crew notion. The **binding record's meaning** (its keys, value domains, `origin` semantics) and the anchor-side lifecycle are owned by `.specify/shared/definitions/anchor-definitions.md` § Archive Layers / § The Binding Record; this file cites them by path and section and must not restate them. Single-agent skills (`create-agent`, `improve-agent`) MUST link here rather than re-defining any part of this model.
 
 ## The three orthogonal dimensions
 
 Every agent participating in a team is described by three orthogonal dimensions:
 
 - **Role** — the responsibility/perspective (e.g. `system-designer`, `test-engineer`, `team-supervisor`); a Role is a **seat** filled by an agent whose **Capacity** is defined in a `agent-capacity-<X>-template.md` (create-agent) or, for the sole Meta role, `agent-team-supervisor-template.md` (create-team). Role is the responsibility; Capacity is what the filling agent can do (see `capacity-vs-responsibility.md`).
-- **Stage** — one of `executor`, `evaluator`, `optimizer` (canonical names; the deprecated dimension name "SubRole" and stage name "improver" are removed). 本 Stage 维度**不是** SDD 阶段名册:SDD 的阶段名册(阶段链与其顺序、哨兵、状态脊)仍由驱动所有,唯一真源是 `skills/external/sdd-loop-driver/SKILL.md`,本维度只按路径抵达它、不复述也不枚举;本维度不重命名、不重载任何取值,任何 SDD 阶段名都 MUST NOT 被当作一个 team Stage 取值使用。
+- **Stage** — one of `executor`, `evaluator`, `optimizer` (canonical names; the deprecated dimension name "SubRole" and stage name "improver" are removed). 本 Stage 维度**不是** SDD 阶段名册:SDD 的阶段名册(阶段链与其顺序、哨兵、状态脊)仍由驱动所有,唯一真源是 `.specify/skills/sdd-loop-driver/SKILL.md`,本维度只按路径抵达它、不复述也不枚举;本维度不重命名、不重载任何取值,任何 SDD 阶段名都 MUST NOT 被当作一个 team Stage 取值使用。
 - **Type** — `Worker` or `Meta`, **judged independently by what the agent operates on** (see the criterion below). Stage does NOT determine Type; it only supplies a default tendency.
 
 ## Type criterion: judged by operating object, not by stage
@@ -53,7 +53,7 @@ So the practical rule when building a roster: decide **what the member writes to
 
 ### 消解条款:「每席皆 Worker」vs canonical 写权(本节为该消解的唯一真源)
 
-一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
+一个 pattern 的**每个执行席位都是 Worker**(serial 链的常态,见 `.specify/templates/agents/agent-serial-orchestration-template.md`)与上面的写权门并不冲突,因为二者约束的是**不同的写目标**。消解规则:
 
 - **Worker 只产补丁到工作区** —— 交付物落在业务路径或运行工作区(`.specify/teams/.work/<slug>/`);这是 Worker 的合法写面,不需要 Meta 身份。
 - **交付物本身就是 agent / skill / team 定义时**,花名册 MUST 含**唯一 Meta supervisor**(Team Supervisor),由它把 Worker 产出的补丁落到 canonical 路径;Worker MUST NOT 直接写 canonical 定义文件。
@@ -73,7 +73,7 @@ A seat's **territory** — the path set it may write and read — is a property 
 - **File-level, not directory-level.** A territory is a file-level path set (the same form as a unit's write domain); a directory-level entry declares a region rather than a path set and is red for that reason.
 - **Capability bounds the roster.** The team is not instantiated with more concurrent members than its stated concurrency capability supports; the instantiation step reads the per-agent capability verdict (from the existing `capability-tools` frontmatter key) and reports the reduction when it applies.
 
-The obligation's three-part statement, the class table and the slot/reserve values are reached by pointer — `shared/definitions/subagent-definitions.md` § The Concurrency Obligation and `shared/declarations/facts/` ([[STR-001]]/[[STR-008]] class and roots entries, `concurrency-slot-and-reserve.yaml`); this section restates none of their values.
+The obligation's three-part statement, the class table and the slot/reserve values are reached by pointer — `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation and `.specify/shared/declarations/facts/` ([[STR-001]]/[[STR-008]] class and roots entries, `concurrency-slot-and-reserve.yaml`); this section restates none of their values.
 
 ## The Team Supervisor (single Meta role)
 
@@ -102,18 +102,18 @@ The team domain has **four** collaboration patterns. Each encodes a different **
 
 ## The Team Definition and the Binding Model
 
-A team is a **persisted definition** in the one team archive layer: `.specify/teams/<slug>/team.md`, with its run reports accumulating under `.specify/teams/<slug>/runs/`. There is no second team store: a spec directory holds no current team definition, and a leftover spec-local tree is a migration source only. The binding record's meaning — its three keys, their value domains, `origin` semantics and the anchor-side lifecycle — is owned by `shared/definitions/anchor-definitions.md` § Archive Layers / § The Binding Record; this section owns the team's side of that model and restates none of the anchor side's value domains.
+A team is a **persisted definition** in the one team archive layer: `.specify/teams/<slug>/team.md`, with its run reports accumulating under `.specify/teams/<slug>/runs/`. There is no second team store: a spec directory holds no current team definition, and a leftover spec-local tree is a migration source only. The binding record's meaning — its three keys, their value domains, `origin` semantics and the anchor-side lifecycle — is owned by `.specify/shared/definitions/anchor-definitions.md` § Archive Layers / § The Binding Record; this section owns the team's side of that model and restates none of the anchor side's value domains.
 
 - **Binding on a team.** A team definition carries the same binding record every anchor carries (written only by the engine / `create-team` persistence path, never hand-edited). Ownership and writability are answered by that record, never by where the file sits. The team's own binding says which run created it, independently of whether the anchor it serves has since been bound by another line.
 - **`anchor_slug` — identity, not content.** A team serves exactly one anchor by declaring `anchor_slug` (legacy teams carry the retired `goal_slug` spelling); the binding is N teams : 1 anchor, and the team stores the identity reference only — never a copy of the anchor's objective or criteria. Several teams bound to one anchor are a legal, first-class shape.
-- **`handoff_ref` — the reverse key.** When a spec-side handoff contract hands construction work to this team, the team definition carries `handoff_ref`, a spec-dir-relative path back to that contract. It is written by the engine's binding action; the contract and the two definitions form a three-way key pair. The contract's shape is owned by `skills/internal/create-team/references/handoff-contract-template.md`.
+- **`handoff_ref` — the reverse key.** When a spec-side handoff contract hands construction work to this team, the team definition carries `handoff_ref`, a spec-dir-relative path back to that contract. It is written by the engine's binding action; the contract and the two definitions form a three-way key pair. The contract's shape is owned by `.specify/skills/internal/create-team/references/handoff-contract-template.md`.
 - **Team lifecycle.** The team's lifecycle is its own pair — `active` / `archived` — never the anchor's three values. An `archived` team is refused by `run-team`; reviving it is an explicit modify, never a side effect.
 - **The construction crew (施工队).** A team bound to an anchor under an active handoff contract is the **construction crew** of the design-vs-construction split: the spec side keeps design authority (`requirements.md`, `tasks.md`, `verification.md` and the contract itself are spec-side writes), the crew executes inside its declared territory and writes back one record per completed task. The two lines are peers; neither requires the other, and the handoff is the only documented collaboration shape.
-- **Creation timing** is read from `shared/declarations/facts/goal-team-handoff-threshold.yaml`: a direct run creates no team, a handoff run creates it after `tasks` U4, and a command run declares its creation moment in its command template. This section does not restate the threshold or the timing labels.
+- **Creation timing** is read from `.specify/shared/declarations/facts/goal-team-handoff-threshold.yaml`: a direct run creates no team, a handoff run creates it after `tasks` U4, and a command run declares its creation moment in its command template. This section does not restate the threshold or the timing labels.
 - **Stage dimension is not the SDD stage roster**: the Team's own `Stage` values remain `executor` / `evaluator` / `optimizer`. The canonical SDD stages exist only as `stage_seats` keys, each carrying its seats and `max_parallel`.
 - **Dynamic roster**: the number and type of agents per stage are implementation details decided by the work-package benefit test, effective concurrency, and checkpoint evidence. No fixed per-stage count is a contract.
 - **One definition per slug**: multiple runs append `runs/` and checkpoints rather than creating new team directories.
 
 ## Template home
 
-The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).
+The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `.specify/skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `.specify/skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).

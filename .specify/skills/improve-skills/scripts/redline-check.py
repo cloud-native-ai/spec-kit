@@ -34,7 +34,7 @@ Usage
     redline-check.py <path/to/SKILL.md> [--scan-all] [--file-only] [--json] [--quiet]
 
     <SKILL.md>   target Skill. Default scope is the Skill's own behavior contract:
-                 SKILL.md + scripts/ (+ root-level *.sh/*.py). Encyclopedic L2
+                 SKILL.md + .specify/scripts/ (+ root-level *.sh/*.py). Encyclopedic L2
                  references (API listings, "rejected mechanism" tables) are excluded
                  from the gate because they *document* capabilities rather than
                  *perform* them, and grepping them produces noise.
@@ -337,7 +337,7 @@ def main(argv=None) -> int:
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -393,8 +393,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -406,7 +406,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/external/improve-skills/scripts/redline-check.py'
+_SIG_SCRIPT = '.specify/skills/improve-skills/scripts/redline-check.py'
 _SIG_DECLARED = ('--file-only', '--json', '--quiet', '--scan-all')
 _SIG_HELP = (
     'usage: redline-check.py [options]\n'

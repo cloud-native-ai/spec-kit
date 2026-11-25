@@ -22,7 +22,7 @@ statement:
   entry_condition: the owner supplies one value from allowed_values, recorded against this entry
   absent_reading: owner-unavailable with exit 2, never a default
 consumers:
-  - scripts/python/concurrency-check.py
+  - .specify/scripts/python/concurrency-check.py
   - tests/contract/test_concurrency_dispatch_capability.py
 former_carriers: []
 note: "The verdict value is deliberately absent. C-016 has two MUSTs — carry a value from {allow, forbid}, and never write a verdict the owner did not supply — and they are jointly satisfiable only when the owner has ruled; the register's F-093-003 row records that it has not. The surface is what this feature delivers now: one registered place, a closed value domain, the authority pointer and each value's consequence, so the ruling lands as a one-line revision rather than a new design. `decision_state: unadjudicated` is a state of the surface, not a member of allowed_values; a consumer MUST treat it as 'no verdict readable'."

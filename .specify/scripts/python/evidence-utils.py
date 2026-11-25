@@ -20,7 +20,7 @@ from pathlib import Path
 
 # Feature 084, batch 1 rows 2-3: the evidenceState closed set and the lane closed set are
 # declaration-layer facts. This engine carries no copy of either — it reads
-# `shared/declarations/facts/evidence-seven-states.yaml` and `.../evidence-lanes.yaml` through the
+# `.specify/shared/declarations/facts/evidence-seven-states.yaml` and `.../evidence-lanes.yaml` through the
 # shared read entry, and a project without the layer is labelled rather than served from a tuple
 # (FR-012 / C-049).
 SEVEN_STATES_FACT = "evidence-seven-states"

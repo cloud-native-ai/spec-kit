@@ -7,7 +7,7 @@ classification: internal
 
 # memory-record
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Overview
@@ -22,23 +22,23 @@ Invoke during or right after a `/speckit.*` command or skill run when the intera
 - Review feedback that should shape future work.
 - The in-flight working state of a long run (what was just done / the next step).
 
-A non-derivable takeaway from the run is a recording obligation, not an optional nicety — see `shared/guidelines/knowledge-promotion.md` § 1.
+A non-derivable takeaway from the run is a recording obligation, not an optional nicety — see `.specify/shared/guidelines/knowledge-promotion.md` § 1.
 
 ## What NOT to store
 Do not store anything derivable from project state: code, architecture, file layouts, git history, or content already captured in `constitution.md`, `features.md`, `features/<ID>.md`, or `tools.md`. Memory is only for **non-derivable** context. Keep entries short and high-signal.
 
-The recording obligation and the repeated-emphasis promotion trigger are owned by `shared/guidelines/knowledge-promotion.md`; this skill owns the write mechanics.
+The recording obligation and the repeated-emphasis promotion trigger are owned by `.specify/shared/guidelines/knowledge-promotion.md`; this skill owns the write mechanics.
 
 ## Choosing scope
 The scope domain is a machine fact, not this skill's: the closed set `--scope` accepts (and the order
-`--scope all` expands in) is owned by `shared/declarations/facts/memory-types.yaml#/statement` and read
-by `scripts/python/memory-utils.py`. What follows is the **judgement** for picking one member — which
+`--scope all` expands in) is owned by `.specify/shared/declarations/facts/memory-types.yaml#/statement` and read
+by `.specify/scripts/python/memory-utils.py`. What follows is the **judgement** for picking one member — which
 scope a given takeaway belongs in — and it is the only thing owned here.
 
 - `session` — short-term / working memory for the current effort (progress, in-flight state, ephemeral context). Append-only; safe to prune later.
 - `knowledge` — long-term / distilled memory that stays useful across sessions (stable preferences, conventions, lasting decisions). Upserted by title slug, so re-recording the same subject updates it.
 
-For a user emphasis, use `session` with tags `user-emphasis,key:<ascii-slug>` so the second occurrence can be counted; the promotion trigger is owned by `shared/guidelines/knowledge-promotion.md` § 2.
+For a user emphasis, use `session` with tags `user-emphasis,key:<ascii-slug>` so the second occurrence can be counted; the promotion trigger is owned by `.specify/shared/guidelines/knowledge-promotion.md` § 2.
 
 ## Workflow
 1. Confirm the trigger is a Spec Kit command or skill. Determine the correct `--source`:
@@ -46,9 +46,9 @@ For a user emphasis, use `session` with tags `user-emphasis,key:<ascii-slug>` so
    - `skill:<skill-name>` for skill-driven work (e.g. `skill:study-code`).
    The engine rejects any other source, so this is a hard boundary — never fabricate a source to force a write.
 2. Distill the takeaway into a concise title and a few lines of content.
-3. Pick the scope — one member of the set `shared/declarations/facts/memory-types.yaml#/statement`
+3. Pick the scope — one member of the set `.specify/shared/declarations/facts/memory-types.yaml#/statement`
    owns — using the judgement above.
-   - For a user emphasis, first check prior occurrences with `memory-utils.py --action recall --scope all --tags "key:<ascii-slug>" --format json`. If this is the second occurrence, follow `shared/guidelines/knowledge-promotion.md` § 2 — do not stop after recording.
+   - For a user emphasis, first check prior occurrences with `memory-utils.py --action recall --scope all --tags "key:<ascii-slug>" --format json`. If this is the second occurrence, follow `.specify/shared/guidelines/knowledge-promotion.md` § 2 — do not stop after recording.
 4. Run the shared engine from the project root:
    ```bash
    python3 "${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py" \

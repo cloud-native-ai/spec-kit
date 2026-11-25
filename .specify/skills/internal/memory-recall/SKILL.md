@@ -7,7 +7,7 @@ classification: internal
 
 # memory-recall
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Overview
@@ -17,7 +17,7 @@ Search the project memory store and surface the most relevant entries so the cur
 - At the start of a `/speckit.*` command or skill run, to load relevant context before acting.
 - Mid-task, when you need prior decisions or conventions on a specific subject.
 - When the user asks what is already known/decided about a topic.
-- To check whether a user emphasis has occurred before, query the stable `key:<ascii-slug>` tag; the promotion trigger is owned by `shared/guidelines/knowledge-promotion.md` § 2.
+- To check whether a user emphasis has occurred before, query the stable `key:<ascii-slug>` tag; the promotion trigger is owned by `.specify/shared/guidelines/knowledge-promotion.md` § 2.
 
 ## Workflow
 1. Derive a compact query from the task: key terms, the feature key (if any), and useful tags.
@@ -44,8 +44,8 @@ Search the project memory store and surface the most relevant entries so the cur
 ## Related actions
 
 The scope domain — the closed set `--scope` accepts, plus `all` as its expansion — is a machine fact
-owned by `shared/declarations/facts/memory-types.yaml#/statement` and read by
-`scripts/python/memory-utils.py`; this skill states which action answers which question, not the
+owned by `.specify/shared/declarations/facts/memory-types.yaml#/statement` and read by
+`.specify/scripts/python/memory-utils.py`; this skill states which action answers which question, not the
 member set.
 
 - `--action list --scope <one member of the declared set, or all> --limit N` — browse the most recent entries without a query.

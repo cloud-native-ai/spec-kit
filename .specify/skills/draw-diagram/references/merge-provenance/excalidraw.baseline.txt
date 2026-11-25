@@ -317,7 +317,7 @@ roundness
 roundness: null
 run_id
 scene
-scripts/server/
+.specify/scripts/server/
 seed
 sequenceDiagram
 server

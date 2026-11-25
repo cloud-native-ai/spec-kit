@@ -1,6 +1,6 @@
 # 快速失败纪律 (Fast Fail Discipline)
 
-本文件是**快速失败(Fast Fail)** 纪律的唯一真源(single source of truth):分流判据、两份封闭清单、上送件形态、双向生长规则、与相邻纪律的边界都只在此定义。指令模板 `templates/instructions-template.md` 的常驻顶级章节 `## Fast Fail Discipline` 只承载摘要 + 指针;消费者 MUST 以路径引用本文件,MUST NOT 复制其规则文本——复制即第二定义点,会各自漂移。
+本文件是**快速失败(Fast Fail)** 纪律的唯一真源(single source of truth):分流判据、两份封闭清单、上送件形态、双向生长规则、与相邻纪律的边界都只在此定义。指令模板 `.specify/templates/instructions-template.md` 的常驻顶级章节 `## Fast Fail Discipline` 只承载摘要 + 指针;消费者 MUST 以路径引用本文件,MUST NOT 复制其规则文本——复制即第二定义点,会各自漂移。
 
 **本纪律防的失效是「静默兜底」**:执行期发现与已记录预期不符的状态时,把它就地修平、用户看不见,下游又把它当已验证前提继续引用,于是错误逻辑逐步扩散到整个系统。取代它的是一条可判定的分流判据:解决该异常只需**纠正**的,顺手修完并在收尾披露;需要**裁定**的,停在异常点、把上送件交用户裁定。
 
@@ -38,7 +38,7 @@ MUST NOT 以"改动的文件数"或"改动的行数"定量代替该判定:改一
 
 ### 三条裁决顺序
 
-- **存疑从严**:既未命中快速失败清单、也未命中顺手修复清单的异常,MUST 按快速失败处理。该默认与 `shared/guidelines/confirmation-gates.md` 的同名规则取向一致而作用面不同——那条按**动作**可逆性裁"该动作可否不经前置授权执行",本条按**发现时点**裁"该发现之后可否继续";MUST NOT 复述其正文。
+- **存疑从严**:既未命中快速失败清单、也未命中顺手修复清单的异常,MUST 按快速失败处理。该默认与 `.specify/shared/guidelines/confirmation-gates.md` 的同名规则取向一致而作用面不同——那条按**动作**可逆性裁"该动作可否不经前置授权执行",本条按**发现时点**裁"该发现之后可否继续";MUST NOT 复述其正文。
 - **上送极优先**:一处异常**同时命中两份清单**时,MUST 按快速失败处理。
 - **两振升级**:同一异常在一次运行内**第二次**出现,MUST 升级为快速失败,MUST NOT 再按顺手修复处理。这里的"同一"按**复发键 = `被证伪的预期` 单键**认定,**不含发现点**——复发几乎总出现在不同发现点,把发现点纳入键会使本规则在最常见形态下永不触发。(生长闭环侧的"两次独立观察"用的是**另一个键**:含发现点的二元组,因为独立性恰恰要求发现点不同。两键 MUST NOT 混用。)
 
@@ -69,20 +69,20 @@ MUST NOT 以"改动的文件数"或"改动的行数"定量代替该判定:改一
 - **FF-7 `git diff` 形态二:以 `HEAD` 为基线** — 判据:中途运行的门禁以 `HEAD` 而非开工时冻结的字面 SHA 为基线 | 实证:同上 §十三
 - **FF-8 `git diff` 形态三:对未跟踪新增的盲区** — 判据:命题涉及本次新增的文件,而命令只达受跟踪路径,未跟踪的新增被静默放过 | 实证:同上 §十三
 - **FF-9 `&&` 链中合法结果为零导致静默截断** — 判据:链中某命令的合法结果是零计数或空匹配(`grep -c`、`diff -q`、`comm`、`test -d`),其非零退出码中断链尾,而检查自身仍报告成功 | 实证:`docs/reference/history/00-cross-cutting-lessons.md` §十三 末段
-- **FF-10 意图缺口** — 判据:补齐它需要在两种以上合理读法之间选择,或需要发明工件未记录的意图 | 实证:`shared/patterns/interview-pattern.md`
-- **FF-11 爆炸半径越界** — 判据:本次修复会触及的工件集合超出当前动作声明的范围(定义见 § 分流判据) | 实证:`skills/internal/create-team/references/patterns.md` 的 `territory` / `forbidden_files` 字段
-- **FF-12 两顶帽子错位** — 判据:改动落在了错误的那棵树(框架源 vs 项目运行时副本),因而到不了它本该抵达的一方 | 实证:`shared/definitions/dogfooding-definitions.md` § 2.1
+- **FF-10 意图缺口** — 判据:补齐它需要在两种以上合理读法之间选择,或需要发明工件未记录的意图 | 实证:`.specify/shared/patterns/interview-pattern.md`
+- **FF-11 爆炸半径越界** — 判据:本次修复会触及的工件集合超出当前动作声明的范围(定义见 § 分流判据) | 实证:`.specify/skills/internal/create-team/references/patterns.md` 的 `territory` / `forbidden_files` 字段
+- **FF-12 两顶帽子错位** — 判据:改动落在了错误的那棵树(框架源 vs 项目运行时副本),因而到不了它本该抵达的一方 | 实证:`.specify/shared/definitions/dogfooding-definitions.md` § 2.1
 - **FF-13 覆盖式脚手架将清空既有制品** — 判据:准备执行的命令会无条件覆盖一个已存在且携有历史的制品 | 实证:`docs/reference/history/00-cross-cutting-lessons.md` §十四
-- **FF-14 两振停滞** — 判据:同一异常在一次运行内第二次出现,或同一循环连续两轮无新进展 | 实证:`templates/commands/implement.md` 长跑模式的 Stagnation two-strike 上限
-- **FF-15 仅不可撤销动作方可通过** — 判据:该动作属不可撤销一类,其前置授权要求以 `shared/guidelines/confirmation-gates.md` 的判据为准 | 实证:`shared/guidelines/confirmation-gates.md`(委托;本文件 MUST NOT 复制其清单条目)
+- **FF-14 两振停滞** — 判据:同一异常在一次运行内第二次出现,或同一循环连续两轮无新进展 | 实证:`.specify/templates/commands/implement.md` 长跑模式的 Stagnation two-strike 上限
+- **FF-15 仅不可撤销动作方可通过** — 判据:该动作属不可撤销一类,其前置授权要求以 `.specify/shared/guidelines/confirmation-gates.md` 的判据为准 | 实证:`.specify/shared/guidelines/confirmation-gates.md`(委托;本文件 MUST NOT 复制其清单条目)
 
 ## In-Passing Repair List(顺手修复清单)
 
 命中本清单**且**四条必要条件全部成立的异常类 MAY 就地修完并继续,并在收尾逐项披露。本清单同为**封闭集**:扩展 MUST 只经修订本文档。条目语法同上,前缀取 `RP-n`。
 
 - **RP-1 明显拼写与近似错** — 判据:路径、旗标或选项名的近似错,纠正后恰有一种读法与已记录意图一致,且该解读被显式陈述 | 实证:`.specify/instructions.md` § "Fact, Correctness & Logic Checks (Input Sanity)" 的 Typos & near-misses 条
-- **RP-2 镜像漂移** — 判据:源与其镜像不一致,且存在既有同步引擎可一次修复 | 实证:`scripts/python/sync-mirrors.py`
-- **RP-3 按工具副本过期** — 判据:某工具目录下的命令副本落后于其源模板,且存在既有再生脚本 | 实证:`scripts/python/regen-command-copies.py`
+- **RP-2 镜像漂移** — 判据:源与其镜像不一致,且存在既有同步引擎可一次修复 | 实证:`.specify/scripts/python/sync-mirrors.py`
+- **RP-3 按工具副本过期** — 判据:某工具目录下的命令副本落后于其源模板,且存在既有再生脚本 | 实证:`.specify/scripts/python/regen-command-copies.py`
 - **RP-4 机器生成物缺失或过期** — 判据:该制品由生成器产出、从不手工编辑,重跑生成器即可 | 实证:`docs/reference/history/00-cross-cutting-lessons.md` §一
 - **RP-5 纯格式与折行** — 判据:改动零语义变更(空白、折行、标点),不触及任何判据文本或稳定字面量 | 实证:`docs/reference/history/00-cross-cutting-lessons.md` §十九
 - **RP-6 缺省补全** — 判据:恰有一种取值与已记录意图一致,补全它不需要在两种读法间选择 | 实证:`.specify/instructions.md` § "Fact, Correctness & Logic Checks (Input Sanity)" 的 Assumptions 条
@@ -91,7 +91,7 @@ MUST NOT 以"改动的文件数"或"改动的行数"定量代替该判定:改一
 
 ### 快速失败:停在异常点,交付一份上送件
 
-停止粒度:停在**异常动作及其依赖者**;与该异常无关的独立并行工作按既有规则处理(成功者继续、失败者上报),该既有规则以指针引用——见 `templates/commands/implement.md` 的进度跟踪节,本文件 MUST NOT 复述。
+停止粒度:停在**异常动作及其依赖者**;与该异常无关的独立并行工作按既有规则处理(成功者继续、失败者上报),该既有规则以指针引用——见 `.specify/templates/commands/implement.md` 的进度跟踪节,本文件 MUST NOT 复述。
 
 上送件四要素**缺一不可**:
 
@@ -117,7 +117,7 @@ MUST NOT 以"改动的文件数"或"改动的行数"定量代替该判定:改一
 
 ### 顺手修复:收尾逐项披露
 
-每一处顺手修复 MUST 在所属流程的收尾报告中**逐项披露**:修了什么、为何是纠正而非裁定、所采用的解读。披露的粒度与合并规则归 `shared/guidelines/confirmation-gates.md` 的执行报告节,本文件 MUST NOT 复述其三要素与粒度条款。
+每一处顺手修复 MUST 在所属流程的收尾报告中**逐项披露**:修了什么、为何是纠正而非裁定、所采用的解读。披露的粒度与合并规则归 `.specify/shared/guidelines/confirmation-gates.md` 的执行报告节,本文件 MUST NOT 复述其三要素与粒度条款。
 
 ### 干净运行也要显式说一句
 
@@ -129,7 +129,7 @@ MUST NOT 以"改动的文件数"或"改动的行数"定量代替该判定:改一
 
 ### 与既有派发期可见性契约的分工
 
-`shared/definitions/subagent-definitions.md` 的 `## External Dispatch Visibility Contract` 拥有「这次派发是否**可观测**」;本节拥有「这次派发是否**受治理**」。二者并列,互不替代。本节 MUST NOT 复述其任何一条义务,该文件也 MUST NOT 复述本节的判据。
+`.specify/shared/definitions/subagent-definitions.md` 的 `## External Dispatch Visibility Contract` 拥有「这次派发是否**可观测**」;本节拥有「这次派发是否**受治理**」。二者并列,互不替代。本节 MUST NOT 复述其任何一条义务,该文件也 MUST NOT 复述本节的判据。
 
 ### 注入子句(拥有者字面量)
 
@@ -140,7 +140,7 @@ fast-fail-clause(快速失败注入子句)——执行中发现与已记录预�
 - 先问一个问题:解决它需要**纠正**还是**裁定**?纠正 = 恰有一种与已记录意图一致的读法、改动局部可逆、未证伪任何下游前提、未越过本动作声明的范围。
 - 纠正 ⇒ 就地修完,并在回传中披露。裁定(须在两种以上读法间选择,或须发明工件未记录的意图)⇒ **停在本层、回抛编排者,MUST NOT 就地修平后继续**。
 - 回传 MUST 含一条显式异常行:有异常则逐条以**行首** `ANOMALY:` 列出;无异常则明写 `未发现异常`。缺该行即回传不完整,沉默 MUST NOT 被读作干净。
-- 判据、两份封闭清单与上送件形态的唯一真源:`shared/guidelines/fast-fail.md`。
+- 判据、两份封闭清单与上送件形态的唯一真源:`.specify/shared/guidelines/fast-fail.md`。
 <!-- fast-fail-clause:end -->
 
 子句 MUST ≤ 10 行且 ≤ 1,200 字节,其每一行 MUST NOT 命中门控扫描器的阻塞模式。
@@ -240,32 +240,32 @@ fast-fail-clause(快速失败注入子句)——执行中发现与已记录预�
 
 本纪律与五条既有纪律**相邻而不重叠**。每条边界按同一格式声明:对方拥有什么、本纪律拥有什么、本纪律 MUST NOT 重定义什么。边界声明的目的是让两套规则**不说出互相矛盾的话**,而不是把对方的规则抄一遍。
 
-### 一、门控治理纪律(`shared/guidelines/confirmation-gates.md`)
+### 一、门控治理纪律(`.specify/shared/guidelines/confirmation-gates.md`)
 
 - **对方拥有**:按**动作**可逆性裁"该动作可否不经前置授权执行",含破坏性动作清单、治理保留清单、存疑从严、回流约束、执行报告与门控观察协议。
 - **本纪律拥有**:按**发现时点**裁"该发现之后可否继续",即执行期异常的分流判据、两份清单、上送件形态。
 - **MUST NOT 重定义**:本纪律 MUST NOT 重定义其可逆性判据,MUST NOT 向其治理保留清单新增行,MUST NOT 新增任何门控。fast fail 清单中"仅不可撤销动作方可通过"一条以**路径**委托该文件并以其判据为准。
 - **正交关系**:一个动作本身可逆、但执行中发现其前提被证伪时,两条纪律同时适用且各裁一半——对方裁"该动作可否不经前置授权执行",本纪律裁"该发现之后可否继续"。二者结论可以不同,那不是冲突。
 
-### 二、输入健全性检查(`templates/instructions-template.md` § "Fact, Correctness & Logic Checks (Input Sanity)")
+### 二、输入健全性检查(`.specify/templates/instructions-template.md` § "Fact, Correctness & Logic Checks (Input Sanity)")
 
 - **对方拥有**:行动**之前**对用户输入与继承前提的核验(名称与标识符、事实主张、逻辑一致性、近似错、假设),以及其两级升级规则。
 - **本纪律拥有**:行动**之中**发现的异常如何分流。
 - **MUST NOT 重定义**:本纪律 MUST NOT 另立一套输入核验清单。二者的关系是**时点**关系:对方在动手前把前提当假设,本纪律在动手后处置被证伪的前提。继承前提的复测义务归对方,"复测发现前提为假之后怎么办"归本纪律。
 
-### 三、同作者检测委托(`shared/workflow/objective-analysis-gate.md`)
+### 三、同作者检测委托(`.specify/shared/workflow/objective-analysis-gate.md`)
 
 - **对方拥有**:何时 MUST 把检测委托给新鲜上下文的只读子代理、其触发条件、七条门规则、严重度上限纪律与范围限制。
 - **本纪律拥有**:被委托的子代理**内部**发现异常时怎么办。
 - **MUST NOT 重定义**:本纪律 MUST NOT 重定义其触发条件或严重度规则。两条衔接义务:子代理内的异常 MUST **上抛**给编排者而不是在子代理内自行消化;检测被降级为直接重读时,该降级 MUST 被**标注**,使较弱的证据路径对读者可见。
 
-### 四、自我提升治理(`shared/guidelines/self-improvement.md`)
+### 四、自我提升治理(`.specify/shared/guidelines/self-improvement.md`)
 
 - **对方拥有**:什么样的证据有资格驱动一次持久改动(直接用户纠正是有效的辅助证据、不需要重复出现;自省与反馈条目是观察而非证明)。
 - **本纪律拥有**:清单条目的**移动方向**与留痕形态。
 - **MUST NOT 重定义**:本纪律的生长规则**引用**对方的证据资格判据,MUST NOT 复述它、也 MUST NOT 另设一套阈值。"一次用户直接纠正即充分"直接来自对方。
 
-### 五、问一次记下来(`shared/guidelines/ask-record-repeat.md`)
+### 五、问一次记下来(`.specify/shared/guidelines/ask-record-repeat.md`)
 
 - **对方拥有**:何时 MUST 问而不是猜、答案记到哪里、以及"同一个问题不需要问第二遍"这条检验标准。
 - **本纪律拥有**:上送件的形态与处置集。

@@ -8,7 +8,7 @@ classification: external
 
 # git-utils
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 ## Overview
 
@@ -17,9 +17,9 @@ classification: external
 | 作用域 | 覆盖 | 细节入口 |
 |--------|------|----------|
 | **A — Spec Kit 框架下的 git workflow** | 框架级 git workflow 治理（不是开发者个人 git 习惯：SDD 驱动、周期维护、反馈消化、自动收口等无人值守机制同样受其约束），模型可选（见下方工作流模型菜单：单分支 / 双分支 / 临时分支 / MAIN/PRE/DEV 三层）、同步与合并纪律、选择性合并、`.gitexcludes`、强推纪律；状态面 `.specify/workflow/git.md` 托管块 | 本文件下方 Workflow + `references/` 的 `bootstrap-commands` / `health-check-commands` / `execute-commands` / `gitexcludes-subroutine` / `instructions-lookup` / `troubleshooting` |
-| **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `scripts/git_fleet.py` |
-| **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`scripts/record-bump.sh`；`assets/ledger-template.md` |
-| **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`scripts/provision-git-server.sh` / `scripts/ssh_config_insert.py` |
+| **B — 多环境协调** | 同一批仓库跨多台机器的巡检、危险分级、仓库间依赖图与依赖优先排序 | `references/fleet-workflow.md` + `fleet-inventory-schema` / `fleet-hazard-taxonomy` / `fleet-coordination-playbook` / `fleet-dependency-model`；引擎 `.specify/scripts/git_fleet.py` |
+| **C — 子模块编辑** | 子模块内改代码纪律（`project-<PARENT_SLUG>/*` 分支）+ gitlink 抬升台账 | `references/submodule-workflow.md` + `submodule-command-recipes`；`.specify/scripts/record-bump.sh`；`assets/ledger-template.md` |
+| **D — 服务器置备** | 纯 SSH 服务器 → Git 服务器（D1–D4 四期望态） | `references/server-workflow.md` + `server-ssh-config-entry` / `server-reference-architecture` / `server-troubleshooting`；`.specify/scripts/provision-git-server.sh` / `.specify/scripts/ssh_config_insert.py` |
 
 跨作用域硬约束：① 环境无关——主机名/绝对路径一律由调用方 inventory 或参数提供；② 高影响动作（写远端、强推等）的分级确认口径以本文件下方分级确认表与各作用域自身规则为准；③ 数据源唯一——分支信息只在 `.specify/workflow/git.md` 托管块，子模块台账只在 `${SKILL_WORKDIR}/submodule-edits.md`。
 
@@ -252,11 +252,11 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 
 ### 作用域 C — 子模块编辑（原 git-submodule-edit）
 
-两条纪律：① 子模块内每次编辑都在 `project-<PARENT_SLUG>/<topic>` 分支上（自当前 gitlink 检出，绝不 detached HEAD / main）；② 父仓 gitlink 每次抬升追加一行到 `${SKILL_WORKDIR}/submodule-edits.md` 台账（旧→新 SHA、子模块分支、验证父仓分支/提交、验证状态）。全流程（进入 → 编辑 → 抬升 → 验证 → 上游回收）见 `references/submodule-workflow.md`，即用命令见 `references/submodule-command-recipes.md`；台账助手 `scripts/record-bump.sh`，模板 `assets/ledger-template.md`。
+两条纪律：① 子模块内每次编辑都在 `project-<PARENT_SLUG>/<topic>` 分支上（自当前 gitlink 检出，绝不 detached HEAD / main）；② 父仓 gitlink 每次抬升追加一行到 `${SKILL_WORKDIR}/submodule-edits.md` 台账（旧→新 SHA、子模块分支、验证父仓分支/提交、验证状态）。全流程（进入 → 编辑 → 抬升 → 验证 → 上游回收）见 `references/submodule-workflow.md`，即用命令见 `references/submodule-command-recipes.md`；台账助手 `.specify/scripts/record-bump.sh`，模板 `assets/ledger-template.md`。
 
 ### 作用域 D — 服务器置备（原 git-server-init）
 
-把只有 SSH 的服务器置备成 Git 服务器——四期望态：D1 git 用户、D2 裸仓库、D3 授权公钥、D4 本机 ssh config Host 条目（first-match-wins 陷阱见 `references/server-ssh-config-entry.md`）。可移植契约：MUST NOT 内嵌主机清单/IP/内部主机名/绝对用户目录；服务器身份一律由调用方参数传入。流程见 `references/server-workflow.md`；脚本 `scripts/provision-git-server.sh`（远端 D1–D3 观察/收敛）与 `scripts/ssh_config_insert.py`（本机 D4）；架构与排查见 `references/server-reference-architecture.md` / `references/server-troubleshooting.md`。
+把只有 SSH 的服务器置备成 Git 服务器——四期望态：D1 git 用户、D2 裸仓库、D3 授权公钥、D4 本机 ssh config Host 条目（first-match-wins 陷阱见 `references/server-ssh-config-entry.md`）。可移植契约：MUST NOT 内嵌主机清单/IP/内部主机名/绝对用户目录；服务器身份一律由调用方参数传入。流程见 `references/server-workflow.md`；脚本 `.specify/scripts/provision-git-server.sh`（远端 D1–D3 观察/收敛）与 `.specify/scripts/ssh_config_insert.py`（本机 D4）；架构与排查见 `references/server-reference-architecture.md` / `references/server-troubleshooting.md`。
 
 ---
 
@@ -277,7 +277,7 @@ python3 "${SKILL_HOME}/scripts/git_fleet.py" --inventory <inventory.yaml> --stat
 ## Git Workflow 块维护
 
 - **创建**：Bootstrap 调谐（Setup）Step 1.4 用 `${SKILL_HOME}/assets/git-workflow-block.md` 渲染 `${SKILL_WORKDIR}/.specify/workflow/git.md`（文件级模板）。
-- **初始化播种**：`specify init` 从框架模板 `templates/workflow/git.md` 在目标缺失时生成 `.specify/workflow/git.md`（`None yet.` 占位块）；已存在的文件永不覆盖——之后由 Bootstrap 填充。
+- **初始化播种**：`specify init` 从框架模板 `.specify/templates/workflow/git.md` 在目标缺失时生成 `.specify/workflow/git.md`（`None yet.` 占位块）；已存在的文件永不覆盖——之后由 Bootstrap 填充。
 - **观测钩子（probe + handler）**：注册表行 `h-git-workflow-observe`（engine · action `observe` · `@point:situation` · scope `all`）——情境评估引擎在每回合 assess 后派发 `.specify/scripts/python/git-workflow-observe.py --action observe`，它只刷新托管块之后的 `Observed facts (machine, dated)` 小节（`GIT_OBSERVED` 标记间）；声明只经 Bootstrap + 用户确认变更。机制细节：[observe-hook.md](./references/observe-hook.md)。
 - **更新**：分支改名或 tracking 变化时改对应表格单元并刷新 `Last updated`；新增异常经验追加到 [troubleshooting.md](./references/troubleshooting.md)。
 - **数据源**：`.specify/workflow/git.md` 的 Git Workflow 托管块是后续所有操作的**唯一**分支名数据源；各分支的 `.gitexcludes` 是排除规则的数据源。`.specify/instructions.md` 只保留指向本文件的指针——操作规程留在本技能与其 references 中，避免第二个数据源。

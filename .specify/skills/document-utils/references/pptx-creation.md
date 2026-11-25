@@ -252,14 +252,14 @@ those, use the XML route: unpack the deck, edit the part, clean, pack -- see
 | Need | Route |
 |------|-------|
 | Delete or reorder slides | edit `<p:sldIdLst>` in `ppt/presentation.xml`, then `clean.py` |
-| Add a slide to an unpacked tree | `scripts/pptx/add_slide.py` |
+| Add a slide to an unpacked tree | `.specify/scripts/pptx/add_slide.py` |
 | Create a layout or master | copy an existing layout part and rewire its relationships |
 | Change theme colours or fonts | edit `ppt/theme/theme1.xml` |
 | Animations, transitions, SmartArt | not modelled; edit the XML or use PowerPoint |
 
 `Slides` has no `remove()`. Deleting a slide means removing its `<p:sldId>` from
 the slide list; the part, its relationships and its media are then orphaned, and
-`scripts/pptx/clean.py` reclaims them.
+`.specify/scripts/pptx/clean.py` reclaims them.
 
 ## Save and verify
 

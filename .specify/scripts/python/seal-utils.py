@@ -219,7 +219,7 @@ def is_mirror_copy(self_path: Optional[Path] = None) -> bool:
     """Whether this engine is the `<repo>/.specify/scripts/python/` mirror copy.
 
     The signal is the literal `.specify` component at the fixed index that the mirror
-    position dictates (`scripts/python/<name>.py` sits directly under it). Walking up
+    position dictates (`.specify/scripts/python/<name>.py` sits directly under it). Walking up
     to the nearest `.specify` ancestor is forbidden: the worktree itself may live under
     `.specify/.tmp/...`, and that heuristic would misclassify the framework source.
     """
@@ -566,7 +566,7 @@ ARCHIVE_LIVE_FILES = frozenset((
     ".specify/register.md", ".specify/glossary.md", ".specify/instructions.md",
 ))
 ARCHIVE_DATED_SUBDIRS = ("notes/", "test-evidence/", "checklists/", "slices/")
-ARCHIVE_LIVE_TREES = ("shared/", ".specify/shared/", "tests/")
+ARCHIVE_LIVE_TREES = (".specify/shared/", ".specify/shared/", "tests/")
 ARCHIVE_DATED_TREES = (".specify/memory/", ".specify/history/")
 ARCHIVE_FEATURES_DETAIL_PREFIX = ".specify/features/"
 ARCHIVE_MIXED_HEADING_RE = re.compile(
@@ -4521,7 +4521,7 @@ def _archive_apply_batch(repo: Path, spec_dir: Path,
                     "mixed carrier %s changed in its dated sections during the "
                     "batch" % carrier)
         for carrier in sorted(live_rows):
-            if not carrier.startswith("shared/"):
+            if not carrier.startswith(".specify/shared/"):
                 continue
             mirror = ".specify/" + carrier
             if (repo / mirror).is_file() and \
@@ -4638,7 +4638,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 MIRROR_CODE,
                 "this engine is the .specify/scripts/python/ mirror copy; write actions "
                 "MUST run from the framework source to keep the pair byte-identical",
-                "run scripts/python/seal-utils.py from the framework source tree",
+                "run .specify/scripts/python/seal-utils.py from the framework source tree",
                 "rerun the same command against the framework source copy",
             )],
         )

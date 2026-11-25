@@ -54,9 +54,9 @@ HTML 依赖 CDN echarts@5，离线不可渲染（R1 点名）。规范：
 
 引用 `vendor/echarts.min.js` 却未实际下载（vendor/ 空目录 + CDN document.write 回退），离线打开全空白（R1 两次点名：*"vendor/echarts.min.js 未下载"*、*"离线打开 HTML 无法渲染"*）。规范：
 
-- 交付前把锁定版本的 `echarts.min.js` 真实放入 vendor/（`scripts/vendor-echarts.sh <dir>` 下载并校验非空/版本标记/JS 语法）；
+- 交付前把锁定版本的 `echarts.min.js` 真实放入 vendor/（`.specify/scripts/vendor-echarts.sh <dir>` 下载并校验非空/版本标记/JS 语法）；
 - 加载器禁用 `document.write`（阻塞、废弃、CSP 不友好），改用本地优先 + CDN `onerror` 动态回退（见 SKILL.md Step 4 模板）；
-- 交付前跑 `node scripts/verify-deliverable.mjs <html>` 做结构性检查。
+- 交付前跑 `node .specify/scripts/verify-deliverable.mjs <html>` 做结构性检查。
 
 ## 10. 交付附静态渲染产物（PNG/SVG 渲染证明）
 
@@ -76,7 +76,7 @@ HTML 依赖 CDN echarts@5，离线不可渲染（R1 点名）。规范：
 
 config.js 与 config.json 双副本手工同步会漂移（R1：*"双副本手工同步有漂移风险"*）。规范：
 
-- 以 `*.config.json` 为唯一权威，`*.config.js` 由 `node scripts/sync-config.mjs <file>.config.json` 生成；
+- 以 `*.config.json` 为唯一权威，`*.config.js` 由 `node .specify/scripts/sync-config.mjs <file>.config.json` 生成；
 - 交付前用 `sync-config.mjs --check` 或 `verify-deliverable.mjs` 校验两文件一致；
 - 复现说明中写入生成命令。
 
@@ -92,7 +92,7 @@ config.js 与 config.json 双副本手工同步会漂移（R1：*"双副本手�
 手写固定坐标的 graph 节点/分区随维护易重叠（R1：*"18 节点在 900px 画布上较密"*、*"手写固定坐标长期维护易重叠"*）。规范：
 
 - config `meta` 记录画布尺寸（canvasWidth/Height）与栅格规则；
-- 交付前跑 `node scripts/check-layout.mjs <config>`（越界/重叠/分区越界检查）。
+- 交付前跑 `node .specify/scripts/check-layout.mjs <config>`（越界/重叠/分区越界检查）。
 
 ## 15. 校正/仲裁需附依据（可复核）
 

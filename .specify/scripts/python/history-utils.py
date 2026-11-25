@@ -34,7 +34,7 @@ import declaration_reader  # noqa: E402  (import follows the sys.path entry abov
 # --------------------------------------------------------------------------- #
 # The file name the incremental read and write agree on, the three top-level keys of a fresh record
 # and the per-session entry key are owned by
-# `shared/declarations/facts/history-manifest-schema.yaml#/statement` and read here through the shared
+# `.specify/shared/declarations/facts/history-manifest-schema.yaml#/statement` and read here through the shared
 # read entry, so none of them is spelled in this engine again. The `_FALLBACK` values below are the
 # **FR-012 compatibility value** for a tree with no declaration layer; when the declaration is
 # readable they are never consulted (no double read).

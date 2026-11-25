@@ -8,7 +8,7 @@
 的正确性校验。它回答的是「图画对了吗」——条形起止是否落在记录层日期上、里程碑菱形
 是否落在锚定日上、进行中条形的结束边界是否与基准日自洽。
 
-**通用几何量测一律委托 draw-diagram**（`skills/external/draw-diagram/references/types/plantuml/scripts/measure-svg-layout.py`
+**通用几何量测一律委托 draw-diagram**（`.specify/skills/draw-diagram/references/types/plantuml/scripts/measure-svg-layout.py`
 「量测自检：三条几何判据」）：长宽比、正文有效字号 / 内联可读性分档、标签越过时间轴
 右边界（溢出）、A/B 排期是否被改写——这些**不需要项目数据、纯几何/版面**的判据是绘图
 技能的权威量测，本脚本**不再重复实现**（曾经的 C2/C3/C4/C5/C7/C8 已删除，避免两套
@@ -250,7 +250,7 @@ def main():
 
 
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _VERSION_SOURCE = "pyproject.toml"
@@ -306,8 +306,8 @@ def _bridge_main():
 _bridge_main()
 del _bridge_main
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its executable form by
-# `scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its executable form by
+# `.specify/scripts/python/script_interface_cli.py`. This block owns no rule of its own.)
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
@@ -319,7 +319,7 @@ _SIG_OWNER = str(_SIG_OWNER / 'scripts' / 'python')
 if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
-_SIG_SCRIPT = 'skills/internal/summarize-project/scripts/verify-chart-data.py'
+_SIG_SCRIPT = '.specify/skills/internal/summarize-project/scripts/verify-chart-data.py'
 _SIG_DECLARED = ('--expect', '--json', '--kind', '--svg')
 _SIG_HELP = (
     'usage: verify-chart-data.py [options]\n'

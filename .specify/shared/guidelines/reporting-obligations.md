@@ -13,10 +13,10 @@
 >
 > 下列四件事**不由本文档拥有**,本文档只以路径 + 节锚点抵达,MUST NOT 复制其规则文本:
 >
-> - **周期锚点、汇报内容下限(四要素)、原子步骤补报规则、交互档缺省周期** → `shared/guidelines/progress-reporting.md`;
-> - **产物三元组(artifact triplet)与三种执行模态** → `shared/definitions/subagent-definitions.md`;
-> - **停滞阈值的数值表** → `skills/internal/create-team/references/patterns.md` § Monitoring → Stall Detection;
-> - **注册表状态词表(`STATE_VALUES` / `ACTIVE_STATES`)** → `skills/external/sdd-loop-driver/scripts/line-registry.py`。
+> - **周期锚点、汇报内容下限(四要素)、原子步骤补报规则、交互档缺省周期** → `.specify/shared/guidelines/progress-reporting.md`;
+> - **产物三元组(artifact triplet)与三种执行模态** → `.specify/shared/definitions/subagent-definitions.md`;
+> - **停滞阈值的数值表** → `.specify/skills/internal/create-team/references/patterns.md` § Monitoring → Stall Detection;
+> - **注册表状态词表(`STATE_VALUES` / `ACTIVE_STATES`)** → `.specify/skills/sdd-loop-driver/scripts/line-registry.py`。
 >
 > 本文档所引用的每一份借用纪律都以路径 + 节锚点抵达,MUST NOT 在此重述;两份文档一旦对同一事实给出两种说法,以被引用的 owner 为准,本文档按缺陷修正。
 
@@ -40,11 +40,11 @@
 
 ## 二 · 长跑档缺省周期与覆盖(Long-run cadence default)
 
-<!-- 092 handoff: D4 — 本节是汇报周期数值的**唯一 owner**（长跑档缺省值见本节第一段）；`shared/guidelines/progress-reporting.md` § 默认间隔与覆盖 只拥有交互档缺省，`skills/internal/create-team/references/create-mode.md` 与 `agents/reporter.agent.md` 只以指针抵达本节。本节文本保留不改。参见 092 D4，2026-11-09。 -->
+<!-- 092 handoff: D4 — 本节是汇报周期数值的**唯一 owner**（长跑档缺省值见本节第一段）；`.specify/shared/guidelines/progress-reporting.md` § 默认间隔与覆盖 只拥有交互档缺省，`.specify/skills/internal/create-team/references/create-mode.md` 与 `agents/reporter.agent.md` 只以指针抵达本节。本节文本保留不改。参见 092 D4，2026-11-09。 -->
 框架从**同一个 owner** 读出两档周期,并用**一个已声明的条件**在两者之间选择:
 
 - **长跑档(long-run profile)**:缺省 **30 seconds**。当该结构存在**至少一个活的汇报接收方**时使用——即它拥有一个运行期未被省略的 reporter 席位,或它是一个持有至少一个已派发子流程的监督者。
-- **交互档(interactive profile)**:其缺省值与全部语义由 `shared/guidelines/progress-reporting.md` § 默认间隔与覆盖 拥有,本文档不携带该数值,也不改写它。当上面条件不成立时使用。
+- **交互档(interactive profile)**:其缺省值与全部语义由 `.specify/shared/guidelines/progress-reporting.md` § 默认间隔与覆盖 拥有,本文档不携带该数值,也不改写它。当上面条件不成立时使用。
 
 两档在同一运行内 MUST NOT 竞争:一次运行只在一档下计时,每条汇报都携带当时生效的档位;运行中途接收方消失(所有 team lane 结束、监督者停止)时,在**下一个边界**切到交互档并**说出来**,切换是被记录的,绝不静默,且 MUST NOT 把两档的 tick 当作同一节奏来报告。
 
@@ -89,7 +89,7 @@
 - **只派发一个下级的流程仍在范围内**:它点名那**一个**,而不是报一份空集,也不是只报自己的进度。一个下级被派出并被继续看守,就已经满足范围谓词第二个析取项。
 - **汇报描述子流程,不是描述主控**:主控自身的进度 MAY 附带,但 MUST NOT 取代对子流程的逐条陈述。
 
-**停滞判定的引用**:每个子流程的状态判定 MUST 对照一份**已声明的**阈值作出,数值由 `skills/internal/create-team/references/patterns.md` § Monitoring → Stall Detection 的阈值表拥有——本文档不携带任何阈值数字,也不建立第二份数值表。判定 MUST 区分「比阈值慢(slow)」与「停滞(stalled)」:未超过阈值的静默是 `slow`(它是 `running` 的一个限定词,不是第五个状态);超过阈值才是 `stalled`。汇报 MUST 点名这次判定用了阈值表的**哪一行**(行身份)以及**实测静默时长**,使读者能复核判断;阈值 MUST NOT 按运行临时猜测,也 MUST NOT 由墙钟倒推。
+**停滞判定的引用**:每个子流程的状态判定 MUST 对照一份**已声明的**阈值作出,数值由 `.specify/skills/internal/create-team/references/patterns.md` § Monitoring → Stall Detection 的阈值表拥有——本文档不携带任何阈值数字,也不建立第二份数值表。判定 MUST 区分「比阈值慢(slow)」与「停滞(stalled)」:未超过阈值的静默是 `slow`(它是 `running` 的一个限定词,不是第五个状态);超过阈值才是 `stalled`。汇报 MUST 点名这次判定用了阈值表的**哪一行**(行身份)以及**实测静默时长**,使读者能复核判断;阈值 MUST NOT 按运行临时猜测,也 MUST NOT 由墙钟倒推。
 
 ## 五 · 非周期汇报的触发事件(Out-of-cadence trigger classes)
 
@@ -99,14 +99,14 @@
 2. **跨越停滞阈值**(从 `slow` 进入 `stalled`);
 3. **派发失败**(派发本身未能成立)。
 
-与这三类并列、由 `shared/guidelines/progress-reporting.md` § 不打断原子步骤 拥有的两类时序规则,本文档只抵达不重述:
+与这三类并列、由 `.specify/shared/guidelines/progress-reporting.md` § 不打断原子步骤 拥有的两类时序规则,本文档只抵达不重述:
 
 - **阶段边界**:两次 tick 之间跨过阶段边界时,在边界处**额外**发一条;它 MUST NOT 重置周期计时(三 tick 仍按原锚点到来)。
 - **落在原子步骤内部**:瞬时 tick MUST NOT 把不可分割的步骤切成两半;**在该步骤的下一个边界**补报,并**注明延迟原因**。补报是常态,隐藏延迟才是缺陷。
 
 ## 六 · 汇报内容与归属(Content and attribution)
 
-每条汇报 MUST 携带四要素,其定义与反例由 `shared/guidelines/progress-reporting.md` § 汇报内容下限(四要素) 拥有——本文档只**命名**这四个标签,使消费者知道自己必须发出什么,而不复述定义:
+每条汇报 MUST 携带四要素,其定义与反例由 `.specify/shared/guidelines/progress-reporting.md` § 汇报内容下限(四要素) 拥有——本文档只**命名**这四个标签,使消费者知道自己必须发出什么,而不复述定义:
 
 | 标签 | 含义由谁定义 |
 |------|--------------|
@@ -117,17 +117,17 @@
 
 **归属**:每条汇报 MUST 点名发出它的结构身份——结构 slug 与运行戳(run stamp)。两个结构 MUST NOT 能产出字节相同而无法区分的行:一次会话里交错的多条汇报靠这两个字段可辨。运行戳沿用发出流程**已经在写**的那个,本文档不引入新的时间戳格式。
 
-**可读性**:每条汇报是一个受 `shared/guidelines/user-facing-comprehension.md` 治理的表面;在该处存在用户可读名称时,MUST NOT 携带内部引擎标识符,其余事实以路径引用抵达。
+**可读性**:每条汇报是一个受 `.specify/shared/guidelines/user-facing-comprehension.md` 治理的表面;在该处存在用户可读名称时,MUST NOT 携带内部引擎标识符,其余事实以路径引用抵达。
 
 ## 七 · 汇报是单向陈述(Reporting is not a gate)
 
-一条汇报 MUST NOT 成为审批请求:它**从不等待回应**,发送后继续执行;它**永不构成**任何动作已获授权的依据。需要用户裁定的动作按 `shared/guidelines/confirmation-gates.md` 自己的判据**前置征询**——那是确认门,与本义务的节奏无关,两者 MUST NOT 互相替代:一条常规汇报不构成确认门,一次确认征询也不必等到下一个 tick。
+一条汇报 MUST NOT 成为审批请求:它**从不等待回应**,发送后继续执行;它**永不构成**任何动作已获授权的依据。需要用户裁定的动作按 `.specify/shared/guidelines/confirmation-gates.md` 自己的判据**前置征询**——那是确认门,与本义务的节奏无关,两者 MUST NOT 互相替代:一条常规汇报不构成确认门,一次确认征询也不必等到下一个 tick。
 
 由此得出两条可机械判定的形态要求:一条汇报里 MUST NOT 出现疑问句、审批请求或豁免征询;发出汇报这一事实 MUST NOT 授权任何动作。
 
 ## 八 · 三种执行模态、两种载体(Three modes, two carriers)
 
-本义务**同等**约束 `shared/definitions/subagent-definitions.md` § Three Execution Modes 的三种模态(native / virtual / external),无一被豁免:
+本义务**同等**约束 `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes 的三种模态(native / virtual / external),无一被豁免:
 
 - 一个**没有原生活跃控制台**的模态,使用其**已经声明的流产物流载体**(该契约 § External Dispatch Visibility Contract 定义的三元组中的 liveness 日志),而不是新造一个通道;
 - 一次运行 MUST **在它已经在写的那份运行记录里**记录**模态**与**实际接收汇报的载体**:二者一起记录,读者才能判断「该模态应有的那个面」是否就是被用的那个;
@@ -143,7 +143,7 @@
 - 存在一个**显式的「无人在跑」状态** `nothing-running`:空集合渲染为它,而不是渲染成一份空摘要;
 - 有一个**已声明的条目上限**,截断时以 `omitted=<n>` 声明被省略的条数;清单只列**当前工作区**的条目。
 
-命令名与脚本路径由 plan 阶段固定,本文档按名引用:入口为薄命令 `templates/commands/status.md`(`/speckit.status`),其背后是确定性脚本 `scripts/python/status-digest.py`。摘要渲染、守卫裁决与单行状态渲染**共享同一次状态读**:第二个 parser 或第二个 renderer 就是本条所指的缺陷,本文档不再描述任何第二个渲染面。
+命令名与脚本路径由 plan 阶段固定,本文档按名引用:入口为薄命令 `.specify/templates/commands/status.md`(`/speckit.status`),其背后是确定性脚本 `.specify/scripts/python/status-digest.py`。摘要渲染、守卫裁决与单行状态渲染**共享同一次状态读**:第二个 parser 或第二个 renderer 就是本条所指的缺陷,本文档不再描述任何第二个渲染面。
 
 ### 9.1 效率维度落在这两个面上(Efficiency dimension on the same two surfaces)
 
@@ -158,11 +158,11 @@
 
 ### 9.2 长任务登记判据(Long-task registration criterion)
 
-**本小节是下列阈值与判定边界的唯一 owner 承载点**;其它表面(`templates/commands/status.md`、`templates/instructions-template.md` 及其投影、`skills/internal/run-team/SKILL.md`、测试)只以路径抵达本小节,MUST NOT 复述阈值或判定边界。
+**本小节是下列阈值与判定边界的唯一 owner 承载点**;其它表面(`.specify/templates/commands/status.md`、`.specify/templates/instructions-template.md` 及其投影、`.specify/skills/internal/run-team/SKILL.md`、测试)只以路径抵达本小节,MUST NOT 复述阈值或判定边界。
 
 - **判据(人工阈值)**:一次运行**预计超过 5 分钟**,或**含后台批量 apply / verify**(含长时间测试、无人值守批处理)时,它就是一个长任务。判定者是运行者,在启动时按预期时长判断。
-- **义务**:长任务 MUST 在**启动时**登记一条 line、在**每个阶段边界**刷新该 line 的最近事件、在**结束时**关闭它。哪些脚本内容算长任务、什么调用形态算已登记,这两种机械可判定的投影由扫描器模块常量唯一拥有(`scripts/python/line-registration-scan.py`),本小节只抵达、不复述。
-- **载体**:让登记顺手发生的载体是 `scripts/bash/line-run.sh`(register → 执行 → 按结果 close;无法收尾时条目保留 `active`)。registry 的写入方是 `line-registry.py`;`scripts/python/journal-utils.py` 与 registry 零关系,MUST NOT 被用来写 registry。
+- **义务**:长任务 MUST 在**启动时**登记一条 line、在**每个阶段边界**刷新该 line 的最近事件、在**结束时**关闭它。哪些脚本内容算长任务、什么调用形态算已登记,这两种机械可判定的投影由扫描器模块常量唯一拥有(`.specify/scripts/python/line-registration-scan.py`),本小节只抵达、不复述。
+- **载体**:让登记顺手发生的载体是 `.specify/scripts/bash/line-run.sh`(register → 执行 → 按结果 close;无法收尾时条目保留 `active`)。registry 的写入方是 `line-registry.py`;`.specify/scripts/python/journal-utils.py` 与 registry 零关系,MUST NOT 被用来写 registry。
 - **未登记即不可见**:digest 的 line 可见性唯一来源是 registry;未登记的运行不进入 digest,因此 `nothing-running` 是「registry 里没有活着的 line」的**准确结论**,不是漏报。任何 liveness 探测只作用于**已登记条目记录的 PID**,绝不发现未登记进程;把 digest 改成发现未登记进程,是用猜测替换确定性,属禁令。
 - **不新增机制**:本判据 MUST NOT 引入调度器、定时器、常驻进程、心跳文件或第二条 liveness 通道;阶段刷新是运行自身步骤边界上的事件,不是时钟。§ 十一 的零新增机制禁令照旧。
 
@@ -184,15 +184,15 @@
 ## 判定边界
 
 - 本文档拥有上面八件事;**不**拥有周期的锚点、内容下限、补报规则、交互档数值(归 `progress-reporting.md`),不拥有三元组与模态(归 `subagent-definitions.md`),不拥有停滞阈值的数值(归 `create-team/references/patterns.md`),不拥有状态词表(归 `line-registry.py`)。
-- 与**快速失败纪律**(`shared/guidelines/fast-fail.md`)的边界:本义务与快速失败注入子句**共用同一条派发载荷通道**,并**不改动**那条子句;reporter 没有被授予修复或中止任何事情的权限(它只观察、只汇报,写面仅限自己的流产物;任何越界改动都是缺陷)。
-- 与 **Token 效率纪律**(`shared/guidelines/token-efficiency.md`)的边界:状态行与摘要是**摘要优先的投影**——只带判定与计数,不把日志或文件原文搬进对话。
-- 与**确认门纪律**(`shared/guidelines/confirmation-gates.md`)的边界:见 § 七。本义务不新增任何确认门。
-- 与**单次执行证据纪律**(`shared/guidelines/single-run-evidence.md`)的边界:那侧管昂贵执行的输出是否完整落盘且后续不重跑;本侧管运行**进行中**向用户暴露什么。汇报中的数字 SHOULD 取自那份留痕,而不是为了取数再跑一遍。
-- 与**运行判定**(`shared/workflow/feedback-step.md` § Run Determination)的边界:本义务是运行**进行中、每隔一段时间**的节奏;运行判定是**收尾时一次**的测量;两者不互相替代,也不互相触发。
+- 与**快速失败纪律**(`.specify/shared/guidelines/fast-fail.md`)的边界:本义务与快速失败注入子句**共用同一条派发载荷通道**,并**不改动**那条子句;reporter 没有被授予修复或中止任何事情的权限(它只观察、只汇报,写面仅限自己的流产物;任何越界改动都是缺陷)。
+- 与 **Token 效率纪律**(`.specify/shared/guidelines/token-efficiency.md`)的边界:状态行与摘要是**摘要优先的投影**——只带判定与计数,不把日志或文件原文搬进对话。
+- 与**确认门纪律**(`.specify/shared/guidelines/confirmation-gates.md`)的边界:见 § 七。本义务不新增任何确认门。
+- 与**单次执行证据纪律**(`.specify/shared/guidelines/single-run-evidence.md`)的边界:那侧管昂贵执行的输出是否完整落盘且后续不重跑;本侧管运行**进行中**向用户暴露什么。汇报中的数字 SHOULD 取自那份留痕,而不是为了取数再跑一遍。
+- 与**运行判定**(`.specify/shared/workflow/feedback-step.md` § Run Determination)的边界:本义务是运行**进行中、每隔一段时间**的节奏;运行判定是**收尾时一次**的测量;两者不互相替代,也不互相触发。
 
 ## 守卫与证据
 
-本义务的一部分命题是可机械判定的,由 `scripts/python/status-digest.py --action guard` 裁决。**命题的编号与主题只由契约拥有**:`reporting-obligations.contract.md` C-01…C-13 定义全部十三条命题(`RO-01`…`RO-13`),其他任何表面只按 id 抵达、只陈述「守卫读什么」,不得重述命题断言的内容。本文档不复述那十三条命题清单。
+本义务的一部分命题是可机械判定的,由 `.specify/scripts/python/status-digest.py --action guard` 裁决。**命题的编号与主题只由契约拥有**:`reporting-obligations.contract.md` C-01…C-13 定义全部十三条命题(`RO-01`…`RO-13`),其他任何表面只按 id 抵达、只陈述「守卫读什么」,不得重述命题断言的内容。本文档不复述那十三条命题清单。
 
 同样由契约拥有、本文档只按 id 抵达的范围:四要素的标签集与归属字段、摘要的条目上限与过期界限的具体位置(分别见 `status-report.contract.md`、`status-digest.contract.md`、`ownership-map.contract.md`)。
 

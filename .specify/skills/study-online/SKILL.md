@@ -86,7 +86,7 @@ classification: external
 
 ## Self-Improvement Contract
 
-- Canonical owner: `skills/external/study-online/`（镜像 `.specify/skills/study-online/` 由 sync-mirrors 生成，不手改）
+- Canonical owner: `.specify/skills/study-online/`（镜像 `.specify/skills/study-online/` 由 sync-mirrors 生成，不手改）
 - Own-run observation: 每个子问题的来源数/独立性、冲突裁决结果、自检发现的缺证据结论、调用方追问形态
 - Mutation route: `improve-skills`（检索策略、证据 schema、置信度判据的修订均走此路由）
 - Validation route: 纪律类修订按 create-skills 压力测试法 RED-GREEN；报告结构变更需同步更新 `## Workflow` 的固定结构

@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-todo/SKILL.md>"
 
 # manage-todo
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -24,7 +24,7 @@ is owned by `.specify/shared/guidelines/todo-in-context.md`. **Link to it; never
 its rules.**
 
 Scanner engine: the command frontmatter `scripts:` block resolves `{SCRIPT}` to
-`scripts/python/search-todo.py --json`; run it from repo root. Its JSON output contract is
+`.specify/scripts/python/search-todo.py --json`; run it from repo root. Its JSON output contract is
 fixed in Collection Mode Step 1 — consume it summary-first, never wholesale
 (`.specify/shared/guidelines/token-efficiency.md`).
 
@@ -33,7 +33,7 @@ pre-collection recall (Collection Step 3) and the wrap-up record (§ Memory Reco
 existing delegations to the native `memory-recall` / `memory-record` skills. This skill
 invokes them; it does not absorb their logic.
 
-Canonical extraction source: `templates/commands/todo.md` § List/Collection/Insertion/Park
+Canonical extraction source: `.specify/templates/commands/todo.md` § List/Collection/Insertion/Park
 Mode Workflows, § Safety Rules, § Optional: Git Commit, and § Memory Record. Content moved
 here verbatim in substance; the command template keeps entry, user-input handling, the
 glossary pre-step, the Philosophy pointer, and wrap-up lifecycle steps only.
@@ -133,7 +133,7 @@ Execute `{SCRIPT}` from repo root. The script outputs JSON to stdout:
 
 ### Step 3: Group and Organize Blocks
 
-**Recall prior memory first** (native `memory-recall` skill, `skills/internal/memory-recall/SKILL.md`): search `.specify/memory/session/` and `.specify/memory/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`), and list `.specify/memory/todo/` for parked ideas whose theme matches the current blocks. Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. When a block clearly implements a parked idea, mark the parked record `promoted` (see Park Mode Step 4). Never contradict a recalled user decision — pause and ask the user first (user-decision protection, kept).
+**Recall prior memory first** (native `memory-recall` skill, `.specify/skills/internal/memory-recall/SKILL.md`): search `.specify/memory/session/` and `.specify/memory/knowledge/` for prior TODO-run outcomes and durable preferences (suggested queries: `todo`, `convention`, `preference`, `decision`, `veto`), and list `.specify/memory/todo/` for parked ideas whose theme matches the current blocks. Apply recalled entries as non-derivable inputs below — e.g. a recorded user veto or deferral of a recurring block, a preferred grouping/batching convention, or a standing scope constraint. When a block clearly implements a parked idea, mark the parked record `promoted` (see Park Mode Step 4). Never contradict a recalled user decision — pause and ask the user first (user-decision protection, kept).
 
 For each valid block, create a **work item** with:
 1. **Source**: `source_file:opening_line` (link to origin)
@@ -296,13 +296,13 @@ Report the record path, title, and a one-line preview of the body (执行报告:
 
 ## Optional: Git Commit
 
-After execution, offer to commit the changes using `templates/commit-template.md`:
+After execution, offer to commit the changes using `.specify/templates/commit-template.md`:
 - Collect: BRANCH, TYPE (`feat`/`fix`/`chore` per block content), SCOPE, SUBJECT
 - Display `git add -A && git commit -m "{msg}"` — only execute on explicit user approval
 
 ## Memory Record (delegated)
 
-At wrap-up, invoke the native `memory-record` skill (`skills/internal/memory-record/SKILL.md`; skip for trivial no-op runs — zero blocks found, or a pure insertion with no decisions):
+At wrap-up, invoke the native `memory-record` skill (`.specify/skills/internal/memory-record/SKILL.md`; skip for trivial no-op runs — zero blocks found, or a pure insertion with no decisions):
 
 - **Session scope**: persist a working note of this run's outcome (blocks executed / deferred / vetoed and why, batches confirmed) so the next `/speckit.todo` run recalls what was already handled and avoids re-proposing it.
 - **Knowledge scope**: when the run surfaced a durable user preference, veto rule, or grouping/batching convention, upsert it as long-term knowledge so future runs apply it at Collection Step 3.

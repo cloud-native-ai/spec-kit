@@ -7,7 +7,7 @@ skill_id: "<SKILL:.specify/skills/internal/manage-features/SKILL.md>"
 
 # manage-features
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
@@ -19,7 +19,7 @@ skill owns the executable core of `/speckit.feature` — the reconcile model app
 and Actions 0–9 — while the command template keeps entry, user-input handling and
 lifecycle only.
 
-Canonical extraction source: `templates/commands/feature.md` § Outline (registry
+Canonical extraction source: `.specify/templates/commands/feature.md` § Outline (registry
 surfaces + feature classification), § Reconcile model, § Actions, and § Formatting
 Requirements. Content moved here verbatim in substance.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only role-edge judgement engine (Feature 095).
 
-Rule owner: ``shared/definitions/superagent-definitions.md`` ([[STR-004]]). Executable
+Rule owner: ``.specify/shared/definitions/superagent-definitions.md`` ([[STR-004]]). Executable
 interface: ``contracts/role-edge-engine.contract.md`` C-1 … C-11; the parsed carrier
 shapes and the violation predicates are owned by ``data-model.md`` § 2 / § 3 / § 5.
 

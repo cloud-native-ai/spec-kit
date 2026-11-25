@@ -95,7 +95,7 @@ classification: internal
 
 ## Self-Improvement Contract
 
-- Canonical owner: `skills/internal/study-kb/`(镜像 `.specify/skills/internal/study-kb/` 由 sync-mirrors 生成,不手改)
+- Canonical owner: `.specify/skills/internal/study-kb/`(镜像 `.specify/skills/internal/study-kb/` 由 sync-mirrors 生成,不手改)
 - Own-run observation: 各知识域的命中/空率、`dated` 结论的复核失败次数、Gaps 中被证明其实存在的遗漏、调用方追问形态
 - Mutation route: `improve-skills`(知识域清单、现役复核判据、报告结构的修订均走此路由)
 - Validation route: 纪律类修订按 create-skills 压力测试法 RED-GREEN;知识域清单变更需同步本表与 Step 2

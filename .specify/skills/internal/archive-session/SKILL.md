@@ -13,10 +13,10 @@ skill_id: "<SKILL:.specify/skills/internal/archive-session/SKILL.md>"
 
 # 调用
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
-脚本是本 SKILL.md 同目录的 `scripts/export.py`。按**当前能执行的 shell**(不是按操作系统)选下面一组整段执行:Windows 上的 Agent 常经 Git Bash 执行命令,此时用 bash 那组。
+脚本是本 SKILL.md 同目录的 `.specify/scripts/export.py`。按**当前能执行的 shell**(不是按操作系统)选下面一组整段执行:Windows 上的 Agent 常经 Git Bash 执行命令,此时用 bash 那组。
 
 bash(macOS / Linux / Windows 的 Git Bash):
 
@@ -28,7 +28,7 @@ if [ ! -f "$SCRIPT" ]; then
     [ -n "$d" ] && [ -f "$d/scripts/export.py" ] && SCRIPT="$d/scripts/export.py" && break
   done
 fi
-[ -z "$SCRIPT" ] && { echo "archive-session: scripts/export.py not found" >&2; exit 4; }
+[ -z "$SCRIPT" ] && { echo "archive-session: .specify/scripts/export.py not found" >&2; exit 4; }
 PY=""; for c in python3 python py; do "$c" -V >/dev/null 2>&1 && PY="$c" && break; done
 [ -z "$PY" ] && { echo "archive-session: python not found" >&2; exit 4; }
 "$PY" "$SCRIPT" --name "<bundle-name>" --verify "用户最近一句内容"
@@ -42,7 +42,7 @@ if (-not (Test-Path -LiteralPath $SCRIPT)) {
   $dirs = @($env:CLAUDE_SKILL_DIR) + ('.qoder','.claude','.codex','.config\opencode' | ForEach-Object { Join-Path $env:USERPROFILE "$_\skills\archive-session" })
   $SCRIPT = $dirs | Where-Object { $_ } | ForEach-Object { Join-Path $_ 'scripts\export.py' } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 }
-if (-not $SCRIPT) { Write-Error 'archive-session: scripts/export.py not found'; exit 4 }
+if (-not $SCRIPT) { Write-Error 'archive-session: .specify/scripts/export.py not found'; exit 4 }
 $PY = 'python','py','python3' | Where-Object { try { & $_ -V *>$null; $LASTEXITCODE -eq 0 } catch { $false } } | Select-Object -First 1
 if (-not $PY) { Write-Error 'archive-session: python not found'; exit 4 }
 & $PY $SCRIPT --name "<bundle-name>" --verify "用户最近一句内容"

@@ -3,7 +3,7 @@
 #
 # Run under the same identity as the runner (run-user), locally or via ssh:
 #   ssh <alias> "su - <run-user> -c \
-#     'bash --noprofile --norc -c \"bash scripts/watch-hook.sh <stage> <window> <deadline> <fifo> <done-json> <iter>\"'"
+#     'bash --noprofile --norc -c \"bash .specify/scripts/watch-hook.sh <stage> <window> <deadline> <fifo> <done-json> <iter>\"'"
 #
 # Output: the event JSON (done file preferred over a FIFO line) or
 # HOOK_TIMEOUT iter=<token>. The caller then runs watch-target.sh --once for the
@@ -14,7 +14,7 @@
 # pass a literal, different token such as "<run>-w07". It is echoed on the
 # timeout line only; the event JSON stays byte-identical for existing parsers.
 #
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# Emitted by `.specify/scripts/python/sync-mirrors.py`; the authority for this block is
 # `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
 # that exists only in the source tree: it re-derives its own version line (C-36).
 _script_interface_guard() {
@@ -49,8 +49,8 @@ _script_interface_guard() {
 _script_interface_guard "$@"
 
 # script-interface:86:begin (feature 086 -- generated; the rule is owned by
-# `shared/definitions/script-interface-definitions.md`, its bash half by
-# `scripts/bash/script-interface.sh` and `scripts/python/sync-mirrors.py`. No rule of its own.)
+# `.specify/shared/definitions/script-interface-definitions.md`, its bash half by
+# `.specify/scripts/bash/script-interface.sh` and `.specify/scripts/python/sync-mirrors.py`. No rule of its own.)
 _sig_usage() {
     printf 'usage: %s\n' 'watch-hook.sh [arguments]'
     printf 'options:\n'

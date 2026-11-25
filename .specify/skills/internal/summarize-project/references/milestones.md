@@ -2,7 +2,7 @@
 
 对应报告 `## 项目里程碑` 节。面向外部读者回答两个问题：**项目的里程碑是什么？当前完成了哪些里程碑？** 工作流主框架见 [../SKILL.md](../SKILL.md)；跨层公共约定见 [reporting-playbook.md](reporting-playbook.md)（日期格式、里程碑配色、图说三要素等见其「跨层图表呈现公约」节）。
 
-**边界**：本文档只写**呈现什么、怎么呈现**。里程碑的状态判定、锚定日换算、逾期天数、视图独立成图的日期侧条件，全部由 `scripts/progress-engine.py` 计算，本文档只写"取引擎哪个字段、怎么落在图与表上"——见 [consistency-rules.md](consistency-rules.md) §0.1「计算下沉」。
+**边界**：本文档只写**呈现什么、怎么呈现**。里程碑的状态判定、锚定日换算、逾期天数、视图独立成图的日期侧条件，全部由 `.specify/scripts/progress-engine.py` 计算，本文档只写"取引擎哪个字段、怎么落在图与表上"——见 [consistency-rules.md](consistency-rules.md) §0.1「计算下沉」。
 
 ## 呈现要素
 
@@ -130,7 +130,7 @@ end legend
 - [ ] **每个菱形标签自带 `yyyy-mm-dd` + 状态符号 `✓/◇/⚠`**；字形合规与两行标签串一致性按 `<draw-diagram>/references/guide/style.md`「状态编码：颜色 + 符号冗余」与 `<draw-diagram>/references/howto/14-gantt-diagram.md`「里程碑」检查
 - [ ] **里程碑进度汇总表在位**（置于跟踪表之前）：达成率（`分子/分母 = 百分比%`）、已达成 / 逾期 / 待达成、最大逾期天数三行齐全，数值均取引擎里程碑汇总字段；无里程碑材料时整表未出（未写"达成率 0%"）
 - [ ] 跟踪表八列齐全（编号 | 里程碑 | 锚定 | 状态 | **达成进度** | **延期天数** | 负责人 | 依据）；负责人取值为规范名 / `规范名（推断）` / `未记录`，与结构 D 一致；达成进度/延期天数取引擎 `progress_pct` / `delay_days`，`null` 已写成 `-（无可计数依据）` / `-`，未用 0 顶替
-- [ ] 已跑过 `scripts/progress-engine.py`（`--baseline` = 全报告基准日），本节所有状态/日期/天数均可在引擎输出逐字找到，**报告内无手工日期比较**；引擎判为 at-risk 的未被改回 pending；引擎 `unknown-schedule` 的里程碑已声明「无计划日期，无法判定延期」且**未上红**
+- [ ] 已跑过 `.specify/scripts/progress-engine.py`（`--baseline` = 全报告基准日），本节所有状态/日期/天数均可在引擎输出逐字找到，**报告内无手工日期比较**；引擎判为 at-risk 的未被改回 pending；引擎 `unknown-schedule` 的里程碑已声明「无计划日期，无法判定延期」且**未上红**
 - [ ] 跟踪表后有达成率声明（`已达成 X / 全部 Y（Z%）；延期 N`，数值取引擎汇总字段）+ 形态 A 达成率表；进度条格串取引擎 `progress_bar`，无该字段则只写 `NN%`
 - [ ] 里程碑图按 [people-encoding.md](people-encoding.md) 4.4 的**单一决策阶梯**判定（独立视图 / 形态 B / 不出图三者互斥、**至多出一张**），命中的步骤号已记入元信息
 - [ ] 视图 `happens` 条目与跟踪表逐行对应；绝对日期全部 yyyy-mm-dd

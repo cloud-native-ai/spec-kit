@@ -7,7 +7,7 @@ classification: internal
 
 # manage-agents — 通用多 Agent 配置管理
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 跨平台、跨 Agent 的通用配置管理下层技能：组件运维协议、异常诊断循环、
@@ -53,7 +53,7 @@ uname -s   # Darwin → macOS；Linux → linux
 | `references/intents/` | agent-ops / agent-diagnose / agent-setup |
 | `references/setup/` | unified-variables / supported-tuples / available-tuples / permission-modes / usage-examples |
 | `references/agent-page-contract.md` | Agent 知识页结构契约 |
-| `scripts/` | config-agent.sh（统一环境变量装配） |
+| `.specify/scripts/` | config-agent.sh（统一环境变量装配） |
 
 ## Wrap-up
 

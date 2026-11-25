@@ -214,7 +214,7 @@ def _atomic_write(path: Path, text: str) -> None:
 
 
 def _slug_from_registry(workspace: Path, fid: str):
-    # The registry lives at the anchor root in a migrated project and under memory/ in a legacy one.
+    # The registry lives at the anchor root in a migrated project and under .specify/memory/ in a legacy one.
     for candidate in (workspace / ".specify" / "features.md",
                       workspace / ".specify" / "memory" / "features.md"):
         if candidate.is_file():

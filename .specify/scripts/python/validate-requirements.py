@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """validate-requirements.py — deterministic checker for a `requirements.md` artifact.
 
-Program-First discipline (shared/guidelines/token-efficiency.md): the propositions checked
+Program-First discipline (.specify/shared/guidelines/token-efficiency.md): the propositions checked
 here are fixed, textual and decidable, so a program judges them and prints a verdict; an
 agent MUST NOT re-derive them by reading the artifact and declaring a result.
 
@@ -31,7 +31,7 @@ least two spaces before each description are load-bearing, not cosmetic):
   path-marker     every Success Criterion definition line carries `**Path**: final` or
                   `**Path**: supporting` as its LAST token, exactly once, and an `execution`-class
                   feature carries at least one `final` path. Owner of the rule: the `## Success
-                  Criteria` `Path` contract in `shared/workflow/acceptance-hardening.md` § Closure
+                  Criteria` `Path` contract in `.specify/shared/workflow/acceptance-hardening.md` § Closure
                   Verdict. Judged only on a spec that DECLARES its flow class
                   (`**Flow Class**: execution|expression` in the header block), and the reason is
                   **scope, not decidability**: the closure checker resolves an undeclared class to
@@ -89,7 +89,7 @@ PLACEHOLDER_RE = re.compile(r"\[(?!NEEDS)[A-Z][A-Z_ ]{3,}\]|\[placeholder\]")
 CLARIFICATIONS_HEADING_RE = re.compile(r"^##\s+Clarifications")
 HEADING_RE = re.compile(r"^#{1,6}\s")
 
-# --- the `Path` marker (Feature 081; owner: shared/workflow/acceptance-hardening.md) -------- #
+# --- the `Path` marker (Feature 081; owner: .specify/shared/workflow/acceptance-hardening.md) -------- #
 # The marker is a line attribute, not a second table: both this checker and the closure checker
 # anchor on the definition-line prefix and read the trailing token, so no separate list has to be
 # kept in sync with the Success Criteria rows.
@@ -100,7 +100,7 @@ FLOW_CLASS_RE = re.compile(r"^\*\*Flow Class\*\*\s*:\s*(\S+)\s*$")
 # used to sit here was the second copy of the class axis (review 084 blocking #1).
 
 #: Feature 084, batch 1 row 9: the `Path` closed set is a declaration-layer fact
-#: (`shared/declarations/facts/success-criterion-path-values.yaml`). This checker carries no copy of
+#: (`.specify/shared/declarations/facts/success-criterion-path-values.yaml`). This checker carries no copy of
 #: the member set — it reads it through the shared read entry, so a third value added to the
 #: declaration changes what this rule refuses with no edit here, and a second tuple anywhere is the
 #: defect the declaration exists to make impossible.

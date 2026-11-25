@@ -7,12 +7,12 @@ skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"
 
 # run-team — 团队运行(从 /speckit.team run 提取)
 
-> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `shared/declarations/facts/concurrency-class.yaml`; reason codes: `shared/declarations/facts/serial-reason.yaml`; reading fields: `shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
+> **Concurrency obligation（执行义务，按指针抵达）**: this skill is an execution body — before the first real action, run the one-shot assessment (class → carrier → partition), default to concurrent execution for two or more independent units, and when serial name a reason code and record the `requested` / `effective` / `effective_reason` reading. Authored text: `.specify/shared/definitions/subagent-definitions.md` § The Concurrency Obligation; class table: `.specify/shared/declarations/facts/concurrency-class.yaml`; reason codes: `.specify/shared/declarations/facts/serial-reason.yaml`; reading fields: `.specify/shared/declarations/facts/effective-concurrency.yaml`. This body restates none of their rules.
 
 
 ## Goal
 
-执行一个已建团队的完整运行流程,承接 `/speckit.team` run 语义的全部程序性义务——五查预检经引擎唯一判定、目标重述、双结构渲染、present & execute、按 pattern 编排派发、运行报告(每次运行强制);每条义务以同等强度落于本技能对应节。概念语义:团队 = anchor + Static Structure(Role × Stage × Type)+ Dynamic Structure(四种协作模式),真源 `skills/internal/create-team/references/conceptual-model.md`;Anchor–Team 绑定与 Target 语义真源 `.specify/shared/definitions/anchor-definitions.md`。单代理操作归 `/speckit.agents`;create/modify 语义归 create-team / improve-team。
+执行一个已建团队的完整运行流程,承接 `/speckit.team` run 语义的全部程序性义务——五查预检经引擎唯一判定、目标重述、双结构渲染、present & execute、按 pattern 编排派发、运行报告(每次运行强制);每条义务以同等强度落于本技能对应节。概念语义:团队 = anchor + Static Structure(Role × Stage × Type)+ Dynamic Structure(四种协作模式),真源 `.specify/skills/internal/create-team/references/conceptual-model.md`;Anchor–Team 绑定与 Target 语义真源 `.specify/shared/definitions/anchor-definitions.md`。单代理操作归 `/speckit.agents`;create/modify 语义归 create-team / improve-team。
 
 ## Input Contract
 
@@ -47,7 +47,7 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 
 ### 5. Present & Execute
 
-**Run line 登记（任何席位派发之前）**: 呈现 anchor 与两个结构之前，先为本轮登记一条 run line。run-id 按本仓 requirements 102 的 A-18 生成——形如 `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 位小写十六进制>`，MUST 匹配引擎的 `RUN_ID_RE`；本技能既有的裸 UTC 时间戳 MUST NOT 充当 run-id（§7 报告文件名里的时间戳只是文件名成分，不是 run-id）。registry `line_id` 按 A-18 合成为 `<team-slug>-<run-id>`。引擎按 A-17 的有序候选解析：先 `skills/external/sdd-loop-driver/scripts/line-registry.py`，其次 `.specify/skills/sdd-loop-driver/scripts/line-registry.py`（下游项目只持有后者）。用引擎的 `register` 动作把该 line 登记为 `active`；动作、参数与退出码一律从引擎 `--help` 读取，本技能不复述参数表。**登记失败即 fail-closed**：具名引擎退出码后停下，不派发任何席位。§2 五查判 `blocked` 时流程在 §2 停止，不进入本步骤、不登记，避免留下悬空 line。
+**Run line 登记（任何席位派发之前）**: 呈现 anchor 与两个结构之前，先为本轮登记一条 run line。run-id 按本仓 requirements 102 的 A-18 生成——形如 `r<UTC yyyymmdd>T<UTC hhmmss>Z-<4 位小写十六进制>`，MUST 匹配引擎的 `RUN_ID_RE`；本技能既有的裸 UTC 时间戳 MUST NOT 充当 run-id（§7 报告文件名里的时间戳只是文件名成分，不是 run-id）。registry `line_id` 按 A-18 合成为 `<team-slug>-<run-id>`。引擎按 A-17 的有序候选解析：先 `.specify/skills/sdd-loop-driver/scripts/line-registry.py`，其次 `.specify/skills/sdd-loop-driver/scripts/line-registry.py`（下游项目只持有后者）。用引擎的 `register` 动作把该 line 登记为 `active`；动作、参数与退出码一律从引擎 `--help` 读取，本技能不复述参数表。**登记失败即 fail-closed**：具名引擎退出码后停下，不派发任何席位。§2 五查判 `blocked` 时流程在 §2 停止，不进入本步骤、不登记，避免留下悬空 line。
 
 呈现 **anchor** 与两个结构后**直接执行**——呈现是披露,不是阻断门禁(事后修改途径:`/speckit.team` modify / improve-team;判据:`.specify/shared/guidelines/confirmation-gates.md`)。同时披露 summary 判定(refresh 或 suppressed;周期总结落锚点档案的 `.specify/anchoring/<anchor-slug>/summary/`,**从不**落团队目录;档案层归 `.specify/shared/definitions/anchor-definitions.md` § Archive Layers)与 Target 指派行,逐字形态:
 
@@ -55,14 +55,14 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 - `本次 Target: 无(对 goal 整体运行)`
 - 解析来源为 `team-default` 时:`本次 Target: T-<nnn> — <statement>(open)(团队默认)`
 
-(表单真源:`skills/internal/create-team/SKILL.md` → Summary Refresh)
+(表单真源:`.specify/skills/internal/create-team/SKILL.md` → Summary Refresh)
 
 **User-facing output channel**: when this run dispatches seats, this root is the only writer of user-facing output; seat activity is not user-facing; an echo command's product is emitted at a presentation boundary inside the stable envelope owned by `.specify/shared/guidelines/user-facing-output.md` (disclosure, not a gate). The run report and the periodic reporting line are the user-facing output; seat streams stay in their artifact paths. A tool result is not user-facing presentation.
 
 ### 6. Orchestrate(按团队 pattern 编排)
 
-- **默认并发（team 执行体，席位即单元）**:只要席位之间无依赖、写领地（文件级路径集）互不相交、存在合法进程承载（fork / subprocess，定义 owner：`.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes）且预算允许，本次运行 MUST 并发派发席位；串行 MUST 给出 `shared/declarations/facts/serial-reason.yaml` 的具名理由码与依据。运行报告 MUST 记录 `requested` / `effective` / `effective_reason` 三元组（字段 owner：`shared/declarations/facts/effective-concurrency.yaml`；`effective` 取席位派发/返回区间的最大重叠数，区间缺失记字面量 `not_evaluated`，MUST NOT 写 0 或估计值）。宿主内建 in-process subagent 路径 BANNED，不计为并发机制。
-- 并行(parallel):派发前做 territory 校验(团队范围声明,真源 `skills/internal/create-team/references/` 与词汇表 Team Territory);未声明或相交的领地按绑定期判定判红,不带病运行。
+- **默认并发（team 执行体，席位即单元）**:只要席位之间无依赖、写领地（文件级路径集）互不相交、存在合法进程承载（fork / subprocess，定义 owner：`.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes）且预算允许，本次运行 MUST 并发派发席位；串行 MUST 给出 `.specify/shared/declarations/facts/serial-reason.yaml` 的具名理由码与依据。运行报告 MUST 记录 `requested` / `effective` / `effective_reason` 三元组（字段 owner：`.specify/shared/declarations/facts/effective-concurrency.yaml`；`effective` 取席位派发/返回区间的最大重叠数，区间缺失记字面量 `not_evaluated`，MUST NOT 写 0 或估计值）。宿主内建 in-process subagent 路径 BANNED，不计为并发机制。
+- 并行(parallel):派发前做 territory 校验(团队范围声明,真源 `.specify/skills/internal/create-team/references/` 与词汇表 Team Territory);未声明或相交的领地按绑定期判定判红,不带病运行。
 - 串行链(serial):DAG 无环校验 + 逐交接(harness)验证。
 - 迭代(iteration):强制最大迭代上限。
 - 持续(continuous):每轮 run 一个 cycle,按声明成熟度运行,独立校验者(独立 verifier)在 L2+ 常驻。
@@ -79,8 +79,8 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 ## Constraints(不变量)
 
 - **`--target` 不变量**:Goal–Team 绑定、身份解析、summary 送达目录不因 `--target` 改变——它只是本次运行的聚焦切片,不是重绑或写域声明。
-- **输出纪律**:run 中间产物留在 git-ignored `.specify/teams/.work/<slug>/`;交付物只到声明的目标路径(完整纪律:`skills/internal/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline)。
-- **continuous 例外门控**:`skills/internal/create-team/references/operating-loops.md` 与 `templates/teams/project-cluster.md` 的分级门保持,不因提取而放开。
+- **输出纪律**:run 中间产物留在 git-ignored `.specify/teams/.work/<slug>/`;交付物只到声明的目标路径(完整纪律:`.specify/skills/internal/create-team/SKILL.md` → Run Workspace, Reports & Output Discipline)。
+- **continuous 例外门控**:`.specify/skills/internal/create-team/references/operating-loops.md` 与 `.specify/templates/teams/project-cluster.md` 的分级门保持,不因提取而放开。
 
 ## Boundaries
 

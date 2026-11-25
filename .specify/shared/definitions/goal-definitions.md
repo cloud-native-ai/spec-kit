@@ -6,7 +6,7 @@ Canonical definition of the **action-level Goal** (行动级目标) in Spec Kit:
 2. **its store and identity** — `.specify/goals/<goal-slug>/goal.md` ([[STR-002]]), the directory slug as the only identity, and the identity grammar;
 3. **its schema** — the closed frontmatter key set and the closed section set, including what a Goal definition does **not** declare.
 
-Two facts are **cited, never restated**: the shared three-key **binding record** and the shared **lifecycle** are owned by `shared/definitions/anchor-definitions.md` (its § The Binding Record and § Lifecycle). The project-level, long-horizon end state is a different concept with its own owner, that same file; a Goal is not that concept and carries none of its mechanics. The engine's action signatures and exit codes are owned by `scripts/python/goal-utils.py` and are cited, never restated here.
+Two facts are **cited, never restated**: the shared three-key **binding record** and the shared **lifecycle** are owned by `.specify/shared/definitions/anchor-definitions.md` (its § The Binding Record and § Lifecycle). The project-level, long-horizon end state is a different concept with its own owner, that same file; a Goal is not that concept and carries none of its mechanics. The engine's action signatures and exit codes are owned by `.specify/scripts/python/goal-utils.py` and are cited, never restated here.
 
 ## What an Action-Level Goal Is
 
@@ -16,7 +16,7 @@ Composition is exactly three parts:
 
 1. **Guidance narrative** — the practical direction. Unlike an Anchor's objective, **guidance MAY be step-shaped**: a numbered sequence, a checklist, or a phase-ordered approach is a legitimate body. No outcome-only shape rule applies here.
 2. **Verifiable completion conditions** — at least one condition that tells the reader the guidance has been carried out. "Verifiable" means a reader can decide it from the artifact state; a condition nobody can check is not one. A definition with zero completion conditions is not a Goal.
-3. **Lifecycle state** — inherited from § Lifecycle of `shared/definitions/anchor-definitions.md`.
+3. **Lifecycle state** — inherited from § Lifecycle of `.specify/shared/definitions/anchor-definitions.md`.
 
 A Goal MAY carry a **readable title** — a presentation-layer heading. **Identity stays the directory slug**: a title is never a second identifier and never takes part in resolution, binding, or reference. A Goal MAY also carry `created` / `updated` timestamps. Nothing else is part of the concept.
 
@@ -60,11 +60,11 @@ The key set is **closed**. In particular the schema declares **no `anchor_ref`**
 | `## Migrated Targets` | optional carry-over — a preserved record from a definition migrated by feature 101; it is history, not a live mechanism |
 | `## Boundaries` | optional carry-over — exclusions preserved from a migrated definition |
 
-A Goal definition does **not** declare `## Objective`, `## Success Criteria`, or a live `## Targets` section. Target decomposition, Target identity and Target lifecycle are mechanics of the Anchor, owned by `shared/definitions/anchor-definitions.md`; a Goal neither issues, transitions nor resolves Targets, and the rows under `## Migrated Targets` are inert text preserved from the migration. The same holds for team binding and for `coordinate`: both are Anchor-side and team-side mechanics and have no Goal-side form.
+A Goal definition does **not** declare `## Objective`, `## Success Criteria`, or a live `## Targets` section. Target decomposition, Target identity and Target lifecycle are mechanics of the Anchor, owned by `.specify/shared/definitions/anchor-definitions.md`; a Goal neither issues, transitions nor resolves Targets, and the rows under `## Migrated Targets` are inert text preserved from the migration. The same holds for team binding and for `coordinate`: both are Anchor-side and team-side mechanics and have no Goal-side form.
 
 ## Lifecycle (by reference)
 
-The value set and transition discipline are owned by `shared/definitions/anchor-definitions.md` § Lifecycle. In Goal terms:
+The value set and transition discipline are owned by `.specify/shared/definitions/anchor-definitions.md` § Lifecycle. In Goal terms:
 
 - `active` → `achieved` | `abandoned`; both terminal states are absorbing for ordinary actions and **retained on disk** — a terminal Goal is never deleted.
 - Re-opening a terminal Goal requires the explicit `reopen` action, is permitted only for `owner: human`, and appends a `## History` line. It is never a side effect of another action.
@@ -89,6 +89,6 @@ The value set and transition discipline are owned by `shared/definitions/anchor-
 | **Guidance** | The Goal's practical narrative — steps allowed, and not an outcome-only objective |
 | **Completion condition** | A checkable statement that the guidance has been carried out; at least one per Goal |
 
-**Retired wording (mapped forward, never reused):** the phrases "project-level Goal", "Global Goal" and "temporary Goal" described the concept that is now the **Anchor**; they are historical spellings and MUST NOT be used for a Goal in any live surface. The project-level end state is the Anchor — its owner is `shared/definitions/anchor-definitions.md`. Likewise the retired team binding key `goal_slug` refers to an Anchor binding and is now `anchor_slug`.
+**Retired wording (mapped forward, never reused):** the phrases "project-level Goal", "Global Goal" and "temporary Goal" described the concept that is now the **Anchor**; they are historical spellings and MUST NOT be used for a Goal in any live surface. The project-level end state is the Anchor — its owner is `.specify/shared/definitions/anchor-definitions.md`. Likewise the retired team binding key `goal_slug` refers to an Anchor binding and is now `anchor_slug`.
 
-**Action signatures are not here.** The engine (`scripts/python/goal-utils.py`) owns the Goal action group's names, flags and exit codes; this document defines what the words mean and cites the engine for how to call it.
+**Action signatures are not here.** The engine (`.specify/scripts/python/goal-utils.py`) owns the Goal action group's names, flags and exit codes; this document defines what the words mean and cites the engine for how to call it.

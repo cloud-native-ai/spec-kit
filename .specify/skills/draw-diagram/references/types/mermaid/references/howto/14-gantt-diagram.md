@@ -70,14 +70,14 @@ gantt
 ## 6. 量测自检（交付前必做）
 
 ```bash
-python3 skills/external/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py gantt.svg --display-width 1400
+python3 .specify/skills/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py gantt.svg --display-width 1400
 ```
 
 三判据：**正文有效字号 ≥12px**、**长宽比 1.2~1.8:1**、**标签不越过时间轴右边界**。
 A/B 判断某写法是否改写排期：
 
 ```bash
-python3 skills/external/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py a.svg --compare b.svg
+python3 .specify/skills/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py a.svg --compare b.svg
 ```
 
 看 `scheduleChanged` 字段（依赖箭头、标题字号、zoom 都可能实际影响排期布局）。

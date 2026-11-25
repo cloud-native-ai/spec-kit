@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Shared script-interface helper: one rule table, one version source, for every `*.py` script.
 
-Owner of the *rule*: `shared/definitions/script-interface-definitions.md`. This module is the
-Python half of that rule's executable form (the bash half is `scripts/bash/script-interface.sh`).
+Owner of the *rule*: `.specify/shared/definitions/script-interface-definitions.md`. This module is the
+Python half of that rule's executable form (the bash half is `.specify/scripts/bash/script-interface.sh`).
 It owns exactly two things:
 
 1. **The constants table** (`RULE` and its parts) that both the *emitted* rule and the
@@ -13,9 +13,9 @@ It owns exactly two things:
    literal (C-8). An unreachable file yields the literal `unknown` and still exits 0.
 
 Usage:
-  python3 scripts/python/script_interface_cli.py --version
-  python3 scripts/python/script_interface_cli.py --help
-  python3 scripts/python/script_interface_cli.py --emit-rule
+  python3 .specify/scripts/python/script_interface_cli.py --version
+  python3 .specify/scripts/python/script_interface_cli.py --help
+  python3 .specify/scripts/python/script_interface_cli.py --emit-rule
 
 Exit codes:
   0  the requested surface answered (help, version, or the emitted rule)
@@ -636,62 +636,5 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     return FLAG_EXIT
 
 
-# projected mirror: source + python-version-bridge; regenerate it, never hand-edit it
-#
-# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
-# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
-# that exists only in the source tree: it re-derives its own version line (C-36).
-_VERSION_SOURCE = "pyproject.toml"
-_VERSION_QUOTES = chr(39) + chr(34)
-_MAX_UPWARD_LEVELS = 12
-
-
-def _bridge_version(start):
-    _here = start.resolve()
-    for _ in range(_MAX_UPWARD_LEVELS + 1):
-        if (_here / _VERSION_SOURCE).is_file() and (_here / ".git").exists():
-            try:
-                _text = (_here / _VERSION_SOURCE).read_text(encoding="utf-8")
-            except (OSError, UnicodeDecodeError):
-                return "unknown"
-            _in_project = False
-            for _raw in _text.splitlines():
-                _line = _raw.strip()
-                if not _line or _line.startswith("#"):
-                    continue
-                if _line.startswith("[") and _line.endswith("]"):
-                    _in_project = _line == "[project]"
-                    continue
-                if not _in_project:
-                    continue
-                _key, _sep, _value = _line.partition("=")
-                if _sep and _key.strip() == "version":
-                    _value = _value.strip()
-                    if len(_value) >= 2 and _value[0] == _value[-1] and _value[0] in _VERSION_QUOTES:
-                        _value = _value[1:-1]
-                    return _value or "unknown"
-            return "unknown"
-        if _here.parent == _here:
-            return "unknown"
-        _here = _here.parent
-    return "unknown"
-
-def _bridge_main():
-    import sys as _bridge_sys
-    from pathlib import Path as _bridge_path
-
-    _argv = list(_bridge_sys.argv[1:])
-    if "--version" not in _argv:
-        return
-    if "--" in _argv and _argv.index("--version") > _argv.index("--"):
-        return
-    _invoked = _bridge_sys.argv[0] if _bridge_sys.argv[0] else "."
-    _name = _bridge_path(_invoked).name or "script"
-    print("%s %s" % (_name, _bridge_version(_bridge_path(_invoked).resolve().parent)))
-    raise SystemExit(0)
-
-
-_bridge_main()
-del _bridge_main
 if __name__ == "__main__":
     sys.exit(main())

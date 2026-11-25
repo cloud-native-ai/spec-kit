@@ -20,7 +20,7 @@ Identity resolves to existing labels: the child is the existing dispatch label (
 
 One dispatch produces exactly one edge, and one retry is a new attempt with a new label (old attempt artifacts are kept, never overwritten). When the same field of one edge disagrees between two carriers, the judgement face emits a `conflicts` row naming the field, **both paths** and the edge identity (`parent` / `child` / `attempt`) — never a silent pick.
 
-The judgement face is the deterministic, read-only engine `scripts/python/role-edge-check.py`; its actions, exit codes and output schema are owned by the engine itself and pinned by `tests/contract/test_role_edge_engine.py`. The violation set is **closed at four kinds**:
+The judgement face is the deterministic, read-only engine `.specify/scripts/python/role-edge-check.py`; its actions, exit codes and output schema are owned by the engine itself and pinned by `tests/contract/test_role_edge_engine.py`. The violation set is **closed at four kinds**:
 
 | Kind | Predicate |
 |------|-----------|
@@ -41,13 +41,13 @@ When an executor enters the SDD carrying chain, the three conditions, the three 
 
 ## The super↔sub Protocol (super↔sub 协议)
 
-**Downlink.** Every governed dispatch carries seven role fields in its existing payload channel: `parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`, `depth_position`, `authority_ref`, `return_channel`. The four pre-existing injections keep their owners and travel by pointer: the fast-fail clause (`shared/guidelines/fast-fail.md` § 子代理派发注入), the concurrency obligation (`subagent-definitions.md` § The Concurrency Obligation), the reporting duty (`shared/guidelines/reporting-obligations.md`), and the re-anchoring anchor digest (`shared/definitions/re-anchoring-definitions.md`). The payload MUST NOT instruct the child to load any skill, MUST NOT reference a driver skill, and MUST NOT contain loop logic — the anti-nesting owner is `subagent-definitions.md` § Dispatch-Time Governance Obligation.
+**Downlink.** Every governed dispatch carries seven role fields in its existing payload channel: `parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`, `depth_position`, `authority_ref`, `return_channel`. The four pre-existing injections keep their owners and travel by pointer: the fast-fail clause (`.specify/shared/guidelines/fast-fail.md` § 子代理派发注入), the concurrency obligation (`subagent-definitions.md` § The Concurrency Obligation), the reporting duty (`.specify/shared/guidelines/reporting-obligations.md`), and the re-anchoring anchor digest (`.specify/shared/definitions/re-anchoring-definitions.md`). The payload MUST NOT instruct the child to load any skill, MUST NOT reference a driver skill, and MUST NOT contain loop logic — the anti-nesting owner is `subagent-definitions.md` § Dispatch-Time Governance Obligation.
 
 **Uplink.** Every return carries the result or deliverable path, evidence pointer(s), an explicit anomaly line (stating "no anomaly" explicitly when none), the concurrency reading triple with its fields owned by `subagent-definitions.md` § The Concurrency Obligation, and the returning executor's identity. Missing any item makes the return incomplete: the parent MUST NOT consume the conclusion and MUST NOT backfill the missing fields.
 
 **Message classes.** Edge messages are classified into one closed set of four tokens: `ack`, `answer`, `result`, `attention-escalation`. Unclassified progress MUST NOT travel up an edge; an executor's activity stays visible through the existing liveness carriers (artifact triplet and `watch-model.md`). This model adds no attention mechanism, channel or notification service.
 
-**User-facing output.** User-facing output is not an edge message: only the root executor composes it, and its channel, boundary and envelope are owned by `shared/guidelines/user-facing-output.md`. A child's return is an input to that output, never the output itself, and a child does not write user-facing text.
+**User-facing output.** User-facing output is not an edge message: only the root executor composes it, and its channel, boundary and envelope are owned by `.specify/shared/guidelines/user-facing-output.md`. A child's return is an input to that output, never the output itself, and a child does not write user-facing text.
 
 **Waiting.** Waiting is bounded and observable through the existing watch model (`watch-model.md`); a human abort or redirect stays servable; slow versus stalled uses the existing thresholds.
 
@@ -73,7 +73,7 @@ When a subagent is granted dispatch duty, its dispatch payload MUST physically c
 | h | `depth-remaining-prohibitions` | remaining depth and the prohibitions that still bind it, by pointer to their owners |
 | i | `aggregate-return-contract` | the aggregate return contract |
 
-The list is closed — adding or removing an item is a contract change. Each item is carried as a pointer, never as rule text. The existing pre-dispatch self-check (`shared/guidelines/fast-fail.md` § 派发前自检) requires the `role-transition` identifier and each item-id slug; a missing identifier or slug is a payload-construction defect and is blocked before dispatch. The check form and its landing are existing — only the judged identifier is new.
+The list is closed — adding or removing an item is a contract change. Each item is carried as a pointer, never as rule text. The existing pre-dispatch self-check (`.specify/shared/guidelines/fast-fail.md` § 派发前自检) requires the `role-transition` identifier and each item-id slug; a missing identifier or slug is a payload-construction defect and is blocked before dispatch. The check form and its landing are existing — only the judged identifier is new.
 
 The payload red lines are owned by `subagent-definitions.md` § Dispatch-Time Governance Obligation and referenced here: no full driver manual, no skill-load instruction, no driver-skill reference, no loop logic.
 
@@ -97,7 +97,7 @@ Recovery rebuilds the edges from those three layers and reports the real state: 
 
 ## Visualization & Tracking (状态跟踪与可视化)
 
-`scripts/python/status-digest.py` remains the **only** digest renderer. Its role view adds `parent`, `roles`, `role_set_marker` (passed through from the judgement model, never re-derived) and `depth` beside the existing identity, state, recent activity, age and stale fields, in both the table and JSON outputs. The role model is computed once per digest run through the engine's importable interface, so the legacy line view and the role view share one carrier materialization. `nothing-running`, the omitted-count declaration on truncation and stale marking keep their existing semantics.
+`.specify/scripts/python/status-digest.py` remains the **only** digest renderer. Its role view adds `parent`, `roles`, `role_set_marker` (passed through from the judgement model, never re-derived) and `depth` beside the existing identity, state, recent activity, age and stale fields, in both the table and JSON outputs. The role model is computed once per digest run through the engine's importable interface, so the legacy line view and the role view share one carrier materialization. `nothing-running`, the omitted-count declaration on truncation and stale marking keep their existing semantics.
 
 A fan-out of one parent to N children renders in the same digest read: the parent row plus one row per child. No dashboard, second parser or second renderer is introduced; liveness stays on the artifact triplets, and the dispatch mapping tables in team and driver run reports carry `label → role → dispatch_duty → workspace → parent` by pointer to their report-contract owners.
 
@@ -105,9 +105,9 @@ A fan-out of one parent to N children renders in the same digest read: the paren
 
 This model adds no persistence root, registry, second renderer, dispatcher, scheduler, queue, transport or notification channel. Edge records are projections over the existing carriers named in § Role Edges; the role view is an extension of the existing digest, not a second visualization.
 
-The judgement face is read-only: `scripts/python/role-edge-check.py` has zero write points, answers `--help` / `--version`, and rejects undeclared options before reading — the script interface contract is owned by `shared/definitions/script-interface-definitions.md`.
+The judgement face is read-only: `.specify/scripts/python/role-edge-check.py` has zero write points, answers `--help` / `--version`, and rejects undeclared options before reading — the script interface contract is owned by `.specify/shared/definitions/script-interface-definitions.md`.
 
-Owner rules are not copied here and keep their owners: concurrency (`subagent-definitions.md` § The Concurrency Obligation and the concurrency facts under `shared/declarations/facts/`), reporting (`shared/guidelines/reporting-obligations.md`), authorization (`sdd-route.py`), waiting and attribution (`watch-model.md`), the SDD dispatch-time governance and the anti-nesting red lines (`subagent-definitions.md` § Dispatch-Time Governance Obligation), the fast-fail injection (`shared/guidelines/fast-fail.md`), and the re-anchoring obligation (`shared/definitions/re-anchoring-definitions.md`).
+Owner rules are not copied here and keep their owners: concurrency (`subagent-definitions.md` § The Concurrency Obligation and the concurrency facts under `.specify/shared/declarations/facts/`), reporting (`.specify/shared/guidelines/reporting-obligations.md`), authorization (`sdd-route.py`), waiting and attribution (`watch-model.md`), the SDD dispatch-time governance and the anti-nesting red lines (`subagent-definitions.md` § Dispatch-Time Governance Obligation), the fast-fail injection (`.specify/shared/guidelines/fast-fail.md`), and the re-anchoring obligation (`.specify/shared/definitions/re-anchoring-definitions.md`).
 
 Gaining the superagent role grants no new capacity: slots and reserves stay with the existing concurrency facts, and nesting does not amplify them. Suppressing unclassified progress inside an edge never reduces the human-facing reporting duty, which stays with its owner.
 
@@ -118,9 +118,9 @@ Gaining the superagent role grants no new capacity: slots and reserves stay with
 | **super agent** | The parent-side relative logical role on a dispatch edge; prose form (two words) | here |
 | **superagent** | The machine identifier of that role, used in carrier declarations and judgement output | here |
 | **super-agent** | Glossary alias only; framework prose does not use it | `.specify/glossary.md` `Super Agent` entry |
-| **subagent** | The child-side relative logical role; its execution modes, visibility contract and governance stay with the child-side owner | `shared/definitions/subagent-definitions.md` |
+| **subagent** | The child-side relative logical role; its execution modes, visibility contract and governance stay with the child-side owner | `.specify/shared/definitions/subagent-definitions.md` |
 | **dual-role** | The output-only marker of the both-roles set state (`role_set_marker`); never a third role value and never a carrier declaration value | here |
 | **role edge** | One dispatch's directed parent → child relation, record kind `role-edge` | here |
 | **role-transition** | The stable identifier of the injection a dispatch-duty grant carries | here |
 
-The role is **not a fourth layer**: it acts on the three-layer Agent taxonomy owned by `shared/definitions/agent-definitions.md`, and this page MUST NOT be read as a new entity type, a new Agent category or a new owner for subagent behaviour. The parent-side role is owned here; the child side stays with `subagent-definitions.md`.
+The role is **not a fourth layer**: it acts on the three-layer Agent taxonomy owned by `.specify/shared/definitions/agent-definitions.md`, and this page MUST NOT be read as a new entity type, a new Agent category or a new owner for subagent behaviour. The parent-side role is owned here; the child side stays with `subagent-definitions.md`.

@@ -1,7 +1,7 @@
 # Path A — 就地消化 (Digest In This Project)
 
 Owns § Path A (A1–A6 + behavior rules) of the feedback skill. Extracted from
-`templates/commands/feedback.md`; content preserved, form re-expressed. The routing
+`.specify/templates/commands/feedback.md`; content preserved, form re-expressed. The routing
 judgment that selects this path lives in the skill's SKILL.md (Routing flow).
 
 Everything the feedback points at this project. In the **framework project** that is
@@ -178,9 +178,9 @@ set of three** existing mechanisms — no fourth carrier exists, and
 
 | # | Carrier | When it applies | Owner (cited, never restated) |
 |---|---------|-----------------|-------------------------------|
-| 1 | **todo Park mode** | The default landing for free-floating improvement ideas that have no code anchor yet | `shared/guidelines/todo-in-context.md` owns the Park store boundary and the park → promote → insert lifecycle; the command face is `/speckit.todo` (`templates/commands/todo.md`) |
-| 2 | **New requirements specification** | The finding constrains what this project's own source must implement | the requirements flow, `templates/commands/requirements.md` |
-| 3 | **One subject loop of the improvement command** | The finding lands on a client artifact that meets the Execution Subject criteria | `shared/workflow/self-improvement-workflow.md` owns the subject-loop rules |
+| 1 | **todo Park mode** | The default landing for free-floating improvement ideas that have no code anchor yet | `.specify/shared/guidelines/todo-in-context.md` owns the Park store boundary and the park → promote → insert lifecycle; the command face is `/speckit.todo` (`.specify/templates/commands/todo.md`) |
+| 2 | **New requirements specification** | The finding constrains what this project's own source must implement | the requirements flow, `.specify/templates/commands/requirements.md` |
+| 3 | **One subject loop of the improvement command** | The finding lands on a client artifact that meets the Execution Subject criteria | `.specify/shared/workflow/self-improvement-workflow.md` owns the subject-loop rules |
 
 The carriers' boundaries and storage locations belong to those owners — this
 section cites the owners and restates none of their content (contract C-27).

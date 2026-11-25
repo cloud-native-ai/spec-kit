@@ -80,8 +80,8 @@ Stable marker: `cli-profile:<cli>`. Probe Object: `skill-sdd-loop-driver-cli-pro
 
 ## Matrix Authority
 
-Dispatch eligibility (accepted shapes, flags, support set) is owned by `CAPABILITY_MATRIX` in `scripts/python/execution-config.py` — the **唯一 owner**. Profiles record observed behaviour only. On conflict, eligibility follows the matrix while the profile records the observation and raises a feedback entry; matrix changes go through its owner process, never through a profile edit.
+Dispatch eligibility (accepted shapes, flags, support set) is owned by `CAPABILITY_MATRIX` in `.specify/scripts/python/execution-config.py` — the **唯一 owner**. Profiles record observed behaviour only. On conflict, eligibility follows the matrix while the profile records the observation and raises a feedback entry; matrix changes go through its owner process, never through a profile edit.
 
 ## Delivery
 
-Profiles and this index live under `references/cli/` and ship through `scripts/python/sync-mirrors.py --only skills/external/sdd-loop-driver`; the docs entry `docs/reference/skills/sdd-loop-driver.md` points here without copying tables.
+Profiles and this index live under `references/cli/` and ship through `.specify/scripts/python/sync-mirrors.py --only skills/external/sdd-loop-driver`; the docs entry `docs/reference/skills/sdd-loop-driver.md` points here without copying tables.

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # script-interface.sh — the bash half of the script-interface contract (feature 086).
 #
-# OWNER OF THE RULE: `shared/definitions/script-interface-definitions.md` (sections 3 and 4).
+# OWNER OF THE RULE: `.specify/shared/definitions/script-interface-definitions.md` (sections 3 and 4).
 # This file is the executable form of that rule and owns nothing else; the Python half is
-# `scripts/python/script_interface_cli.py`. It carries no rule table and no literal version:
+# `.specify/scripts/python/script_interface_cli.py`. It carries no rule table and no literal version:
 # the version is re-derived at run time by the bounded upward search section 2 fixes.
 #
 # It is a LIBRARY. Sourcing it defines two functions and runs nothing; it writes nothing and

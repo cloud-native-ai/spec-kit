@@ -397,7 +397,7 @@ def check_dead_references(root: Path) -> list:
             except ValueError:
                 continue
             repo_root_resolved = root / target if _has_prefix(
-                target, MATERIAL_TARGET_PREFIXES + ("scripts/", "shared/", "templates/",
+                target, MATERIAL_TARGET_PREFIXES + (".specify/scripts/", ".specify/shared/", ".specify/templates/",
                                                     "skills/", "agents/", "src/", "tests/")) else None
             if resolved.exists() or (repo_root_resolved and repo_root_resolved.exists()):
                 continue
@@ -563,7 +563,7 @@ def parse_mirror_drift_lines(text: str) -> list:
 
 # Orphan-dir detection is scoped to the skills pairs: `agents/` mirrors only
 # *.agent.md files while `.specify/agents/` additionally carries legitimate
-# runtime structure (templates/instances/execution per agent-definitions),
+# runtime structure (.specify/templates/instances/execution per agent-definitions),
 # so source-less dirs there are not rename residue. Two source layers map to
 # two runtime shapes (external flat, internal nested) — keep in step with
 # sync-mirrors.py MIRROR_PAIRS.
@@ -702,7 +702,7 @@ def check_legacy_install_residue(root: Path) -> list:
         findings.append(_finding(
             "stale-residue", ".specify/tools",
             "旧代工具记录目录:记录新址为 .specify/memory/tools/"
-            "(术语消歧见 shared/definitions/tool-definitions.md § Terminology)——"
+            "(术语消歧见 .specify/shared/definitions/tool-definitions.md § Terminology)——"
             "归档本目录前核对记录已迁移",
             disposition="archive"))
     return findings
@@ -862,7 +862,7 @@ def collect_semantic_candidates(root: Path):
         paths = extract_repo_paths(text)
         # file-like fragments without a rooted prefix still carry locating
         # power as glob pathspecs ("*platforms/opencode.mjs" matches
-        # scripts/js/.../platforms/opencode.mjs) — absence-of-work claims are
+        # .specify/scripts/js/.../platforms/opencode.mjs) — absence-of-work claims are
         # often contradicted by commits that PREDATE the claim date, so the
         # pack carries the latest bounded history instead of a since-window
         fragments = [f for f in FILE_FRAGMENT_RE.findall(text) if f not in paths]
