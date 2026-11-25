@@ -57,8 +57,8 @@ State table (old = `legacy_source`, new = `target`):
 
 | old authoritative | new authoritative | disposition | action |
 |---|---|---|---|
-| none | none | none (converged) | no store item; an old dir whose only entries are non-content relocates them per M-3 (superseding duplicates) and the container pass removes it when empty |
-| none | any | none (converged) | new is authoritative; never touch; remove an empty old dir if present |
+| none | none | `archive` / `relocate` when old has ≥1 non-content entry; otherwise none (converged) | an old dir whose only entries are non-content emits an archive item, relocates free targets, supersedes target-existing duplicates per M-3, and leaves the container removable when empty; no old entries means no item |
+| none | any | `archive` / `relocate` when old has ≥1 non-content entry; otherwise none (converged) | new authoritative content is never touched; an old non-content entry relocates when its target is free or is superseded when the record target already exists (M-3); no conflict, no authoritative overwrite; no old entries means no item |
 | content | none | `archive` / `relocate` | build E-4 manifest, move each entry, verify digests |
 | content | content | `refuse` / `none` | name both paths; move/overwrite/delete nothing |
 | old path is a symlink (either side) | any | `refuse` / `none` | `reason = symlink-<side>`; never follow, never unlink |
@@ -95,7 +95,7 @@ The existing per-run receipt (`<workspace>/.specify/migrate/receipts/<run-id>.js
 | `recover[]` | list | existing shape; for store items each row carries `path`(from), `archiveTo`(to), `change: "relocated"`, `digest`; superseded duplicates appear only in `entries[]` (status `superseded`) with their preserved new-side copy as the recovery reference, never in `recover[]` |
 | `status` | enum | `running` \| `completed` \| `aborted` (existing domain) |
 
-Validation: `receiptVersion=2` iff a `storeLayout` object exists; every store item's `entries[]` digest set equals its `recover[]` digest set; no path appears in two store items.
+Validation: `receiptVersion=2` iff a `storeLayout` object exists; the digest set of `entries[]` rows with status `moved` equals that store item's `recover[]` digest set; `superseded` rows carry a digest in `entries[]` only and MUST NOT be required in `recover[]` (their preserved new-side copy is the recovery reference); no path appears in two store items.
 
 ## E-6 Retired Store Root
 
