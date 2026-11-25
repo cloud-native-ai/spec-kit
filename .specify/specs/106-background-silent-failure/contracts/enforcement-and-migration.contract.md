@@ -7,11 +7,11 @@
 
 **C-25** One deterministic, read-only settlement judgment face — *artifact-class*.
 
-`scripts/python/role-edge-check.py` MUST gain an additive `--action settle` that reads existing carriers plus the additive attempt/end records (C2/C4) and emits one finding per attempt. It MUST remain read-only (zero write points, no temporary files, fixture tree byte-identical after a run) and MUST answer `-h`/`--version` and reject undeclared options before reading. The `report` and `query` actions and their output schemas MUST NOT change (byte-identical JSON on the same input). (FR-028, FR-033, A-6)
+`scripts/python/role-edge-check.py` MUST gain an additive `--action settle` that reads existing carriers plus the additive attempt/end records (C2/C4) and emits one finding per attempt. It MUST remain read-only (zero write points, no temporary files, fixture tree byte-identical after a run) and MUST answer `-h`/`--version` and reject undeclared options before reading. The `report` and `query` actions and their output schemas MUST NOT change (byte-identical JSON on the same input). It MUST declare the settlement boundary inputs as named options — `--live-window N` (default 120 s), `--wait-deadline N` (default 1800 s), `--start-grace N` (default 30 s), all positive-integer seconds — and state the precedence: an attempt record's optional `wait_deadline_s` / `start_grace_s` field overrides the corresponding option for that attempt; otherwise the option value applies, else the built-in default. These are settlement-time parameters, not new carriers or roots (C-28). (FR-005, FR-006, FR-016, FR-018, FR-028, FR-033, A-6)
 
 **C-26** Exit codes carry the three outcomes — *artifact-class*.
 
-`--action settle` MUST use the engine's existing exit codes: `0` = every attempt judged (a correctly derived `silent-end` is a judged attempt, not a violation); `1` = settlement violations found; `2` = unreadable/unparseable evidence, with `unknown` findings that name the unreadable pointers. `unknown` MUST never be represented as exit 0. (FR-007, FR-029)
+`--action settle` MUST use the engine's existing exit codes: `0` = every attempt judged (a correctly derived `silent-end` is a judged attempt, not a violation); `1` = settlement violations found; `2` = `unknown` findings — unreadable/unparseable evidence or a claimed attempt with no resolvable start record — naming the unreadable pointers or the missing start slot. `unknown` MUST never be represented as exit 0. (FR-007, FR-010, FR-029)
 
 **C-27** The violation kinds are closed and additive — *artifact-class*.
 
@@ -19,7 +19,7 @@ The settle action MUST emit only the three settlement violation kinds owned by �
 
 **C-28** Inputs are the existing carriers plus additive records — *artifact-class*.
 
-The settle action MUST read: the driver four-piece + stage sidecar/spine (C1), the C2 triplet + `.attempt`/`.end`/optional `.settlement`, the team report mapping rows (C3), and the C4 native attempt records; it MUST NOT introduce a new root concept beyond the existing `--state-dir` / `--teams-dir` / `--logs-dir` roots. C5 and C6 contribute no direct reader: C5 is excluded and C6 is constrained to comply through C1/C2. (FR-028, FR-012, FR-020)
+The settle action MUST read: the driver four-piece + stage sidecar/spine (C1), the C2 triplet + `.attempt`/`.end`/optional `.settlement`, the team report mapping rows (C3), and the C4 native attempt records; it MUST NOT introduce a new root concept beyond the existing `--state-dir` / `--teams-dir` / `--logs-dir` roots. The settlement boundary inputs are C-25's `--live-window` / `--wait-deadline` / `--start-grace` options plus the optional attempt-record `wait_deadline_s` / `start_grace_s` fields; they introduce no new root. C5 and C6 contribute no direct reader: C5 is excluded and C6 is constrained to comply through C1/C2. (FR-028, FR-012, FR-020)
 
 **C-29** Determinism and repeated-run identity — *artifact-class*.
 
@@ -39,7 +39,7 @@ New tests MUST run through `scripts/bash/run-tests.sh` (targeted set `targeted-s
 
 **C-33** Legacy / migration — *artifact-class content / behavior-class discharge*.
 
-Records without `settlement_version` MUST be annotated `legacy` in the audit output, MUST NOT be counted as compliant, MUST NOT be rewritten, and MUST NOT cause a failing exit code. The single deterministic refusal is `unknown` (exit 2) for unreadable evidence; no pre-built rejection mechanism is added. The incompatible-change ledger for this feature is **empty** (FR-033's allowed-delta set is empty); any future incompatible change MUST carry a migration path or a deterministic refusal plus a test, and MUST NOT leave a silent mixed state. A test MUST assert the ledger is empty and that a versioned vs legacy fixture pair behaves as specified. (FR-034, FR-035, A-10, SC-006)
+Records without `settlement_version` MUST be annotated `legacy` in the audit output, MUST NOT be counted as compliant, MUST NOT be rewritten, and MUST NOT cause a failing exit code. A legacy 5-column team-report row is exempt from the `settlement-unrecorded` predicate (C-16) — its empty-by-schema cells are absence of columns, not absence of a claim; it is annotated and exits 0. The single deterministic refusal is `unknown` (exit 2) for unreadable evidence or a missing start record; no pre-built rejection mechanism is added. The incompatible-change ledger for this feature is **empty** (FR-033's allowed-delta set is empty); any future incompatible change MUST carry a migration path or a deterministic refusal plus a test, and MUST NOT leave a silent mixed state. A test MUST assert the ledger is empty and that a versioned vs legacy fixture pair behaves as specified. (FR-034, FR-035, A-10, SC-006)
 
 **C-34** Enforcement honesty boundary — *artifact-class*.
 

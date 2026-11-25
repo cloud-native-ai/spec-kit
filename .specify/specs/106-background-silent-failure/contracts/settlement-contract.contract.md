@@ -13,15 +13,15 @@
 
 **C-02** Every value carries a positive-evidence requirement — *artifact-class content / behavior-class discharge*.
 
-§ Termination MUST carry one row per settlement value naming the positive evidence required for that value and the readings that explicitly do **not** constitute it. The rows MUST cover at least: completion = success terminal record **and** independent verification; failure = non-zero terminal record, named failure return, or exit 0 without the required completion evidence; anomaly = explicit anomaly signal **with** terminal evidence; running = a live check performed at settlement time; silent-end = start record + subject gone + all four terminal evidences absent; unknown = the unreadable/unparseable pointer set; cancelled = an explicit parent-side cancellation record. (FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, A-7)
+§ Termination MUST carry one row per settlement value naming the positive evidence required for that value and the readings that explicitly do **not** constitute it. The rows MUST cover at least: completion = success terminal record **and** independent verification, where the independent-verification mechanism is a closed four-value set — `u4`, `team-verification`, `five-element`, `return-record` (E4 of the data model) — and no mechanism outside it constitutes completion evidence; failure = non-zero terminal record, named failure return, or exit 0 without the required completion evidence **and without an explicit anomaly signal**; anomaly = explicit anomaly signal **with** terminal evidence, and an exit-0 termination carrying an explicit anomaly signal settles `anomaly` (the incomplete-failure reading applies only when no anomaly marker is present); running = a live check performed at settlement time; silent-end = start record + subject gone + all four terminal evidences absent, where for pid-less carriers "the declared wait deadline passed with no return and no live signal" substitutes for the disappearance test (C-25's `--wait-deadline` option, or an attempt's `wait_deadline_s` field); unknown = the unreadable/unparseable pointer set **or** a claimed attempt with no resolvable start record (finding label `start-record-missing`); cancelled = an explicit parent-side cancellation record. (FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, A-7)
 
 **C-03** `silent-end` is an explicit terminal state, not a fallback — *artifact-class*.
 
-§ Termination MUST state that `silent-end` is a named abnormal terminal state for "terminated with no conclusion" and that it MUST NOT be folded into `completed` or `failed`, nor reported as still running; for carriers without a pid it is "the declared wait deadline passed with no return and no live signal". (FR-006, A-7)
+§ Termination MUST state that `silent-end` is a named abnormal terminal state for "terminated with no conclusion" and that it MUST NOT be folded into `completed` or `failed`, nor reported as still running; for carriers without a pid it is "the declared wait deadline (C-25's `--wait-deadline` option, or an attempt's `wait_deadline_s` field) passed with no return and no live signal" — the same value's no-pid branch, not a second value. (FR-006, A-7)
 
 **C-04** `unknown` is a detection-defect state, never an ending — *artifact-class*.
 
-§ Termination MUST state that `unknown` is produced only when evidence is unreadable/unparseable, that it names the unreadable pointers, that it is not an ending, and that it carries the same "do not claim success" reaction as `silent-end`. (FR-007)
+§ Termination MUST state that `unknown` is produced only in two readable cases — (a) evidence is unreadable/unparseable, naming the unreadable pointers, or (b) a claimed attempt has no resolvable start record, naming the missing start slot — each carrying its finding label (`unreadable` / `start-record-missing`), that it is not an ending, and that it carries the same "do not claim success" reaction as `silent-end`. (FR-007, FR-010)
 
 **C-05** Attempts and labels — *artifact-class*.
 
@@ -29,7 +29,7 @@
 
 **C-06** Start record or `unknown`; the return channel is not liveness evidence — *artifact-class content / behavior-class discharge*.
 
-§ Termination MUST require that the parent record the attempt identity, carrier, parent identity, start time and (process carriers) pid into an existing parent-side carrier before or at dispatch, and MUST state that an attempt with no start record cannot prove it existed and settles as `unknown`, never `completed`. It MUST state that the return channel (including the seven-field `return_channel`) is a child-initiated uplink whose silence is neither liveness nor completion. (FR-010)
+§ Termination MUST require that the parent record the attempt identity, carrier, parent identity, start time, optional `wait_deadline_s` / `start_grace_s` and (process carriers) pid into the existing dispatch log directory (the `--logs-dir` root) as the additive `<label>.attempt` record before or at dispatch — C1 reuses its existing four-piece instead of writing a duplicate, and the additive file is FR-033-permitted, not a new storage root — and MUST state that an attempt with no start record cannot prove it existed and settles as `unknown` with the finding label `start-record-missing`, never `completed`. It MUST state that the return channel (including the seven-field `return_channel`) is a child-initiated uplink whose silence is neither liveness nor completion. (FR-010)
 
 **C-07** The parent settles before it reports — *artifact-class content / behavior-class discharge*.
 

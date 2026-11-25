@@ -15,7 +15,7 @@
 
 - [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
-- [x] Stability / containment claims name a baseline referent and a derivable allowed-delta set (owner: `.specify/shared/guidelines/closed-set-claims.md`)
+- [x] Stability / containment claims name a baseline referent and a derivable allowed-delta set (owner: `.specify/shared/guidelines/closed-set-claims.md`) — FR-039 / SC-009 referent re-scoped by analyze W1-07 (2026-11-25): plan EP-005 (frozen `27`, live `31` at base; allowed delta = per-file zero new blocking hits; the `== 27` equality is a disclosed pre-existing red, never claimed green)
 - [x] Backward-incompatible changes are closed over tested migration/refusal behaviors (FR-035, SC-006)
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)

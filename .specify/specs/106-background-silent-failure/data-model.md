@@ -26,6 +26,8 @@ One file per attempt, `<label>.attempt` (JSON object) in the carrier's existing 
 | `started_at` | ISO-8601 | Recorded before execution starts (C2: before the CLI launches; C4: before hand-off) |
 | `pid` | integer, optional | Process carriers only (C2 wrapper shell; C1 from the pid file) |
 | `pid_start_ticks` | integer, optional | `/proc/<pid>/stat` field 22 where available; used for pid-reuse detection |
+| `wait_deadline_s` | integer, optional | Per-attempt wait deadline in seconds for pid-less settlement; overrides the settle `--wait-deadline` option (C-25); positive integer |
+| `start_grace_s` | integer, optional | Per-attempt start grace in seconds; overrides the settle `--start-grace` option (C-25); positive integer |
 | `contract` | string | Pointer literal `superagent-definitions.md § Termination` |
 
 Existing carriers that already record equivalent facts (C1 four-piece, `exec-quant` dispatch records) are **not** duplicated; the engine reads them at their existing paths (E7).
@@ -67,7 +69,7 @@ A recorded settlement on a claim-bearing surface; two shapes exist because two c
 | `attempt_id` / `label` | string | Matches E2 / the dispatched seat label |
 | `value` | enum | E1 value (STR-003 `end_state` is the column name on the team report) |
 | `evidence` | list of pointers | Required for `completed`; required for `silent-end` to name disappearance + absence evidence |
-| `settlement_version` | integer, optional | Absent = **legacy claim**: annotated, never compliant, exit unaffected (FR-034) |
+| `settlement_version` | integer, optional | Absent = **legacy claim**: annotated, never compliant, exit unaffected, exempt from `settlement-unrecorded` (FR-034, INV08) |
 | `claimed_at` | ISO-8601 | When the claim was written |
 
 ## E6 — Settlement Finding（判定发现）
@@ -82,17 +84,18 @@ The engine's per-attempt row; the only place a derived verdict and a claim audit
 | `claim` | object, optional | The E5 snapshot the audit compared against |
 | `consistent` | boolean | False when a claim disagrees with evidence (e.g. `completed` claim with no E4) |
 | `legacy` | boolean | True when the claim/record carries no `settlement_version` (E5) |
+| `unknown_cause` | enum, optional | Present only when `verdict` = `unknown`: `unreadable` or `start-record-missing` (FR-007) |
 | `violations` | list of E7 | Zero when the attempt is cleanly settled |
 
 ## E7 — Settlement Violation（结算违例，closed）
 
 | Kind | Predicate |
 |------|-----------|
-| `settlement-unrecorded` | A claim-bearing slot exists with no value (team-report row missing `end_state`/`evidence`; claim file missing `value`) |
+| `settlement-unrecorded` | A versioned claim-bearing slot exists with no value (team-report row missing `end_state`/`evidence`; claim file missing `value`); a legacy 5-column row is exempt and only annotated `legacy` (INV08) |
 | `settlement-out-of-set` | A recorded value is outside E1's closed set |
 | `settlement-unbacked` | A recorded value lacks its required positive evidence (covers: `completed` without E4; `running` without a settlement-time live check; `silent-end` without start-record + disappearance + absence of all four terminal evidences) |
 
-`unknown` is **not** a violation kind: unreadable evidence produces E6 rows with `kind: unreadable` and the engine exits 2 (the single deterministic refusal, FR-007). The four edge kinds (`self-dispatch`, `dangling-parent`, `unbacked-role-claim`, `depth-inconsistent`) remain closed at the same page and are untouched.
+`unknown` is **not** a violation kind: unreadable evidence produces E6 rows with `kind: unreadable` and `unknown_cause: unreadable`; a claimed attempt with no resolvable start record produces a `start`-slot `lack` row with `unknown_cause: start-record-missing`; either way the engine exits 2 (the single deterministic refusal, FR-007). The four edge kinds (`self-dispatch`, `dangling-parent`, `unbacked-role-claim`, `depth-inconsistent`) remain closed at the same page and are untouched.
 
 ## E8 — Carrier Evidence Map（载体证据映射，C1…C6 closed）
 
@@ -122,12 +125,12 @@ A carrier not in this table is outside the closed inventory (FR-012) and is a sp
 
 - **INV01** A settlement value comes from E1's closed set; nothing coerces an out-of-set value (V: `settlement-out-of-set`).
 - **INV02** A `completed` verdict requires E3 success **and** E4 with non-empty resolvable evidence; exit 0 alone is not completion.
-- **INV03** A `running` verdict requires a live check performed at settlement time (pid alive, not zombie, start ticks match; or fresh heartbeat; or declared-threshold log growth; or open return channel). A stale reading is not `running`.
-- **INV04** `silent-end` requires all three: E2 start record present, execution subject gone (or, for pid-less carriers, the declared wait deadline passed), and all four terminal evidences (completed/failed/anomaly/cancelled) absent.
-- **INV05** `unknown` is produced only from unreadable/unparseable evidence, names the unreadable pointers, and the engine exits 2 — never 0.
+- **INV03** A `running` verdict requires a live check performed at settlement time (pid alive, not zombie, start ticks match; or fresh heartbeat; or log growth within the C-25 settlement live window (`--live-window`); or open return channel). A stale reading is not `running`.
+- **INV04** `silent-end` requires all three: E2 start record present, execution subject gone (or, for pid-less carriers, the C-25 wait-deadline input — `--wait-deadline`, or the attempt's `wait_deadline_s` — passed), and all four terminal evidences (completed/failed/anomaly/cancelled) absent.
+- **INV05** `unknown` is produced only from unreadable/unparseable evidence or from a claimed attempt with no resolvable start record, names the unreadable pointers or the missing start slot with its finding label (`unreadable` / `start-record-missing`), and the engine exits 2 — never 0.
 - **INV06** `cancelled` requires an explicit parent-side cancellation record written under the existing destructive-action discipline; process death or a dropped connection is never inferred as cancellation.
 - **INV07** Each attempt has one unique label; a retry is a new attempt with a new label; the old attempt's evidence is kept and its late return is never consumed as the current result.
-- **INV08** `legacy` claims (no `settlement_version`) are annotated, never counted as compliant, never rewritten, and never cause a failing exit code.
+- **INV08** `legacy` claims (no `settlement_version`) are annotated, never counted as compliant, never rewritten, never cause a failing exit code, and are exempt from the `settlement-unrecorded` predicate (E7) — a 5-column row's absent cells are absent columns, not an unrecorded claim.
 - **INV09** The engine is read-only: zero write points, no temporary files, and a fixture tree is byte-identical after a run (AST + hash legs).
 - **INV10** The same input yields byte-identical `settle` output across consecutive runs (deterministic ordering; no clock in the compared payload).
 - **INV11** Existing `.status` line format, sentinel literals, watcher verdict tokens/exit codes and the four-piece names are unchanged (extraction equality vs `fbab7a45c`).
@@ -147,7 +150,10 @@ attempt started (E2)
   ├─ no terminal record + live evidence at settlement ────► running
   └─ no terminal record + subject gone / deadline passed
         + start record + all terminal evidences absent ──► silent-end
-unreadable evidence anywhere ─────────────────────────────► unknown (exit 2, never a pass)
+unreadable evidence anywhere ─────────────────────────────► unknown (unreadable; exit 2, never a pass)
+claimed attempt with no resolvable start record ─────────► unknown (start-record-missing; exit 2)
 ```
+
+An exit-0 termination carrying an explicit anomaly line is `anomaly`; the incomplete-failure rows apply only when no anomaly marker is present.
 
 A retry starts a **new** `attempt started` transition with a new `attempt_id`; the previous row keeps its verdict.

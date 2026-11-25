@@ -77,7 +77,7 @@ python3 scripts/python/role-edge-check.py --action settle \
   --teams-dir .specify/teams --logs-dir .specify/agents/execution/logs
 ```
 
-**Expected after implementation**: each mapping row carries `end_state` + `evidence`; a row missing either is `settlement-unrecorded` (exit 1); a `completed` row with no evidence pointer is `settlement-unbacked`; a 5-column legacy report still parses and is annotated `legacy`.
+**Expected after implementation**: each mapping row carries `end_state` + `evidence`; a versioned row missing either is `settlement-unrecorded` (exit 1); a `completed` row with no evidence pointer is `settlement-unbacked`; a 5-column legacy report still parses, is annotated `legacy`, and is exempt from `settlement-unrecorded` (exit 0 — its absent cells are absent columns, not an unrecorded claim).
 
 **Premises**: new reports use the 7-column header `label | role | dispatch_duty | workspace | parent | end_state | evidence`; legacy 5-column headers remain accepted; `## Verification` carries the settlement-coverage declaration.
 **Pinning test**: `tests/contract/test_settlement_carriers.py::test_team_report_5_and_7_columns`.
