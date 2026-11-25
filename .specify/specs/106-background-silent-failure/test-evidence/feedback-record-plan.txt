@@ -1,0 +1,9 @@
+{
+  "id": "20261125T121425Z-speckit-plan",
+  "path": ".specify/feedback/20261125T121425Z-speckit-plan.md",
+  "duplicate": false,
+  "count_since_submission": 558,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
