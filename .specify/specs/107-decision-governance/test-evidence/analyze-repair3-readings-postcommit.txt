@@ -1,0 +1,37 @@
+# analyze-repair3 post-commit readings — 2026-11-25T18:01:33Z
+
+## commit
+576439fef docs(107-decision-governance): analyze round-3 repair — decidable preservation claim + pinned new-form discriminator
+
+## numstat of the artifact commit (576439fef^..576439fef)
+2	2	.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+1	1	.specify/specs/107-decision-governance/contracts/archive-and-audit.contract.md
+2	2	.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md
+1	1	.specify/specs/107-decision-governance/data-model.md
+4	4	.specify/specs/107-decision-governance/plan.md
+12	7	.specify/specs/107-decision-governance/requirements.md
+2	2	.specify/specs/107-decision-governance/research.md
+7	7	.specify/specs/107-decision-governance/tasks.md
+5	0	.specify/specs/107-decision-governance/test-evidence/analyze-domain-w1-r3.jsonl
+6	0	.specify/specs/107-decision-governance/test-evidence/analyze-domain-w2-r3.jsonl
+6	0	.specify/specs/107-decision-governance/test-evidence/analyze-domain-w3-r3.jsonl
+55	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-2026-11-26.md
+3	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-decomposition.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-pre-analyze-plan.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-pre-analyze-requirements.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-pre-analyze-tasks.txt
+50	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-readings.txt
+12	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-validate-requirements.txt
+3	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair3-validate-tasks.txt
+
+## protected record paths — zero-rewrite check (288a8a0c9..HEAD)
+$ git diff --numstat 288a8a0c9..HEAD -- .specify/register.md .specify/specs/*/checkpoints/ .specify/specs/107-decision-governance/test-evidence/analyze-repair-2026-11-26.md .specify/specs/107-decision-governance/test-evidence/analyze-repair2-2026-11-26.md .specify/specs/107-decision-governance/test-evidence/analyze-domain-w*-r2.jsonl
+(rows above: none means zero rewrite)
+
+## preservation reading after commit
+git diff --quiet ... rc=0
+numstat rows: 0
+
+## workspace guard check
+clean
+guard_exit=0
