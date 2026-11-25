@@ -1,0 +1,8 @@
+unit: /speckit.tasks   run: r20261125T113505Z-106a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_baseline)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261125T113505Z-106a clean=false findings=4
+persisted: .specify/session/20261125T122808Z-run-determination-speckit-tasks-r20261125t113505z-106a.md
