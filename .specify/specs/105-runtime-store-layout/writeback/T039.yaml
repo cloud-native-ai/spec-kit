@@ -1,0 +1,5 @@
+task: T039
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: .specify/specs/105-runtime-store-layout/verification.md materialized from test-evidence/verification-input.md (SC-001…SC-009, one smoke triple, evidence hashes for every pass, joint-acceptance rows); spec-side write because verification.md stays forbidden to the crew per handoff C-62.
+at: 2026-11-25T07:25:00Z
