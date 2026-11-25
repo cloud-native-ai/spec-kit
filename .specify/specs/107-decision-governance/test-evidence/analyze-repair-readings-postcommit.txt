@@ -1,0 +1,10 @@
+# post-commit containment reading — 2026-11-25T16:23:15Z — HEAD 346f54d60
+# command: git diff --numstat 08b59695c..HEAD -- .specify/register.md .specify/specs/107-decision-governance/checkpoints .specify/specs/107-decision-governance/plan.md
+3	0	.specify/register.md
+31	0	.specify/specs/107-decision-governance/checkpoints/03-plan.md
+31	0	.specify/specs/107-decision-governance/checkpoints/04-tasks.md
+34	0	.specify/specs/107-decision-governance/checkpoints/05-goal-team-activation.md
+26	0	.specify/specs/107-decision-governance/checkpoints/06-checklist.md
+217	0	.specify/specs/107-decision-governance/plan.md
+# deleted files:
+(empty = none)
