@@ -83,3 +83,20 @@ $ find .specify -maxdepth 1 -mindepth 1 | sort   -> the 14 store roots; no memor
   trigger/ (1 entries)
 $ tracked-entry mapping: 2999 tracked paths removed at the retired root, 0 missing at the new roots
 $ git log --follow <a moved record>   -> recorded in the close-out commit (needs the package commit first)
+
+## git log --follow (post-commit)
+$ git log --follow --oneline -- .specify/feedback/probe-map.md
+6a62a8c3a feat(105-runtime-store-layout): land P4 dogfood migration and live-reference rewrite (T025–T033)
+dae8a9424 refactor(study-code,humanize): land the study-code content batch and rename humanize to humanize-conclusion
+7f648be27 chore(078-coaching-skills): regenerate the mirrors, command copies, rendered agents and probe faces (T023)
+c3cbee212 refactor(078-coaching-skills): rename the skill package and rebuild ledger, probe, and memory-directory wiring (T004-T008)
+
+$ git log --follow --oneline -- .specify/tools/build-summary-input.py.md
+6a62a8c3a feat(105-runtime-store-layout): land P4 dogfood migration and live-reference rewrite (T025–T033)
+c6b8b9534 fix(101): close WP-05b live residue — C1 derivation row and C4 tool default
+f3b9d0881 feat(037-goal-registry): foundational — consolidate the goal index into .specify/goal/<slug>/summary/
+
+## Wrap-up accounting (P4 package, run r20261125T022857Z-06dd)
+$ run-determination.py --action determine ... -> duplicate (no-op; already determined for this run id)
+$ exec-quant.py --action collect ... -> duplicate record; no second row written
+$ feedback-utils.py --action record ... -> duplicate:true (existing entry 20261125T055151Z-skill-implement-feature)
