@@ -71,7 +71,7 @@ A recorded settlement on a claim-bearing surface; two shapes exist because two c
 | `attempt_id` / `label` | string | Matches E2 / the dispatched seat label |
 | `value` | enum | E1 value (STR-003 `end_state` is the column name on the team report) |
 | `evidence` | list of pointers | Required for `completed`; required for `silent-end` to name disappearance + absence evidence |
-| `settlement_version` | integer, optional | Absent = **legacy claim**: annotated `legacy`, never counted as compliant, never rewritten, and not judged by any E7 predicate (so it contributes no exit 1) (FR-034, INV08) |
+| `settlement_version` | integer, optional | `attempt-file` shape only. Absent = **legacy claim**: annotated `legacy`, never counted as compliant, never rewritten, and not judged by any E7 predicate (so it contributes no exit 1). The `team-report-row` shape carries no version slot — its version-bearing test is the 7-column header (E7 Legacy scope; C-16) (FR-034, INV08) |
 | `claimed_at` | ISO-8601 | When the claim was written |
 
 ## E6 — Settlement Finding（判定发现）
@@ -85,7 +85,7 @@ The engine's per-attempt row; the only place a derived verdict and a claim audit
 | `evidence` | list of `{pointer, kind}` | `kind` ∈ `start` / `live` / `terminal` / `lack` / `claim` / `unreadable` |
 | `claim` | object, optional | The E5 snapshot the audit compared against |
 | `consistent` | boolean | False when a claim disagrees with evidence (e.g. `completed` claim with no E4) |
-| `legacy` | boolean | True when the claim/record carries no `settlement_version` (E5) |
+| `legacy` | boolean | True when the claim/record is version-less by its shape's test (E7 Legacy scope): a claim file carrying no `settlement_version`; a team-report row under the legacy 5-column header |
 | `unknown_cause` | enum, optional | Present only when `verdict` = `unknown`: `unreadable` or `start-record-missing` (FR-007) |
 | `violations` | list of E7 | Zero when the attempt is cleanly settled |
 
@@ -93,11 +93,11 @@ The engine's per-attempt row; the only place a derived verdict and a claim audit
 
 | Kind | Predicate |
 |------|-----------|
-| `settlement-unrecorded` | A versioned claim-bearing slot exists with no value (team-report row missing `end_state`/`evidence`; claim file missing `value`); a legacy 5-column row is exempt and only annotated `legacy` (INV08) |
+| `settlement-unrecorded` | A version-bearing claim-bearing slot exists with no value: a 7-column team-report row (version-bearing by its header, C-16) missing `end_state`/`evidence`, or a claim file carrying `settlement_version` missing `value`; a legacy 5-column row is exempt and only annotated `legacy` (INV08) |
 | `settlement-out-of-set` | A recorded value on a version-bearing record is outside E1's closed set |
 | `settlement-unbacked` | A recorded value on a version-bearing record lacks its required positive evidence (covers: `completed` without E4; `running` without a settlement-time live check; `silent-end` without start-record + disappearance + absence of all four terminal evidences) |
 
-**Legacy scope**: all three predicates apply only to **version-bearing** records (a claim or record carrying `settlement_version`); a versionless record is annotated `legacy` (E6) and judged by none of them, so it alone never contributes exit 1 (INV08) — the `settlement-unrecorded` row's 5-column exemption is this scope's table-level instance.
+**Legacy scope**: all three predicates apply only to **version-bearing** records; the version-bearing test is per claim shape — a claim file (E5 `attempt-file`) is version-bearing iff it carries `settlement_version`, while a team-report row (E5 `team-report-row`) carries no version slot and is version-bearing iff it is parsed under the 7-column header (C-16), a 5-column row being legacy by schema. A version-less record is annotated `legacy` (E6) and judged by none of them, so it alone never contributes exit 1 (INV08); a malformed 7-column row stays version-bearing and is `settlement-unrecorded` (exit 1), while a 5-column row contributes none.
 
 `unknown` is **not** a violation kind: unreadable evidence produces E6 rows with `kind: unreadable` and `unknown_cause: unreadable`; a claimed attempt with no resolvable start record produces a `start`-slot `lack` row with `unknown_cause: start-record-missing`; either way the engine exits 2 (the single deterministic refusal, FR-007), and the legacy annotation never suppresses that refusal. The four edge kinds (`self-dispatch`, `dangling-parent`, `unbacked-role-claim`, `depth-inconsistent`) remain closed at the same page and are untouched.
 
@@ -134,7 +134,7 @@ A carrier not in this table is outside the closed inventory (FR-012) and is a sp
 - **INV05** `unknown` is produced only from unreadable/unparseable evidence or from a claimed attempt with no resolvable start record, names the unreadable pointers or the missing start slot with its finding label (`unreadable` / `start-record-missing`), and the engine exits 2 — never 0.
 - **INV06** `cancelled` requires an explicit parent-side cancellation record written under the existing destructive-action discipline; process death or a dropped connection is never inferred as cancellation.
 - **INV07** Each attempt has one unique label; a retry is a new attempt with a new label; the old attempt's evidence is kept and its late return is never consumed as the current result.
-- **INV08** `legacy` records (no `settlement_version`) are annotated `legacy`, never counted as compliant, never rewritten, and not judged by any of E7's three violation predicates — so a legacy record alone never causes exit 1; a 5-column row's absent cells are absent columns, not an unrecorded claim. The exit-2 `unknown` refusal (INV05) is a detection defect, not a judgment, and applies regardless of version.
+- **INV08** Version-bearing is decided per claim shape: a claim file by carrying `settlement_version`, a team-report row by its 7-column header (C-16). `legacy` records (a claim file without `settlement_version`; a 5-column-header row) are annotated `legacy`, never counted as compliant, never rewritten, and not judged by any of E7's three violation predicates — so a legacy record alone never causes exit 1; a 5-column row's absent cells are absent columns, not an unrecorded claim, while a malformed 7-column row stays version-bearing and is `settlement-unrecorded` (exit 1). The exit-2 `unknown` refusal (INV05) is a detection defect, not a judgment, and applies regardless of version.
 - **INV09** The engine is read-only: zero write points, no temporary files, and a fixture tree is byte-identical after a run (AST + hash legs).
 - **INV10** The same input yields byte-identical `settle` output across consecutive runs (deterministic ordering; no clock in the compared payload).
 - **INV11** Existing `.status` line format, sentinel literals, watcher verdict tokens/exit codes and the four-piece names are unchanged (extraction equality vs `fbab7a45c`).

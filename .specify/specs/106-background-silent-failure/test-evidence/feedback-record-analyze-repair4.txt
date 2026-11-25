@@ -1,0 +1,9 @@
+{
+  "id": "20261125T174002Z-skill-analyze-artifacts",
+  "path": ".specify/feedback/20261125T174002Z-skill-analyze-artifacts.md",
+  "duplicate": false,
+  "count_since_submission": 565,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
