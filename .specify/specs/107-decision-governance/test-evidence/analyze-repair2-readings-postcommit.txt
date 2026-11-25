@@ -1,0 +1,35 @@
+# analyze-repair2 post-commit readings — 2026-11-25T16:38:20Z
+
+## commit
+d33319fa7 docs(107-decision-governance): analyze round-2 repair — layered record grammar + conditional timepoints
+7f1df4320 chore(107-decision-governance): record the analyze-repair run determination, exec-quant and feedback entries
+
+## numstat of the artifact commit (d33319fa7^..d33319fa7)
+2	2	.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+1	1	.specify/specs/107-decision-governance/contracts/archive-and-audit.contract.md
+2	2	.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md
+2	2	.specify/specs/107-decision-governance/contracts/transmission-and-implementation.contract.md
+23	19	.specify/specs/107-decision-governance/data-model.md
+1	1	.specify/specs/107-decision-governance/quickstart.md
+44	29	.specify/specs/107-decision-governance/requirements.md
+3	3	.specify/specs/107-decision-governance/research.md
+7	7	.specify/specs/107-decision-governance/tasks.md
+6	0	.specify/specs/107-decision-governance/test-evidence/analyze-domain-w1-r2.jsonl
+6	0	.specify/specs/107-decision-governance/test-evidence/analyze-domain-w2-r2.jsonl
+6	0	.specify/specs/107-decision-governance/test-evidence/analyze-domain-w3-r2.jsonl
+60	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-2026-11-26.md
+3	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-decomposition.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-pre-analyze-plan.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-pre-analyze-requirements.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-pre-analyze-tasks.txt
+50	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-readings.txt
+12	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-validate-requirements.txt
+3	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair2-validate-tasks.txt
+
+## protected record paths — zero-rewrite check (7f1df4320..HEAD)
+$ git diff --numstat 7f1df4320..HEAD -- .specify/register.md <dated evidence>
+(rows: 0 — empty means zero rewrite)
+
+## workspace guard check
+clean
+guard_exit=0
