@@ -23,7 +23,7 @@ None.
 
 ## Task Reference
 
-T001–T037 as defined in `.specify/specs/106-background-silent-failure/tasks.md`.
+T001–T037 as defined in `.specify/specs/106-background-silent-failure/tasks.md`, with one ownership split: T035's crew-executed part is the `test-evidence/verification-input.md` input only; `verification.md` is materialized spec-side from that input (the path stays forbidden to every seat, C-62).
 
 ## Territory
 

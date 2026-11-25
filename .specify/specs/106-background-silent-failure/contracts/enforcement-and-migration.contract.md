@@ -19,7 +19,7 @@ The settle action MUST emit only the three settlement violation kinds owned by �
 
 **C-28** Inputs are the existing carriers plus additive records — *artifact-class*.
 
-The settle action MUST read: the driver four-piece + stage sidecar/spine (C1), the C2 triplet + `.attempt`/`.end`/optional `.settlement`, the team report mapping rows (C3), and the C4 native attempt records; it MUST NOT introduce a new root concept beyond the existing `--state-dir` / `--teams-dir` / `--logs-dir` roots. The settlement boundary inputs are C-25's `--live-window` / `--wait-deadline` / `--start-grace` options plus the optional attempt-record `wait_deadline_s` / `start_grace_s` fields; they introduce no new root. C5 and C6 contribute no direct reader: C5 is excluded and C6 is constrained to comply through C1/C2. (FR-028, FR-012, FR-020)
+The settle action MUST read: the driver four-piece + stage sidecar/spine (C1), the C2 triplet + `.attempt`/`.end`/optional `.settlement`, the C3 seat start records (E2, carrier `c3-team-seat`) + team report mapping rows, and the C4 native attempt records; it MUST NOT introduce a new root concept beyond the existing `--state-dir` / `--teams-dir` / `--logs-dir` roots. The settlement boundary inputs are C-25's `--live-window` / `--wait-deadline` / `--start-grace` options plus the optional attempt-record `wait_deadline_s` / `start_grace_s` fields; they introduce no new root. C5 and C6 contribute no direct reader: C5 is excluded and C6 is constrained to comply through C1/C2. (FR-028, FR-012, FR-017, FR-020)
 
 **C-29** Determinism and repeated-run identity — *artifact-class*.
 

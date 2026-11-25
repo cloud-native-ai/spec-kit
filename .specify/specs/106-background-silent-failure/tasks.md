@@ -21,7 +21,7 @@
 - DoD-5: 镜像与副本 — plan.md § Mirror Obligations 逐行落地；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员（触及 scope 逐字节一致）；`regen-command-copies.py --check` exit 0；零手改镜像 / 副本。
 - DoD-6: 保留面空差异 — watcher 判定 token 集 / 退出码集 / 哨兵字面量集与 `fbab7a45c` 基线逐成员相等；`--self-test` 39 passed / 0 failed；五要素上行与七字段下行文本不变；既有 `.status` 行格式可被基线读取器读回；确认纪律冻结 total 的 `31 != 27` 红是 EP-005 的既有事实，按「触及文件零新增命中」度量，不声称 `== 27` 绿。
 - DoD-7: 行为类义务如实分类（C-34 集合）经评审/变异演练举证；四个变异演练各至少一条测试转红并留证在 `test-evidence/mutation-drill.md`；演练未转红即记守卫缺陷，不软化。
-- DoD-8: `verification.md` 逐条记录 SC-001…SC-009 的状态、命令与证据指针；`final` 路径的 SC-001 / SC-002 / SC-004 记 `pass` 并带 smoke 记录。
+- DoD-8: `verification.md` 逐条记录 SC-001…SC-009 的状态、命令与证据指针；`final` 路径的 SC-001 / SC-002 / SC-004 记 `pass` 并带 smoke 记录。crew 只写 `test-evidence/verification-input.md`（T035 的 crew 部分）；`verification.md` 由 spec 侧据此派生落盘（该文件对所有 crew 席位为 forbidden 领土）。
 
 **DoD Status**: pending
 
@@ -61,7 +61,7 @@
 
 - **框架源（编辑面）**: `shared/`、`skills/`、`scripts/`、`templates/`、`agents/`、`docs/`。
 - **生成面（MUST NOT 手改）**: `.specify/shared/**`、`.specify/skills/**`、`.specify/scripts/**`、`.specify/agents/templates/**`（由 `sync-mirrors.py` 投影）；`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`（由 `regen-command-copies.py` 生成）。
-- **证据落点（本特性）**: `.specify/specs/106-background-silent-failure/` 下的 `notes/pre-change-measurements.md`、`notes/red-first-evidence.md`、`notes/quickstart-run.md`、`coverage-baseline.txt`（已冻结）、`test-evidence/mutation-drill.md`、`test-evidence/reaction-drill.md`、`test-evidence/enforcement-honesty.md`、`test-evidence/acceptance-106.md`、`test-evidence/non-goals-audit.md`、`verification.md`。
+- **证据落点（本特性）**: `.specify/specs/106-background-silent-failure/` 下的 `notes/pre-change-measurements.md`、`notes/red-first-evidence.md`、`notes/quickstart-run.md`、`coverage-baseline.txt`（已冻结）、`test-evidence/mutation-drill.md`、`test-evidence/reaction-drill.md`、`test-evidence/enforcement-honesty.md`、`test-evidence/acceptance-106.md`、`test-evidence/non-goals-audit.md`、`test-evidence/verification-input.md`（crew 可写的验收输入）；`verification.md` 由 spec 侧（驱动者）在 T035 输入落盘后派生写回——它对所有 crew 席位是 forbidden 领土（`handoff.md` § Territory / `team.md` territory.forbidden）。
 - **只读面（零修改）**: `skills/external/sdd-loop-driver/scripts/watch-target.sh`、`skills/external/sdd-loop-driver/scripts/stage-runner.sh`、`scripts/python/exec-quant.py`、`scripts/python/sync-mirrors.py`、`scripts/python/regen-command-copies.py`、`scripts/python/scan-confirmation-gates.py`、`docs/reference/history/**`。
 - **plan-owned 面（spec 侧所有；crew 不可写）**: `plan.md`、`data-model.md`、`contracts/`、`quickstart.md`、`research.md`、`feature-ref.md` —— 只有 spec 侧（驱动者 / analyze-repair）修订；crew 的 forbidden 领土（`handoff.md` § Territory、`team.md` territory.forbidden）覆盖这些路径，二者冲突时以领土契约为准。
 
@@ -96,14 +96,14 @@
 | FR-007 | T002、T006、T007、T028 | FR-028 | T004、T006、T007、T008 |
 | FR-008 | T003、T006、T007 | FR-029 | T006、T007、T025 |
 | FR-009 | T002、T007、T020 | FR-030 | T025 |
-| FR-010 | T002、T007、T010、T013 | FR-031 | T009、T024、T027 |
+| FR-010 | T002、T007、T010、T013、T017 | FR-031 | T009、T024、T027 |
 | FR-011 | T002、T019 | FR-032 | T009、T024、T027 |
 | FR-012 | T017、T026 | FR-033 | T023、T027 |
 | FR-013 | T004、T017、T026 | FR-034 | T003、T028、T029 |
 | FR-014 | T007、T008、T023 | FR-035 | T028、T029 |
 | FR-015 | T009、T010 | FR-036 | T031 |
 | FR-016 | T007、T009、T011 | FR-037 | T030 |
-| FR-017 | T009、T012、T018 | FR-038 | T026、T036 |
+| FR-017 | T007、T009、T012、T017、T018 | FR-038 | T026、T036 |
 | FR-018 | T009、T013 | FR-039 | T023、T036 |
 | FR-019 | T009、T014 | FR-040 | T036 |
 | FR-020 | T009、T015、T026 | FR-041 | T026、T032、T036 |
@@ -168,12 +168,12 @@
 ### Tests for User Story 1 (MANDATORY) ⚠️
 
 - [ ] T004 [US1] [blockedBy: T002,T003] 红先新建 `tests/contract/test_settlement_contract_definitions.py`：断言 owner 页面逐字包含 `silent-end` 与 `unknown`、七值与三分语义类、逐值正证据行、四类边违例保持与三类结算违例、`settlement_version` 与 legacy 规则、virtual/native 边界；反向断言 `shared/`、`skills/`、`templates/` 的声明面不存在第二张状态值表或第二份证据矩阵（只以指向 owner 的指针出现，FR-013）；运行 `scripts/bash/run-tests.sh` 记录红并把命令、真实输出、退出码写入 `notes/red-first-evidence.md`。
-- [ ] T005 [P] [US1] [blockedBy: T002,T003] 新建确定性夹具树 `tests/fixtures/settlement/builders.py` 与静态夹具目录 `tests/fixtures/settlement/c1-state/`、`tests/fixtures/settlement/c3-report/`、`tests/fixtures/settlement/legacy/logs/`、`tests/fixtures/settlement/versioned/logs/`：按参见 `data-model.md` § E2 / § E3 / § E5 的形状生成六类终局（completed / failed / anomaly / cancelled / running / silent-end）、不可读指针、活体与半死（pid 丢失或复用）夹具，全部落在 `tmp_path` 或提交型静态目录，不用固定 `sleep`（FR-031、FR-032）。
+- [ ] T005 [P] [US1] [blockedBy: T002,T003] 新建确定性夹具树 `tests/fixtures/settlement/builders.py` 与静态夹具目录 `tests/fixtures/settlement/c1-state/`、`tests/fixtures/settlement/c3-report/`、`tests/fixtures/settlement/legacy/logs/`、`tests/fixtures/settlement/versioned/logs/`：按参见 `data-model.md` § E2 / § E3 / § E5 的形状生成六类终局（completed / failed / anomaly / cancelled / running / silent-end）、不可读指针、活体与半死（pid 丢失或复用）夹具、C3 席位起点记录（`c3-team-seat` 的 E2 记录）与缺起点记录两态，全部落在 `tmp_path` 或提交型静态目录，不用固定 `sleep`（FR-031、FR-032）。
 
 ### Implementation for User Story 1
 
 - [ ] T006 [US1] [blockedBy: T005] 红先新建 `tests/contract/test_settlement_engine.py`：断言只读 `scripts/python/role-edge-check.py` 的 `--action settle` 存在且输出自有 schema（必需键超集断言，不锁定排他键集）与逐尝试 findings、六类终局夹具的结算值与证据指针、退出码 0/1/2 的三义（含 `silent-end` 判对也是 0、不可读为 2 且 `unknown` 永不为 0）、同输入两次运行逐字节相同、夹具树运行前后逐字节不变（零写入）、C1 判定映射（DONE / FAILED / ANOMALY / INCOMPLETE / DEAD / NO_SIGNAL / TIMEOUT / RUNNING）、C2 记录按证据结算、claim 与推导值不一致即 `settlement-unbacked`；调用唯一入口 `scripts/bash/run-tests.sh` 记录红并写入 `notes/red-first-evidence.md`。
-- [ ] T007 [US1] [blockedBy: T002,T003,T006] 在 `scripts/python/role-edge-check.py` 加性实现 `--action settle`（零写入、无临时文件；`report` / `query` 输出逐字节不变）：读取 C1 四件套与 stage sidecar/spine、C2 三件套加 `<label>.attempt` / `<label>.end` / 可选 `<label>.settlement`、C3 报告映射行（5 列 legacy 与 7 列新格式）、C4 native attempt 记录；声明边界输入选项 `--live-window` / `--wait-deadline` / `--start-grace`（缺省、值域与记录字段 `wait_deadline_s` / `start_grace_s` 优先级按 C-25）；输出 E6 findings（value / class / evidence 指针 / consistent / legacy / unknown_cause / violations）与三类封闭违例；退出码沿用 0 判净 / 1 违例 / 2 `unknown`（不可读 / 不可解析或 `start-record-missing`，命名对应指针或起点槽）；`-h` / `--version` 与未声明选项拒绝保持前置（FR-028、FR-029）。 [green: contracts/carrier-conformance.contract.md#C-13] [green: contracts/enforcement-and-migration.contract.md#C-25] [green: contracts/enforcement-and-migration.contract.md#C-26] [green: contracts/enforcement-and-migration.contract.md#C-27] [green: contracts/enforcement-and-migration.contract.md#C-28]
+- [ ] T007 [US1] [blockedBy: T002,T003,T006] 在 `scripts/python/role-edge-check.py` 加性实现 `--action settle`（零写入、无临时文件；`report` / `query` 输出逐字节不变）：读取 C1 四件套与 stage sidecar/spine、C2 三件套加 `<label>.attempt` / `<label>.end` / 可选 `<label>.settlement`、C3 席位起点记录与报告映射行（5 列 legacy 与 7 列新格式）、C4 native attempt 记录；声明边界输入选项 `--live-window` / `--wait-deadline` / `--start-grace`（缺省、值域与记录字段 `wait_deadline_s` / `start_grace_s` 优先级按 C-25）；输出 E6 findings（value / class / evidence 指针 / consistent / legacy / unknown_cause / violations）与三类封闭违例；退出码沿用 0 判净 / 1 违例 / 2 `unknown`（不可读 / 不可解析或 `start-record-missing`，命名对应指针或起点槽）；`-h` / `--version` 与未声明选项拒绝保持前置（FR-028、FR-029）。 [green: contracts/carrier-conformance.contract.md#C-13] [green: contracts/enforcement-and-migration.contract.md#C-25] [green: contracts/enforcement-and-migration.contract.md#C-26] [green: contracts/enforcement-and-migration.contract.md#C-27] [green: contracts/enforcement-and-migration.contract.md#C-28]
 - [ ] T008 [US1] [blockedBy: T006,T007] US1 转绿与取证：运行 `tests/contract/test_settlement_contract_definitions.py`、并运行 `tests/contract/test_settlement_engine.py`、再运行既有的 `tests/contract/test_role_edge_engine.py` 确认 `report` / `query` schema 原样；把同输入两次运行逐字节相同与零写入哈希的读数写入 `notes/red-first-evidence.md`，并对 T001 的 report 基线做逐字节比较（FR-014、FR-028）。 [green: contracts/enforcement-and-migration.contract.md#C-29]
 
 **Checkpoint**: US1 独立可验——六类终局各得一个封闭值且带证据指针；不可读即 `unknown`（exit 2）。
@@ -188,7 +188,7 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T009 [US2] [blockedBy: T007] 红先新建 `tests/contract/test_settlement_carriers.py`：C2 的 SIGKILL 静默死亡（无 `.end`、pid 消失 → `silent-end`）、TERM/INT/HUP trap 写出终止记录（非零 → `failed`）、活体反向（pid 活 → `running`，不得 `silent-end`）、退出 0 无完成声明 → `failed`（incomplete）、`.status` 行与基线读取器读回一致；C3 的 5 列 legacy 与 7 列新头（缺 `end_state`/`evidence` → `settlement-unrecorded`；`completed` 无证据 → `settlement-unbacked`）；C4 与 C5 的文本钉（尝试记录、前台终结分支、virtual 排除与未完成不得报 `completed`）；C6 的逐值处置措辞；运行 `scripts/bash/run-tests.sh` 记录红并写入 `notes/red-first-evidence.md`（FR-015、FR-016、FR-017、FR-018、FR-019、FR-020、FR-021）。
+- [ ] T009 [US2] [blockedBy: T007] 红先新建 `tests/contract/test_settlement_carriers.py`：C2 的 SIGKILL 静默死亡（无 `.end`、pid 消失 → `silent-end`）、TERM/INT/HUP trap 写出终止记录（非零 → `failed`）、活体反向（pid 活 → `running`，不得 `silent-end`）、退出 0 无完成声明 → `failed`（incomplete）、`.status` 行与基线读取器读回一致；C3 的 5 列 legacy 与 7 列新头（缺 `end_state`/`evidence` → `settlement-unrecorded`；`completed` 无证据 → `settlement-unbacked`）；C3 席位静默死亡（有起点记录、无报告行）→ `silent-end`，无起点记录 → `unknown`（`start-record-missing`）；C4 与 C5 的文本钉（尝试记录、前台终结分支、virtual 排除与未完成不得报 `completed`）；C6 的逐值处置措辞；运行 `scripts/bash/run-tests.sh` 记录红并写入 `notes/red-first-evidence.md`（FR-015、FR-016、FR-017、FR-018、FR-019、FR-020、FR-021）。
 
 ### Implementation for User Story 2
 
@@ -199,7 +199,7 @@
 - [ ] T014 [P] [US2] [blockedBy: T002] 在 `shared/definitions/subagent-definitions.md` § Three Execution Modes 写入 virtual 排除：不能脱离会话、父侧就是执行者、不存在孤儿边、因此排除在后台结算之外，且未完成的 virtual 工作不得报 `completed`，并附指向结算 owner 的指针（FR-019）。 [green: contracts/carrier-conformance.contract.md#C-18]
 - [ ] T015 [US2] [blockedBy: T002] 在 `shared/workflow/external-dispatch-recipes.md` 把 Recipe 4 的单一 stall 句替换为逐值处置（无哨兵且主体消失/无终止记录 → `silent-end`，证据不可读 → `unknown`，无哨兵但主体仍活 → `running`），并限定后台配方只允许合规 runner/wrapper 或显式前台终结两形态；Recipe 7 的结果契约写明每个校验者独立结算、缺失状态/结论即 `failed`（incomplete）并按既有规则重问、不得从波次结果静默消失，结算 owner 以指针引用（FR-020、FR-021）。 [green: contracts/carrier-conformance.contract.md#C-19] [green: contracts/carrier-conformance.contract.md#C-20]
 - [ ] T016 [US2] [blockedBy: T003] 在 `shared/definitions/superagent-definitions.md` § Termination 追加 observer 可选句：observer 可记录结算事实但不得成为唯一结算载体，没有 observer 的线仍必须结算；不新增 probe class、handler binding 或 observer 依赖（FR-022）。 [green: contracts/carrier-conformance.contract.md#C-21]
-- [ ] T017 [US2] [blockedBy: T002,T003] 为派发入口与派发职责定义各写一行结算 owner 指针：`skills/internal/run-team/SKILL.md`、`skills/external/sdd-loop-driver/SKILL.md`、`templates/commands/agents.md`、`templates/commands/team.md`、`agents/sdd-plan-coordinator.agent.md`、`agents/sdd-task-coordinator.agent.md`、`agents/sdd-implement-coordinator.agent.md`、`agents/sdd-review-coordinator.agent.md`；叶子执行者模板不获得第二套结算逻辑；任何一处都不得出现第二张状态值表或第二份证据矩阵（FR-012、FR-013）。 [green: contracts/carrier-conformance.contract.md#C-22]
+- [ ] T017 [US2] [blockedBy: T002,T003] 为派发入口与派发职责定义各写一行结算 owner 指针：`skills/internal/run-team/SKILL.md`、`skills/external/sdd-loop-driver/SKILL.md`、`templates/commands/agents.md`、`templates/commands/team.md`、`agents/sdd-plan-coordinator.agent.md`、`agents/sdd-task-coordinator.agent.md`、`agents/sdd-implement-coordinator.agent.md`、`agents/sdd-review-coordinator.agent.md`；其中 `skills/internal/run-team/SKILL.md` 的入口行同时声明席位派发前的起点记录义务（E2 `<label>.attempt`，carrier `c3-team-seat`，或复用同 label 的 C1/C2 起点证据，不重复写入）；叶子执行者模板不获得第二套结算逻辑；任何一处都不得出现第二张状态值表或第二份证据矩阵（FR-012、FR-013、FR-017）。 [green: contracts/carrier-conformance.contract.md#C-22]
 - [ ] T018 [US2] [blockedBy: T009,T011,T012,T013,T014,T015,T016,T017] US2 转绿与取证：运行 `tests/contract/test_settlement_carriers.py` 全模块，逐载体记录静默形态的结算值与反应读数（C1/C2/C3/C4/C6；C5 为排除断言），并把 `.status` 旧格式可读、7 列新头解析、指针行使 owner 唯一性写入 `notes/red-first-evidence.md`（FR-017）。
 
 **Checkpoint**: US2 独立可验——每个后台可脱离载体都能被同一判定面结算；virtual 与前台同步的排除有文本与断言；入口指针全部指向同一 owner。
@@ -280,7 +280,7 @@
 
 - [ ] T033 [blockedBy: T022,T027,T032] quickstart 实跑：执行 `quickstart.md` 的 S-0、S-1、S-2、S-3、S-4、S-5、S-6、S-7 可执行部分并贴真实输出（S-1/S-3/S-4/S-5 此时已可执行），teardown 只删除自建的 `.specify/.tmp/settlement-demo`；落盘 `notes/quickstart-run.md`。
 - [ ] T034 [blockedBy: T033] 验收证据包：写 `test-evidence/acceptance-106.md` 逐条记录 SC-001…SC-009 的状态、测量命令、真实输出与证据指针（SC-001 / SC-004 / SC-008 的活 / 死 / 半死夹具读数、SC-002 的守卫退出码、SC-003 的三集合相等、SC-005 的覆盖矩阵、SC-006 的 legacy / versioned 与镜像读数、SC-007 的重复运行 diff 与无固定 sleep 扫描、SC-009 的 gate 读数）；final / supporting 路径标注与 `requirements.md` 一致。
-- [ ] T035 [blockedBy: T034] 写 `.specify/specs/106-background-silent-failure/verification.md`：逐 SC 状态行（SC-001 / SC-002 / SC-004 为 `final` 且记 `pass`，其余按实测 supporting 读数）、`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（指向存在的证据文件）与 `deferred_tasks=`（无 `[~]` 时为空）；不伪造未测读数。
+- [ ] T035 [blockedBy: T034] 写逐 SC 验收输入 `.specify/specs/106-background-silent-failure/test-evidence/verification-input.md`（crew 可写）：逐 SC 状态行（SC-001 / SC-002 / SC-004 为 `final` 且记 `pass`，其余按实测 supporting 读数）、`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（指向存在的证据文件）与 `deferred_tasks=`（无 `[~]` 时为空）；不伪造未测读数。`verification.md` 由 spec 侧（驱动者）在该输入落盘后派生写回——该文件对所有 crew 席位为 forbidden 领土（`handoff.md` § Territory / `team.md` territory.forbidden），crew 只写本行输入、不写该文件。
 - [ ] T036 [blockedBy: T032,T035] 非目标与零第二机制审计：断言零自动 kill / stop / retry、零推送 / 合并 / 删分支、零证据删除 / 改写 / 历史重写、零新增调度器 / 注册表 / 队列 / 存储 / 通知通道、`.status` 与哨兵字面量不变、只读 `scripts/python/scan-confirmation-gates.py` 的触及文件零新增命中；调用 `scripts/python/scan-confirmation-gates.py --root . --json` 与只读 `scripts/python/account-clause-coverage.py --spec-dir .specify/specs/106-background-silent-failure`，把命令、真实输出与结论写入 `test-evidence/non-goals-audit.md`（FR-038、FR-039、FR-040）。
 - [ ] T037 [blockedBy: T036] 最终门禁：调用 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/106-background-silent-failure/tasks.md`（exit 0）、调用 `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/106-background-silent-failure --stage tasks --repo .`（decision=pass errors=0）、再调用 `python3 scripts/python/sync-mirrors.py --check` 与 `python3 scripts/python/regen-command-copies.py --check`、并断言 `grep -cE '^- \[[ >]\]' .specify/specs/106-background-silent-failure/tasks.md` 返回 0；命令与读数写入 `test-evidence/final-gate.txt`。
 

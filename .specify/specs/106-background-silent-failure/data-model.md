@@ -23,7 +23,7 @@ One file per attempt, `<label>.attempt` (JSON object) in the carrier's existing 
 | `attempt_id` | string | Equal to the dispatch `label`; unique per attempt; a retry is a new label (FR-009) |
 | `carrier` | enum | `c1-fork`, `c2-subprocess`, `c3-team-seat`, `c4-native` (C5/C6 write no attempt record) |
 | `parent_identity` | string | The dispatch edge's parent label/root identity |
-| `started_at` | ISO-8601 | Recorded before execution starts (C2: before the CLI launches; C4: before hand-off) |
+| `started_at` | ISO-8601 | Recorded before execution starts (C2: before the CLI launches; C3: before seat hand-off — or the same label's existing C1/C2 start evidence when the seat is dispatched through them; C4: before hand-off) |
 | `pid` | integer, optional | Process carriers only (C2 wrapper shell; C1 from the pid file) |
 | `pid_start_ticks` | integer, optional | `/proc/<pid>/stat` field 22 where available; used for pid-reuse detection |
 | `wait_deadline_s` | integer, optional | Per-attempt wait deadline in seconds for pid-less settlement; overrides the settle `--wait-deadline` option (C-25); positive integer |
@@ -103,7 +103,7 @@ The engine's per-attempt row; the only place a derived verdict and a claim audit
 |----|----------------------|---------------------------|---------------------------|
 | C1 | driver stage (fork) | `pid-`, `status-`, `log-`, `heartbeat-<line>-<stage>`; stage sidecar `prompt-*.md.meta.json`; U4/`last_verdict` pointer from the spine/checkpoints | stage-runner (existing four-piece; no new file) |
 | C2 | `dispatch.sh` subprocess | existing `.live.log` / `.jsonl` / `.status` + new `.attempt` / `.end` / optional `.settlement` | `dispatch.sh` |
-| C3 | team run report | `## Execution Detail` mapping row + `## Verification` | the report row (E5 surface) |
+| C3 | team run report | `## Execution Detail` mapping row + `## Verification` + the seat's E2 `<label>.attempt` (carrier `c3-team-seat`, `started_at` before hand-off) or the same label's existing C1/C2 start evidence | `run-team` seat dispatch (no duplicate when dispatched through C1/C2); the report row remains the E5 claim surface, not the start record |
 | C4 | native host subagent | `.attempt` in the existing dispatch log dir + return record / five elements | `run-agent` |
 | C5 | virtual | none — excluded; no detachable edge | none |
 | C6 | direct recipes | only through a compliant runner (C1/C2 evidence) or foreground-terminal | none extra |
@@ -126,7 +126,7 @@ A carrier not in this table is outside the closed inventory (FR-012) and is a sp
 - **INV01** A settlement value comes from E1's closed set; nothing coerces an out-of-set value (V: `settlement-out-of-set`).
 - **INV02** A `completed` verdict requires E3 success **and** E4 with non-empty resolvable evidence; exit 0 alone is not completion.
 - **INV03** A `running` verdict requires a live check performed at settlement time (pid alive, not zombie, start ticks match; or fresh heartbeat; or log growth within the C-25 settlement live window (`--live-window`); or open return channel). A stale reading is not `running`.
-- **INV04** `silent-end` requires all three: E2 start record present, execution subject gone (or, for pid-less carriers, the C-25 wait-deadline input — `--wait-deadline`, or the attempt's `wait_deadline_s` — passed), and all four terminal evidences (completed/failed/anomaly/cancelled) absent.
+- **INV04** `silent-end` requires all three: E2 start record present (C3: the seat's E2 record or the same label's C1/C2 start evidence), execution subject gone (process carriers: recorded pid absent — disappeared, or never appeared within C-25's `--start-grace` / the attempt's `start_grace_s`; for pid-less carriers: the C-25 wait-deadline input — `--wait-deadline`, or the attempt's `wait_deadline_s` — passed with the settlement-time live check finding no live signal), and all four terminal evidences (completed/failed/anomaly/cancelled) absent.
 - **INV05** `unknown` is produced only from unreadable/unparseable evidence or from a claimed attempt with no resolvable start record, names the unreadable pointers or the missing start slot with its finding label (`unreadable` / `start-record-missing`), and the engine exits 2 — never 0.
 - **INV06** `cancelled` requires an explicit parent-side cancellation record written under the existing destructive-action discipline; process death or a dropped connection is never inferred as cancellation.
 - **INV07** Each attempt has one unique label; a retry is a new attempt with a new label; the old attempt's evidence is kept and its late return is never consumed as the current result.

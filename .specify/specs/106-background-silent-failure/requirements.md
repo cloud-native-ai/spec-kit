@@ -28,7 +28,7 @@
 
 - **C1 fork 载体（SDD 驱动阶段派发）**：`skills/external/sdd-loop-driver/scripts/stage-runner.sh` 写四件套（pid / status / log / heartbeat）与 runner log；`scripts/watch-target.sh` 拥有判定状态机与退出码；`references/watch-model.md` §2–§3 规定「完成需正证据」。`NO_SIGNAL` / `DEAD` / `INCOMPLETE` 已覆盖该载体的部分静默形态，065a 的状态快照另检测 `dead-no-exit-record`、`unwatched`、`artifacts-without-completion` 等中断形态。这是**已有静默退出契约**的一侧。
 - **C2 subprocess 载体（`skills/internal/create-team/scripts/dispatch.sh`）**：产出 `.live.log` / `.jsonl` / `.status` 三件套；`.status` 只在管线正常走到末尾时写一次 `<label> exit=<code>`，脚本自身**没有 trap、没有 pid 记录、没有心跳**。若包装脚本被 SIGKILL、宿主被杀或机器中断，目录里只剩停止增长的日志：**没有终止记录，也没有可判活的 pid**。这是**缺失静默退出契约**的一侧。
-- **C3 团队席位**：`skills/internal/run-team/SKILL.md` 经 C1/C2 派发席位；`skills/internal/create-team/SKILL.md` 的运行报告有 `## Execution Detail` 派发映射表与必填 `## Verification`，但映射表没有「该席位以什么状态结束」这一列——一个席位静默死亡时，报告仍可能以成功语气收尾。
+- **C3 团队席位**：`skills/internal/run-team/SKILL.md` 经 C1/C2 派发席位；`skills/internal/create-team/SKILL.md` 的运行报告有 `## Execution Detail` 派发映射表与必填 `## Verification`，但映射表没有「该席位以什么状态结束」这一列，也没有席位起点记录（报告行只在报告写就时出现）——一个席位静默死亡时，报告仍可能以成功语气收尾。
 - **C4 native / C5 virtual**：`skills/internal/run-agent/SKILL.md` 要求回传携带五要素，缺一即不完整、不得消费；但**尝试记录只在父侧记忆中**，回归载体里没有一个「这个尝试已开始、至今没有返回」的持久事实。native 后台任务若被宿主丢失，父侧无法凭既有载体证明它消失过；virtual 不脱离会话，不存在孤儿边，但当前也没有把这一排除写成显式规则。
 - **C6 直接外部配方**：`.specify/shared/workflow/external-dispatch-recipes.md` 的后台配方只承诺阶段粒度观测，且把「超过超时仍无哨兵」写成 stall；在「进程已死且无终止记录」与「进程仍活」两种情形下，这同一句话给出的处置方向相反。
 - **契约层的既有半句**：`.specify/shared/definitions/superagent-definitions.md` § The super↔sub Protocol § Termination 已声明边的结束值 `completed` / `failed` / `cancelled` 且「silent orphaning is a defect」；但**没有把静默终止命名为一个可观测状态，没有给出每个状态的正证据，也没有任何守卫让它转红**。本特性修订这一 owner 章节，而不是另立一套平行定义。
@@ -49,7 +49,7 @@
 | **A-4** | **载体范围 = 后台可脱离者**：C1 fork、C2 subprocess、C3 团队席位、C4 native（仅在宿主提供后台形态时）、C6 直接外部配方在范围内；C5 virtual 显式排除（不能脱离会话，父侧就是执行者，不存在孤儿边），但父侧仍不得把未完成的 virtual 工作报成 `completed`。 | 不静默缩小请求：把 virtual 排除的理由写明并留下「未完成不得报成功」的义务，而不是假装它不存在。native 是否后台由宿主决定，故按「宿主提供则适用、否则前台终结」双分支写明。 |
 | **A-5** | **后台派发 = 可脱离派发回合的执行**；前台 native/virtual 的工具返回本身就是终止事件，不产生持久边。 | 与 `.specify/shared/definitions/subagent-definitions.md` § Three Execution Modes 的承载分类一致；避免把前台同步调用也纳入异步结算。 |
 | **A-6** | **零第二机制**：不新建存储、注册表、调度器、队列、守护进程、通知通道或 child list；结算是对**既有载体**的只读分类。契约的单一 owner 是 `.specify/shared/definitions/superagent-definitions.md` § Termination（本特性修订），载体判定仍归 `references/watch-model.md` 与 065a，边判定优先复用 `scripts/python/role-edge-check.py`；新引擎只有在 plan 记录「既有 owner 不覆盖」的裁定后才允许。 | 宪法 IX / 政策 One Source Of Truth；简报明确要求「不要建造第二套机制」。 |
-| **A-7** | **正证据原则延伸**：`completed` / `failed` / `anomaly` / `cancelled` / `silent-end` 都必须有**正向记录**；「没看到输出」「进程不在了但没查」不构成任何终态证据。`silent-end` 需要「尝试已开始」+「执行主体已消失」+「四类终态证据均缺席」三件同时成立；对没有 pid 的载体，以「声明等待期限（判定面选项 `--wait-deadline`，其缺省与值域 owner：C-25）已过、无返回且无活信号」作为「执行主体已消失」这一件的替代判据——这是同一值的无 pid 分支，不是第二个值。 | 延续 watch-model 的「完成需正证据」；否则静默终止会被读成「未知」，而未知又会被读成「还行」。 |
+| **A-7** | **正证据原则延伸**：`completed` / `failed` / `anomaly` / `cancelled` / `silent-end` 都必须有**正向记录**；「没看到输出」「进程不在了但没查」不构成任何终态证据。`silent-end` 需要「尝试已开始」+「执行主体已消失」+「四类终态证据均缺席」三件同时成立；对没有 pid 的载体，以「声明等待期限（判定面选项 `--wait-deadline`，其缺省与值域 owner：C-25）已过、无返回且无活信号」作为「执行主体已消失」这一件的替代判据——期限只触发结算时刻的观测，观测时已出现的证据优先（见 FR-006）；这是同一值的无 pid 分支，不是第二个值。 | 延续 watch-model 的「完成需正证据」；否则静默终止会被读成「未知」，而未知又会被读成「还行」。 |
 | **A-8** | **反应三选一**：report / retry / stop；禁止静默修复。`silent-end` 与 `unknown` 按 fast-fail 的异常停纪律上送，不得当作普通失败原样重派。重试永远是**新尝试、新 label**，旧证据保留。 | owner：`.specify/shared/guidelines/fast-fail.md`、`superagent-definitions.md` § Attempts。新增计数器或自动重试器会造出第二套处置。 |
 | **A-9** | **既有契约的包含性保持**：哨兵字面量、watcher 判定/退出码/`--self-test`、五要素上行、七字段下行、确认纪律与其冻结预算、两槽位测试预算的允许差异集为**空集**；新字段/新文件一律加性；不改变既有 `.status` 行格式。 | 简报的 preserve 要求；同时满足 `closed-set-claims.md` 的五要件（基线、比较单元、允许集来源、补集断言、无未定义聚合词）。 |
 | **A-10** | **迁移 = 前向加性 + 旧记录显式标注**：新格式记录以**加性字段**声明结算契约版本（随结算承载记录声明，不改既有行格式）；无版本的历史记录/报告按 dated record 不改写，但在**结算判定/审计输出**中标注 legacy，**不得**被报成「符合新契约」，且 legacy 标注本身**不构成失败退出码**。不新增预造拒绝机制：证据不可读由 [[STR-002]] 承担确定性拒绝语义；不兼容的活面变更按 FR-035 自带迁移/拒绝并附测试（本特性的允许差异集为空集，即不发生）。 | 历史记录是当时事实，不是待修缺陷；「legacy 沉默通过」才是盲检类失效。标注、拒绝、禁止三分闭合，避免第二套拒绝机制。 |
@@ -150,7 +150,7 @@
 - **进程被 SIGKILL**：无终止记录、pid 已消失 → `silent-end`；若启动宽限（判定面选项 `--start-grace`，缺省与值域 owner：C-25）内 pid 从未出现，同样按 `silent-end`，而不是「仍在启动」。
 - **包装脚本捕获到 SIGTERM 并写出终止记录**：按记录结算（非零 → `failed`）；只有父侧经既有破坏性纪律显式取消时才可记 `cancelled`。
 - **pid 被复用或已僵尸**：不算存活；没有终止记录时按 `silent-end`，不得因 `kill -0` 成功就报 `running`。
-- **期限之后的晚完成**：在既有 deadline grace 内出现终止/哨兵证据时按新证据重判；宽限耗尽仍无终态才判静默终止类结果，不得提前宣布消失。
+- **期限之后的晚完成**：声明等待期限到点只触发结算时刻观测（FR-006 的唯一读法）；观测时已出现的终止/哨兵证据按证据重判该尝试，观测未发现返回与活信号才结算静默终止类结果，不得在期限之前宣布消失；C1 的期限后重判沿用 watcher 既有 `--deadline-grace`。已落定的 [[STR-001]] 是终值，其后再到的返回按 FR-009 作为晚到返回处理，不改写旧尝试的结算值。
 - **进程活着但长时间无输出**：pid/心跳新鲜即 `running`；日志静默本身不产生 `silent-end`，也不单独产生超时。
 - **证据不可读（权限/解析失败）**：`unknown` + 上送；不得回退成 `completed`、`failed` 或 `running`，也不得返回绿色。
 - **父代理自身死亡**：后续会话必须能凭既有持久载体（既有派发日志目录下的加性 `.attempt` 记录，见 FR-010）重建尝试并结算；缺起点记录的尝试结算为 [[STR-002]]（finding 标签 `start-record-missing`，与 `legacy` 无关，见 FR-007），不得补写成 `completed`。
@@ -171,11 +171,11 @@
 - **FR-003**: `failed` MUST 只在存在**正失败证据**时成立：非零终端记录、带具名原因的失败返回，或退出码 0 但缺少所需完成证据（incomplete 类）；退出码 0 但带显式异常信号时 MUST 按 FR-004 结算为 `anomaly`，不落入本条的 incomplete 分支；日志缺失、无输出或沉默 MUST NOT 被读作失败。
 - **FR-004**: `anomaly` MUST 只在存在**显式异常信号**且有终端证据时成立（如最后非空行以 `ANOMALY:` 开头、或显式异常返回）；进程仍活时出现的异常行只表示 `anomaly=observed`，该尝试仍为 `running`，不得提前终态化。**优先级**：退出码 0 且带显式异常信号（末非空行 `ANOMALY:` 前缀或等价异常返回）时 MUST 结算为 `anomaly`；incomplete 类 `failed` 只在没有任何显式异常信号时适用。
 - **FR-005**: `running` MUST 只在**结算时刻复核过的活证据**下成立（pid 存活且非僵尸/未复用、心跳新鲜、活日志在声明的活窗口内增长（判定面选项 `--live-window`，缺省与值域 owner：C-25）、返回通道仍开放之一）；陈旧读数或未复核 MUST NOT 被报成 `running`。
-- **FR-006**: [[STR-001]] 是「执行主体已消失且完成/失败/异常/取消证据全部缺席」的显式异常终态；对没有 pid 的载体，它是「声明等待期限（判定面选项 `--wait-deadline`，尝试记录可选字段 `wait_deadline_s` 优先；缺省与值域 owner：C-25）已过、无返回且无活信号」。它 MUST NOT 被折算成 `completed` 或 `failed`，也 MUST NOT 被报成「仍在运行」。
+- **FR-006**: [[STR-001]] 是「执行主体已消失且完成/失败/异常/取消证据全部缺席」的显式异常终态；对没有 pid 的载体，它是「声明等待期限（判定面选项 `--wait-deadline`，尝试记录可选字段 `wait_deadline_s` 优先；缺省与值域 owner：C-25）已过、无返回且无活信号」。期限到点只触发观测：父侧 MUST 在期限之后做一次**结算时刻观测**，观测时已出现的终止/哨兵证据 MUST 优先按该证据结算（C1 的期限后重判窗口沿用 watcher 既有 `--deadline-grace`——本特性不改 watcher，也不在结算面另立宽限参数）；观测未发现返回与活信号才结算 [[STR-001]]，MUST NOT 在期限之前宣布消失；结算落定后再到的返回按 FR-009 作为晚到返回处理，不改写旧尝试的结算值。它 MUST NOT 被折算成 `completed` 或 `failed`，也 MUST NOT 被报成「仍在运行」。
 - **FR-007**: [[STR-002]] MUST 在证据不可读/不可解析，**或一次被声称存在却没有任何可解析起点记录的尝试（缺起点记录）**时产出，点名不可读的证据指针或缺失的起点槽，并以 finding 标签 `unreadable` / `start-record-missing` 区分两种成因；它不是一个结束，且 MUST 携带与 [[STR-001]] 相同的「不得声称成功」反应。
 - **FR-008**: `cancelled` MUST 只来自父侧经既有破坏性动作纪律产生的显式取消记录；进程死亡、提前退出或连接断开 MUST NOT 被推断为取消。
 - **FR-009**: 每次尝试 MUST 有唯一 label；一次重试 MUST 是**新尝试、新 label**；旧尝试的证据 MUST 保留；旧尝试的晚到返回 MUST NOT 被当作当前尝试的结果消费。
-- **FR-010**: 父侧 MUST 在派发前或派发时把尝试身份、载体、父身份、开始时间、（可选的）等待期限 `wait_deadline_s`、启动宽限 `start_grace_s` 与（进程载体的）pid 记入**既有派发日志目录**（判定面 `--logs-dir` 根）下的加性 `<label>.attempt` 记录（C2 / C4 直接写入；C1 复用既有四件套，不重复写）；该加性文件由 FR-033 允许，不构成 A-6 / FR-038 所禁的新存储根。缺起点记录的尝试无法证明「曾经存在」，其结算 MUST 为 [[STR-002]]（finding 标签 `start-record-missing`）而不是 `completed`。返回通道（含七字段角色的 `return_channel`）是**子侧发起**的上行，其沉默 MUST NOT 被读作存活或完成；父侧结算的依据是尝试记录 + 活证据/期限 + 载体终止记录，而不是「等一个可能永远不来的返回」。
+- **FR-010**: 父侧 MUST 在派发前或派发时把尝试身份、载体、父身份、开始时间、（可选的）等待期限 `wait_deadline_s`、启动宽限 `start_grace_s` 与（进程载体的）pid 记入**既有派发日志目录**（判定面 `--logs-dir` 根）下的加性 `<label>.attempt` 记录（C2 / C3 / C4 直接写入；C1 复用既有四件套、经 C1/C2 派发的 C3 席位复用同 label 的载体起点证据，均不重复写）；该加性文件由 FR-033 允许，不构成 A-6 / FR-038 所禁的新存储根。缺起点记录的尝试无法证明「曾经存在」，其结算 MUST 为 [[STR-002]]（finding 标签 `start-record-missing`）而不是 `completed`。返回通道（含七字段角色的 `return_channel`）是**子侧发起**的上行，其沉默 MUST NOT 被读作存活或完成；父侧结算的依据是尝试记录 + 活证据/期限 + 载体终止记录，而不是「等一个可能永远不来的返回」。
 - **FR-011**: 父侧在自身对外可见的完成报告之前 MUST 结算它开过的每个尝试；任一尝试无结算即使父侧报告不完整，其成功结论 MUST NOT 成立。
 
 #### B. 载体一致性（Carrier Conformance）
@@ -185,7 +185,7 @@
 - **FR-014**: C1 fork 载体 MUST 继续以四件套与 watcher 判定作为载体证据源；本特性 MUST 消费它们，且 MUST NOT 改变 `watch-target.sh` 的判定、退出码、哨兵字面量或 `--self-test`；U4/U5 与 065a 的恢复动作仍归驱动者。
 - **FR-015**: C2 subprocess 载体 MUST 产出**加性**的起点/存活/终止证据，使结算可导出：至少包含尝试身份、pid、开始时间的起点记录，以及正常退出与可捕获信号下的终止记录保证；既有 `.status` 行格式与三件套语义 MUST 对旧消费者保持可读，新证据不得改变旧格式。
 - **FR-016**: C2 的结算 MUST 按证据成立：成功终止记录 + 已核验返回 → `completed`；非零终止记录 → `failed`；退出 0 但无完成声明 → `failed`（incomplete），不得 `completed`；无终止记录 + 已记录 pid 消失（或启动宽限（判定面选项 `--start-grace` / 记录字段 `start_grace_s`，缺省与值域 owner：C-25）内从未出现）→ [[STR-001]]；证据不可读 → [[STR-002]]。
-- **FR-017**: C3 团队运行 MUST 在运行报告的 `## Execution Detail` 映射表中为**每个被派发席位**记录结算值 [[STR-003]] 与证据指针（加性列/加性行），并在 `## Verification` 声明结算覆盖；缺少席位行或结算的运行报告 MUST 被判不完整，不得以成功语气收尾。
+- **FR-017**: C3 团队运行 MUST 在运行报告的 `## Execution Detail` 映射表中为**每个被派发席位**记录结算值 [[STR-003]] 与证据指针（加性列/加性行），并在 `## Verification` 声明结算覆盖；每个被派发席位 MUST 在派发时留下 E2 形状的起点记录（`<label>.attempt`，carrier `c3-team-seat`，含 `started_at`；经 C1/C2 派发的席位以同 label 的载体起点证据充当，不重复写入），否则死亡于报告行之前的席位无法被结算为 [[STR-001]]；缺少席位行、起点记录或结算的运行报告 MUST 被判不完整，不得以成功语气收尾。
 - **FR-018**: C4 native MUST 在派发时留下尝试记录（既有派发日志目录下的加性 `<label>.attempt`，见 FR-010），并在返回时结算：五要素缺任一 → `failed`（incomplete）且不得消费；宿主报错 → `failed`；超过声明的等待期限（同 FR-006：`--wait-deadline` / `wait_deadline_s`）仍无返回且无活信号 → [[STR-001]]；宿主不提供后台形态时，该模式 MUST 显式声明为前台终结，工具返回即终止事件。
 - **FR-019**: C5 virtual MUST 被显式排除在后台结算之外并写明理由：它不能脱离会话、父侧就是执行者、不存在孤儿边；同时父侧 MUST NOT 把未完成的 virtual 工作报成 `completed`。
 - **FR-020**: C6 直接外部配方 MUST 只提供两种形态：使用合规 runner/wrapper 产出终止证据的后台形态，或把配方显式限制为「前台返回即终止」；后台配方 MUST 修正「超时无哨兵＝stall」的含混表述——无哨兵且执行主体已消失/无终止记录 → [[STR-001]]（不可读为 [[STR-002]]），无哨兵但进程仍活 → `running`。
@@ -224,7 +224,7 @@
 
 - **Dispatch Attempt（派发尝试）**：一次有唯一 label 的后台派发；属性含父身份、载体、起点证据、终止证据、结算值、证据指针、契约版本。重试产生新的 Attempt，旧 Attempt 保留。
 - **Settlement Verdict（结算判定）**：A-3 的封闭值之一；区分「终态」「非终态」「检测缺陷」三类语义，任何输出都不得省略。
-- **Evidence Bundle（证据束）**：载体特定的证据集合——C1 的四件套 + 日志 + watcher 判定，C2 的三件套 + 加性起点/终止记录，C3 的报告行 + 席位返回，C4 的返回与尝试记录，C6 的 runner 记录；每个结算值必须指名其证据来源。
+- **Evidence Bundle（证据束）**：载体特定的证据集合——C1 的四件套 + 日志 + watcher 判定，C2 的三件套 + 加性起点/终止记录，C3 的席位起点记录（E2）+ 报告行 + 席位返回，C4 的返回与尝试记录，C6 的 runner 记录；每个结算值必须指名其证据来源。
 - **Reaction Record（反应记录）**：对非 `completed` 结算的上送/重试/停止动作及理由；重试必须指向新的 Attempt，停止必须指向既有纪律。
 
 ### Dispatch Carrier Inventory (closed)
@@ -233,7 +233,7 @@
 |----|-------------|-----------|----------|-----------|
 | **C1** | SDD 驱动阶段派发（fork；`skills/external/sdd-loop-driver/scripts/stage-runner.sh` + `watch-target.sh`） | 是 | 四件套 + 哨兵 + watcher 判定 + 065a 中断形态 | 保持载体契约不变；补齐结算消费与测试 |
 | **C2** | 外部 CLI subprocess（`skills/internal/create-team/scripts/dispatch.sh`；run-agent 外部派发、团队席位、验证波共用） | 是 | `.live.log` / `.jsonl` / `.status`；无 pid/起点/心跳；status 只在正常走到末尾时写 | 加性起点/存活/终止证据 + 结算判定 |
-| **C3** | 团队运行（`/speckit.team`；席位经 C1/C2） | 是 | 运行报告 `## Execution Detail` 映射表、`## Verification` | 每席位结算列 + 覆盖声明 |
+| **C3** | 团队运行（`/speckit.team`；席位经 C1/C2） | 是 | 运行报告 `## Execution Detail` 映射表、`## Verification`；无席位起点记录 | 席位起点记录（E2 `<label>.attempt`，carrier `c3-team-seat`；经 C1/C2 派发时复用同 label 的载体起点证据）+ 每席位结算列 + 覆盖声明 |
 | **C4** | native 子代理（`/speckit.agents`，宿主管理） | 宿主提供后台形态时是，否则否 | 工具返回；无持久尝试记录 | 父侧尝试记录 + 期限/无返回结算；前台终结显式声明 |
 | **C5** | virtual 子代理（会话内模拟） | 否 | 内联返回 | **显式排除**；保留「未完成不得报成功」义务 |
 | **C6** | 直接外部配方（`external-dispatch-recipes.md` Recipe 3/4/7 与同类直驱） | 是 | runner 哨兵/日志；后台轮询 | 只允许「合规 runner 后台形态」或「前台返回即终止」；修正 stall 表述 |
@@ -270,7 +270,7 @@
 - **SC-003**: 以基线提交 `fbab7a45c` 为参照物，用同一抽取器从实现后的文件抽取 watcher 判定 token 集合、退出码集合与哨兵字面量集合，三个集合均逐成员等于基线集合（允许差异集为空集，补集断言即「成员差集为空」）；`watch-target.sh --self-test` 通过率 100%；抽取器读取的输入恰为 `skills/external/sdd-loop-driver/scripts/watch-target.sh` 及其 `--help` / `--self-test` 输出。**Path**: supporting
 - **SC-004**: 反应演练中，100% 的 [[STR-001]]/[[STR-002]] 夹具产生显式上送；自动 kill 次数为 0；重试均使用新 label 且旧证据保留；旧尝试晚到返回被消费的次数为 0。**Path**: final
 - **SC-005**: 清单内每个后台可脱离载体都有确定性一致性测试与结算映射（覆盖率 100%），未分类载体数为 0；native 的前台终结分支与 virtual 的排除理由各有断言。**Path**: supporting
-- **SC-006**: 新格式记录声明 [[STR-004]]；旧格式记录被标 legacy 且被计为符合新契约的行数为 0；源/模板/已安装副本一致；每个不兼容变更都映射到一条被测试的迁移/拒绝行为。**Path**: supporting
+- **SC-006**: 新格式记录声明 [[STR-004]]；旧格式记录被标 legacy 且被计为符合新契约的行数为 0；源/模板/已安装副本在**本特性触及面**上零新增漂移（基线漂移如实报告、不声称全树一致——相对判据形态同 SC-009）；每个不兼容变更都映射到一条被测试的迁移/拒绝行为。**Path**: supporting
 - **SC-007**: 新增测试全部经 `scripts/bash/run-tests.sh` 运行，且不新增第三个全量槽位；同一夹具重复运行的结算判定差异数为 0；固定等待型新增测试数为 0。**Path**: supporting
 - **SC-008**: 活体夹具（pid 存活、心跳/活日志新鲜）在所有后台可脱离载体上被误报为 [[STR-001]] 的次数为 0；长时间静默但存活的尝试保持 `running`。**Path**: supporting
 - **SC-009**: `scan-confirmation-gates.py` 按 EP-005 fallback 度量：本特性触及文件的逐文件阻断命中数不高于基线（零新增），新增阻断模式命中数为 0；冻结 `total == 27` 相等判定在实施前后均为既有红（live 31），如实上报、不声称绿。**Path**: supporting

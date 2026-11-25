@@ -79,7 +79,7 @@ python3 scripts/python/role-edge-check.py --action settle \
 
 **Expected after implementation**: each mapping row carries `end_state` + `evidence`; a versioned row missing either is `settlement-unrecorded` (exit 1); a `completed` row with no evidence pointer is `settlement-unbacked`; a 5-column legacy report still parses, is annotated `legacy`, and is exempt from `settlement-unrecorded` (exit 0 — its absent cells are absent columns, not an unrecorded claim).
 
-**Premises**: new reports use the 7-column header `label | role | dispatch_duty | workspace | parent | end_state | evidence`; legacy 5-column headers remain accepted; `## Verification` carries the settlement-coverage declaration.
+**Premises**: new reports use the 7-column header `label | role | dispatch_duty | workspace | parent | end_state | evidence`; legacy 5-column headers remain accepted; `## Verification` carries the settlement-coverage declaration; each seat has an E2 start record (`<label>.attempt`, carrier `c3-team-seat`) or the same label's C1/C2 start evidence — a seat with a start record but no report row settles `silent-end`, and a seat with neither start record nor row is `unknown` (`start-record-missing`).
 **Pinning test**: `tests/contract/test_settlement_carriers.py::test_team_report_5_and_7_columns`.
 
 ---
