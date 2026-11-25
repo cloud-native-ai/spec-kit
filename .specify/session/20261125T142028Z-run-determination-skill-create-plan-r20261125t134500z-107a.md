@@ -21,7 +21,7 @@ skill:create-plan run=r20261125T134500Z-107a token=not_evaluated elapsed=not_eva
   "feature": "107-decision-governance",
   "feature_id": "107",
   "determined_at": "2026-11-25T14:20:28Z",
-  "settled_at": null,
+  "settled_at": "2026-11-25T17:36:24Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -88,7 +88,7 @@ skill:create-plan run=r20261125T134500Z-107a token=not_evaluated elapsed=not_eva
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -166,8 +166,8 @@ skill:create-plan run=r20261125T134500Z-107a token=not_evaluated elapsed=not_eva
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -197,7 +197,7 @@ skill:create-plan run=r20261125T134500Z-107a token=not_evaluated elapsed=not_eva
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
