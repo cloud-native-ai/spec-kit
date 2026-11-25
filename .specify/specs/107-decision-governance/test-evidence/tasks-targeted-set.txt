@@ -1,0 +1,19 @@
+# targeted-set-v1 — stage_base=d05c3a350 — 2026-11-25T14:31:46Z
+## input: changed_paths (diff + porcelain union)
+.specify/specs/107-decision-governance/tasks.md
+.specify/specs/107-decision-governance/test-evidence/tasks-targeted-set.txt
+
+## candidates: tests/{unit,contract,integration,scenarios}/test_*.py
+586
+
+## (a) changed path / module-stem matches (grep -lF, fixed strings)
+133
+
+## (b) delivery-surface tests (short name + declared driver paths)
+31
+
+## (c) fixture changes: none (no tests/fixtures path changed)
+
+## classification
+executable-or-test changed paths: 0
+docs-only: 2 of 2 changed paths are non-executable
