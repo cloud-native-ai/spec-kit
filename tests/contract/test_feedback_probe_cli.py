@@ -39,7 +39,7 @@ def probe_workspace(tmp_path: Path) -> Path:
     defs = tmp_path / ".specify" / "shared" / "definitions"
     defs.mkdir(parents=True, exist_ok=True)
     (defs / "probe-definitions.md").write_text(VALID_REGISTRY, encoding="utf-8")
-    store = tmp_path / ".specify" / "memory" / "feedback"
+    store = tmp_path / ".specify" / "feedback"
     store.mkdir(parents=True, exist_ok=True)
     (store / ".gitkeep").touch()
     return tmp_path
@@ -53,14 +53,14 @@ class TestMapAction:
             "--action", "map", "--workspace-root", str(probe_workspace),
         ])
         assert rc == 0
-        assert (probe_workspace / ".specify" / "memory" / "feedback"
+        assert (probe_workspace / ".specify" / "feedback"
                 / "probe-map.md").is_file()
 
     def test_map_is_deterministic_byte_identical(
         self, probe_workspace: Path, capsys
     ):
         capsys.readouterr()
-        map_path = (probe_workspace / ".specify" / "memory" / "feedback"
+        map_path = (probe_workspace / ".specify" / "feedback"
                     / "probe-map.md")
         probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
@@ -76,7 +76,7 @@ class TestMapAction:
         capsys.readouterr()
         probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
-        text = (probe_workspace / ".specify" / "memory" / "feedback"
+        text = (probe_workspace / ".specify" / "feedback"
                 / "probe-map.md").read_text(encoding="utf-8")
         for needle in ("command-wrapup", "skill-wrapup", "external-custom",
                        "speckit-plan-wrapup", "skill-study-wrapup",
@@ -88,7 +88,7 @@ class TestMapAction:
         capsys.readouterr()
         probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
-        text = (probe_workspace / ".specify" / "memory" / "feedback"
+        text = (probe_workspace / ".specify" / "feedback"
                 / "probe-map.md").read_text(encoding="utf-8")
         assert "```mermaid" in text
 
@@ -117,7 +117,7 @@ def _record_entry(root: Path, unit_id: str, unit_type: str, run_id: str) -> int:
 class TestListFiltersAndDispose:
     @pytest.fixture
     def mixed_workspace(self, probe_workspace: Path) -> Path:
-        probes = (probe_workspace / ".specify" / "memory" / "feedback" / "probes")
+        probes = (probe_workspace / ".specify" / "feedback" / "probes")
         probes.mkdir(parents=True, exist_ok=True)
         (probes / "ext-myteam-deploy-wrapup.md").write_text(
             "---\nobject_id: ext-myteam-deploy-wrapup\n"
@@ -223,7 +223,7 @@ class TestCleanupAction:
     ):
         self._record(probe_workspace, "c1")
         zip_rel = self._package(probe_workspace, capsys)
-        store = probe_workspace / ".specify" / "memory" / "feedback"
+        store = probe_workspace / ".specify" / "feedback"
 
         capsys.readouterr()
         rc = feedback_utils.main([
@@ -283,7 +283,7 @@ class TestCleanupAction:
         ).strftime("%Y-%m-%dT%H:%M:%SZ")
         self._record(probe_workspace, "remove-me", now=pending_at)  # pending → packaged
         zip_rel = self._package(probe_workspace, capsys)
-        store = probe_workspace / ".specify" / "memory" / "feedback"
+        store = probe_workspace / ".specify" / "feedback"
         before = sorted(p.name for p in store.glob("2*.md"))
         assert len(before) == 2
 
@@ -309,7 +309,7 @@ class TestCleanupAction:
 
 def _write_legacy_entry(root: Path, unit_id: str, run_id: str) -> str:
     """Hand-write an OLD-format entry (no probe field) like pre-041 stores."""
-    store = root / ".specify" / "memory" / "feedback"
+    store = root / ".specify" / "feedback"
     store.mkdir(parents=True, exist_ok=True)
     entry_id = f"20260101T000000Z-{unit_id.replace(':', '-').replace('/', '-')}"
     body = (
@@ -364,9 +364,9 @@ class TestMigrateLegacy:
         out = json.loads(capsys.readouterr().out)
         assert rc == 0
         assert out["deleted"] == [entry_id]
-        assert not (probe_workspace / ".specify" / "memory" / "feedback"
+        assert not (probe_workspace / ".specify" / "feedback"
                     / f"{entry_id}.md").exists()
-        assert (probe_workspace / ".specify" / "memory" / "feedback"
+        assert (probe_workspace / ".specify" / "feedback"
                 / "migration-log.md").is_file()
 
     def test_migrate_legacy_re_registers_with_probe_fields(
@@ -385,7 +385,7 @@ class TestMigrateLegacy:
         out = json.loads(capsys.readouterr().out)
         assert rc == 0
         assert out["re_registered"] == [entry_id]
-        entry_file = (probe_workspace / ".specify" / "memory" / "feedback"
+        entry_file = (probe_workspace / ".specify" / "feedback"
                       / f"{entry_id}.md")
         assert entry_file.exists()  # re-registered in place
         meta, body = feedback_utils.parse_frontmatter(
@@ -427,7 +427,7 @@ class TestProbeInjectAndExclusion:
         out = json.loads(capsys.readouterr().out)
         assert rc == 0
         assert out["object_id"].startswith("ext-")
-        ext_file = (probe_workspace / ".specify" / "memory" / "feedback"
+        ext_file = (probe_workspace / ".specify" / "feedback"
                     / "probes" / f"{out['object_id']}.md")
         assert ext_file.is_file()
         # merged view + map now include it
@@ -441,7 +441,7 @@ class TestProbeInjectAndExclusion:
         capsys.readouterr()
         probe_utils.main([
             "--action", "map", "--workspace-root", str(probe_workspace)])
-        map_text = (probe_workspace / ".specify" / "memory" / "feedback"
+        map_text = (probe_workspace / ".specify" / "feedback"
                     / "probe-map.md").read_text(encoding="utf-8")
         assert out["object_id"] in map_text
 
@@ -458,7 +458,7 @@ class TestProbeInjectAndExclusion:
     def test_package_excludes_external_entries(
         self, probe_workspace: Path, capsys, tmp_path: Path
     ):
-        probes = (probe_workspace / ".specify" / "memory" / "feedback" / "probes")
+        probes = (probe_workspace / ".specify" / "feedback" / "probes")
         probes.mkdir(parents=True, exist_ok=True)
         (probes / "ext-myteam-deploy-wrapup.md").write_text(
             "---\nobject_id: ext-myteam-deploy-wrapup\n"

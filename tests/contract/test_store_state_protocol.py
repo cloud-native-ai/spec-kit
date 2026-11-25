@@ -28,8 +28,8 @@ import pytest
 from tests.script_api import feedback_utils as fu
 from tests.script_api import memory_utils as mu
 
-FEEDBACK_STORE = Path(".specify") / "memory" / "feedback"
-SESSION_DIR = Path(".specify") / "memory" / "session"
+FEEDBACK_STORE = Path(".specify") / "feedback"
+SESSION_DIR = Path(".specify") / "session"
 
 
 # --------------------------------------------------------------------------- #

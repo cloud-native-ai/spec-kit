@@ -31,11 +31,11 @@ def _json(proc: subprocess.CompletedProcess) -> dict:
 
 
 def _target(tmp_path: Path) -> Path:
-    memory = tmp_path / ".specify" / "memory"
-    memory.mkdir(parents=True)
-    (memory / "constitution.md").write_text("# Constitution\n", encoding="utf-8")
-    (memory / "features.md").write_text("# Features\n", encoding="utf-8")
-    (memory / "features").mkdir()
+    specify = tmp_path / ".specify"
+    specify.mkdir(parents=True)
+    (specify / "constitution.md").write_text("# Constitution\n", encoding="utf-8")
+    (specify / "features.md").write_text("# Features\n", encoding="utf-8")
+    (specify / "features").mkdir()
     (tmp_path / ".specify" / "skills").mkdir()
     (tmp_path / ".specify" / "templates").mkdir()
     (tmp_path / ".specify" / "instructions.md").write_text(
@@ -61,7 +61,7 @@ def test_inventory_scripts_run_read_only_on_target(tmp_path: Path) -> None:
 
 def test_retention_engine_flow_primitives_on_target(tmp_path: Path) -> None:
     target = _target(tmp_path)
-    records = target / ".specify" / "memory" / "exec-quant" / "records"
+    records = target / ".specify" / "exec-quant" / "records"
     records.mkdir(parents=True)
     (records / "old.json").write_text(json.dumps({
         "kind": "speckit.exec-quant",
@@ -72,7 +72,7 @@ def test_retention_engine_flow_primitives_on_target(tmp_path: Path) -> None:
         "collected_at": OLD,
         "quality": {"tokens": "not_evaluated"},
     }) + "\n", encoding="utf-8")
-    feedback = target / ".specify" / "memory" / "feedback"
+    feedback = target / ".specify" / "feedback"
     feedback.mkdir(parents=True)
     (feedback / "20260901T000000Z-speckit-plan.md").write_text(f"""---
 id: "20260901T000000Z-speckit-plan"
@@ -111,5 +111,5 @@ done
     assert payload["conservation_ok"] is True
     assert not (records / "old.json").exists()
     assert not (feedback / "20260901T000000Z-speckit-plan.md").exists()
-    assert (target / ".specify" / "memory" / "retention" / "ledger"
+    assert (target / ".specify" / "retention" / "ledger"
             ).is_dir()

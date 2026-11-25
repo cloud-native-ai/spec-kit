@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "scripts" / "python" / "sanitize-utils.py"
 FIXTURE = ROOT / "tests" / "fixtures" / "sanitize" / "stale-todo" / "parked-todo.md"
-STORE_REL = Path(".specify") / "memory" / "sanitize" / "findings.json"
+STORE_REL = Path(".specify") / "sanitize" / "findings.json"
 
 
 def git(root: Path, *args: str, date: str | None = None) -> str:
@@ -38,12 +38,12 @@ def run_engine(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
 
 
 def assemble_workspace(tmp_path: Path) -> Path:
-    todo = tmp_path / ".specify" / "memory" / "todo" / "20260812-backlog.md"
+    todo = tmp_path / ".specify" / "todo" / "20260812-backlog.md"
     todo.parent.mkdir(parents=True, exist_ok=True)
     todo.write_text(FIXTURE.read_text(encoding="utf-8"), encoding="utf-8")
     # a second material whose claims have no contradicting evidence — the
     # agent would judge it "insufficient evidence" and never record it
-    vague = tmp_path / ".specify" / "memory" / "todo" / "20260812-vague.md"
+    vague = tmp_path / ".specify" / "todo" / "20260812-vague.md"
     vague.write_text(
         "---\nstatus: parked\nparked_at: 2026-08-12\n---\n待办:考虑一下未来的事情。\n",
         encoding="utf-8")

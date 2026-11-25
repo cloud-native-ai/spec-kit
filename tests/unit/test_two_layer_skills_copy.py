@@ -22,7 +22,7 @@ def _build_fake_skills_source(root):
     (ext / "SKILL.md").write_text(
         "# demo-ext\n"
         "See skills/internal/demo-int/SKILL.md and skills/external/demo-ext/scripts/run.py\n"
-        "Working notes live at memory/session/notes.md\n",
+        "Working notes live at .specify/session/notes.md\n",
         encoding="utf-8",
     )
     (int_ / "SKILL.md").write_text(

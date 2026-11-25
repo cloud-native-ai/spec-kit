@@ -18,7 +18,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "sanitize" / "correctness"
 
 
 def make_ws(tmp_path: Path) -> Path:
-    (tmp_path / ".specify" / "memory" / "todo").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specify" / "todo").mkdir(parents=True, exist_ok=True)
     (tmp_path / "scripts" / "python").mkdir(parents=True, exist_ok=True)
     (tmp_path / "skills" / "external" / "create-docs" / "scripts").mkdir(parents=True, exist_ok=True)
     engine = (Path(__file__).resolve().parents[2]
@@ -28,7 +28,7 @@ def make_ws(tmp_path: Path) -> Path:
     (tmp_path / "templates" / "commands").mkdir(parents=True, exist_ok=True)
     (tmp_path / "scripts" / "python" / "feedback-utils.py").write_text("#", encoding="utf-8")
     (tmp_path / "templates" / "commands" / "feedback.md").write_text("#", encoding="utf-8")
-    (tmp_path / ".specify" / "memory" / "todo" / "material.md").write_text(
+    (tmp_path / ".specify" / "todo" / "material.md").write_text(
         FIXTURES.joinpath("material.md").read_text(encoding="utf-8"), encoding="utf-8")
     return tmp_path
 
@@ -108,7 +108,7 @@ def test_docs_lane_maps_broken_links(tmp_path):
 def test_store_self_is_exempt_from_reference_scan(tmp_path):
     """The engine's own store dir is exempt from scanning (no recursion)."""
     ws = make_ws(tmp_path)
-    store_dir = ws / ".specify" / "memory" / "sanitize"
+    store_dir = ws / ".specify" / "sanitize"
     store_dir.mkdir(parents=True, exist_ok=True)
     (store_dir / "findings.json").write_text(
         '{"notes": "references scripts/python/never-exists.py"}', encoding="utf-8")

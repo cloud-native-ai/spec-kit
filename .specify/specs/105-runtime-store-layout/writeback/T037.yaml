@@ -1,0 +1,5 @@
+task: T037
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: quickstart S-0 (three baseline commands: git ls-tree 12 children, zero tracked retired paths, ignore matrix now sanitize/ + tools/*.json with the corrected depth note) and S-7 (post-dogfood apply clean exit 0 / items=0, receipt 20261125T070056Z-e5d8a761.json completed clean, retired root absent, 13 present store roots + lazy sanitize, sync-mirrors rc 0 with 132+116 byte-identical files under the pinned interpreter and the profile-python3 rc 2 platform fact, regen-copies rc 0); S-1..S-6/S-8 declared route-b with pinned tests; notes/quickstart-run.md
+at: 2026-11-25T07:16:00Z

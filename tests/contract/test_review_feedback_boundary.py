@@ -497,7 +497,7 @@ def test_c57_the_framework_friction_sample_is_judged_legal(tmp_path):
     ws = _ws(tmp_path)
     out = _record_feedback(ws, sample["unit_id"], "r20261027T000000Z-us5-c57", sample["text"])
     assert out.returncode == 0, f"recording a legal friction item failed: {out.stderr[:300]}"
-    entries = sorted((ws / ".specify" / "memory" / "feedback").glob("*.md"))
+    entries = sorted((ws / ".specify" / "feedback").glob("*.md"))
     assert len(entries) == 1, f"the legal sample MUST produce one entry, got {len(entries)}"
     entry = entries[0].read_text(encoding="utf-8")
     assert _frontmatter_field(entry, "unit_id") == sample["unit_id"]
@@ -615,7 +615,7 @@ def test_c58_run_determination_keeps_four_unit_records_driven(tmp_path):
     for unit in UNITS:
         out = _determine(ws, unit, run_id)
         assert out.returncode == 0, f"determine failed for {unit}: {out.stderr[:300]}"
-    session = ws / ".specify" / "memory" / "session"
+    session = ws / ".specify" / "session"
     records = sorted(session.glob("*.md"))
     assert len(records) == len(UNITS), (
         "one nested run MUST leave one run-determination record per unit; "
@@ -638,7 +638,7 @@ def test_c59_four_units_one_run_produce_four_entries_driven(tmp_path):
     for unit in UNITS:
         out = _record_feedback(ws, unit, run_id, "framework friction: receipt gap")
         assert out.returncode == 0, f"record failed for {unit}: {out.stderr[:300]}"
-    entries = sorted((ws / ".specify" / "memory" / "feedback").glob("*.md"))
+    entries = sorted((ws / ".specify" / "feedback").glob("*.md"))
     assert len(entries) == len(UNITS), (
         "the (unit_id, run_id) key means four units of one run produce four "
         f"entries; found {len(entries)}"
@@ -661,7 +661,7 @@ def test_c59_a_repeated_unit_dedups_only_itself_driven(tmp_path):
         assert _record_feedback(ws, unit, run_id, "framework friction").returncode == 0
     again = _record_feedback(ws, "/speckit.review", run_id, "framework friction")
     assert again.returncode == 0, "a duplicate call stays exit 0, never an error"
-    entries = sorted((ws / ".specify" / "memory" / "feedback").glob("*.md"))
+    entries = sorted((ws / ".specify" / "feedback").glob("*.md"))
     assert len(entries) == len(UNITS), (
         "re-running one unit MUST NOT create a further entry and MUST NOT remove or "
         f"merge another unit's; found {len(entries)}"

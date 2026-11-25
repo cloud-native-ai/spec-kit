@@ -36,7 +36,7 @@ def ws(tmp_path: Path) -> Path:
     (tmp_path / ".specify" / "templates" / "proactive-trigger-seed.json").write_bytes(
         SEED.read_bytes()
     )
-    (tmp_path / ".specify" / "memory").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specify").mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "init", "-q", "."], cwd=tmp_path, check=True)
     run(["--action", "init"], tmp_path)
     return tmp_path
@@ -57,7 +57,7 @@ def env_of(proc) -> dict:
 
 
 def index(ws: Path) -> dict:
-    return json.loads((ws / ".specify" / "memory" / "trigger" / "index.json")
+    return json.loads((ws / ".specify" / "trigger" / "index.json")
                       .read_text(encoding="utf-8"))
 
 

@@ -68,7 +68,7 @@ class TestPartialCoreRepair:
 
         copy_local_templates(project, "copilot", "sh", is_current_dir=True)
 
-        assert (project / ".specify" / "session").is_dir(), "memory/ not created"
+        assert (project / ".specify" / "session").is_dir(), "session/ not created"
 
     def test_existing_memory_files_preserved_during_repair(
         self, monkeypatch, tmp_path: Path

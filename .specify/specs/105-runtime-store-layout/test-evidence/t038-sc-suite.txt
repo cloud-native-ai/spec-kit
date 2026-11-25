@@ -1,0 +1,7 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_runtime_store_layout.py tests/contract/test_store_layout_live_refs.py tests/contract/test_tools_domain.py tests/contract/test_specify_gitignore_template.py tests/integration/test_memory_preservation.py tests/integration/test_dispatch_injection_paths.py tests/integration/test_init_new_layout.py tests/integration/test_store_layout_migration_us1_us2.py tests/integration/test_store_layout_migration_us3_us6.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.........................................                                [100%]
+41 passed in 10.03s

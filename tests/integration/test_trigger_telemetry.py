@@ -99,7 +99,7 @@ def ws(tmp_path: Path) -> Path:
     (tmp_path / ".specify" / "templates" / "proactive-trigger-seed.json").write_bytes(
         SEED.read_bytes()
     )
-    (tmp_path / ".specify" / "memory").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specify").mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "init", "-q", "."], cwd=tmp_path, check=True)
     run(["--action", "init"], tmp_path)
     return tmp_path
@@ -111,7 +111,7 @@ def env_of(proc) -> dict:
 
 
 def telemetry_file(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "trigger" / "telemetry.jsonl"
+    return ws / ".specify" / "trigger" / "telemetry.jsonl"
 
 
 def rows(ws: Path) -> list:
@@ -174,7 +174,7 @@ def test_cli_subprocess_smoke_pins_payload_and_exit_semantics(tmp_path: Path):
         (d / ".specify" / "templates" / "proactive-trigger-seed.json").write_bytes(
             SEED.read_bytes()
         )
-        (d / ".specify" / "memory").mkdir(parents=True, exist_ok=True)
+        (d / ".specify").mkdir(parents=True, exist_ok=True)
         subprocess.run(["git", "init", "-q", "."], cwd=d, check=True)
 
     # init: envelope shape + ok flag, pinned on the subprocess face.
@@ -288,7 +288,7 @@ def test_rotate_does_not_touch_index_file(ws):
         run(["--action", "record", "--session", session, "--rule", "r-001",
             "--response", "accepted"], ws)
 
-    index_path = ws / ".specify" / "memory" / "trigger" / "index.json"
+    index_path = ws / ".specify" / "trigger" / "index.json"
     before = json.loads(index_path.read_text(encoding="utf-8"))
     before_rules = before["rules"]
     before_events = before["events"]
@@ -307,7 +307,7 @@ def test_consecutive_survives_window_shrink(ws):
         assess(ws, session, f"{session}-01", CLARIFY_ARGS)
         run(["--action", "record", "--session", session, "--rule", "r-001",
             "--response", "accepted"], ws)
-    data = json.loads((ws / ".specify" / "memory" / "trigger" / "index.json")
+    data = json.loads((ws / ".specify" / "trigger" / "index.json")
                       .read_text(encoding="utf-8"))
     promoted = next(r for r in data["rules"] if r["ruleId"] == "r-001")
     assert promoted["promotion"]["consecutive"] == 3
@@ -316,7 +316,7 @@ def test_consecutive_survives_window_shrink(ws):
     run(["--action", "rotate"], ws)
     assert len(rows(ws)) <= 1
 
-    data = json.loads((ws / ".specify" / "memory" / "trigger" / "index.json")
+    data = json.loads((ws / ".specify" / "trigger" / "index.json")
                       .read_text(encoding="utf-8"))
     after = next(r for r in data["rules"] if r["ruleId"] == "r-001")
     assert after["promotion"]["consecutive"] == 3, (
@@ -382,7 +382,7 @@ def test_escalation_over_budget_is_flagged(ws):
 def test_probe_budget_is_configurable(ws):
     proc = run(["--action", "config", "--probe-budget", "50"], ws)
     assert proc.returncode == EXIT_OK, proc.stderr
-    data = json.loads((ws / ".specify" / "memory" / "trigger" / "index.json")
+    data = json.loads((ws / ".specify" / "trigger" / "index.json")
                       .read_text(encoding="utf-8"))
     assert data["config"]["probeBudgetPct"] == 50
 
@@ -399,11 +399,11 @@ def test_telemetry_is_git_ignored_but_index_is_not(ws):
     gi = ws / ".specify" / ".gitignore"
     assert gi.is_file(), "init must maintain the .specify-scoped ignore file"
     text = gi.read_text(encoding="utf-8")
-    assert "memory/trigger/telemetry.jsonl" in text, (
+    assert "trigger/telemetry.jsonl" in text, (
         "V6.9: per-turn telemetry churns and must be ignored"
     )
     root_gi = ws / ".gitignore"
-    assert not root_gi.is_file() or "memory/trigger/telemetry.jsonl" not in root_gi.read_text(
+    assert not root_gi.is_file() or "trigger/telemetry.jsonl" not in root_gi.read_text(
         encoding="utf-8"
     ), "telemetry ignore rule must stay .specify-scoped, not in the project root"
     proc = subprocess.run(

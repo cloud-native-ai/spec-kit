@@ -92,7 +92,7 @@ def _make_package(directory: Path, records: list, project: str = "cws-lib-python
 
 
 def _agg(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant" / "aggregated"
+    return ws / ".specify" / "exec-quant" / "aggregated"
 
 
 def _groups(ws: Path) -> list:
@@ -157,7 +157,7 @@ def test_no_payload_package_zero_difference(tmp_path, capsys):
     pkg = _make_package(ws, [], extra_members={
         "MANIFEST.md": "# Feedback Package Manifest\n",
         "SUBMISSION-NOTES.md": "notes\n"})
-    before_fb = _snapshot(ws / ".specify" / "memory" / "feedback")
+    before_fb = _snapshot(ws / ".specify" / "feedback")
 
     payload, rc = _ingest(ws, pkg, capsys)
 
@@ -170,7 +170,7 @@ def test_no_payload_package_zero_difference(tmp_path, capsys):
     assert payload["groups_touched"] == 0
     assert payload["manifest_unreadable"] is False
     assert not _agg(ws).exists()  # zero storage write, zero directory creation
-    assert _snapshot(ws / ".specify" / "memory" / "feedback") == before_fb
+    assert _snapshot(ws / ".specify" / "feedback") == before_fb
 
 
 # --------------------------------------------------------------------------- #
@@ -474,7 +474,7 @@ def test_storage_unwritable_exit_2(tmp_path, capsys):
     # never as a silent degradation.
     ws = tmp_path
     pkg = _make_package(ws, [_rec("2026-01-01T00:00:00Z")])
-    store = ws / ".specify" / "memory" / "exec-quant"
+    store = ws / ".specify" / "exec-quant"
     store.parent.mkdir(parents=True, exist_ok=True)
     store.write_text("blocks aggregated/ creation", encoding="utf-8")
 
@@ -490,7 +490,7 @@ def test_storage_unwritable_exit_2(tmp_path, capsys):
 # --------------------------------------------------------------------------- #
 def test_feedback_store_untouched_no_contamination(tmp_path, capsys):
     ws = tmp_path
-    feedback_store = ws / ".specify" / "memory" / "feedback"
+    feedback_store = ws / ".specify" / "feedback"
     feedback_store.mkdir(parents=True)
     entry = feedback_store / "20260101T000000Z-speckit-plan.md"
     entry.write_text("# feedback entry (pre-existing)\n", encoding="utf-8")

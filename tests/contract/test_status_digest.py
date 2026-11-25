@@ -1456,7 +1456,7 @@ def _digest_fixture(tmp_path: Path, count: int):
         (registry / ("%s.json" % entry["line_id"])).write_text(
             json.dumps(entry, sort_keys=True, indent=2) + "\n", encoding="utf-8"
         )
-    records = workspace / ".specify" / "memory" / "exec-quant" / "records"
+    records = workspace / ".specify" / "exec-quant" / "records"
     records.mkdir(parents=True)
     for index in range(count):
         record = {
@@ -1535,8 +1535,8 @@ def test_c68_an_absent_store_keeps_the_entry_set_ordering_and_exit_status_unchan
         cwd=workspace,
         env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
     )
-    store = workspace / ".specify" / "memory" / "exec-quant"
-    hidden = workspace / ".specify" / "memory" / "exec-quant-hidden"
+    store = workspace / ".specify" / "exec-quant"
+    hidden = workspace / ".specify" / "exec-quant-hidden"
     store.rename(hidden)
     try:
         without_store = _run_digest(

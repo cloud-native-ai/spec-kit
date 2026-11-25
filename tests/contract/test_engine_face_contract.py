@@ -409,7 +409,7 @@ def test_c24_duplicate_determine_is_exit_zero_no_second_record(tmp_path):
     ws = _scratch_ws(tmp_path)
     first = _determine(ws, "s63-c24-run-1")
     assert first.returncode == 0
-    session_dir = ws / ".specify" / "memory" / "session"
+    session_dir = ws / ".specify" / "session"
     assert session_dir.is_dir()
     assert len(list(session_dir.glob("*.md"))) == 1
 
@@ -434,7 +434,7 @@ def test_c24_engine_never_mints_a_run_id(tmp_path):
                       ["--action", "determine", "--unit-id", "/speckit.us3-c24",
                        "--unit-type", "command", "--complexity", "complex"], ws)
     assert out.returncode == 2
-    session_dir = ws / ".specify" / "memory" / "session"
+    session_dir = ws / ".specify" / "session"
     assert not session_dir.is_dir() or not list(session_dir.glob("*.md")), (
         "a call missing --run-id must not leave any record behind"
     )
@@ -457,7 +457,7 @@ def test_c24_feedback_record_duplicate_is_a_no_op(tmp_path):
               "No significant optimization points identified this run."]
     first = _run_engine(ENGINES["feedback-utils"], common, ws)
     assert first.returncode == 0
-    entries_dir = ws / ".specify" / "memory" / "feedback"
+    entries_dir = ws / ".specify" / "feedback"
     assert entries_dir.is_dir()
     assert len(list(entries_dir.glob("*.md"))) == 1
 

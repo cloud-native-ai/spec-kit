@@ -192,7 +192,7 @@ def test_double_empty_packages_nothing_with_explicit_note(tmp_path, capsys):
 def test_triple_coexistence_full_chain_package_receive_aggregate(
         tmp_path, capsys):
     ws1 = tmp_path / "source-ws"
-    rdir = ws1 / ".specify" / "memory" / "exec-quant" / "records"
+    rdir = ws1 / ".specify" / "exec-quant" / "records"
     rdir.mkdir(parents=True)
     v2 = _rec("2026-01-01T00:00:00Z", "/speckit.plan", "r-v2",
               quality={"elapsed_ms": {"value": 1200, "provenance": "carried"},
@@ -206,13 +206,13 @@ def test_triple_coexistence_full_chain_package_receive_aggregate(
           "quality": {"elapsed_ms": NOT_EVALUATED}}
     (rdir / "v2.json").write_text(json.dumps(v2) + "\n", encoding="utf-8")
     (rdir / "v1.json").write_text(json.dumps(v1) + "\n", encoding="utf-8")
-    legacy = ws1 / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+    legacy = ws1 / ".specify" / "exec-quant" / "records.jsonl"
     legacy.write_text(json.dumps(
         _rec("2026-01-03T00:00:00Z", "/speckit.review", "r-legacy",
              quality={"tokens": {"value": 7, "provenance": "measured"}},
              legacy_extra="keep-me"), ensure_ascii=False) + "\n{broken\n",
         encoding="utf-8")
-    store_before = _snapshot(ws1 / ".specify" / "memory" / "exec-quant")
+    store_before = _snapshot(ws1 / ".specify" / "exec-quant")
     _feedback_entry(ws1, "run-entry")
 
     # leg 1 — package: both layouts, both schemas, both shapes in one zip
@@ -233,7 +233,7 @@ def test_triple_coexistence_full_chain_package_receive_aggregate(
     carried_forms = {json.dumps(rec, sort_keys=True) for rec in carried.values()}
     assert json.dumps(v2, sort_keys=True) in carried_forms  # verbatim carry
     assert json.dumps(v1, sort_keys=True) in carried_forms
-    assert _snapshot(ws1 / ".specify" / "memory" / "exec-quant") == store_before
+    assert _snapshot(ws1 / ".specify" / "exec-quant") == store_before
 
     # leg 2 — receive: unknown fields survive verbatim into the aggregated layer
     ws2 = tmp_path / "target-ws"
@@ -241,7 +241,7 @@ def test_triple_coexistence_full_chain_package_receive_aggregate(
     payload, rc = _ingest(ws2, ws1 / packaged["zip"], capsys)
     assert rc == 0
     assert payload["ingested"] == 3 and payload["skipped_unreadable"] == 0
-    aggregated = ws2 / ".specify" / "memory" / "exec-quant" / "aggregated"
+    aggregated = ws2 / ".specify" / "exec-quant" / "aggregated"
     envelopes = [json.loads(p.read_text(encoding="utf-8"))
                  for p in aggregated.glob("*/records/*.json")]
     landed = {json.dumps(env["record"], sort_keys=True): env for env in envelopes}
@@ -291,7 +291,7 @@ def test_new_legs_join_no_confirmation_gate_surface(tmp_path, capsys,
                             AssertionError("blocking prompt consulted")))
 
     ws1 = tmp_path / "source-ws"
-    rdir = ws1 / ".specify" / "memory" / "exec-quant" / "records"
+    rdir = ws1 / ".specify" / "exec-quant" / "records"
     rdir.mkdir(parents=True)
     (rdir / "r.json").write_text(json.dumps(_rec(run="r-gate")) + "\n",
                                  encoding="utf-8")
@@ -318,11 +318,11 @@ def test_storage_boundary_and_inventory_disjunction(tmp_path, capsys):
     (ws / ".specify").mkdir(parents=True)
     _feedback_entry(ws, "run-feedback")
     eq_unit = "custom:boundary/leak-probe"
-    rdir = ws / ".specify" / "memory" / "exec-quant" / "records"
+    rdir = ws / ".specify" / "exec-quant" / "records"
     rdir.mkdir(parents=True)
     (rdir / "eq.json").write_text(json.dumps(
         _rec(unit=eq_unit, run="run-quant")) + "\n", encoding="utf-8")
-    feedback_store = ws / ".specify" / "memory" / "feedback"
+    feedback_store = ws / ".specify" / "feedback"
     before = _snapshot(feedback_store)
 
     pkg = _make_package(ws, [_rec(unit=eq_unit, run="run-quant")])
@@ -334,7 +334,7 @@ def test_storage_boundary_and_inventory_disjunction(tmp_path, capsys):
 
     # the aggregated layer exists only under exec-quant/aggregated/
     aggregated_dirs = [p for p in ws.rglob("aggregated") if p.is_dir()]
-    assert aggregated_dirs == [ws / ".specify" / "memory" / "exec-quant" / "aggregated"]
+    assert aggregated_dirs == [ws / ".specify" / "exec-quant" / "aggregated"]
     # exec-quant records never mix into the feedback store
     assert _snapshot(feedback_store) == before
     for path in feedback_store.rglob("*"):

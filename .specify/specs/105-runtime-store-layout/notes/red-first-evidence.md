@@ -423,3 +423,95 @@ cmp_rc=0 (0 = byte-identical, no output)
   copy are byte-identical; both claude/codex templates release exactly the 14 declared store roots
   (plus the pre-existing `instructions.md` and `specs/` lines) and carry zero `!.specify/memory/`
   occurrences.
+
+## T034 — failure-surface fixtures (builders extended)
+
+- Date: 2026-11-25
+- `tests/fixtures/store-layout-105/builders.py` gains `build_residue` (`draft/` + stray
+  `git-workflow.md` under the retired container), `build_symlink` (one store's legacy path replaced
+  by a symlink to `sibling-content/<store>`), `build_readonly` (one store's target root pre-created
+  `0o555`; the target parent of every relocated entry) and `build_partial` (a real dry-run plan whose
+  upper-half entries are physically relocated and whose rows are flipped to `status=moved`, landed in a
+  `running` receipt via the engine's own `create_migrate_receipt`/`update_migrate_receipt` so the resume
+  oracle is engine-shaped; `archives[]` stays empty — an interruption persists manifest snapshots only).
+- All fixtures stay declaration-driven (no second roster, no store-name literal).
+
+## T035 — `tests/integration/test_store_layout_migration_us3_us6.py`
+
+- Date: 2026-11-25
+- Classification: migration/regression exception (tasks.md § Tests Mode). The guarded executor behaviour
+  was delivered by T014; red ability is proven by D5/D6 in `test-evidence/mutation-drill.md`, and every
+  assertion group carries its mutation pairing in the module docstring.
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_store_layout_migration_us3_us6.py -q`
+- Exit code: **0** — `4 passed in 9.64s`.
+- Fixture readings (seed probe, re-confirmed by the module):
+  - residue: apply exit **3** / `blocked`; 14 store items `done`; container item `refused`,
+    `unknown-residue` naming `.specify/memory/draft/`, `.specify/memory/draft/parked-idea.md`,
+    `.specify/memory/git-workflow.md`; container + both files byte-identical after the run (zero deletion).
+  - symlink: apply exit **3** / `blocked`; `.specify/feedback` item `refused`, `symlink-source`, path named;
+    link readable and unchanged (`os.readlink` equal), sibling bytes unchanged, `.specify/feedback` never created.
+  - readonly (uid 1001; root-run records the platform fact and skips): apply exit **3** / `blocked`;
+    feedback item `refused permission-denied` naming both paths; old side hash map unchanged and the
+    pre-created target root still empty (no partial success); other stores converge.
+  - partial: apply exit **0** / `applied`; previously moved entries verified in place with identical raw
+    bytes and no second move; remainder moved; container absent; two receipts, one per run; the
+    interrupted receipt is byte-identical (read-only resume input) and carries `archives: []`; the
+    completing receipt has unique entry relpaths, all rows `moved`, unique archive records keyed by
+    `from` (one record per object), `len(recover) == len(archives)`, and zero `.specify/archive/` bytes.
+- Disclosed observation (no assertion; spec-side decision needed): a THIRD `--apply` after a completed
+  resume still reads the stale `status=running` receipt as the resume oracle, so it re-emits the 14 store
+  items (all rows verified `moved`, 32 archive rows again) and reports `applied`, not `clean` — M-6's
+  idempotence sentence ("after a completed run, a second apply … exits `clean`") is not met for the
+  crash→resume→rerun sequence. No data movement or loss occurs; the run only re-records. Reported as an
+  anomaly to the driver rather than repaired here (marking the interrupted receipt superseded is a
+  design decision, not a correction).
+
+## T042 — FR-027 / SC-009 inventory closure guard
+
+- Date: 2026-11-25
+- Subject: `tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed`
+  (migration/regression exception per tasks.md: it guards the already-landed plan inventory and T016's
+  delivered migration behaviour; red ability is proven by the drills below, not by a red-first pass).
+- Guard scope decisions:
+  - (d) forbidden-word scope = the **Behavior cell only** (U-03): BC12's change cell legitimately names
+    `todo/`, and the test pins that fact (`"todo/" in BC12.change`) so the scope choice stays honest.
+  - (c) evidence pointers resolve transitively: evidence cells that say `同 BC01` expand through the
+    named row before resolution; every extracted test path must exist, every `T0NN` must be a tasks.md
+    row, every `M-n` / `C-n` must have a heading in its contract.
+  - (a) state-changing Store Inventory rows are derived from the table's disposition cell (a
+    `.specify/` target, `退役`, or `墓碑行`, excluding the `非存储` row) and must equal
+    `{1…15, 17}` exactly once across the BC rows (18 rows, contiguous BC01…BC18).
+- Green run: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed -q`
+  → `1 passed in 9.74s`, exit **0**.
+- Drill A (delete one row) — plan.md pre-drill sha256 `7a7baac8362ce8a8…`; the BC13 row removed:
+  exit **1**, `AssertionError: the inventory must be a contiguous, duplicate-free BC01…BCNN set`
+  (`At index 12 diff: 'BC14' != 'BC13'`). Restore = exact line re-insertion at its original index;
+  sha equal; green re-run exit **0**.
+- Drill B (forbidden word) — BC01's Behavior cell `migrate:relocate` → `manual`:
+  exit **1**, `AssertionError: BC01: behavior 'manual' is outside the closed class set`. Restore =
+  exact reverse substitution; sha equal; green re-run exit **0**; `git diff -- plan.md` empty.
+- Territory disclosure: the drill required temporary edits to `plan.md` (forbidden as a work product).
+  Both were reverse-substituted exactly, checksum-equal, and `git diff` on the file is empty; no plan
+  content changed.
+
+## T041 — final gate readings
+
+- Date: 2026-11-25
+- Full fast tier (runner passes=2): **218 failed, 10040 passed, 3 skipped, 0 setup errors** in
+  64.05 s — `test-evidence/p5-full-run.txt`, names `test-evidence/p5-full-failed.txt`.
+- Name-level delta vs the implement entry baseline (`implement-baseline-failed.txt`, 748 names):
+  `comm -13` **0 new failures** (`test-evidence/p5-new-vs-baseline.txt` is empty), `comm -23`
+  **530 repaired** baseline reds. The remaining 218 are all pre-existing baseline reds and are
+  named by the file.
+- The 351-new-name class carried from P1–P4 was a fragment-built-path blind spot of T029's literal
+  search; it is repaired on the assertion/fixture side under T041's "attributed or fixed" clause.
+  Per-module changes, root cause and before/after readings: `test-evidence/t041-stale-live-target-repair.md`.
+- Guard re-runs: `test_store_layout_live_refs.py` + `test_runtime_store_layout.py` (including
+  `test_backward_incompatible_inventory_is_closed`) → 11 passed.
+- `sync-mirrors.py --check` exit **0**, **0** DIFF members today (baseline file: 444 DIFF; member-set
+  delta new=0 / cured=all); `regen-command-copies.py --check` exit **0**.
+- `test ! -e .specify/memory` exit **0**.
+- `grep -cE '^- \[[ >]\]' tasks.md` = **43** — every row, including this package's, is still in the
+  open form at executor hand-back; tasks.md is on this seat's forbidden-write list, so row marking
+  and the GATE-8 evaluation belong to the driver after it collects the writebacks.
+- All readings: `test-evidence/t041-final-gate.txt`.

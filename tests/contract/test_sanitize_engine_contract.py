@@ -13,8 +13,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "scripts" / "python" / "sanitize-utils.py"
-STORE_REL = Path(".specify") / "memory" / "sanitize" / "findings.json"
-PLAN_REL = Path(".specify") / "memory" / "sanitize" / "cleanup-plan.json"
+STORE_REL = Path(".specify") / "sanitize" / "findings.json"
+PLAN_REL = Path(".specify") / "sanitize" / "cleanup-plan.json"
 
 
 def run_engine(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
@@ -97,7 +97,7 @@ def test_collect_creates_store_and_writes_nothing_else(tmp_path):
     assert store.is_file(), "collect must persist the findings store"
     after = {p: p.stat().st_mtime_ns for p in tmp_path.rglob("*") if p.is_file() and p != store}
     assert after == before, "collect must not modify any file other than the store"
-    assert not list((tmp_path / ".specify" / "memory" / "sanitize").glob("*.part")), "no .part residue"
+    assert not list((tmp_path / ".specify" / "sanitize").glob("*.part")), "no .part residue"
 
 
 def test_status_is_zero_write(tmp_path):
@@ -158,7 +158,7 @@ def test_apply_rejects_unknown_finding_exits_2(tmp_path):
 
 def test_apply_rejects_disposition_mismatch_exits_2(tmp_path):
     finding = make_finding()  # suggested disposition: delete
-    todo = tmp_path / ".specify" / "memory" / "todo"
+    todo = tmp_path / ".specify" / "todo"
     todo.mkdir(parents=True, exist_ok=True)
     (todo / "example.md").write_text("x\n", encoding="utf-8")
     store_path = tmp_path / STORE_REL
@@ -183,7 +183,7 @@ def test_apply_repair_is_state_only(tmp_path):
         detection="programmatic", disposition="repair", severity="medium",
         evidenceRefs=[{"kind": "path", "ref": "scripts/x.py"}],
     )
-    todo = tmp_path / ".specify" / "memory" / "todo"
+    todo = tmp_path / ".specify" / "todo"
     todo.mkdir(parents=True, exist_ok=True)
     (todo / "example.md").write_text("x\n", encoding="utf-8")
     store_path = tmp_path / STORE_REL
@@ -211,9 +211,9 @@ def test_apply_archive_moves_to_archive_root(tmp_path):
         evidenceRefs=[{"kind": "path", "ref": ".specify/todo/new.md"}],
         detection="semantic", disposition="archive",
     )
-    draft = tmp_path / ".specify" / "memory" / "draft"
-    draft.mkdir(parents=True, exist_ok=True)
-    (draft / "old.md").write_text("old\n", encoding="utf-8")
+    todo = tmp_path / ".specify" / "todo"
+    todo.mkdir(parents=True, exist_ok=True)
+    (todo / "old.md").write_text("old\n", encoding="utf-8")
     store_path = tmp_path / STORE_REL
     store_path.parent.mkdir(parents=True, exist_ok=True)
     store_path.write_text(json.dumps({"version": 1, "updated": "x", "findings": [finding]}), encoding="utf-8")
@@ -227,8 +227,8 @@ def test_apply_archive_moves_to_archive_root(tmp_path):
         cwd=tmp_path,
     )
     assert proc.returncode == 0
-    assert not (draft / "old.md").exists(), "archived material leaves its origin"
-    archived = tmp_path / ".specify" / "archive" / "memory" / "draft" / "old.md"
+    assert not (todo / "old.md").exists(), "archived material leaves its origin"
+    archived = tmp_path / ".specify" / "archive" / "todo" / "old.md"
     assert archived.is_file() and archived.read_text(encoding="utf-8") == "old\n"
     report = out_json(proc)
     assert any(a["change"] == "archived" for a in report["artifacts"])
@@ -236,7 +236,7 @@ def test_apply_archive_moves_to_archive_root(tmp_path):
 
 def _make_plan(tmp_path, confirmed: bool) -> Path:
     finding = make_finding()
-    todo = tmp_path / ".specify" / "memory" / "todo"
+    todo = tmp_path / ".specify" / "todo"
     todo.mkdir(parents=True, exist_ok=True)
     (todo / "example.md").write_text("---\nstatus: parked\n---\nclaims unlanded\n", encoding="utf-8")
     verdicts = tmp_path / "verdicts.json"
@@ -254,7 +254,7 @@ def _make_plan(tmp_path, confirmed: bool) -> Path:
 
 def test_apply_rejects_unconfirmed_plan_exits_2_zero_execution(tmp_path):
     plan = _make_plan(tmp_path, confirmed=False)
-    material = tmp_path / ".specify" / "memory" / "todo" / "example.md"
+    material = tmp_path / ".specify" / "todo" / "example.md"
     proc = run_engine(
         ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
         cwd=tmp_path,
@@ -292,7 +292,7 @@ def test_apply_rejects_out_of_whitelist_target_exits_2(tmp_path):
 
 def test_apply_executes_confirmed_delete_and_updates_state(tmp_path):
     plan = _make_plan(tmp_path, confirmed=True)
-    material = tmp_path / ".specify" / "memory" / "todo" / "example.md"
+    material = tmp_path / ".specify" / "todo" / "example.md"
     proc = run_engine(
         ["--action", "apply", "--plan", str(plan), "--workspace-root", str(tmp_path)],
         cwd=tmp_path,

@@ -141,7 +141,7 @@ def ws(tmp_path: Path) -> Path:
     (tmp_path / ".specify" / "templates" / "proactive-trigger-seed.json").write_bytes(
         SEED.read_bytes()
     )
-    (tmp_path / ".specify" / "memory").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specify").mkdir(parents=True, exist_ok=True)
     return tmp_path
 
 
@@ -168,11 +168,11 @@ def do_init(ws: Path) -> dict:
 
 
 def index_path(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "trigger" / "index.json"
+    return ws / ".specify" / "trigger" / "index.json"
 
 
 def telemetry_path(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "trigger" / "telemetry.jsonl"
+    return ws / ".specify" / "trigger" / "telemetry.jsonl"
 
 
 def read_index(ws: Path) -> dict:
@@ -337,7 +337,7 @@ def test_c7_explicit_workspace_wins(ws, tmp_path):
     assert Path(env["workspaceRoot"]).resolve() == other.resolve(), (
         f"explicit --workspace must win; workspaceRoot={env['workspaceRoot']}"
     )
-    assert (other / ".specify" / "memory" / "trigger" / "index.json").is_file()
+    assert (other / ".specify" / "trigger" / "index.json").is_file()
     assert not index_path(ws).exists(), "the CWD workspace must not have been written"
 
 
@@ -1028,14 +1028,14 @@ def test_init_maintains_the_telemetry_ignore_entry(ws):
     gi = ws / ".specify" / ".gitignore"
     assert gi.is_file(), "init must create/extend .specify/.gitignore"
     text = gi.read_text(encoding="utf-8")
-    assert "memory/trigger/telemetry.jsonl" in text, (
+    assert "trigger/telemetry.jsonl" in text, (
         "V6.9: telemetry must be ignored (it churns every turn)"
     )
     assert not re.search(r"(?m)^memory/trigger/index\.json$", text), (
         "V6.9: index.json must NOT be ignored — it carries user tuning across clones"
     )
     root_gi = ws / ".gitignore"
-    assert not root_gi.is_file() or "memory/trigger/telemetry.jsonl" not in root_gi.read_text(
+    assert not root_gi.is_file() or "trigger/telemetry.jsonl" not in root_gi.read_text(
         encoding="utf-8"
     ), "telemetry ignore rule must stay .specify-scoped, not in the project root"
 

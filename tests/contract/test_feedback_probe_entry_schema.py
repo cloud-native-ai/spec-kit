@@ -49,7 +49,7 @@ def workspace(tmp_path: Path) -> Path:
 
 
 def _entry_file(root: Path) -> Path:
-    files = sorted((root / ".specify" / "memory" / "feedback").glob("*.md"))
+    files = sorted((root / ".specify" / "feedback").glob("*.md"))
     assert files, "no entry written"
     return files[-1]
 
@@ -105,7 +105,7 @@ class TestRecordProbeResolution:
     def test_record_custom_unit_resolves_external(
         self, workspace: Path, capsys
     ):
-        probes = workspace / ".specify" / "memory" / "feedback" / "probes"
+        probes = workspace / ".specify" / "feedback" / "probes"
         probes.mkdir(parents=True, exist_ok=True)
         (probes / "ext-myteam-deploy-wrapup.md").write_text(
             "---\nobject_id: ext-myteam-deploy-wrapup\n"

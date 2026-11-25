@@ -1,0 +1,5 @@
+task: T034
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/fixtures/store-layout-105/builders.py extended with build_residue (draft/ + stray git-workflow.md under the retired container), build_symlink (store legacy path replaced by a symlink to sibling-content/<store>), build_readonly (target root pre-created 0o555, the parent of every relocated entry) and build_partial (real dry-run plan, upper-half entries physically relocated, rows flipped to status=moved, landed in a running receipt via the engine's own create/update receipt); all declaration-driven; consumed by T035
+at: 2026-11-25T07:16:00Z

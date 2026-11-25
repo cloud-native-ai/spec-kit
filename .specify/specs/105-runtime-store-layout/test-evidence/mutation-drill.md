@@ -48,3 +48,32 @@ Drill declarations (L-5 item 4 / `contracts/live-reference-migration.contract.md
 - Restore: exact reverse substitution (`grep -c 'PROBE_DRILL'` = 0); checksum equals the pre-drill
   value (`sha_equal=yes`); `py_compile` exit 0 on the restored file.
 - Same command as D3 → `1 passed in 6.23s`, exit **0**.
+
+## D5 — deleted `dual-content` conflict check (red) — 2026-11-25
+
+- Drill owner: T036 drill ①. Pre-drill checksum of `src/specify_cli/__init__.py`:
+  `18f3a038227a66067e94eb8c5ca7014ef1369716de66ee774c927fb2bd13271f` (mutated `06deae6c4c3a…`).
+- Mutation (exact substitution, one site): the planner's dual-content branch
+  `    if old_authoritative and new_authoritative:` →
+  `    if False and old_authoritative and new_authoritative:`.
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_store_layout_migration_us1_us2.py::test_dual_content_refuses_with_both_paths_and_leaves_both_trees -q`
+- Exit code: **1** — `1 failed in 8.14s`; the failure is the named-reason assertion:
+  `AssertionError: assert 'dual-content' in 'path-collision:entry.md — the relative path exists on both sides …'`
+  (with the conflict check gone, the dual fixture degrades to a path-collision refusal).
+- Restore: exact reverse substitution; `count(old) == 1`, `count(new) == 0`; checksum equals the
+  pre-drill value (`sha_equal=yes`); re-run of the two migration modules → `9 passed in 9.56s`, exit **0**.
+
+## D6 — cancelled `unknown-residue` enumeration (red) — 2026-11-25
+
+- Drill owner: T036 drill ②. Pre-drill checksum as D5 (mutated `5b823c866f80…`).
+- Mutation (exact substitutions, two sites — the rule lives once in the planner and once in the
+  executor's container pass): `        if unknown:` → `        if False and unknown:` and
+  `    if blocking:` → `    if False and blocking:`.
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_store_layout_migration_us3_us6.py::test_residue_lists_every_remaining_path_and_deletes_nothing -q`
+- Exit code: **1** — `1 failed in 8.14s`; the failure is the outcome assertion:
+  `assert 0 == 3` (`<Result okay>.exit_code`), i.e. the run reports `applied` and the residue
+  listing disappears while `draft/` and `git-workflow.md` stay on disk un-named.
+- Restore: both exact reverse substitutions; each restored literal `count == 1`; checksum equals
+  the pre-drill value (`sha_equal=yes`); re-run of the two migration modules → `9 passed in 9.56s`,
+  exit **0**.
+

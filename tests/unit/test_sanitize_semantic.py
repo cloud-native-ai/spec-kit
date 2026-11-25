@@ -33,7 +33,7 @@ def git(root: Path, *args: str, date: str | None = None) -> str:
 def assemble_workspace(tmp_path: Path, land_commit: bool = True) -> Path:
     """Build a mini repo around the fixture material: todo claims unlanded work
     that a later commit (dated after the claim) actually landed."""
-    todo = tmp_path / ".specify" / "memory" / "todo" / "20260812-backlog.md"
+    todo = tmp_path / ".specify" / "todo" / "20260812-backlog.md"
     todo.parent.mkdir(parents=True, exist_ok=True)
     todo.write_text(FIXTURE.read_text(encoding="utf-8"), encoding="utf-8")
     target = tmp_path / "scripts" / "js" / "better-harness" / "session-analysis" / "platforms" / "claude.mjs"
@@ -109,9 +109,9 @@ def test_evidence_pack_fragment_globs_reach_deep_paths(tmp_path):
     """Fragments without a rooted prefix (e.g. `platforms/claude.mjs`) glob to
     their deep counterparts for git evidence."""
     tmp = assemble_workspace(tmp_path)
-    text = (tmp / ".specify" / "memory" / "todo" / "20260812-backlog.md").read_text(encoding="utf-8")
+    text = (tmp / ".specify" / "todo" / "20260812-backlog.md").read_text(encoding="utf-8")
     # simulate a material that references only the bare fragment
-    (tmp / ".specify" / "memory" / "todo" / "fragment-only.md").write_text(
+    (tmp / ".specify" / "todo" / "fragment-only.md").write_text(
         text.replace("scripts/js/better-harness/session-analysis/platforms/claude.mjs",
                      "platforms/claude.mjs"), encoding="utf-8")
     candidates, _ = su.collect_semantic_candidates(tmp)

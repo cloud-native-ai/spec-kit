@@ -121,7 +121,7 @@ def _record(unit_id: str, unit_type: str, collected_at: str, elapsed=None, token
 
 
 def _store(workspace: Path) -> Path:
-    directory = workspace / ".specify" / "memory" / "exec-quant" / "records"
+    directory = workspace / ".specify" / "exec-quant" / "records"
     directory.mkdir(parents=True, exist_ok=True)
     return directory
 

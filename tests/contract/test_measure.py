@@ -72,7 +72,7 @@ def _run(args, cwd: Path) -> subprocess.CompletedProcess:
 
 
 def _store_dir(workspace: Path) -> Path:
-    return workspace / ".specify" / "memory" / "exec-quant" / "records"
+    return workspace / ".specify" / "exec-quant" / "records"
 
 
 def _write(workspace: Path, stem: str, unit_id: str, unit_type: str, collected_at: str,
@@ -161,7 +161,7 @@ def _cap_fixture(workspace: Path, count: int = 8) -> None:
 
 def _paths(workspace: Path) -> dict:
     """Per-file digests of the whole store — the read-only measurement (C-62 / SC-012)."""
-    base = workspace / ".specify" / "memory" / "exec-quant"
+    base = workspace / ".specify" / "exec-quant"
     digests = {}
     for path in sorted(base.rglob("*")):
         if path.is_file():

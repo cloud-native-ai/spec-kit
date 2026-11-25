@@ -83,16 +83,19 @@ def make_resource_with_skills(
         "cli: qodercli\nmodel: fixture-model\n", encoding="utf-8"
     )
 
-    # memory
-    memory_dir = root / "memory"
-    memory_dir.mkdir(parents=True, exist_ok=True)
-    (memory_dir / "constitution.md").write_text(
+    # seed (the packaged seed namespace; Feature 105 C-7)
+    seed_dir = root / "seed"
+    seed_dir.mkdir(parents=True, exist_ok=True)
+    (seed_dir / "constitution.md").write_text(
         "# Constitution\n\nSupported: Claude Code, Codex CLI, GitHub Copilot, Hermes Agent, opencode, Qoder\n",
         encoding="utf-8",
     )
-    (memory_dir / "features.md").write_text(
+    (seed_dir / "features.md").write_text(
         "# Features\n\n| ID | Name | Status |\n", encoding="utf-8"
     )
+    for tier in ("session", "knowledge"):
+        (seed_dir / tier).mkdir(parents=True, exist_ok=True)
+        (seed_dir / tier / ".gitkeep").touch()
 
     # scripts
     scripts_dir = root / "scripts" / "bash"

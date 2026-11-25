@@ -44,7 +44,7 @@ def _build_fixture(tmp_path: Path, attempts: list[tuple[str, str]]) -> dict:
     registry = tmp_path / "registry"
     for path in (state, teams, logs, registry):
         path.mkdir()
-    store = tmp_path / "memory" / "exec-quant" / "records"
+    store = tmp_path / "exec-quant" / "records"
     store.mkdir(parents=True)
     for index, (record_name, label) in enumerate(attempts):
         record = {

@@ -1,0 +1,35 @@
+# T041 final gate readings — 2026-11-25T07:14:45Z
+
+== 1. full suite names + comm against the implement entry baseline
+$ env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --names-out .specify/specs/105-runtime-store-layout/test-evidence/p5-full-failed.txt
+main parallel pass: 218 failed, 10040 passed, 3 skipped, 1536 warnings in 64.05s
+serial-marker pass: 1 passed, 10268 deselected (runner passes=2)
+failed-name list entries: 218 (baseline: 748)
+comm -13 baseline current (NEW failures): 0
+comm -23 baseline current (repaired baseline reds): 530
+setup errors: 0 (P4 carried 9; baseline 0)
+
+== 2. guard modules
+...........                                                              [100%]
+11 passed in 6.61s
+
+== 3. mirrors member-set vs baseline
+exit=0
+DIFF members now: 0; baseline DIFF members: 444
+new members vs baseline: 0
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (116 files, byte-identical)
+
+== 4. command copies
+OK: all per-tool command copies match the source templates.
+exit=0
+
+== 5. retired root absent
+exit=0
+
+== 6. no open/claimed tasks
+grep -cE '^- \[[ >]\]' .specify/specs/105-runtime-store-layout/tasks.md
+43
+reading: all 43 rows are still in the open form at executor hand-back — tasks.md is on this
+seat's forbidden-write list, so row marking and the GATE-8 evaluation belong to the driver
+after it collects the writebacks.

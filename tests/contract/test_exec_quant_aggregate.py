@@ -84,7 +84,7 @@ def _hex(seed: str) -> str:
 
 
 def _agg(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant" / "aggregated"
+    return ws / ".specify" / "exec-quant" / "aggregated"
 
 
 def _summaries(ws: Path) -> Path:
@@ -363,7 +363,7 @@ def test_local_records_and_scores_never_enter_view(tmp_path):
     # context) never reach the view.
     ws = tmp_path
     _seed_store(ws)
-    store = ws / ".specify" / "memory" / "exec-quant"
+    store = ws / ".specify" / "exec-quant"
     local_unit = "custom:local/private-probe"
     for name, body in (
         ("20260101T000010Z-local001.json", {

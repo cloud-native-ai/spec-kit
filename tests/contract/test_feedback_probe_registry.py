@@ -48,7 +48,7 @@ def _workspace(tmp_path: Path, registry: str | None = VALID_REGISTRY) -> Path:
 
 
 def _external_probe(tmp_path: Path, name: str, body: str) -> Path:
-    probes = tmp_path / ".specify" / "memory" / "feedback" / "probes"
+    probes = tmp_path / ".specify" / "feedback" / "probes"
     probes.mkdir(parents=True, exist_ok=True)
     path = probes / f"{name}.md"
     path.write_text(body, encoding="utf-8")

@@ -51,7 +51,6 @@ def engine_v2_present():
 def make_ws(tmp_path: Path) -> Path:
     ws = tmp_path / "ws"
     (ws / ".specify" / "agents" / "execution" / "logs").mkdir(parents=True)
-    (ws / ".specify" / "memory").mkdir(parents=True)
     return ws
 
 
@@ -148,7 +147,7 @@ def dispatch_args(ws: Path, snapshot: Path, cid: str, label: str = "demo-label",
 
 
 def store_dir(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant"
+    return ws / ".specify" / "exec-quant"
 
 
 def records_dir(ws: Path) -> Path:
@@ -583,7 +582,7 @@ class TestListAndScore:
 
     def test_v1_record_read_only_normalization(self, tmp_path):
         ws = make_ws(tmp_path)
-        store = ws / ".specify" / "memory" / "exec-quant"
+        store = ws / ".specify" / "exec-quant"
         store.mkdir(parents=True, exist_ok=True)
         v1 = {
             "kind": "speckit.exec-quant", "schema_version": 1,

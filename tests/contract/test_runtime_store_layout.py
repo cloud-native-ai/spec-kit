@@ -9,9 +9,17 @@ Red-first: authored before the declaration, the framework-map rows and the seede
 * C-2 retired container      -> ``test_repo_has_no_retired_root`` (dogfood closes it in US5)
 * SC-007 mirror member set   -> ``test_mirror_member_set`` (US5 regenerates the mirrors)
 * FR-025 per-store layout    -> ``test_two_writers_distinct_paths``
+* FR-027 / SC-009 closure    -> ``test_backward_incompatible_inventory_is_closed``
 
 The baseline children below are the measured `git ls-tree -d 23938f22e:.specify/memory` set
 (12 entries); the requirements Store Inventory is the human side of the same closed set.
+
+U-03 scope decision (analyze residue, recorded here): the FR-027 forbidden-behavior words are
+asserted against the inventory's **Behavior cell only**, never the whole row. BC12's change cell
+legitimately names ``todo/`` (a Store Inventory member), and a whole-row scan would be red on a
+correct plan. The Behavior cell is where the closed class must appear, so that cell is the guard's
+scope; a forbidden word smuggled into any other cell is caught by (b)'s exact-token assertion only
+if it replaces the behavior, which is the failure mode FR-027 names.
 """
 
 from __future__ import annotations
@@ -29,6 +37,11 @@ pytestmark = pytest.mark.contract
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "105-runtime-store-layout"
 REQUIREMENTS = SPEC_DIR / "requirements.md"
+PLAN = SPEC_DIR / "plan.md"
+TASKS = SPEC_DIR / "tasks.md"
+CONTRACTS = SPEC_DIR / "contracts"
+MIGRATE_CONTRACT = CONTRACTS / "migrate-store-layout.contract.md"
+STORE_CONTRACT = CONTRACTS / "store-layout.contract.md"
 FRAMEWORK_MAP = REPO_ROOT / "shared" / "definitions" / "framework-map.md"
 MIRROR_BASELINE = SPEC_DIR / "test-evidence" / "sync-mirrors-baseline.txt"
 DECLARATION_FILE = (
@@ -423,3 +436,186 @@ def test_two_writers_distinct_paths(tmp_path: Path):
         written.extend([path_a, path_b])
 
     assert len(written) == len(set(written)), "two stores produced the same entry path"
+
+
+# --------------------------------------------------------------------------- #
+# FR-027 / SC-009 — the closed backward-incompatible change inventory (T042)
+# --------------------------------------------------------------------------- #
+BC_ID_RE = re.compile(r"^\|\s*(BC\d+)\s*\|")
+BC_CITATION_RE = re.compile(r"#(\d+)")
+BC_SAME_AS_RE = re.compile(r"同\s*(BC\d+)")
+EVIDENCE_PATH_RE = re.compile(
+    r"(?<![\w/.-])(?:tests|test-evidence|notes|shared|scripts|src|seed|templates|docs)/[\w./-]+"
+)
+EVIDENCE_TASK_RE = re.compile(r"T(\d{3})")
+EVIDENCE_CLAUSE_RE = re.compile(r"(?<![\w-])([MC])-(\d+)(?!\d)")
+BEHAVIOR_CLASSES = {
+    "migrate:relocate",
+    "migrate:container-pass",
+    "compatibility-bridge",
+    "no-workspace-object",
+}
+REFUSE_PREFIX = "migrate:refuse:"
+FORBIDDEN_BEHAVIOR_WORDS = ("manual", "docs-only", "fallback", "runtime-fallback", "todo")
+
+
+def _bc_rows():
+    """`{id, change, source, behavior, evidence}` for every plan inventory row."""
+    rows = []
+    for line in PLAN.read_text(encoding="utf-8").splitlines():
+        match = BC_ID_RE.match(line)
+        if not match:
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        assert len(cells) == 5, f"the BC inventory row {match.group(1)} must hold five cells"
+        rows.append(
+            {
+                "id": cells[0],
+                "change": cells[1],
+                "source": cells[2],
+                "behavior": cells[3],
+                "evidence": cells[4],
+            }
+        )
+    return rows
+
+
+def _m5_tokens():
+    """The M-5 closed refusal table's `reason` tokens."""
+    text = MIGRATE_CONTRACT.read_text(encoding="utf-8")
+    assert "## M-5" in text, "the migrate contract must define the M-5 refusal classes"
+    section = text.split("## M-5", 1)[1].split("## M-6", 1)[0]
+    tokens = set()
+    for line in section.splitlines():
+        match = re.match(r"^\|\s*`([^`]+)`\s*\|", line)
+        if match:
+            tokens.add(match.group(1))
+    return tokens
+
+
+def _clause_headings(path):
+    return {
+        f"{match.group(1)}-{match.group(2)}"
+        for match in re.finditer(r"^## ([MCL])-(\d+)", path.read_text(encoding="utf-8"), re.M)
+    }
+
+
+def _task_ids():
+    ids = set()
+    for line in TASKS.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^- \[[ >X~]\] (T\d{3})\b", line)
+        if match:
+            ids.add(match.group(1))
+    return ids
+
+
+def _state_changing_inventory_rows():
+    """Store Inventory rows this feature changes: relocations, retirements, the container."""
+    derived = set()
+    for number, _member, _classification, disposition in _inventory_rows():
+        cell = disposition
+        if "非存储" in cell:
+            continue
+        if ".specify/" in cell or "退役" in cell or "墓碑" in cell:
+            derived.add(number)
+    return derived
+
+
+def _evidence_refs(cell, rows_by_id, seen=None):
+    """Expand `同 BCnn` pointers and collect `(paths, tasks, clauses)` from one evidence cell."""
+    seen = set(seen or ())
+    paths = {match.group(0) for match in EVIDENCE_PATH_RE.finditer(cell)}
+    tasks = {"T" + match.group(1) for match in EVIDENCE_TASK_RE.finditer(cell)}
+    clauses = {
+        f"{match.group(1)}-{match.group(2)}"
+        for match in EVIDENCE_CLAUSE_RE.finditer(cell)
+    }
+    for target in BC_SAME_AS_RE.findall(cell):
+        if target in seen or target not in rows_by_id:
+            continue
+        sub_paths, sub_tasks, sub_clauses = _evidence_refs(
+            rows_by_id[target]["evidence"], rows_by_id, seen | {target}
+        )
+        paths |= sub_paths
+        tasks |= sub_tasks
+        clauses |= sub_clauses
+    return paths, tasks, clauses
+
+
+def test_backward_incompatible_inventory_is_closed():
+    rows = _bc_rows()
+    rows_by_id = {row["id"]: row for row in rows}
+    assert [row["id"] for row in rows] == [
+        f"BC{number:02d}" for number in range(1, len(rows) + 1)
+    ], "the inventory must be a contiguous, duplicate-free BC01…BCNN set"
+    assert len(rows) == 18, f"the closed inventory holds 18 rows; found {len(rows)}"
+
+    # (a) every state-changing Store Inventory row is cited by exactly one BC row.
+    cited = [
+        int(number)
+        for row in rows
+        for number in BC_CITATION_RE.findall(row["source"])
+    ]
+    state_changing = _state_changing_inventory_rows()
+    assert state_changing == set(range(1, 16)) | {17}, (
+        "the requirements Store Inventory must classify rows 1–15 and 17 as state-changing"
+    )
+    assert sorted(cited) == sorted(state_changing), (
+        "the inventory must cite every state-changing Store Inventory row exactly once; "
+        f"cited={sorted(cited)} expected={sorted(state_changing)}"
+    )
+
+    # (b) exactly one primary behavior from the closed class set, refuse tokens from M-5.
+    m5 = _m5_tokens()
+    assert m5, "the M-5 table must be parseable"
+    for row in rows:
+        behavior = row["behavior"].replace("`", "").strip()
+        assert behavior, f"{row['id']} names no behavior"
+        if behavior.startswith(REFUSE_PREFIX):
+            token = behavior[len(REFUSE_PREFIX):]
+            assert token in m5 or (
+                token.startswith("path-collision:") and "path-collision:<relpath>" in m5
+            ), (
+                f"{row['id']}: refusal token {token!r} is outside the closed M-5 table"
+            )
+        else:
+            assert behavior in BEHAVIOR_CLASSES, (
+                f"{row['id']}: behavior {behavior!r} is outside the closed class set"
+            )
+
+    # (c) every evidence pointer resolves to an existing path, evidence file, or task id.
+    task_ids = _task_ids()
+    migrate_clauses = _clause_headings(MIGRATE_CONTRACT)
+    store_clauses = _clause_headings(STORE_CONTRACT)
+    for row in rows:
+        paths, tasks, clauses = _evidence_refs(row["evidence"], rows_by_id)
+        assert paths or tasks, (
+            f"{row['id']}: the evidence cell carries no resolvable test path, evidence "
+            f"file, or task id: {row['evidence']!r}"
+        )
+        for path in sorted(paths):
+            assert (REPO_ROOT / path).exists(), (
+                f"{row['id']}: evidence path {path!r} does not exist"
+            )
+        for task in sorted(tasks):
+            assert task in task_ids, (
+                f"{row['id']}: evidence task {task!r} is not a tasks.md row"
+            )
+        for clause in sorted(clauses):
+            prefix = clause[0]
+            known = migrate_clauses if prefix == "M" else store_clauses
+            assert clause in known, (
+                f"{row['id']}: evidence clause {clause!r} has no heading in its contract"
+            )
+
+    # (d) forbidden behavior words are absent from the BEHAVIOR cell (U-03 scope: the change
+    # cell legitimately names the todo/ store; the pin below keeps that scope decision honest).
+    assert "todo/" in rows_by_id["BC12"]["change"], (
+        "the U-03 scope decision only holds while BC12's change cell names todo/"
+    )
+    for row in rows:
+        lowered = row["behavior"].lower()
+        for word in FORBIDDEN_BEHAVIOR_WORDS:
+            assert word not in lowered, (
+                f"{row['id']}: forbidden behavior word {word!r} in {row['behavior']!r}"
+            )

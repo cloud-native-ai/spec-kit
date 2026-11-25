@@ -49,7 +49,7 @@ def _make_eq(collected_at: str) -> dict:
 
 
 def _write_record(ws: Path, name: str, collected_at: str, pad: int = 0) -> bytes:
-    rdir = ws / ".specify" / "memory" / "exec-quant" / "records"
+    rdir = ws / ".specify" / "exec-quant" / "records"
     rdir.mkdir(parents=True, exist_ok=True)
     record = dict(_make_eq(collected_at), schema_version=2)
     if pad:
@@ -60,11 +60,11 @@ def _write_record(ws: Path, name: str, collected_at: str, pad: int = 0) -> bytes
 
 
 def _store(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "feedback"
+    return ws / ".specify" / "feedback"
 
 
 def _eq_store(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant"
+    return ws / ".specify" / "exec-quant"
 
 
 def _snapshot(root: Path) -> dict:
@@ -163,7 +163,7 @@ def test_payload_manifest_field_set_e4(tmp_path, capsys):
 def test_payload_manifest_counts_legacy_form(tmp_path, capsys):
     ws = _make_workspace(tmp_path)
     _record(ws, "run-a")
-    legacy = ws / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+    legacy = ws / ".specify" / "exec-quant" / "records.jsonl"
     legacy.parent.mkdir(parents=True, exist_ok=True)
     legacy.write_text(json.dumps(_make_eq("2026-01-01T00:00:00Z")) + "\n"
                       + "{broken\n", encoding="utf-8")
@@ -195,7 +195,7 @@ def test_manifest_human_section_same_source(tmp_path, capsys):
     ws = _make_workspace(tmp_path)
     _record(ws, "run-a")
     _write_record(ws, "2026-a.json", "2026-01-01T00:00:00Z")
-    legacy = ws / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+    legacy = ws / ".specify" / "exec-quant" / "records.jsonl"
     legacy.parent.mkdir(parents=True, exist_ok=True)
     legacy.write_text("{broken line\n", encoding="utf-8")
 
@@ -401,8 +401,8 @@ def test_mark_submitted_archive_has_no_payload(tmp_path, capsys):
 def test_payload_degradations_exit_zero(tmp_path, capsys, monkeypatch):
     ws = _make_workspace(tmp_path)
     _record(ws, "run-a")
-    (ws / ".specify" / "memory" / "exec-quant" / "records").mkdir(parents=True)
-    (ws / ".specify" / "memory" / "exec-quant" / "records" / "bad.json"
+    (ws / ".specify" / "exec-quant" / "records").mkdir(parents=True)
+    (ws / ".specify" / "exec-quant" / "records" / "bad.json"
      ).write_bytes(b"{broken")
     _write_record(ws, "2026-a.json", "2026-01-01T00:00:00Z")
     _write_record(ws, "2026-b.json", "2026-01-02T00:00:00Z")

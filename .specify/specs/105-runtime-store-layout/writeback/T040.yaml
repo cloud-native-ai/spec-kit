@@ -1,0 +1,5 @@
+task: T040
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: test-evidence/non-goals-audit.md: no added file under scripts/python or src/specify_cli since the feature base; pyproject diff is only the force-include memory->seed rename with the runtime dependency set unchanged; added imports are stdlib fnmatch only; engine diffs are path constants/docstrings/declaration reads; FR-025 two-writer test 1 passed; entry format and 055 write protocol unchanged; .specify/draft absent, declaration legacy_retired=[draft], zero framework-map rows; legacy git-workflow.md absent at baseline and now and its successor .specify/workflow/git.md has an empty diff vs the base; [green contracts/store-layout.contract.md#C-8]
+at: 2026-11-25T07:16:00Z

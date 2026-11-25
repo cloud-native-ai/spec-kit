@@ -77,8 +77,8 @@ def engine_source() -> str:
 
 @pytest.fixture
 def ws(tmp_path: Path) -> Path:
-    """A bare project workspace with the memory session store present."""
-    (tmp_path / ".specify" / "memory" / "session").mkdir(parents=True)
+    """A bare project workspace with the session store present."""
+    (tmp_path / ".specify" / "session").mkdir(parents=True)
     return tmp_path
 
 
@@ -87,7 +87,7 @@ def framework_store_untouched():
     """Two-hats guard: the documented path-resolution trap surfaces as workspace
     state written into the framework repository rather than as a failing test, so
     make it a failing test. Every test must pass an explicit --workspace-root."""
-    store = FRAMEWORK_ROOT / ".specify" / "memory" / "session"
+    store = FRAMEWORK_ROOT / ".specify" / "session"
     before = sorted(p.name for p in store.glob("*")) if store.is_dir() else []
     yield
     after = sorted(p.name for p in store.glob("*")) if store.is_dir() else []
@@ -152,7 +152,7 @@ _FENCE = re.compile(r"```json\n(.*?)\n```", re.S)
 
 def record_of(ws: Path, run_id: str) -> dict:
     """Read back one persisted determination record (program-side read)."""
-    session = ws / ".specify" / "memory" / "session"
+    session = ws / ".specify" / "session"
     for path in sorted(session.glob("*.md")):
         match = _FENCE.search(path.read_text(encoding="utf-8"))
         if not match:
@@ -164,7 +164,7 @@ def record_of(ws: Path, run_id: str) -> dict:
 
 
 def only_record(ws: Path) -> dict:
-    session = ws / ".specify" / "memory" / "session"
+    session = ws / ".specify" / "session"
     bodies = [p for p in sorted(session.glob("*.md")) if _FENCE.search(p.read_text(encoding="utf-8"))]
     assert len(bodies) == 1, f"expected exactly one record, got {[p.name for p in bodies]}"
     return json.loads(_FENCE.search(bodies[0].read_text(encoding="utf-8")).group(1))
@@ -320,14 +320,14 @@ class TestEngineSurface:
         rc, payload, _ = run_cli(eng, determine_args(ws, complexity="simple"), capsys)
         assert rc == 0
         assert payload == {"skipped": "simple-unit"}
-        assert [p.name for p in (ws / ".specify" / "memory" / "session").glob("*.md")] == []
+        assert [p.name for p in (ws / ".specify" / "session").glob("*.md")] == []
 
     def test_duplicate_key_no_ops(self, eng, ws, capsys):
         rc1, _, _ = run_cli(eng, determine_args(ws), capsys)
         rc2, payload2, _ = run_cli(eng, determine_args(ws), capsys)
         assert rc1 == 0 and rc2 == 0
         assert payload2.get("duplicate") is True
-        assert len(list((ws / ".specify" / "memory" / "session").glob("*.md"))) == 1
+        assert len(list((ws / ".specify" / "session").glob("*.md"))) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -1019,7 +1019,7 @@ class TestSettlement:
         assert rc == 0
         assert payload.get("already_settled") is True
         assert record_of(ws, "run-a")["axes"]["satisfaction"]["verdict"] == "accepted"
-        assert len(list((ws / ".specify" / "memory" / "session").glob("*.md"))) == 1
+        assert len(list((ws / ".specify" / "session").glob("*.md"))) == 1
 
     def test_settle_cannot_retrofit_the_red_state(self, eng, ws, capsys):
         """The red belongs to the run being determined (§ 5.4 adjacency), so it is
@@ -1183,7 +1183,7 @@ class TestChangePointLedgerSeparation:
 
     def test_record_is_not_a_feedback_entry(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, run_id="run-a"), capsys)
-        feedback = ws / ".specify" / "memory" / "feedback"
+        feedback = ws / ".specify" / "feedback"
         assert not feedback.exists() or list(feedback.glob("*.md")) == []
 
     def test_observations_describe_measurements_never_fixes(self, eng, ws, capsys):
@@ -1311,10 +1311,10 @@ class TestPassiveTrigger:
 # ---------------------------------------------------------------------------
 
 class TestNoNewStore:
-    def test_no_new_directory_appears_under_memory(self, eng, ws, capsys):
-        before = {p.name for p in (ws / ".specify" / "memory").iterdir()}
+    def test_no_new_directory_appears_under_the_specify_root(self, eng, ws, capsys):
+        before = {p.name for p in (ws / ".specify").iterdir()}
         run_cli(eng, determine_args(ws, run_id="run-a"), capsys)
-        after = {p.name for p in (ws / ".specify" / "memory").iterdir()}
+        after = {p.name for p in (ws / ".specify").iterdir()}
         assert before == {"session"}
         assert after == before
 
@@ -1388,7 +1388,7 @@ class TestOI2PersistenceIsolation:
         assert payload["persistence"] == {"persisted": False, "reason": "probe-adapter"}
         assert set(payload["record"]["axes"]) == set(eng.AXES)
         assert original is not None
-        assert [p.name for p in (ws / ".specify" / "memory" / "session").glob("*.md")] == []
+        assert [p.name for p in (ws / ".specify" / "session").glob("*.md")] == []
 
     def test_custom_unit_reports_honestly_instead_of_dropping(self, eng, ws, capsys):
         """§ 3 admits ``custom:<owner>/<name>``, but the memory engine's enforced
@@ -1489,7 +1489,7 @@ class TestLaneProjections:
 
     def _evidence_ws(self, ws, days_ago=0, digest="sha256:deadbeef"):
         run_id = "ev-20261006-000000-plan"
-        run_dir = ws / ".specify" / "memory" / "evidence" / run_id
+        run_dir = ws / ".specify" / "evidence" / run_id
         run_dir.mkdir(parents=True)
         created = (datetime.now(timezone.utc)
                    - timedelta(days=days_ago)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -1570,7 +1570,7 @@ class TestLaneProjections:
 
     def test_history_skips_entries_that_are_not_determinations(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, run_id="run-a"), capsys)
-        session = ws / ".specify" / "memory" / "session"
+        session = ws / ".specify" / "session"
         # req 055: the scan picks this junk entry up by itself — no index to
         # patch; history must skip it via body parsing.
         (session / "junk.md").write_text(

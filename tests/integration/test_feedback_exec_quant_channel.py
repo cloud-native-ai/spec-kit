@@ -81,13 +81,13 @@ def _quant_record(unit_id: str, run_id: str, quality: dict,
 def _customer_store(ws: Path, dir_records: list[dict],
                     legacy_records: list[dict]) -> None:
     """Dual-form exec-quant store (records/ dir + legacy records.jsonl)."""
-    records = ws / ".specify" / "memory" / "exec-quant" / "records"
+    records = ws / ".specify" / "exec-quant" / "records"
     records.mkdir(parents=True, exist_ok=True)
     for i, record in enumerate(dir_records):
         (records / f"20260101T0000{i:02d}Z-rec{i:04d}.json").write_text(
             json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
     if legacy_records:
-        stream = ws / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+        stream = ws / ".specify" / "exec-quant" / "records.jsonl"
         with stream.open("w", encoding="utf-8") as handle:
             for record in legacy_records:
                 handle.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -181,7 +181,7 @@ def _aggregate(hub: Path, capsys) -> tuple[dict, int]:
 
 
 def _aggregated(hub: Path) -> Path:
-    return hub / ".specify" / "memory" / "exec-quant" / "aggregated"
+    return hub / ".specify" / "exec-quant" / "aggregated"
 
 
 def _envelope_files(hub: Path) -> list[Path]:

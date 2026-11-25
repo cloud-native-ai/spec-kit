@@ -149,7 +149,7 @@ def _write_store(workspace: Path, records, name="20261106T090000000000Z-aaaaaaaa
     """Write one per-record file under the workspace's store and return the path."""
     import json
 
-    directory = workspace / ".specify" / "memory" / "exec-quant" / "records"
+    directory = workspace / ".specify" / "exec-quant" / "records"
     directory.mkdir(parents=True, exist_ok=True)
     written = []
     for index, record in enumerate(records):
@@ -249,8 +249,8 @@ def _no_measurements_literal() -> str:
 
 def _digest_with_the_store_hidden(workspace: Path, registry: Path, *extra) -> str:
     """The same digest rendered with the store absent — the reference render the element must not disturb (C-68)."""
-    hidden = workspace / ".specify" / "memory" / "exec-quant-hidden"
-    store = workspace / ".specify" / "memory" / "exec-quant"
+    hidden = workspace / ".specify" / "exec-quant-hidden"
+    store = workspace / ".specify" / "exec-quant"
     moved = False
     if store.exists():
         store.rename(hidden)
@@ -557,7 +557,7 @@ def test_c68_an_empty_store_renders_no_measurements_with_the_same_exit_status(tm
     workspace.mkdir()
     registry = _registry(tmp_path)
     _write_entry(registry, _entry("t055-empty", workspace))
-    (workspace / ".specify" / "memory" / "exec-quant" / "records").mkdir(parents=True)
+    (workspace / ".specify" / "exec-quant" / "records").mkdir(parents=True)
 
     empty = _digest(workspace, registry)
     assert empty.returncode == 0, empty.stderr

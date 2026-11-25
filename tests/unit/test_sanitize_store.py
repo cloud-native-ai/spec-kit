@@ -42,7 +42,7 @@ def finding(**overrides) -> dict:
 
 
 def init_store(tmp_path: Path, findings: list[dict]) -> Path:
-    store_path = tmp_path / ".specify" / "memory" / "sanitize" / "findings.json"
+    store_path = tmp_path / ".specify" / "sanitize" / "findings.json"
     store_path.parent.mkdir(parents=True, exist_ok=True)
     store_path.write_text(json.dumps({"version": 1, "updated": RUN_TS, "findings": findings}), encoding="utf-8")
     return store_path
@@ -72,7 +72,7 @@ def test_load_store_corrupt_rebuilds_empty_with_note(tmp_path):
 
 def test_save_store_atomic_no_part_residue(tmp_path):
     su.save_store(tmp_path, {"version": 1, "updated": RUN_TS, "findings": []})
-    store_path = tmp_path / ".specify" / "memory" / "sanitize" / "findings.json"
+    store_path = tmp_path / ".specify" / "sanitize" / "findings.json"
     assert store_path.is_file()
     assert not list(store_path.parent.glob("*.part"))
 
@@ -80,7 +80,7 @@ def test_save_store_atomic_no_part_residue(tmp_path):
 # --- schema validation C-1..C-7 ----------------------------------------------------
 
 def make_ws(tmp_path):
-    (tmp_path / ".specify" / "memory" / "todo").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specify" / "todo").mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs").mkdir(exist_ok=True)
     return tmp_path
 

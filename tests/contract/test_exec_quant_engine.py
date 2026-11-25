@@ -50,7 +50,7 @@ RUN_DETERMINATION = REPO_ROOT / "scripts" / "python" / "run-determination.py"
 
 #: Framework-repo store the two-hats guard protects (every test passes an
 #: explicit --workspace-root, so nothing may land here as a side effect).
-FRAMEWORK_STORE = REPO_ROOT / ".specify" / "memory" / "exec-quant"
+FRAMEWORK_STORE = REPO_ROOT / ".specify" / "exec-quant"
 
 # 063 C-22 (2026-10-20): args-manifest joins every wrap-up engine's closed set
 # (same-batch amendment; the docstring below had already drifted at 059 —
@@ -101,7 +101,7 @@ def framework_store_untouched():
 @pytest.fixture
 def ws(tmp_path: Path) -> Path:
     root = tmp_path / "ws"
-    (root / ".specify" / "memory" / "session").mkdir(parents=True)
+    (root / ".specify" / "session").mkdir(parents=True)
     return root
 
 
@@ -155,7 +155,7 @@ def run_via_host_wrapper(args, env_home: Path, host_name: str = "qodercli",
 
 
 def store_dir(ws: Path) -> Path:
-    return ws / ".specify" / "memory" / "exec-quant"
+    return ws / ".specify" / "exec-quant"
 
 
 def records_dir(ws: Path) -> Path:
@@ -387,7 +387,7 @@ class TestCollectContract:
     def test_collect_ignores_determination_outside_recent_window(self, ws, fake_home):
         made = make_determination(ws, "/speckit.plan", "run-stale")
         assert made.returncode == 0, made.stderr
-        entry = next((ws / ".specify" / "memory" / "session").glob("*run-determination*.md"))
+        entry = next((ws / ".specify" / "session").glob("*run-determination*.md"))
         text = entry.read_text(encoding="utf-8")
         stamp = re.search(r'"determined_at": "([^"]+)"', text).group(1)
         stale = (datetime.now(timezone.utc) - timedelta(minutes=120)).strftime(
@@ -882,7 +882,7 @@ class TestCarriedConsistency:
     records carry no values at all."""
 
     def _store_record(self, ws: Path) -> dict:
-        entry = next((ws / ".specify" / "memory" / "session").glob("*run-determination*.md"))
+        entry = next((ws / ".specify" / "session").glob("*run-determination*.md"))
         body = re.search(r"```json\n(.*?)\n```", entry.read_text(encoding="utf-8"), re.S)
         return json.loads(body.group(1))
 

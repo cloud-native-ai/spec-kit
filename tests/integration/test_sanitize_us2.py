@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "scripts" / "python" / "sanitize-utils.py"
 FIXTURES = ROOT / "tests" / "fixtures" / "sanitize" / "correctness"
-STORE_REL = Path(".specify") / "memory" / "sanitize" / "findings.json"
+STORE_REL = Path(".specify") / "sanitize" / "findings.json"
 
 
 def run_engine(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
@@ -28,7 +28,7 @@ def run_engine(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
 def assemble(tmp_path: Path) -> Path:
     ws = tmp_path
     # dead-reference material (4 forms + exemptions)
-    todo = ws / ".specify" / "memory" / "todo"
+    todo = ws / ".specify" / "todo"
     todo.mkdir(parents=True, exist_ok=True)
     (todo / "material.md").write_text(
         FIXTURES.joinpath("material.md").read_text(encoding="utf-8"), encoding="utf-8")
@@ -40,10 +40,10 @@ def assemble(tmp_path: Path) -> Path:
     # skills/external/create-docs/ (external = flat mirror layer)
     (ws / "skills" / "external" / "create-docs").mkdir(parents=True, exist_ok=True)
     # index-inconsistency: features row 099 points to a missing detail file
-    (ws / ".specify" / "memory" / "features").mkdir(parents=True, exist_ok=True)
-    (ws / ".specify" / "memory" / "features.md").write_text(
+    (ws / ".specify" / "features").mkdir(parents=True, exist_ok=True)
+    (ws / ".specify" / "features.md").write_text(
         FIXTURES.joinpath("features-index.md").read_text(encoding="utf-8"), encoding="utf-8")
-    (ws / ".specify" / "memory" / "features" / "098.md").write_text("# 098\n", encoding="utf-8")
+    (ws / ".specify" / "features" / "098.md").write_text("# 098\n", encoding="utf-8")
     # broken-symlink: tool surfaces exist but their compat links do not
     (ws / ".claude").mkdir(exist_ok=True)
     (ws / ".github").mkdir(exist_ok=True)

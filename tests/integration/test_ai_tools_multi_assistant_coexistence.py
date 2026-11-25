@@ -51,5 +51,5 @@ class TestMultiAssistantCoexistence:
         # `templates/` included, which the per-assistant init tests do not assert
         # on a fresh workspace.
         assert (project / ".specify").is_dir()
-        for core in ("memory", "scripts", "skills", "templates"):
+        for core in ("session", "knowledge", "scripts", "skills", "templates"):
             assert (project / ".specify" / core).is_dir(), f".specify/{core} missing"

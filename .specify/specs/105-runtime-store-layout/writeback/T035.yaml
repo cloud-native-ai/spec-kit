@@ -1,0 +1,5 @@
+task: T035
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_store_layout_migration_us3_us6.py -q exit 0 / 4 passed (residue exit 3 blocked with every path listed and zero deletion; symlink refuse naming the path with link untouched; readonly permission-denied on uid 1001 with no partial success; partial resume moves only the remainder with one archive record per object and the interrupted receipt byte-identical); per-assertion mutation pairing in the module docstring; readings in notes/red-first-evidence.md § T035; disclosed observation: a third apply after a completed resume re-reads the stale running receipt and reports applied (M-6 idempotence sentence not met for crash→resume→rerun); no data movement or loss
+at: 2026-11-25T07:16:00Z

@@ -1,0 +1,5 @@
+task: T043
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: SC-009 row appended to test-evidence/acceptance-105.md and the SC-009_status=pass row appended to test-evidence/verification-input.md citing the fresh 10-passed run test-evidence/t043-sc009-run.txt, the T016 dry-run zero-write/apply readings, the T035 residue/dual refusals and the T042 drills; the feature's single smoke record (written at T039) is cited, not duplicated; no fabricated readings
+at: 2026-11-25T07:16:00Z

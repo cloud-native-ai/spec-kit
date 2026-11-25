@@ -133,7 +133,7 @@ def test_memory_over_limit_stdin_records_nothing(tmp_path, monkeypatch, capsys):
     err = capsys.readouterr().err
     assert rc == 2
     assert "stdin payload exceeds" in err
-    session = tmp_path / ".specify" / "memory" / "session"
+    session = tmp_path / ".specify" / "session"
     assert not session.exists() or not list(session.glob("*.md"))
 
 
@@ -143,7 +143,7 @@ def test_memory_small_stdin_records_the_whole_body(tmp_path, monkeypatch, capsys
     rc = mu.main(_record_args(tmp_path))
     captured = capsys.readouterr()
     assert rc == 0, captured.err
-    entries = list((tmp_path / ".specify" / "memory" / "session").glob("*.md"))
+    entries = list((tmp_path / ".specify" / "session").glob("*.md"))
     assert len(entries) == 1
     assert body.strip() in entries[0].read_text(encoding="utf-8")
 

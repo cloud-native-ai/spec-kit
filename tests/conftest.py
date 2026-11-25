@@ -62,7 +62,7 @@ def claude_support_surface_files(repo_root: Path) -> list[Path]:
     return [
         repo_root / "README.md",
         repo_root / "docs" / "tutorials" / "installation.md",
-        repo_root / ".specify" / "memory" / "constitution.md",
+        repo_root / ".specify" / "constitution.md",
         repo_root / "templates" / "plan-template.md",
         repo_root / "templates" / "instructions-template.md",
         repo_root / "templates" / "commands" / "agents.md",
@@ -80,13 +80,17 @@ def qoder_minimal_resource_path(tmp_path: Path) -> Path:
     (resource_root / "templates" / "execution-config-defaults.yaml").write_text(
         "cli: qodercli\nmodel: fixture-model\n", encoding="utf-8"
     )
-    (resource_root / "memory").mkdir(parents=True)
-    (resource_root / "memory" / "constitution.md").write_text(
+    (resource_root / "seed").mkdir(parents=True)
+    (resource_root / "seed" / "constitution.md").write_text(
         "# Constitution", encoding="utf-8"
     )
-    (resource_root / "memory" / "features.md").write_text(
+    (resource_root / "seed" / "features.md").write_text(
         "# Features", encoding="utf-8"
     )
+    # The packaged seed carries the two memory-tier placeholders (Feature 105 C-7).
+    for tier in ("session", "knowledge"):
+        (resource_root / "seed" / tier).mkdir(parents=True)
+        (resource_root / "seed" / tier / ".gitkeep").touch()
     (resource_root / "scripts").mkdir(parents=True)
     (resource_root / "skills").mkdir(parents=True)
     return resource_root
@@ -107,13 +111,17 @@ def claude_minimal_resource_path(tmp_path: Path) -> Path:
         "__pycache__/\n.venv/\n!.specify/specs/\n",
         encoding="utf-8",
     )
-    (resource_root / "memory").mkdir(parents=True)
-    (resource_root / "memory" / "constitution.md").write_text(
+    (resource_root / "seed").mkdir(parents=True)
+    (resource_root / "seed" / "constitution.md").write_text(
         "# Constitution", encoding="utf-8"
     )
-    (resource_root / "memory" / "features.md").write_text(
+    (resource_root / "seed" / "features.md").write_text(
         "# Features", encoding="utf-8"
     )
+    # The packaged seed carries the two memory-tier placeholders (Feature 105 C-7).
+    for tier in ("session", "knowledge"):
+        (resource_root / "seed" / tier).mkdir(parents=True)
+        (resource_root / "seed" / tier / ".gitkeep").touch()
     (resource_root / "scripts").mkdir(parents=True)
     (resource_root / "skills").mkdir(parents=True)
     return resource_root
@@ -134,13 +142,17 @@ def codex_minimal_resource_path(tmp_path: Path) -> Path:
         "__pycache__/\n.venv/\n!.specify/specs/\n",
         encoding="utf-8",
     )
-    (resource_root / "memory").mkdir(parents=True)
-    (resource_root / "memory" / "constitution.md").write_text(
+    (resource_root / "seed").mkdir(parents=True)
+    (resource_root / "seed" / "constitution.md").write_text(
         "# Constitution", encoding="utf-8"
     )
-    (resource_root / "memory" / "features.md").write_text(
+    (resource_root / "seed" / "features.md").write_text(
         "# Features", encoding="utf-8"
     )
+    # The packaged seed carries the two memory-tier placeholders (Feature 105 C-7).
+    for tier in ("session", "knowledge"):
+        (resource_root / "seed" / tier).mkdir(parents=True)
+        (resource_root / "seed" / tier / ".gitkeep").touch()
     (resource_root / "scripts").mkdir(parents=True)
     (resource_root / "skills").mkdir(parents=True)
     return resource_root
@@ -149,7 +161,7 @@ def codex_minimal_resource_path(tmp_path: Path) -> Path:
 @pytest.fixture
 def feedback_store(tmp_path: Path) -> Path:
     """Isolated feedback store workspace containing .specify/feedback/."""
-    store_dir = tmp_path / ".specify" / "memory" / "feedback"
+    store_dir = tmp_path / ".specify" / "feedback"
     store_dir.mkdir(parents=True, exist_ok=True)
     (store_dir / ".gitkeep").touch()
     return tmp_path

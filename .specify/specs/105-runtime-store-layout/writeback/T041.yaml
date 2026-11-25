@@ -1,0 +1,5 @@
+task: T041
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: full fast tier 218 failed / 10040 passed / 3 skipped / 0 setup errors in 64.05 s (test-evidence/p5-full-run.txt, names p5-full-failed.txt); comm -13 vs implement-baseline-failed.txt = 0 new (p5-new-vs-baseline.txt empty), comm -23 = 530 repaired; the 351-name fragment-built-path class carried from P1-P4 repaired on the assertion/fixture side and disclosed in test-evidence/t041-stale-live-target-repair.md; guards 11 passed (live refs + runtime store layout incl. BC closure); sync-mirrors rc 0 with 0 DIFF members (444 baseline, new=0/cured=all); regen-copies rc 0; test ! -e .specify/memory rc 0; tasks.md open-row reading 43 at executor hand-back (tasks.md is driver-owned); readings test-evidence/t041-final-gate.txt
+at: 2026-11-25T07:16:00Z

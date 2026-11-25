@@ -40,7 +40,7 @@ HEX40 = "1234567890abcdef1234567890abcdef12345678"
 # fixture helpers (self-constructed stores)
 # --------------------------------------------------------------------------- #
 def _eq_store(workspace: Path) -> Path:
-    return workspace / ".specify" / "memory" / "exec-quant"
+    return workspace / ".specify" / "exec-quant"
 
 
 def _write_record(store: Path, name: str, record: dict, pad: int = 0) -> bytes:

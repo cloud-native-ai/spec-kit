@@ -14,8 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "scripts" / "python" / "sanitize-utils.py"
-STORE_REL = Path(".specify") / "memory" / "sanitize" / "findings.json"
-PLAN_REL = Path(".specify") / "memory" / "sanitize" / "cleanup-plan.json"
+STORE_REL = Path(".specify") / "sanitize" / "findings.json"
+PLAN_REL = Path(".specify") / "sanitize" / "cleanup-plan.json"
 FIXTURE = ROOT / "tests" / "fixtures" / "sanitize" / "stale-todo" / "parked-todo.md"
 
 
@@ -31,7 +31,7 @@ def sid(category: str, target: str) -> str:
 
 
 def assemble(tmp_path: Path) -> Path:
-    todo = tmp_path / ".specify" / "memory" / "todo"
+    todo = tmp_path / ".specify" / "todo"
     todo.mkdir(parents=True, exist_ok=True)
     (todo / "20260812-backlog.md").write_text(FIXTURE.read_text(encoding="utf-8"), encoding="utf-8")
     (tmp_path / "scripts" / "python").mkdir(parents=True, exist_ok=True)

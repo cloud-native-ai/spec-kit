@@ -1,0 +1,5 @@
+task: T036
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: two drills executed and restored with sha256 equality: (D5) disabling the planner dual-content branch turns the US2 dual assertion red (reason degrades to path-collision), (D6) cancelling the unknown-residue enumeration at both the planner and the container-pass executor turns the residue outcome red (assert 0 == 3 / applied); both restore to the pre-drill checksum and re-run 9 passed; full log test-evidence/mutation-drill.md § D5/D6
+at: 2026-11-25T07:16:00Z

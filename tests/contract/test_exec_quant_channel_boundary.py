@@ -163,13 +163,13 @@ def _make_workspace(ws: Path) -> Path:
                       "--run-id", "run-boundary",
                       "--review", "channel boundary review", "--points", "ok"])
     assert rc == 0
-    rdir = ws / ".specify" / "memory" / "exec-quant" / "records"
+    rdir = ws / ".specify" / "exec-quant" / "records"
     rdir.mkdir(parents=True, exist_ok=True)
     record = {"kind": STR001, "schema_version": 2, "unit_id": "/speckit.plan",
               "unit_type": "command", "run_id": "run-boundary",
               "collected_at": "2026-01-01T00:00:00Z"}
     (rdir / "2026-a.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
-    legacy = ws / ".specify" / "memory" / "exec-quant" / "records.jsonl"
+    legacy = ws / ".specify" / "exec-quant" / "records.jsonl"
     legacy.write_text(json.dumps(dict(record, run_id="run-legacy")) + "\n",
                       encoding="utf-8")
     return ws
@@ -279,7 +279,7 @@ def masked_chain(tmp_path_factory):
         capture_output=True, text=True, timeout=240, env=env)
     assert proc.returncode == 0, f"collect failed: {proc.stderr}"
 
-    records = sorted((ws1 / ".specify" / "memory" / "exec-quant" / "records"
+    records = sorted((ws1 / ".specify" / "exec-quant" / "records"
                       ).glob("*.json"))
     assert len(records) == 1, "fixture expected exactly one collected record"
     record = json.loads(records[0].read_text(encoding="utf-8"))
@@ -321,7 +321,7 @@ def masked_chain(tmp_path_factory):
                       "--format", "json"])
     assert rc == 0
 
-    aggregated = ws2 / ".specify" / "memory" / "exec-quant" / "aggregated"
+    aggregated = ws2 / ".specify" / "exec-quant" / "aggregated"
     envelopes = sorted(aggregated.glob("*/records/*.json"))
     summaries = sorted((aggregated / "summaries").glob("*.json"))
     assert envelopes and summaries

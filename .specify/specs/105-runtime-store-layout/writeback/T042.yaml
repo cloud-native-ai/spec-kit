@@ -1,0 +1,5 @@
+task: T042
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed added (18 contiguous BC rows; cited Store Inventory set {1..15,17} exactly once; behavior in the closed class set with M-5 refuse tokens; evidence pointers resolve transitively through 同 BCnn to existing paths, evidence files, tasks.md ids and contract headings; forbidden behavior words scoped to the Behavior cell per U-03 with the BC12 todo/ pin); green 1 passed; drills delete-row -> contiguous-set red and behavior->manual -> closed-class red, both restored checksum-equal with git diff -- plan.md empty; readings notes/red-first-evidence.md § T042
+at: 2026-11-25T07:16:00Z
