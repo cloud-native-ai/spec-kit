@@ -21,7 +21,7 @@ skill:create-plan run=093-plan-a1 token=not_evaluated elapsed=not_evaluated arti
   "feature": "093-concurrency-by-default",
   "feature_id": "093",
   "determined_at": "2026-11-09T08:11:08Z",
-  "settled_at": null,
+  "settled_at": "2026-11-25T14:20:28Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -86,7 +86,7 @@ skill:create-plan run=093-plan-a1 token=not_evaluated elapsed=not_evaluated arti
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "true",
@@ -168,8 +168,8 @@ skill:create-plan run=093-plan-a1 token=not_evaluated elapsed=not_evaluated arti
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -199,7 +199,7 @@ skill:create-plan run=093-plan-a1 token=not_evaluated elapsed=not_evaluated arti
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
