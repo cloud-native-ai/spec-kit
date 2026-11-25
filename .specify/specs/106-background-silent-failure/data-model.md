@@ -53,9 +53,11 @@ The parent-side verification that upgrades a success terminal record to `complet
 
 | Field | Type | Rule |
 |-------|------|------|
-| `mechanism` | enum | `u4` (driver), `team-verification` (report `## Verification`), `five-element` (run-agent uplink), `return-record` (declared equivalent) |
+| `mechanism` | enum | `u4` (driver U4 verification — C1), `team-verification` (report `## Verification` — C3), `five-element` (run-agent uplink — C4), `return-record` (the parent verifies a declared-equivalent return — C2's read slot: the child's returned artifact pointers, recorded in the parent-written `<label>.settlement` claim) |
 | `evidence` | list of pointers | Must be non-empty; each pointer must resolve |
 | `verified_at` | ISO-8601 | Recorded after the verification actually ran |
+
+Mechanism ↔ carrier is closed: `u4` → C1, `return-record` → C2, `team-verification` → C3, `five-element` → C4; C6 settles only through a compliant C1/C2 runner, and no other pairing constitutes completion evidence. The verification evidence is recorded on the claim surface (E5) by the parent — never by the engine and never by `dispatch.sh` — and a missing claim blocks `completed` (INV02), not verdict derivation.
 
 No E4 → a success terminal record settles as `failed` (incomplete), never `completed`.
 
@@ -65,11 +67,11 @@ A recorded settlement on a claim-bearing surface; two shapes exist because two c
 
 | Field | Type | Rule |
 |-------|------|------|
-| `surface` | enum | `attempt-file` (`<label>.settlement`) or `team-report-row` (`## Execution Detail` row) |
+| `surface` | enum | `attempt-file` (`<label>.settlement`, in the same existing evidence directory as E2/E3 — no new root; written **only by the parent** after its independent verification, never by `dispatch.sh`, never by the engine) or `team-report-row` (`## Execution Detail` row, written by the team run) |
 | `attempt_id` / `label` | string | Matches E2 / the dispatched seat label |
 | `value` | enum | E1 value (STR-003 `end_state` is the column name on the team report) |
 | `evidence` | list of pointers | Required for `completed`; required for `silent-end` to name disappearance + absence evidence |
-| `settlement_version` | integer, optional | Absent = **legacy claim**: annotated, never compliant, exit unaffected, exempt from `settlement-unrecorded` (FR-034, INV08) |
+| `settlement_version` | integer, optional | Absent = **legacy claim**: annotated `legacy`, never counted as compliant, never rewritten, and not judged by any E7 predicate (so it contributes no exit 1) (FR-034, INV08) |
 | `claimed_at` | ISO-8601 | When the claim was written |
 
 ## E6 — Settlement Finding（判定发现）
@@ -92,17 +94,19 @@ The engine's per-attempt row; the only place a derived verdict and a claim audit
 | Kind | Predicate |
 |------|-----------|
 | `settlement-unrecorded` | A versioned claim-bearing slot exists with no value (team-report row missing `end_state`/`evidence`; claim file missing `value`); a legacy 5-column row is exempt and only annotated `legacy` (INV08) |
-| `settlement-out-of-set` | A recorded value is outside E1's closed set |
-| `settlement-unbacked` | A recorded value lacks its required positive evidence (covers: `completed` without E4; `running` without a settlement-time live check; `silent-end` without start-record + disappearance + absence of all four terminal evidences) |
+| `settlement-out-of-set` | A recorded value on a version-bearing record is outside E1's closed set |
+| `settlement-unbacked` | A recorded value on a version-bearing record lacks its required positive evidence (covers: `completed` without E4; `running` without a settlement-time live check; `silent-end` without start-record + disappearance + absence of all four terminal evidences) |
 
-`unknown` is **not** a violation kind: unreadable evidence produces E6 rows with `kind: unreadable` and `unknown_cause: unreadable`; a claimed attempt with no resolvable start record produces a `start`-slot `lack` row with `unknown_cause: start-record-missing`; either way the engine exits 2 (the single deterministic refusal, FR-007). The four edge kinds (`self-dispatch`, `dangling-parent`, `unbacked-role-claim`, `depth-inconsistent`) remain closed at the same page and are untouched.
+**Legacy scope**: all three predicates apply only to **version-bearing** records (a claim or record carrying `settlement_version`); a versionless record is annotated `legacy` (E6) and judged by none of them, so it alone never contributes exit 1 (INV08) — the `settlement-unrecorded` row's 5-column exemption is this scope's table-level instance.
+
+`unknown` is **not** a violation kind: unreadable evidence produces E6 rows with `kind: unreadable` and `unknown_cause: unreadable`; a claimed attempt with no resolvable start record produces a `start`-slot `lack` row with `unknown_cause: start-record-missing`; either way the engine exits 2 (the single deterministic refusal, FR-007), and the legacy annotation never suppresses that refusal. The four edge kinds (`self-dispatch`, `dangling-parent`, `unbacked-role-claim`, `depth-inconsistent`) remain closed at the same page and are untouched.
 
 ## E8 — Carrier Evidence Map（载体证据映射，C1…C6 closed）
 
 | ID | Attempt/claim carrier | Evidence the engine reads | Attempt record written by |
 |----|----------------------|---------------------------|---------------------------|
 | C1 | driver stage (fork) | `pid-`, `status-`, `log-`, `heartbeat-<line>-<stage>`; stage sidecar `prompt-*.md.meta.json`; U4/`last_verdict` pointer from the spine/checkpoints | stage-runner (existing four-piece; no new file) |
-| C2 | `dispatch.sh` subprocess | existing `.live.log` / `.jsonl` / `.status` + new `.attempt` / `.end` / optional `.settlement` | `dispatch.sh` |
+| C2 | `dispatch.sh` subprocess | existing `.live.log` / `.jsonl` / `.status` + new `.attempt` / `.end` + optional parent-written `.settlement` claim | `dispatch.sh` (attempt/end only; the `.settlement` claim belongs to the parent, E5) |
 | C3 | team run report | `## Execution Detail` mapping row + `## Verification` + the seat's E2 `<label>.attempt` (carrier `c3-team-seat`, `started_at` before hand-off) or the same label's existing C1/C2 start evidence | `run-team` seat dispatch (no duplicate when dispatched through C1/C2); the report row remains the E5 claim surface, not the start record |
 | C4 | native host subagent | `.attempt` in the existing dispatch log dir + return record / five elements | `run-agent` |
 | C5 | virtual | none — excluded; no detachable edge | none |
@@ -130,7 +134,7 @@ A carrier not in this table is outside the closed inventory (FR-012) and is a sp
 - **INV05** `unknown` is produced only from unreadable/unparseable evidence or from a claimed attempt with no resolvable start record, names the unreadable pointers or the missing start slot with its finding label (`unreadable` / `start-record-missing`), and the engine exits 2 — never 0.
 - **INV06** `cancelled` requires an explicit parent-side cancellation record written under the existing destructive-action discipline; process death or a dropped connection is never inferred as cancellation.
 - **INV07** Each attempt has one unique label; a retry is a new attempt with a new label; the old attempt's evidence is kept and its late return is never consumed as the current result.
-- **INV08** `legacy` claims (no `settlement_version`) are annotated, never counted as compliant, never rewritten, never cause a failing exit code, and are exempt from the `settlement-unrecorded` predicate (E7) — a 5-column row's absent cells are absent columns, not an unrecorded claim.
+- **INV08** `legacy` records (no `settlement_version`) are annotated `legacy`, never counted as compliant, never rewritten, and not judged by any of E7's three violation predicates — so a legacy record alone never causes exit 1; a 5-column row's absent cells are absent columns, not an unrecorded claim. The exit-2 `unknown` refusal (INV05) is a detection defect, not a judgment, and applies regardless of version.
 - **INV09** The engine is read-only: zero write points, no temporary files, and a fixture tree is byte-identical after a run (AST + hash legs).
 - **INV10** The same input yields byte-identical `settle` output across consecutive runs (deterministic ordering; no clock in the compared payload).
 - **INV11** Existing `.status` line format, sentinel literals, watcher verdict tokens/exit codes and the four-piece names are unchanged (extraction equality vs `fbab7a45c`).

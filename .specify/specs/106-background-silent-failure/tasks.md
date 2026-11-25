@@ -268,7 +268,7 @@
 
 ### Turn-green and Honesty Boundary
 
-- [ ] T032 [US5] [blockedBy: T028,T029,T031] US5 转绿与诚实边界：运行 `tests/contract/test_settlement_migration.py`；写 `test-evidence/enforcement-honesty.md` 记录行为类条款集合（C-34 列出的八项）逐项由文本 + 评审 / 变异演练举证、未被任何测试行冒充机器覆盖，并附 legacy / versioned 与镜像 / 副本读数（FR-041）。 [green: contracts/enforcement-and-migration.contract.md#C-34]
+- [ ] T032 [US5] [blockedBy: T028,T029,T031] US5 转绿与诚实边界：运行 `tests/contract/test_settlement_migration.py`；写 `test-evidence/enforcement-honesty.md` 记录行为类条款集合（项数以 C-34 的封闭集合为准，不在此复述）逐项由文本 + 评审 / 变异演练举证、未被任何测试行冒充机器覆盖，并附 legacy / versioned 与镜像 / 副本读数（FR-041）。 [green: contracts/enforcement-and-migration.contract.md#C-34]
 
 **Checkpoint**: US5 独立可验——升级加性、旧记录可解释但不合规、镜像与副本一致、诚实边界明示。
 
