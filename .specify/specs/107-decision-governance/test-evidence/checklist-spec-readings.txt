@@ -1,0 +1,33 @@
+# checklist-stage spec readings — 2026-11-25T16:04:11Z @ a954f64a3
+## FR count: grep -cE '^\- \*\*FR-[0-9]+\*\*:'
+30
+## SC count: grep -cE '^\- \*\*SC-[0-9]+\*\*:'
+10
+## STR rows: grep -cE '^\| `STR-[0-9]+`'
+0
+## producer rows: grep -c '^| P-'
+12
+## M rows: grep -cE '^\| M-[0-9]+'
+8
+## B rows: grep -cE '^\| B-[0-9]+'
+6
+## BC rows: grep -cE '^\| BC-[0-9]+' plan.md
+6
+## contract clause definition lines per file: grep -cE '^\- \*\*C-[0-9]+\*\*'
+.specify/specs/107-decision-governance/contracts/archive-and-audit.contract.md:8
+.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md:7
+.specify/specs/107-decision-governance/contracts/migration-and-compat.contract.md:6
+.specify/specs/107-decision-governance/contracts/text-and-options.contract.md:9
+.specify/specs/107-decision-governance/contracts/transmission-and-implementation.contract.md:8
+## tasks rows: grep -cE '^\- \[[ X>~]\] T[0-9]{3}'
+56
+## user stories: grep -c '^### User Story'
+6
+## assumptions A rows: grep -cE '^\| \*\*A-[0-9]+\*\*'
+14
+## requirements lines
+393
+## STR rows recount (the row above mis-encoded its backtick quoting and printed 0; kept as-is per single-run evidence discipline)
+## command: grep -cE '^\| .STR-[0-9]+.' requirements.md
+9
+## cross-check: validate-requirements.py reads "9 shared strings" (verbatim: test-evidence/checklist-requirements-validator.txt)

@@ -1,0 +1,13 @@
+checked: 2026-11-25T16:07:10Z
+item_count: 39
+ids_sequential: True
+traceable: 39/39 (100%)
+prohibited_lead_verbs: none
+primary_dimensions: {'Ambiguity': 2, 'Clarity': 3, 'Completeness': 15, 'Conflict': 3, 'Consistency': 5, 'Coverage': 3, 'Dependency': 1, 'Edge Cases': 1, 'Measurability': 5, 'Traceability': 1}
+items_without_dimension_tag: none
+FR covered: 30 /30 missing: none
+SC covered: 10 /10 missing: none
+clauses covered: 38 /38 missing: none
+items_without_FR_or_clause_anchor: none
+sections: 10
+footer_claims_present: True

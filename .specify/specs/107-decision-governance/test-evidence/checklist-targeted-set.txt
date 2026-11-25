@@ -1,0 +1,64 @@
+# targeted-set-v1 — stage_base=a954f64a3 — 2026-11-25T16:07:19Z
+## input: changed_paths (diff + porcelain union)
+.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+.specify/specs/107-decision-governance/test-evidence/checklist-requirements-validator.txt
+.specify/specs/107-decision-governance/test-evidence/checklist-spec-readings.txt
+.specify/specs/107-decision-governance/test-evidence/checklist-targeted-set.txt
+.specify/specs/107-decision-governance/test-evidence/checklist-verification.txt
+
+## candidates: tests/{unit,contract,integration,scenarios}/test_*.py
+586
+
+## (a) changed path / module-stem matches (grep -lF, fixed strings)
+
+## count:
+0
+
+## (b) delivery-surface tests (short name 'decision-governance' + declared driver paths)
+tests/contract/test_acceptance_premises.py
+tests/contract/test_acceptance_state_machine.py
+tests/contract/test_binding_model.py
+tests/contract/test_checkpoint_protocol.py
+tests/contract/test_client_guard_sweep.py
+tests/contract/test_concurrency_disposal.py
+tests/contract/test_concurrency_high_order.py
+tests/contract/test_criterion_vocabulary_scan.py
+tests/contract/test_declaration_facts.py
+tests/contract/test_directory_governance.py
+tests/contract/test_expression_compatibility.py
+tests/contract/test_harness_triple_structure.py
+tests/contract/test_help_body_preservation.py
+tests/contract/test_line_registration_wiring.py
+tests/contract/test_line_state_blocked.py
+tests/contract/test_loop_state_contract.py
+tests/contract/test_no_spec_local_writes.py
+tests/contract/test_non_regression_064.py
+tests/contract/test_non_regression_070.py
+tests/contract/test_sdd_carrier_contract.py
+tests/contract/test_sdd_diffusion.py
+tests/contract/test_sdd_loop_driver_efficiency.py
+tests/contract/test_sdd_loop_driver_skill.py
+tests/contract/test_sdd_loop_driver_wrapup_accounting.py
+tests/contract/test_sdd_observer_lifecycle.py
+tests/contract/test_shipped_surface_client_neutrality.py
+tests/contract/test_superagent_zero_mechanism.py
+tests/contract/test_validation_carrier_contract.py
+tests/integration/test_expression_line_pilot.py
+tests/integration/test_sdd_loop_efficiency_runner.py
+tests/integration/test_temp_team_worktree_queue.py
+tests/unit/test_admission_check.py
+tests/unit/test_audit_plan_changes.py
+tests/unit/test_audit_test_budget.py
+tests/unit/test_derive_live_log.py
+tests/unit/test_isomorphism_checker.py
+tests/unit/test_status_digest_unit.py
+tests/unit/test_wp_gate_085.py
+
+## count:
+38
+
+## (c) fixture changes: none (no tests/fixtures path changed)
+
+## classification
+executable-or-test changed paths: 0
+docs-only: 5 of 5 changed paths are non-executable
