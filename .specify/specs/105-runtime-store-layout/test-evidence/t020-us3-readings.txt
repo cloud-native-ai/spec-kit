@@ -1,0 +1,10 @@
+SESSION record path=.specify/session/20261125T060056Z-roundtrip-probe.md
+SESSION recall matches=['.specify/session/20261125T060056Z-roundtrip-probe.md']
+KNOWLEDGE record path=.specify/knowledge/durable-probe.md upsert_path=.specify/knowledge/durable-probe.md same=True
+KNOWLEDGE files=['durable-probe.md']
+DETERMINATION persisted=True path=.specify/session/20261125T060057Z-run-determination-skill-probe-probe-run-1.md
+DETERMINATION history total=1 runs=['probe-run-1']
+DETERMINATION entry exists=True
+REVERSE token returned=False matches=3
+INJECTION source paths=['.specify/knowledge/durable-probe.md', '.specify/session/20261125T060056Z-roundtrip-probe.md', '.specify/session/20261125T060057Z-run-determination-skill-probe-probe-run-1.md']
+RETIRED root created=False

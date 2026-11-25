@@ -33,6 +33,19 @@ secrets/
 
 # Keep required Spec Kit workflow artifacts visible
 !.specify/instructions.md
-!.specify/memory/
+!.specify/coaching/
+!.specify/evidence/
+!.specify/exec-quant/
+!.specify/feedback/
+!.specify/housekeeping/
+!.specify/knowledge/
+!.specify/migrate/
+!.specify/renumber/
+!.specify/retention/
+!.specify/sanitize/
+!.specify/session/
+!.specify/todo/
+!.specify/tools/
+!.specify/trigger/
 !.specify/specs/
 !.codex/commands/

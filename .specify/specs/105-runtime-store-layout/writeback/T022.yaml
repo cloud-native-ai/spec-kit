@@ -1,0 +1,5 @@
+task: T022
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tools-utils.py canonical layout, skills-utils.py inference prefix + _discover_by_text, create-new-tools.sh (effects/TOOLS_MEMORY_DIR/canonical path) and tool-definitions.md moved to .specify/tools/; sanitize-utils.py legacy-tools-registry check removed (M-7) and MATERIAL_ROOTS entry renamed tools-domain; assertion-side update in tests/unit/test_sanitize_checks_migration.py now pins the absence; behavioral reading saved .specify/tools/probe-tool.md, tool_id <TOOL:.specify/tools/probe-tool.md>, discovery fallback + type inference OK; py_compile/bash -n/--version exit 0; details notes/red-first-evidence.md § T022
+at: 2026-11-25T06:06:00Z

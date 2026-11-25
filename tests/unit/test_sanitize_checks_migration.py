@@ -1,9 +1,13 @@
 """Unit tests: init migration-residue checkers (detection-rules §4a, 2026-10-12).
 
 Pins C-22 (legacy install residue: legacy skill dirs / pre-B2a git-workflow
-state files / old tools-registry directory), C-23 (flat duplicates of the
+state files), C-23 (flat duplicates of the
 nested internal layer), the C-10 extension to .qoder/skills and .claude/skills,
 and the LEGACY_SKILL_NAMES drift guard against the CLI's _OBSOLETE_SKILLS.
+
+2026-11-25 (105-runtime-store-layout, A-5 / M-7): `.specify/tools/` became the single
+tools domain where tracked records and ignored inventories coexist, so the inverted
+`legacy-tools-registry` residue check was removed; the C-22 section now pins its absence.
 """
 from __future__ import annotations
 
@@ -129,18 +133,19 @@ def test_pre_migration_project_not_flagged(tmp_path):
     assert su.check_legacy_install_residue(tmp_path) == []
 
 
-# --- C-22 legacy tools-registry directory -----------------------------------------
+# --- C-22: the tools domain is never legacy residue (105 A-5 / M-7) ---------------
 
-def test_legacy_tools_dir_flagged_only_when_new_home_exists(tmp_path):
+def test_tools_domain_is_not_flagged_as_legacy_residue(tmp_path):
+    # `.specify/tools/` is the current tools domain: tracked records (*.md) and
+    # generated, ignored inventories (*.json) coexist there. A workspace that also
+    # still carries the retired `memory/tools/` home must not make the domain itself
+    # archive-worthy — the pre-105 check was inverted and has been removed.
     (tmp_path / ".specify" / "tools").mkdir(parents=True)
     (tmp_path / ".specify" / "tools" / "shell.json").write_text("{}", encoding="utf-8")
-    assert su.check_legacy_install_residue(tmp_path) == []  # no new home yet
+    (tmp_path / ".specify" / "tools" / "kubectl.md").write_text("# record\n", encoding="utf-8")
     (tmp_path / ".specify" / "memory" / "tools").mkdir(parents=True)
-    findings = [f for f in su.check_legacy_install_residue(tmp_path)
-                if f["target"] == ".specify/tools"]
-    assert len(findings) == 1
-    assert findings[0]["disposition"] == "archive"
-    assert su.validate_finding(findings[0], tmp_path) == []
+    findings = su.check_legacy_install_residue(tmp_path)
+    assert [f for f in findings if f["target"] == ".specify/tools"] == []
 
 
 # --- C-10 extension: agent skills links -------------------------------------------

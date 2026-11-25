@@ -1,0 +1,5 @@
+task: T024
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: package gate run-tests.sh (4 modules) exit 0 / 20 passed (test-evidence/p3-package-gate-run.txt); US4 fixture readings git check-ignore -v (.specify/.gitignore:16:tools/*.json), record rc 1 not-ignored, git ls-files .specify/tools = only kubectl-get.md, cmp template/installed rc 0, claude/codex 14-store release sets in test-evidence/t024-us4-readings.txt and notes/red-first-evidence.md § T024
+at: 2026-11-25T06:06:00Z

@@ -3,6 +3,11 @@
 `templates/gitignore-specify-template` is the source of truth copied into every
 target project's `.specify/.gitignore` during init. It must exist and use
 `.specify/`-relative patterns for the transient `.work/` scratch dirs.
+
+Feature 105 (C-4): the tools rule narrows to the generated inventories only
+(`tools/*.json`; records `tools/*.md` stay tracked), and the sanitize / trigger
+rules move with the runtime stores to the `.specify/` top level. The template and
+the repo's installed copy are one change: they must stay byte-identical.
 """
 
 from pathlib import Path
@@ -11,6 +16,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "templates" / "gitignore-specify-template"
+INSTALLED = REPO_ROOT / ".specify" / ".gitignore"
 
 
 @pytest.mark.contract
@@ -25,10 +31,10 @@ def test_template_uses_specify_relative_patterns():
         "history/.work/",
         "teams/.work/",
         "agents/execution/logs/",
-        "tools/",
+        "tools/*.json",
         "instructions.md-*",
-        "memory/sanitize/",
-        "memory/trigger/telemetry.jsonl",
+        "sanitize/",
+        "trigger/telemetry.jsonl",
         ".tmp/",
         "state/",
     ):
@@ -37,11 +43,29 @@ def test_template_uses_specify_relative_patterns():
     for anchored in (
         ".specify/history/.work/",
         ".specify/teams/.work/",
-        ".specify/tools/",
+        ".specify/tools/*.json",
         ".specify/instructions.md-*",
-        ".specify/memory/sanitize/",
-        ".specify/memory/trigger/telemetry.jsonl",
+        ".specify/sanitize/",
+        ".specify/trigger/telemetry.jsonl",
         ".specify/.tmp/",
         ".specify/state/",
     ):
         assert anchored not in body, f"repo-root-anchored rule leaked: {anchored}"
+
+
+@pytest.mark.contract
+def test_retired_whole_directory_and_memory_rules_are_gone():
+    body = TEMPLATE.read_text(encoding="utf-8")
+    assert "\ntools/\n" not in body, (
+        "a whole-directory tools rule would silently drop tracked Tool records (C-4)"
+    )
+    assert "memory/sanitize/" not in body
+    assert "memory/trigger/telemetry.jsonl" not in body
+
+
+@pytest.mark.contract
+def test_installed_copy_is_byte_identical_to_the_template():
+    assert INSTALLED.is_file(), "the framework repo ships an installed .specify/.gitignore"
+    assert TEMPLATE.read_bytes() == INSTALLED.read_bytes(), (
+        "the template and the installed copy must land in the same change, byte-identical (C-4)"
+    )

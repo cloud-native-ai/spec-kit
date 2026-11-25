@@ -1,6 +1,6 @@
 ---
 name: memory-record
-description: Persist a durable, structured record of a Spec Kit conversation into project memory (memory-as-files). Use when a /speckit.* command or skill produces a decision, user preference, review outcome, or working-state note worth remembering. Records short-term working context to .specify/memory/session/ and long-term distilled knowledge to .specify/memory/knowledge/. Only records conversations driven by a Spec Kit command or skill. Triggers include "记住", "记录记忆", "save to memory", "remember this", "record decision".
+description: Persist a durable, structured record of a Spec Kit conversation into project memory (memory-as-files). Use when a /speckit.* command or skill produces a decision, user preference, review outcome, or working-state note worth remembering. Records short-term working context to .specify/session/ and long-term distilled knowledge to .specify/knowledge/. Only records conversations driven by a Spec Kit command or skill. Triggers include "记住", "记录记忆", "save to memory", "remember this", "record decision".
 skill_id: "<SKILL:.specify/skills/internal/memory-record/SKILL.md>"
 classification: internal
 ---
@@ -65,8 +65,8 @@ For a user emphasis, use `session` with tags `user-emphasis,key:<ascii-slug>` so
 
 ## Path Conventions
 - Engine (shared project script): `${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py`.
-- Memory store (runtime output): `${SKILL_WORKDIR}/.specify/memory/session/` and `${SKILL_WORKDIR}/.specify/memory/knowledge/`.
-- The engine creates these directories on first write and maintains an `index.json` per scope.
+- Memory stores (runtime output): `${SKILL_WORKDIR}/.specify/session/` and `${SKILL_WORKDIR}/.specify/knowledge/` — the two memory tiers are first-class top-level stores, and no other memory directory exists.
+- The engine creates these directories on first write; the per-scope entry list is scan-derived, never a persisted index.
 
 ## Resource ID
 - Canonical ID: `<SKILL:.specify/skills/internal/memory-record/SKILL.md>`

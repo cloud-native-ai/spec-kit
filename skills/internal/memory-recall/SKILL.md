@@ -1,6 +1,6 @@
 ---
 name: memory-recall
-description: Retrieve relevant prior memory before or during a Spec Kit task, using a lightweight local file index (no vectors). Searches short-term working notes in .specify/memory/session/ and long-term knowledge in .specify/memory/knowledge/ by keyword, tag, source, feature, and date, then injects the most relevant entries into context. Pairs with memory-record. Triggers include "回忆", "查找记忆", "recall memory", "what do we know about", "prior decisions".
+description: Retrieve relevant prior memory before or during a Spec Kit task, using a lightweight local file index (no vectors). Searches short-term working notes in .specify/session/ and long-term knowledge in .specify/knowledge/ by keyword, tag, source, feature, and date, then injects the most relevant entries into context. Pairs with memory-record. Triggers include "回忆", "查找记忆", "recall memory", "what do we know about", "prior decisions".
 skill_id: "<SKILL:.specify/skills/internal/memory-recall/SKILL.md>"
 classification: internal
 ---
@@ -11,7 +11,9 @@ classification: internal
 
 
 ## Overview
-Search the project memory store and surface the most relevant entries so the current Spec Kit task can build on past decisions, preferences, and working state. This is the *retrieval* half of the memory system; `memory-record` is the capture half. Retrieval uses a plain local JSON index and keyword/tag scoring — there is no vector store.
+Search the project memory stores and surface the most relevant entries so the current Spec Kit task can build on past decisions, preferences, and working state. This is the *retrieval* half of the memory system; `memory-record` is the capture half. Retrieval uses a plain local JSON index and keyword/tag scoring — there is no vector store.
+
+**Search boundary (P-1)**: retrieval reads only the two memory stores. Runtime stores (feedback, evidence, exec-quant, trigger, retention, renumber, sanitize, housekeeping, coaching, todo, tools, migrate) are records, not memory — they are never traversed, and text that exists only there is never returned.
 
 ## When to use
 - At the start of a `/speckit.*` command or skill run, to load relevant context before acting.
@@ -54,7 +56,7 @@ member set.
 
 ## Path Conventions
 - Engine (shared project script): `${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py`.
-- Memory store (read from): `${SKILL_WORKDIR}/.specify/memory/session/` and `${SKILL_WORKDIR}/.specify/memory/knowledge/`.
+- Memory stores (read from): `${SKILL_WORKDIR}/.specify/session/` and `${SKILL_WORKDIR}/.specify/knowledge/` — the two first-class top-level memory stores; no other retrieval source exists.
 
 ## Resource ID
 - Canonical ID: `<SKILL:.specify/skills/internal/memory-recall/SKILL.md>`

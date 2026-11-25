@@ -1,0 +1,5 @@
+task: T023
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: templates/gitignore-specify-template and .specify/.gitignore updated in the same change and byte-identical (tools/ -> tools/*.json, memory/sanitize/ -> sanitize/, memory/trigger/telemetry.jsonl -> trigger/telemetry.jsonl, comment -> .specify/tools/), cmp rc 0; claude/codex ignore templates release exactly the 14 declared store roots with zero !.specify/memory/ occurrences; C-4 green point claimed with the T024 fixture readings
+at: 2026-11-25T06:06:00Z

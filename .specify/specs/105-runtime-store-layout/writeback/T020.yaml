@@ -1,0 +1,5 @@
+task: T020
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: package gate run-tests.sh tests/integration/test_memory_preservation.py tests/integration/test_dispatch_injection_paths.py -q exit 0 / 12 passed (test-evidence/t020-us3-gate-run.txt); fixture readings (record→recall 往返, knowledge upsert, determination persistence + history, reverse-token non-return, injection source path list, retired root absent) in test-evidence/t020-us3-readings.txt and notes/red-first-evidence.md § T020
+at: 2026-11-25T06:06:00Z

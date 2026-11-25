@@ -1,0 +1,5 @@
+task: T017
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/integration/test_memory_preservation.py authored (5 assertions: session record→recall under .specify/session/, knowledge upsert-by-slug under .specify/knowledge/, prune age/count bounds, reindex legacy-index retirement, determination persistence + history + pinned schema keys); run-tests.sh exit 0 / 5 passed at authoring time because P1 T004 front-loaded the engine re-root — honest reading disclosed in notes/red-first-evidence.md § T017 (full log test-evidence/t017-authoring-run.txt); the root-move red capability is the P1 live-target set (test-evidence/p1-final-failed.txt) owned by T029
+at: 2026-11-25T06:06:00Z

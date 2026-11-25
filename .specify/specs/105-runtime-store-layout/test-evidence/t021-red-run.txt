@@ -1,0 +1,138 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_tools_domain.py tests/contract/test_specify_gitignore_template.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..FFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_________________ test_template_uses_specify_relative_patterns _________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.mark.contract
+    def test_template_uses_specify_relative_patterns():
+        body = TEMPLATE.read_text(encoding="utf-8")
+        for pattern in (
+            "history/.work/",
+            "teams/.work/",
+            "agents/execution/logs/",
+            "tools/*.json",
+            "instructions.md-*",
+            "sanitize/",
+            "trigger/telemetry.jsonl",
+            ".tmp/",
+            "state/",
+        ):
+>           assert pattern in body, f"missing .specify-relative rule: {pattern}"
+E           AssertionError: missing .specify-relative rule: tools/*.json
+E           assert 'tools/*.json' in '# Framework-owned .specify-scoped ignore rules.\n# Installed by `specify init` as .specify/.gitignore. Patterns are r...: runtime, re-entry reads the working tree,\n# never versioned; the spec artifacts it points at stay tracked\nstate/\n'
+
+tests/contract/test_specify_gitignore_template.py:41: AssertionError
+____ test_template_and_installed_copy_are_byte_identical_with_narrow_rules _____
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_template_and_installed_copy_are_byte_identical_with_narrow_rules():
+        assert TEMPLATE.is_file() and INSTALLED.is_file()
+        template_bytes = TEMPLATE.read_bytes()
+        assert template_bytes == INSTALLED.read_bytes(), (
+            "templates/gitignore-specify-template and the installed .specify/.gitignore must be "
+            "byte-identical and change in the same commit (C-4)"
+        )
+        body = template_bytes.decode("utf-8")
+>       assert "tools/*.json" in body
+E       AssertionError: assert 'tools/*.json' in '# Framework-owned .specify-scoped ignore rules.\n# Installed by `specify init` as .specify/.gitignore. Patterns are r...: runtime, re-entry reads the working tree,\n# never versioned; the spec artifacts it points at stay tracked\nstate/\n'
+
+tests/contract/test_tools_domain.py:89: AssertionError
+____________ test_retired_whole_directory_and_memory_rules_are_gone ____________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.mark.contract
+    def test_retired_whole_directory_and_memory_rules_are_gone():
+        body = TEMPLATE.read_text(encoding="utf-8")
+>       assert "\ntools/\n" not in body, (
+            "a whole-directory tools rule would silently drop tracked Tool records (C-4)"
+        )
+E       AssertionError: a whole-directory tools rule would silently drop tracked Tool records (C-4)
+E       assert '\ntools/\n' not in '# Framework...ed\nstate/\n'
+E         
+E         '\ntools/\n' is contained here:
+E           ry/tools/
+E           tools/
+E           
+E           # Instructions backups (time-stamped, regenerated); current instructions.md is tracked
+E           instructions.md-*...
+E         
+E         ...Full output truncated (15 lines hidden), use '-vv' to show
+
+tests/contract/test_specify_gitignore_template.py:59: AssertionError
+_______________ test_same_basename_record_and_inventory_coexist ________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tools_workspace = PosixPath('/tmp/pytest-of-agent/pytest-17519/popen-gw1/test_same_basename_record_and_0')
+
+    def test_same_basename_record_and_inventory_coexist(tools_workspace: Path):
+        tools = tools_workspace / ".specify" / "tools"
+        before = {p.name: p.read_text(encoding="utf-8") for p in tools.iterdir()}
+        added = _git(["add", "-A"], tools_workspace)
+        assert added.returncode == 0, added.stderr
+        listed = _git(["ls-files", ".specify/tools"], tools_workspace)
+>       assert listed.stdout.split() == [".specify/tools/kubectl-get.md"], (
+            "exactly the record is staged; the same-basename inventory and system.json stay out"
+        )
+E       AssertionError: exactly the record is staged; the same-basename inventory and system.json stay out
+E       assert [] == ['.specify/to...bectl-get.md']
+E         
+E         Right contains one more item: '.specify/tools/kubectl-get.md'
+E         Use -v to get more diff
+
+tests/contract/test_tools_domain.py:74: AssertionError
+____________ test_tools_records_are_tracked_and_inventories_ignored ____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tools_workspace = PosixPath('/tmp/pytest-of-agent/pytest-17519/popen-gw0/test_tools_records_are_tracked0')
+
+    def test_tools_records_are_tracked_and_inventories_ignored(tools_workspace: Path):
+        for rel in (".specify/tools/system.json", ".specify/tools/kubectl-get.json"):
+            result = _git(["check-ignore", "-v", rel], tools_workspace)
+            assert result.returncode == 0, (
+                f"{rel} must be ignored by the framework-owned .specify/.gitignore"
+            )
+>           assert "tools/*.json" in result.stdout, (
+                f"the narrow inventory rule must be the matching pattern; got {result.stdout!r}"
+            )
+E           AssertionError: the narrow inventory rule must be the matching pattern; got '.specify/.gitignore:16:tools/\t.specify/tools/system.json\n'
+E           assert 'tools/*.json' in '.specify/.gitignore:16:tools/\t.specify/tools/system.json\n'
+E            +  where '.specify/.gitignore:16:tools/\t.specify/tools/system.json\n' = CompletedProcess(args=['git', 'check-ignore', '-v', '.specify/tools/system.json'], returncode=0, stdout='.specify/.gitignore:16:tools/\t.specify/tools/system.json\n', stderr='').stdout
+
+tests/contract/test_tools_domain.py:58: AssertionError
+___________ test_claude_and_codex_templates_release_every_store_root ___________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_claude_and_codex_templates_release_every_store_root():
+        statement, label = specify_cli.store_layout()
+        assert label is None, label
+        stores = list(statement["stores"])
+        assert len(stores) == 14, f"the declaration must describe 14 stores; got {stores}"
+        for template in (CLAUDE_TEMPLATE, CODEX_TEMPLATE):
+            body = template.read_text(encoding="utf-8")
+            rel = template.relative_to(ROOT).as_posix()
+>           assert "!.specify/memory/" not in body, (
+                f"{rel} still releases the retired container instead of the store roots"
+            )
+E           AssertionError: templates/claudeignore-template still releases the retired container instead of the store roots
+E           assert '!.specify/memory/' not in '# Claude Co.../commands/\n'
+E             
+E             '!.specify/memory/' is contained here:
+E               ctions.md
+E               !.specify/memory/
+E               !.specify/specs/
+E               !.claude/commands/
+
+tests/contract/test_tools_domain.py:108: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_specify_gitignore_template.py::test_template_uses_specify_relative_patterns
+FAILED tests/contract/test_tools_domain.py::test_template_and_installed_copy_are_byte_identical_with_narrow_rules
+FAILED tests/contract/test_specify_gitignore_template.py::test_retired_whole_directory_and_memory_rules_are_gone
+FAILED tests/contract/test_tools_domain.py::test_same_basename_record_and_inventory_coexist
+FAILED tests/contract/test_tools_domain.py::test_tools_records_are_tracked_and_inventories_ignored
+FAILED tests/contract/test_tools_domain.py::test_claude_and_codex_templates_release_every_store_root
+6 failed, 2 passed in 6.47s

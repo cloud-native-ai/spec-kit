@@ -16,7 +16,7 @@ if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
     script_interface_guard entry
     script_interface_guard define name="$0" \
         usage="[--json] [--debug] [--name <name>] [--type <type>] [--action <name>]" \
-        effects="writes a tool record under .specify/memory/tools/; the flags write nothing" \
+        effects="writes a tool record under .specify/tools/; the flags write nothing" \
         codes="0 created or answered; 1 a prerequisite is missing; 2 an unrecognized option" \
         writes=--action \
         -- --json --debug --name -n --type -t --action -a
@@ -156,7 +156,7 @@ main() {
     fi
 
     # Set tools memory directory
-    TOOLS_MEMORY_DIR="$ROOT_DIR/.specify/memory/tools"
+    TOOLS_MEMORY_DIR="$ROOT_DIR/.specify/tools"
 
     to_workspace_relative() {
         local path="$1"
@@ -637,7 +637,7 @@ PYEOF
                 fi
 
                 record_file="$TOOLS_MEMORY_DIR/${resolved_tool_name}.md"
-                canonical_path=".specify/memory/tools/${resolved_tool_name}.md"
+                canonical_path=".specify/tools/${resolved_tool_name}.md"
                 tool_id=$(format_tool_id "$canonical_path")
 
                 if [ -f "$record_file" ]; then

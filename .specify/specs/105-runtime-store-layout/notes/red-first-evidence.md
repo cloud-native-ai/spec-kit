@@ -179,3 +179,165 @@ RERUN apply: exit=0 outcome=clean items=0 receipts=['20261125T054816Z-d15cb0bd.j
   `test_user_facing_comprehension_pointers.py::test_c14_…`) — all five were per-tool command-copy
   drift, cured when `regen-command-copies.py` regenerated every copy for this package. The 9 setup
   errors are byte-identical to the P1-disclosed set (live-target fixtures owned by T029).
+
+## T017 — `tests/integration/test_memory_preservation.py` (authoring run)
+
+- Date: 2026-11-25
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_memory_preservation.py -q`
+- Exit code: **0** — `5 passed in 6.49s` (full log `test-evidence/t017-authoring-run.txt`)
+- Reading — honest disclosure, not a fabricated red: the five assertions (session record→recall
+  round-trip under `.specify/session/`, knowledge upsert-by-slug under `.specify/knowledge/`, prune
+  age/count bounds, reindex legacy-index retirement, determination persistence + history + pinned
+  schema keys) went green at authoring time because **P1's T004 front-loaded this substance** — the
+  memory engine's root constants were re-pointed to `.specify/<scope>/` in the foundational phase,
+  and `run-determination` persists through that engine (P-2 wiring unchanged). The red capability of
+  the root move itself is already on record: the P1 live-target set (`test-evidence/p1-final-failed.txt`,
+  404 names incl. `tests/unit/test_memory_utils.py`, which asserts the old literal and is owned by
+  T029) is exactly the suite that goes red when the root flips. Per the front-loading-closure
+  discipline this row is closed by re-verifying the assertion set against the current tree, not by
+  reverting-then-rewriting; the assertions discriminate (path prefix + retired-root absence would
+  fail if the engine still wrote under `.specify/memory/`).
+- Residual surface this file does NOT cover: the two memory skills' path text — that red belongs to
+  T018's authoring run below and is what T019 fixes.
+
+## T018 — `tests/integration/test_dispatch_injection_paths.py` (red)
+
+- Date: 2026-11-25
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_dispatch_injection_paths.py -q`
+- Exit code: **1** — `1 failed, 6 passed in 6.48s` (full log `test-evidence/t018-red-run.txt`)
+- Red (decisive excerpt):
+
+```text
+FAILED tests/integration/test_dispatch_injection_paths.py::test_memory_skill_text_names_only_the_new_roots
+E       AssertionError: skills/internal/memory-record/SKILL.md still injects a reference to the retired root
+E         '.specify/memory/' is contained here:
+E           ontext to .specify/memory/session/ and long-term distilled knowledge to .specify/memory/knowledge/.
+```
+
+- Reading: the two memory skills still name `.specify/memory/session/` and
+  `.specify/memory/knowledge/` in their description and Path Conventions — the injection surface a
+  `memory-recall`-declaring child loads. Fix side: the subject (T019 skill-text wiring), not the
+  assertion; P-3 requires every injected memory reference to resolve under the new roots.
+- Already green at authoring (structural + behavioural half of the fixture): the owner protocol keeps
+  exactly the seven downlink ids, four injection owner pointers and five uplink elements; the
+  `agents/reporter.agent.md` child still declares `memory-recall` and both seeded entries are returned
+  under the new roots; the reverse fixture's unique token written only to `.specify/feedback/` +
+  `.specify/exec-quant/` is not returned by `--action recall`; the scope closed set stays
+  `("session", "knowledge")` and `--action list --scope all` returns memory-store paths only.
+
+## T019 — memory-surface wiring (subject fixed)
+
+- Date: 2026-11-25
+- Changed subjects: `skills/internal/memory-record/SKILL.md` and
+  `skills/internal/memory-recall/SKILL.md` (description + Path Conventions now name
+  `.specify/session/` / `.specify/knowledge/`; recall gains the P-1 search-boundary statement: only the
+  two memory stores are read, runtime stores are never traversed); `shared/declarations/facts/memory-types.yaml`
+  `note` path parentheticals updated to the new roots. In-passing correction (disclosed): the record
+  skill's "maintains an `index.json` per scope" sentence was already false since the 055
+  scan-derived-index protocol and is repaired in the same bullet it lived in.
+- `scripts/python/memory-utils.py` needs no code change: the two tier roots resolve as
+  `.specify/<scope>` where the scope names are the declaration-layer fact (`memory-types`, read through
+  `declaration_reader`), and the `.specify` container is the engine's own root constant — the C-6
+  single-store-engine allowance. `scripts/python/run-determination.py`'s persistence adapter note already
+  names `.specify/session/` (P-2 wiring untouched; memory-utils is its only writer).
+- No scope renamed, no action added, no second memory source (FR-006 / FR-009 / FR-012 preserved).
+
+## T020 — US3 turn-green readings
+
+- Date: 2026-11-25
+- Package gate command:
+  `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_memory_preservation.py tests/integration/test_dispatch_injection_paths.py -q`
+- Exit code: **0** — `12 passed in 6.49s` (full log `test-evidence/t020-us3-gate-run.txt`)
+- Fixture readings (`test-evidence/t020-us3-readings.txt`, one run over a throwaway
+  `.specify/.tmp/p3-readings-105/` workspace, removed at teardown):
+
+```text
+SESSION record path=.specify/session/20261125T060056Z-roundtrip-probe.md
+SESSION recall matches=['.specify/session/20261125T060056Z-roundtrip-probe.md']
+KNOWLEDGE record path=.specify/knowledge/durable-probe.md upsert_path=.specify/knowledge/durable-probe.md same=True
+KNOWLEDGE files=['durable-probe.md']
+DETERMINATION persisted=True path=.specify/session/20261125T060057Z-run-determination-skill-probe-probe-run-1.md
+DETERMINATION history total=1 runs=['probe-run-1']
+DETERMINATION entry exists=True
+REVERSE token returned=False matches=3
+INJECTION source paths=['.specify/knowledge/durable-probe.md', '.specify/session/20261125T060056Z-roundtrip-probe.md', '.specify/session/20261125T060057Z-run-determination-skill-probe-probe-run-1.md']
+RETIRED root created=False
+```
+
+- Reading: record→recall round-trip lands a single entry under `.specify/session/` and recall returns
+  the same path; knowledge upsert keeps one file (`durable-probe.md`) for the repeated title;
+  the determination record persists through the memory engine into `.specify/session/` and
+  `--action history` retrieves the run (schema pinned by the test's literal key set); the reverse
+  token written only to feedback + exec-quant is not returned by any memory recall (the three matches
+  are the memory entries that share the ordinary word "token" — the unique token string itself never
+  appears); every injected/list-injected memory reference resolves under the two memory roots; the
+  retired container is never created.
+
+## T021 — `tests/contract/test_tools_domain.py` + `tests/contract/test_specify_gitignore_template.py` (red)
+
+- Date: 2026-11-25
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_tools_domain.py tests/contract/test_specify_gitignore_template.py -q`
+- Exit code: **1** — `6 failed, 2 passed in 6.47s` (full log `test-evidence/t021-red-run.txt`)
+- Red (decisive excerpt):
+
+```text
+FAILED tests/contract/test_specify_gitignore_template.py::test_template_uses_specify_relative_patterns
+FAILED tests/contract/test_tools_domain.py::test_template_and_installed_copy_are_byte_identical_with_narrow_rules
+FAILED tests/contract/test_specify_gitignore_template.py::test_retired_whole_directory_and_memory_rules_are_gone
+FAILED tests/contract/test_tools_domain.py::test_same_basename_record_and_inventory_coexist
+FAILED tests/contract/test_tools_domain.py::test_tools_records_are_tracked_and_inventories_ignored
+FAILED tests/contract/test_tools_domain.py::test_claude_and_codex_templates_release_every_store_root
+```
+
+- Reading: the template still ignores the whole `tools/` directory (records would be silently
+  dropped), still carries `memory/sanitize/` and `memory/trigger/telemetry.jsonl`, and both
+  claude/codex templates still release `!.specify/memory/` instead of the 14 store roots. The two
+  green tests are `test_template_exists` and `test_installed_copy_is_byte_identical_to_the_template`
+  (the pair is identical today — they drift only if the update is asymmetric). Fix side: T022/T023
+  (subject), not the assertions.
+
+## T022 — tools domain implementation (subject fixed)
+
+- Date: 2026-11-25
+- Changed subjects: `scripts/python/tools-utils.py` (canonical-layout docstring → `<workspace>/.specify/tools`);
+  `scripts/python/skills-utils.py` (`infer_resource_type_from_path` prefix and `_discover_by_text` tools dir);
+  `scripts/bash/create-new-tools.sh` (effects text, `TOOLS_MEMORY_DIR`, canonical path);
+  `shared/definitions/tool-definitions.md` (5 path references; the inventories sentence and the
+  hand-maintained `.specify/tools.md` statements preserved);
+  `scripts/python/sanitize-utils.py` (the inverted `legacy-tools-registry` check removed per M-7;
+  `MATERIAL_ROOTS` entry renamed `tools-domain` over `.specify/tools` — the domain is scanned, never
+  flagged as residue). Assertion-side follow-up (required, cited): `tests/unit/test_sanitize_checks_migration.py`
+  pinned the removed behaviour; its C-22 section now asserts the tools domain is never residue.
+- Behavioral execution (not only a text scan): a throwaway workspace got `save_record` → saved
+  `.specify/tools/probe-tool.md`, `tool_id <TOOL:.specify/tools/probe-tool.md>`, text discovery
+  `fallback` resolving the same id, `infer_resource_type_from_path(".specify/tools/probe-tool.md") == "tool"`.
+- `py_compile` exit 0 on the three engines; `bash -n` exit 0 on `create-new-tools.sh`;
+  `--version`/`--help` answer on all four faces.
+
+## T024 — US4 turn-green readings
+
+- Date: 2026-11-25
+- Package gate command:
+  `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_memory_preservation.py tests/integration/test_dispatch_injection_paths.py tests/contract/test_tools_domain.py tests/contract/test_specify_gitignore_template.py -q`
+- Exit code: **0** — `20 passed in 6.56s` (full log `test-evidence/p3-package-gate-run.txt`)
+- US4 fixture readings (`test-evidence/t024-us4-readings.txt`, throwaway git workspace removed at
+  teardown):
+
+```text
+== git check-ignore -v .specify/tools/system.json ==
+.specify/.gitignore:16:tools/*.json	.specify/tools/system.json
+== git check-ignore -v .specify/tools/kubectl-get.json ==
+.specify/.gitignore:16:tools/*.json	.specify/tools/kubectl-get.json
+== git check-ignore -q .specify/tools/kubectl-get.md ==
+rc=1 (1 = not ignored)
+== git ls-files .specify/tools ==
+.specify/tools/kubectl-get.md
+== cmp templates/gitignore-specify-template .specify/.gitignore ==
+cmp_rc=0 (0 = byte-identical, no output)
+```
+
+- Reading: only the generated inventories match the narrow `tools/*.json` rule; the record with a
+  colliding basename stays tracked and is the only file `git add -A` stages; template and installed
+  copy are byte-identical; both claude/codex templates release exactly the 14 declared store roots
+  (plus the pre-existing `instructions.md` and `specs/` lines) and carry zero `!.specify/memory/`
+  occurrences.

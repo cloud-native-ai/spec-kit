@@ -1,0 +1,5 @@
+task: T018
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: tests/integration/test_dispatch_injection_paths.py authored; red run-tests.sh exit 1 / 1 failed 6 passed — test_memory_skill_text_names_only_the_new_roots failed on the two memory skills still naming .specify/memory/ (full log test-evidence/t018-red-run.txt); seven-downlink / four-injection-owner / five-uplink structural pins, reporter-child memory-recall declaration, reverse-token boundary and no-second-source assertions already green; fixed by T019 in the same package
+at: 2026-11-25T06:06:00Z

@@ -1,0 +1,33 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_dispatch_injection_paths.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_______________ test_memory_skill_text_names_only_the_new_roots ________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_memory_skill_text_names_only_the_new_roots():
+        for skill in (RECORD_SKILL, RECALL_SKILL):
+            body = skill.read_text(encoding="utf-8")
+            rel = skill.relative_to(ROOT).as_posix()
+>           assert f"{RETIRED_ROOT}/" not in body, (
+                f"{rel} still injects a reference to the retired root"
+            )
+E           AssertionError: skills/internal/memory-record/SKILL.md still injects a reference to the retired root
+E           assert '.specify/memory/' not in '---\nname: ...out` step"\n'
+E             
+E             '.specify/memory/' is contained here:
+E             ?           ^^^^^^^^^^^^
+E               ontext to .specify/memory/session/ and long-term distilled knowledge to .specify/memory/knowledge/. Only records conversations driven by a Spec Kit command or skill. Triggers include "记住", "记录记忆", "save to memory", "remember this", "record decision".
+E             ?           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               skill_id: "<SKILL:.specify/skills/internal/memory-record/SKILL.md>"
+E               classification: internal...
+E             
+E             ...Full output truncated (82 lines hidden), use '-vv' to show
+
+tests/integration/test_dispatch_injection_paths.py:155: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_dispatch_injection_paths.py::test_memory_skill_text_names_only_the_new_roots
+1 failed, 6 passed in 6.48s

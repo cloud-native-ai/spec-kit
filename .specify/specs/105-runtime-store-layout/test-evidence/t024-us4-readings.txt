@@ -1,0 +1,52 @@
+# T024 — US4 fixture readings (2026-11-25, run r20261125T022857Z-06dd)
+# Fixture: .specify/.tmp/p3-us4-fixture (throwaway git workspace, removed at teardown);
+# .specify/.gitignore copied from templates/gitignore-specify-template; tools/ holds one
+# tracked record (kubectl-get.md), its same-basename inventory (kubectl-get.json) and system.json.
+== git check-ignore -v .specify/tools/system.json ==
+.specify/.gitignore:16:tools/*.json	.specify/tools/system.json
+== git check-ignore -v .specify/tools/kubectl-get.json ==
+.specify/.gitignore:16:tools/*.json	.specify/tools/kubectl-get.json
+== git check-ignore -q .specify/tools/kubectl-get.md ==
+rc=1 (1 = not ignored)
+== git ls-files .specify/tools ==
+.specify/tools/kubectl-get.md
+== cmp templates/gitignore-specify-template .specify/.gitignore ==
+cmp_rc=0 (0 = byte-identical, no output)
+== claude release set ==
+!.specify/instructions.md
+!.specify/coaching/
+!.specify/evidence/
+!.specify/exec-quant/
+!.specify/feedback/
+!.specify/housekeeping/
+!.specify/knowledge/
+!.specify/migrate/
+!.specify/renumber/
+!.specify/retention/
+!.specify/sanitize/
+!.specify/session/
+!.specify/todo/
+!.specify/tools/
+!.specify/trigger/
+!.specify/specs/
+== codex release set ==
+!.specify/instructions.md
+!.specify/coaching/
+!.specify/evidence/
+!.specify/exec-quant/
+!.specify/feedback/
+!.specify/housekeeping/
+!.specify/knowledge/
+!.specify/migrate/
+!.specify/renumber/
+!.specify/retention/
+!.specify/sanitize/
+!.specify/session/
+!.specify/todo/
+!.specify/tools/
+!.specify/trigger/
+!.specify/specs/
+== repo-level: retired-container literal in the two ignore templates ==
+templates/claudeignore-template:0
+templates/codexignore-template:0
+== fixture removed: yes ==

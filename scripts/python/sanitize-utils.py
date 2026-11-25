@@ -103,7 +103,7 @@ MATERIAL_ROOTS = [
     ("mirror-scripts", ".specify/scripts"),
     ("legacy-gitworkflow-state", ".specify/git-workflow.md"),
     ("legacy-memory-gitworkflow-state", ".specify/memory/git-workflow.md"),
-    ("legacy-tools-registry", ".specify/tools"),
+    ("tools-domain", ".specify/tools"),
     ("docs", "docs"),
 ]
 if "todo" in STORES:
@@ -701,8 +701,9 @@ def _legacy_names(root: Path) -> set:
 def check_legacy_install_residue(root: Path) -> list:
     """Pre-layering install residue after a cross-generation `specify init`.
 
-    Detection-rules §4a C-22: legacy flat skill directories, the pre-B2a
-    git-workflow state files, and the old tools-registry directory. Disposition
+    Detection-rules §4a C-22: legacy flat skill directories and the pre-B2a
+    git-workflow state files. `.specify/tools/` is the current tools domain
+    (records + inventories coexist), never residue. Disposition
     is archive throughout — apply's delete refuses non-empty directories, and
     content-bearing residue follows archive-not-delete; the summaries point at
     the migration owner for each class.
@@ -739,14 +740,6 @@ def check_legacy_install_residue(root: Path) -> list:
                     "旧代 git-workflow 状态文件:新模型状态面在 .specify/workflow/git.md——"
                     "归档本文件,并经 git-utils 技能 bootstrap 核对分支状态已迁移",
                     disposition="archive"))
-    legacy_tools = root / ".specify" / "tools"
-    if legacy_tools.is_dir() and (root / ".specify" / "memory" / "tools").is_dir():
-        findings.append(_finding(
-            "stale-residue", ".specify/tools",
-            "旧代工具记录目录:记录新址为 .specify/memory/tools/"
-            "(术语消歧见 shared/definitions/tool-definitions.md § Terminology)——"
-            "归档本目录前核对记录已迁移",
-            disposition="archive"))
     return findings
 
 

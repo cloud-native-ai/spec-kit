@@ -1,0 +1,5 @@
+task: T019
+outcome: done
+run_id: r20261125T022857Z-06dd
+evidence: skills/internal/memory-record/SKILL.md + skills/internal/memory-recall/SKILL.md path text moved to .specify/session/ and .specify/knowledge/ (recall gains the P-1 search-boundary statement; in-passing repair of the stale "maintains an index.json" bullet, disclosed); shared/declarations/facts/memory-types.yaml note path parentheticals updated (fact still parses: statement ['session','knowledge']); memory-utils.py needs no code change (tier roots = .specify/<scope> from the declaration-layer scope fact, C-6 single-store allowance) and run-determination.py's adapter note already names .specify/session/; grep for .specify/memory across the two skills/engines returns zero; scope set, actions and sources unchanged
+at: 2026-11-25T06:06:00Z
