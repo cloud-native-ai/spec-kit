@@ -17,7 +17,7 @@ Deliver one normative owner page for general AI-agent decision items (`shared/de
 **Target Platform**: framework repository (framework sources + client-runtime mirrors); downstream client projects receive the instruction section through `specify init` / refresh
 **Project Type**: CLI / documentation framework — no application runtime
 **Performance Goals**: N/A — the checker is one read-only pass over text files; no service, no resident process
-**Constraints**: A-13 section cap 1,500 B; total instructions budget ruling 38,912 → 40,960 B (T-001); zero new `scan-confirmation-gates.py` hits; `regen-command-copies.py --check` stays rc 0; no new mirror drift against the measured baseline; checker is read-only with `--help` / `--version`; no second registry
+**Constraints**: A-13 section cap 1,500 B; total instructions budget ruling 38,912 → 40,960 B (T-001); zero new `scan-confirmation-gates.py` hits against `test-evidence/scan-confirmation-gates-baseline.txt`; the three FR-025 preservation owners (sentinel literals / watcher verdicts-exit codes / two-slot test budget) stay byte-identical to base `fbab7a45c`; `regen-command-copies.py --check` stays rc 0; no new mirror drift against the measured baseline; checker is read-only with `--help` / `--version`; no second registry
 **Scale/Scope**: 12 producers (P-01…P-12), 9 machine rules (M-01…M-09), 6 behavior rules (B-01…B-06), 6 backward-incompatible rows, 1 new owner page, 21 landing files plus mirrors, 5 contracts
 
 ## Constitution Check
@@ -195,11 +195,11 @@ Adopts the requirements § Landing & Compatibility Inventory candidates BC-01…
 
 | BC ID | Change | Resolution (closed) | Migration / refusal behavior | Evidence / test (planned) |
 |-------|--------|--------------------|------------------------------|---------------------------|
-| BC-01 | 既有载体新增决策记录块 | `compatibility-bridge` | 无「`^### D-\d{3}` 标题 + C-201 记录字段文法」块 = `legacy`：可读、不判错、不重写；只有新式块进入 M 检查（id 形态单凭 `D-001` 之类 register 行不判新式） | `tests/contract/test_decision_governance_guards.py`（legacy 夹具）；行级包含读数：`git diff --numstat 08b59695c..HEAD -- <既有记录路径>` 删除列为 0、无删除文件（追加允许） |
+| BC-01 | 既有载体新增决策记录块 | `compatibility-bridge` | 判定式 = `^### D-\d{3}` 标题 **且块内含 ≥1 条 C-201 字段行**（最小合格形态）。低于阈值（无字段行的三位标题、一/两位标题、register 行）= `legacy`：可读、不判错、不重写；达到阈值即新式块，块不完整由 M-01 判缺字段（不会出现「既不新式也不 legacy」的块）；id 形态单凭 `D-001` 之类 register 行不判新式 | `tests/contract/test_decision_governance_guards.py`（legacy 夹具）；行级包含读数：`git diff --numstat 08b59695c..HEAD -- <既有记录路径>` 删除列为 0、无删除文件（追加允许） |
 | BC-02 | 派发载荷新增 `decision_block` | `compatibility-bridge` + deterministic refusal | 非决策派发无块合法；决策 backed 派发无块/缺字段 → payload 构造处拒绝（M-06）；旧载荷不重写 | `tests/unit/test_validate_decisions.py`（M-06 逆向样本）；`tests/contract/test_decision_governance_guards.py`（拒绝分支） |
-| BC-03 | 新增 `D-NNN` 编号族行 | `compatibility-bridge` | 与 `D1–D9` / `D-001` 并存，按载体+区间分组登记；`D-001` 是 legacy register 行（id 形态相符但无记录字段文法，不因形态被当作新式记录）；同载体内重复即红；冲突修复走 `/speckit.sanitize --lane renumber`，不静默改号 | `test_decision_governance_guards.py`（同载体重复 id 夹具）+ register 夹具 |
+| BC-03 | 新增 `D-NNN` 编号族行 | `compatibility-bridge` | 与 `D1–D9` / `D-001` 并存，按载体+区间分组登记；`D-001` 是 legacy register 行（id 形态相符但不是记录标题、块内无字段行，不因形态被当作新式记录）；同载体内重复即红；冲突修复走 `/speckit.sanitize --lane renumber`，不静默改号 | `test_decision_governance_guards.py`（同载体重复 id 夹具）+ register 夹具 |
 | BC-04 | instruction 模板新增段 | `compatibility-bridge` | `/speckit.migrate` 的既有 `templates-generated` 维度把 `.specify/instructions.md` 收敛到含新段；自定义内容保留；不新增第七维度 | `tests/integration/test_decision_governance_migrate_dryrun.py`：`specify migrate --format json` 干跑列出该生成物的收敛项并断言不触碰记录正文 |
-| BC-05 | 新守卫面对旧记录 | `compatibility-bridge` | 守卫只判新式块；旧记录报告 `legacy`；守卫对 base 语料不得转红 | 同 BC-01 的 legacy 夹具 + `--numstat` 零删除读数（无删除行、无删除文件） |
+| BC-05 | 新守卫面对旧记录 | `compatibility-bridge` | 守卫只判达到判定阈值的新式块；旧记录报告 `legacy`；守卫对 base 语料不得转红 | 同 BC-01 的 legacy 夹具 + `--numstat` 零删除读数（无删除行、无删除文件） |
 | BC-06 | 两条生产规则生效 | `compatibility-bridge` | 只约束落地后新建决策；既有决策文本由评审按 B-01/B-02 报告为 legacy，不追溯改写 | `test_decision_governance_contracts.py`（评审承接面指针在场）+ legacy 夹具 |
 
 Row-set closure guard: `tests/contract/test_decision_governance_migration_map.py` asserts the declared set equals `{BC-01…BC-06}` and that every row's named test exists (SC-009's "未映射行使守卫转红").

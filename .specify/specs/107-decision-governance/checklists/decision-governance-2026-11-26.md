@@ -53,8 +53,8 @@
 - [ ] CHK025 - 九条 M 规则是否逐条各配**恰一个**确定性判定器与一个转红条件，每条守卫有逆向样本，全部经唯一测试入口执行，且守卫清单与两张表逐行一致（表—守卫等价）？[Completeness, Req §FR-022, Req §FR-024, C-401, C-403, C-404, C-407, SC-007]
 - [ ] CHK026 - 六条 B 规则是否逐条点名评审承接面（analyze / review 段 / 人工决策评审），文档与测试是否都不得声称其中任何一条被机器覆盖？[Coverage, Req §FR-023, C-402, SC-007]
 - [ ] CHK027 - 机器/行为分野是否按 A-9 一致施加——每处"缺陷"措辞都有对应的 M 或 B 承接面——尤其 M-08 的"已登记 variant"是否与术语只做 `status=proposed` 提案的规则（FR-005 / A-11）相容（"已登记"是否包含未确认的提案条目）？[Consistency, Req §A-9, Req §FR-005, Req §FR-022 (M-08), Req §A-11]
-- [ ] CHK028 - FR-025 的保全命题（既有哨兵字面量、watcher verdict/退出码、两槽测试预算"保持不变"）是否给出基线参照物与可导出的允许差异集（closed-set claims 判据），"除非有记录在案的裁定"是否规定了裁定的记录位置与形态？[Measurability, Req §FR-025, SC-007]
-- [ ] CHK029 - 不新增阻塞式确认门控是否以可复算读数表达（`scan-confirmation-gates.py` 相对具名基线的**零新增命中**），且与"两槽预算不变""既有哨兵不变"共同构成确认纪律的保持声明？[Measurability, Req §FR-025, C-405, SC-008]
+- [ ] CHK028 - FR-025 的保全命题（哨兵字面量 / watcher verdict 与退出码 / 两槽测试预算）是否给出基线参照物（`fbab7a45c`，记录于 requirements-stage 证据）、比较单元（三个所有者产物全文逐字节）、默认空的允许差异集与补集断言（三路径 `git diff --quiet` rc 0、`--numstat` 零行），且"除非有记录在案的裁定"是否规定了裁定的记录位置与形态（FR-014 `D-NNN` 决策记录或阶段检查点中的具名裁决）？[Measurability, Req §FR-025, SC-007] — **pass**（2026-11-26 analyze 修复第三轮：五要件已逐项写入 FR-025 与 C-405）。
+- [ ] CHK029 - 不新增阻塞式确认门控是否以可复算读数表达（`scan-confirmation-gates.py` 相对具名基线 `test-evidence/scan-confirmation-gates-baseline.txt` 的**零新增命中**），且与 FR-025 的哨兵 / watcher / 两槽预算三产物零漂移读数共同构成确认纪律的保持声明？[Measurability, Req §FR-025, C-405, SC-008] — **pass**（2026-11-26 analyze 修复第三轮：门控基线与三产物基线均已具名，SC-008 与 SC-008 Source 同步）。
 
 ## 六、落地、分发与客户接收
 

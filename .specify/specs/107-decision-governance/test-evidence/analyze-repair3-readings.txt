@@ -1,0 +1,50 @@
+# analyze-repair3 deterministic readings — 2026-11-26 (final tree, pre-commit)
+
+## pre-analyze summaries (requirements / plan / tasks)
+- requirements: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+- plan: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+- tasks: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+
+## rule / clause / producer counts (unchanged closed sets)
+- M rows: 9
+- B rows: 6
+- P rows: 12
+- BC rows (plan): 6
+- contract clause definitions: 38
+- FR rows: 30
+- SC rows: 10
+- STR rows: 9
+
+## R3-W1-01 — FR-025 containment claim (five elements present)
+- baseline referent: `fbab7a45c` (requirements-stage base, recorded in test-evidence/requirements-stage-2026-11-25.md) — `grep -n "Baseline commit" test-evidence/requirements-stage-2026-11-25.md` → `fbab7a45c`
+- comparison units (byte comparison, three owner artifacts):
+  - shared/declarations/facts/driver-completion-sentinels.yaml (sentinel literals; exists)
+  - skills/external/sdd-loop-driver/references/watch-model.md (watcher verdicts / exit codes; exists)
+  - skills/external/sdd-loop-driver/references/efficiency-model.md (two-slot test budget; exists)
+- empty allowed delta + complement assertion: `git diff --quiet fbab7a45c..HEAD -- <the three paths>` → rc 0; `--numstat` rows: 0 (measured 2026-11-26 on this tree)
+- ruling location + shape: FR-014 `D-NNN` decision record in the edited producer's carrier, or a named ruling in `<spec-dir>/checkpoints/<NN>-<stage>.md`, naming the changed literal/behavior, new value and reason
+- scan baseline named: `test-evidence/scan-confirmation-gates-baseline.txt` (31 blocking / 0 violations) in FR-025 / SC-008 / SC-008 Source / C-405 / T043 / DoD-6 / GATE-6
+
+## R3-W2-01 — new-form discriminator (minimal qualifying form)
+- stated form: `^### D-\d{3}` heading whose block carries ≥1 C-201 field line (`- **<field>**: <value>`, base or conditional layer); below threshold = legacy; at/above = new-form even when incomplete (missing fields are M-01's red, exit 1)
+- restatement sweep (live artifacts, dated records excluded): `field grammar` / `记录字段文法` hits outside the repair-round Clarifications question: 0
+- legacy corpus measured on this tree: `grep -rn '^### D-' .specify/specs --include='*.md' | wc -l` → 39 (one/two-digit); `grep -rnE '^### D-[0-9]{3}'` → 0; repo-wide tracked markdown `git grep -nE '^### D-[0-9]{3}' -- '*.md' | wc -l` → 0
+
+## preserved surfaces check (this round's edits only)
+- register.md untouched, dated records untouched, other specs untouched
+- file-level preservation read: `git diff --quiet fbab7a45c..HEAD -- shared/declarations/facts/driver-completion-sentinels.yaml skills/external/sdd-loop-driver/references/watch-model.md skills/external/sdd-loop-driver/references/efficiency-model.md` → rc 0
+
+## git diff --numstat (tracked, this round)
+1	1	.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+1	1	.specify/specs/107-decision-governance/contracts/archive-and-audit.contract.md
+2	2	.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md
+1	1	.specify/specs/107-decision-governance/data-model.md
+4	4	.specify/specs/107-decision-governance/plan.md
+12	7	.specify/specs/107-decision-governance/requirements.md
+2	2	.specify/specs/107-decision-governance/research.md
+7	7	.specify/specs/107-decision-governance/tasks.md
+
+## untracked round inputs (analyze round-3 evidence)
+?? .specify/specs/107-decision-governance/test-evidence/analyze-domain-w1-r3.jsonl
+?? .specify/specs/107-decision-governance/test-evidence/analyze-domain-w2-r3.jsonl
+?? .specify/specs/107-decision-governance/test-evidence/analyze-domain-w3-r3.jsonl

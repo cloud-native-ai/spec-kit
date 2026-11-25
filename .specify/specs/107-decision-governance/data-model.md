@@ -117,7 +117,7 @@ Not a store: the union of `{producer × existing carrier}` plus the register ind
 | I-10 | A receipt carries all four fields; a missing item makes the return incomplete and the parent must not consume it | FR-019, M-05 |
 | I-11 | The audit chain record → dispatch attempt → receipt is fully resolvable; a broken link is an explicit anomaly | FR-021, M-07 |
 | I-12 | Supersession preserves the old record and receipt; the old record gains `superseded_by`; nothing is deleted or rewritten | A-6, edge case |
-| I-13 | Legacy records (pre-existing `### D-…` headings without the record field grammar; register rows that are not a new-form record's birth registration — including the id-shaped `D-001` row) are readable, reported `legacy`, never rewritten, never judged. New form = `^### D-\d{3}` heading **with** the field grammar; the id shape alone never qualifies | FR-028, A-10, C-206 |
+| I-13 | Legacy records (pre-existing `### D-…` headings without any C-201 field line; register rows that are not a new-form record's birth registration — including the id-shaped `D-001` row) are readable, reported `legacy`, never rewritten, never judged. New form = `^### D-\d{3}` heading **with at least one C-201 field line** (the stated minimal qualifying form; a block at or above it is new-form even when incomplete, and missing fields are M-01's red); the id shape alone never qualifies | FR-028, A-10, C-206 |
 | I-14 | No record, block, receipt or inventory lives outside the existing carriers + register; no second store exists | FR-004, A-3 |
 
 ## Relationships
