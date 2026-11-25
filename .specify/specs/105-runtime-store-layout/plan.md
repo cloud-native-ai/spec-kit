@@ -142,7 +142,7 @@ The design defers no semantics to implementers: the closed store roster and its 
 │   ├── migrate-store-layout.contract.md  # 第六维、判定表、执行器、回执、续跑、夹具（M-1…M-9）
 │   ├── memory-and-injection.contract.md  # 记忆两层/持久化/边界/注入载荷保持（P-1…P-6）
 │   └── live-reference-migration.contract.md # 路径映射、dated 边界、允许集、镜像（L-1…L-8）
-├── quickstart.md        # Phase 1：8 个场景（含逐例前提与验证路径）
+├── quickstart.md        # Phase 1：9 个场景（含逐例前提与验证路径）
 ├── feature-ref.md       # Phase 1：Feature 024 绑定 + FR/SC 矩阵
 ├── tasks.md             # 下一阶段（/speckit.tasks）产出
 └── verification.md      # 实现阶段产出
