@@ -1,0 +1,11 @@
+# Goal/Team activation — 107-decision-governance (after tasks U4)
+
+- decision: `goal-utils.py handoff-decision` → handoff (56 tasks > 10)
+- Anchor: .specify/anchoring/107-decision-governance/anchor.md (engine-created, 3 criteria)
+- Team: .specify/teams/107-decision-governance/team.md (serial, 5 seats incl. one reporter)
+- Handoff: .specify/specs/107-decision-governance/handoff.md (handoff/v1, active, T001–T056, SC-001…SC-010)
+- handoff-ref: anchor changed=true; team changed=false
+- validate-roster: conforming (exactly one reporter seat) — after a block-style roster fix (inline flow mappings were unparsable; driver correction disclosed)
+- run-checks: verdict ok, blocked false
+- render: specify render-agents --ai qoder → 25 rendered / 25 unmapped-intent notices; manifest + one re-rendered agent surface
+- U0 goal_team line corrected: the handoff axis is engine-decided; activation executed after tasks U4

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261125T034547Z",
+  "rendered_at": "20261125T160141Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -333,7 +333,7 @@
     },
     ".qoder/agents/sdd-debt-governor.agent.md": {
       "source": "templates/sdd-debt-governor.agent.md",
-      "sha256": "1ec55ad74b6ecdeddce912ecec567e02ac4e71061e7a95e3e3dfe325f531b5ae"
+      "sha256": "a4bf0a6b1be8ae20ffc5cbeb70aaee36e7570f98517965814f9af0e39b8e56aa"
     },
     ".qoder/agents/sdd-implement-coordinator.agent.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
