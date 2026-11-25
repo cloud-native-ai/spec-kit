@@ -1,0 +1,21 @@
+# Implement-stage independent verification — verdict record
+
+- Date: 2026-11-25
+- Verifier: runtime-store-layout-implement-verify (fresh context; executed no implementation)
+- Stage log: .specify/state/log-runtime-store-layout-implement-verify.log (status: exit=0 sentinel=1, IMPLEMENT-VERIFY-DONE)
+- Base: c8e73add7; entry baseline: 113d2c650 / 748-name failed set
+
+Verdict table (all PASS):
+1. Task closure 43/43 (42 crew writebacks + spec-side T039) — PASS
+2. SC-001 retired root / inventory — PASS
+3. SC-002/SC-003 memory + injection — PASS
+4. SC-004 migration forms + P5R idempotence — PASS
+5. SC-005 fresh init — PASS
+6. SC-006 allowlist guard — PASS
+7. SC-007 mirrors — PASS
+8. SC-008 tools/ignore — PASS
+9. Regression vs 748-name baseline — PASS (NEW=0, repaired=531)
+10. Discipline / territory / no push — PASS
+
+Full-suite delta: 217 failed / 10042 passed / 3 skipped / 0 setup errors; comm -13 NEW=0; comm -23 repaired=531.
+Tracked store paths 3008 vs T038 3007 — delta is the post-T038 P5R receipt .specify/migrate/receipts/20261125T070056Z-e5d8a761.json.

@@ -5,7 +5,7 @@
 **Description**: Version management and migration support for .specify/ workspace structure across CLI releases.  
 **Status**: Ready for Review  
 **Created**: 2026-06-05  
-**Last Updated**: 2026-11-25（plan：slice 105 runtime-store layout 产出 plan/design 工件并推进 `Draft → Planned`；父状态保持 `Ready for Review`；tasks：slice 105 产出 43 行任务清单（27 FR / 9 SC；`validate-tasks.py` 0 error / 0 warning；FR universe 27），状态维持 `Planned`）
+**Last Updated**: 2026-11-25（plan：slice 105 runtime-store layout 产出 plan/design 工件并推进 `Draft → Planned`；父状态保持 `Ready for Review`；tasks：slice 105 产出 43 行任务清单（27 FR / 9 SC；`validate-tasks.py` 0 error / 0 warning；FR universe 27），状态维持 `Planned`；implement：slice 105 完成 43/43 任务、closure `accept`（final_path 6/6）、`Planned → Implemented`，父状态保持 `Ready for Review`）
 
 ## Overview
 
@@ -26,6 +26,8 @@ Gap identified during project-intrinsic analysis. The CLI version is tracked in 
 2026-11-25 (plan, 105): second sub-spec planned — runtime stores leave `.specify/memory/` for top-level `.specify/<store>/` roots and the container is retired. Design: one new `store-layout` dimension appended to `specify migrate` (five 097 tokens kept as the ordered prefix; 097's dated E-8 not rewritten), per-store manifest-first relocation with digest/from→to recovery, dual-content refusal through the clarified authoritative-entry predicate, receipt v2, and a single machine declaration (`runtime-store-layout.yaml`) replacing seven per-consumer root lists. Artifacts: `.specify/specs/105-runtime-store-layout/` — 4 contracts, 10 entities, 15 work packages, 9 quickstart scenarios (scenarios 0–8; the earlier "8" was corrected in `fa2de626a`); six Decision Tensions recorded in its `plan.md` (dimension extension, seed rename, SC-007 baseline reading, docs dated boundary, manifest-as-archive, declaration ownership).
 
 2026-11-25 (tasks, 105): dependency-ordered task list landed at `.specify/specs/105-runtime-store-layout/tasks.md` — 43 rows across Setup / Foundational / US1–US6 / Polish, all 15 planned WPs mapped, FR coverage map 27/27 and SC map 9/9, test-first obligations with the named red-first landing point. Deterministic readings: `validate-tasks.py` 0 error / 0 warning, `pre-analyze-check.py --stage tasks` decision=pass errors=0, `account-clause-coverage.py` claimed clauses 8 and clause-uncovered beyond baseline 0 (its FR lane reads 6/27 because the M/P/L contracts are `form=md-none`; FR universe 27, FR ownership is proven by the task-row map and the pre-analyze check). No new Feature, no deprecation, no status transition: slice 105 stays `Planned`, parent stays `Ready for Review`.
+
+2026-11-25 (implement, `/speckit.implement` 105): slice 105 implemented — 42 crew writebacks + spec-side T039, all 43 rows `[X]`; `verification.md` SC-001…SC-009 pass (final-path 6/6), one smoke triple exit 0; `closure-acceptance-check.py` verdict `accept`. Full fast tier vs the 748-name entry baseline: NEW=0 / repaired=531 (217 named pre-existing reds remain); mirrors `sync-mirrors --check` rc 0 / zero drift and `regen-command-copies --check` rc 0; dogfood migrated 12 stores and removed `.specify/memory`; bounded P5R closes the crash→resume→third-apply idempotence gap read-only. `Planned → Implemented` landed; parent stays `Ready for Review`. Review pending.
 
 ## Key Changes
 
