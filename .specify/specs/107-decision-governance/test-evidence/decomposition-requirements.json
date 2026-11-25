@@ -1,0 +1,4 @@
+# decomposition-check — mode=plan — 2026-11-25 — branch: 107-decision-governance
+# command: python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/107-decision-governance/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 30, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-25T13:58:30Z"}
+exit: 0
