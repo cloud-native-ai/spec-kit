@@ -1,0 +1,17 @@
+== artifact counts @ 2026-11-25T12:33:29Z ==
+FR definition rows: 41
+SC definition rows: 9
+STR rows: 4
+assumption rows A-: 18
+user stories: 5
+edge case bullets: 14
+contract files: 3
+contract clauses: 34
+task rows: 37
+EP rows: 5
+RS rows: 4
+SC final path: 0
+SC final labelled: 3
+quickstart scenarios: 8
+data-model entities E: 9
+invariants INV: 12
