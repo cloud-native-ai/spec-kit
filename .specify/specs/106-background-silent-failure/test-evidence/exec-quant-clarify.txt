@@ -1,0 +1,2 @@
+exec-quant: recorded /speckit.clarify run=r20261125T113505Z-106a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/exec-quant/records/20261125T115451874927Z-6db027b5.json
+exec_quant_exit=0

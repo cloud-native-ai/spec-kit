@@ -5,7 +5,7 @@
 **Description**: 把事实上的 super agent 归一为派发边上的相对逻辑角色：定义 owner、判定引擎、super↔sub 协议与身份转变注入、digest 角色视图与 harness 落点。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-10
+**Last Updated**: 2026-11-25（clarify：绑定切片 106 background dispatch settlement；父状态保持 `Ready for Review` 不回退）
 
 ## Overview
 
@@ -58,6 +58,7 @@
 ## Related Specifications
 
 - `.specify/specs/095-superagent-role/requirements.md`（本特性的需求规格；三个真实场景为定义输入）
+- `.specify/specs/106-background-silent-failure/requirements.md`（**切片行 106**，`Draft`；2026-11-25 `/speckit.clarify` 绑定）：后台派发静默退出结算契约——修订本 Feature 拥有的 `superagent-definitions.md` § Termination（封闭结算值集合、每值正证据、`silent-end` / `unknown` 语义），并加性扩展 `role-edge-check.py` 为其唯一确定性结算判定面；父行状态保持 `Ready for Review`，不回退。
 - `.specify/studies/dsh-superagent-prototype-study/docs/overview.md`（研读归档；授权链、能力分离、WorkerSlots、注意力预算、三层恢复、提示词不可越权）
 - `.specify/shared/definitions/subagent-definitions.md`（子端 owner：三模态、并发义务、可见性契约、派发治理）
 - `.specify/shared/definitions/agent-definitions.md`（Agent 三层分类法）

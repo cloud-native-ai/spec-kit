@@ -19,8 +19,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 095
+**Feature Name**: Super Agent Role（相对逻辑角色：定义、协议与 harness 落点）
 
 ## Overview
 
@@ -52,13 +52,13 @@
 | **A-7** | **正证据原则延伸**：`completed` / `failed` / `anomaly` / `cancelled` / `silent-end` 都必须有**正向记录**；「没看到输出」「进程不在了但没查」不构成任何终态证据。`silent-end` 需要「尝试已开始」+「执行主体已消失」+「四类终态证据均缺席」三件同时成立。 | 延续 watch-model 的「完成需正证据」；否则静默终止会被读成「未知」，而未知又会被读成「还行」。 |
 | **A-8** | **反应三选一**：report / retry / stop；禁止静默修复。`silent-end` 与 `unknown` 按 fast-fail 的异常停纪律上送，不得当作普通失败原样重派。重试永远是**新尝试、新 label**，旧证据保留。 | owner：`.specify/shared/guidelines/fast-fail.md`、`superagent-definitions.md` § Attempts。新增计数器或自动重试器会造出第二套处置。 |
 | **A-9** | **既有契约的包含性保持**：哨兵字面量、watcher 判定/退出码/`--self-test`、五要素上行、七字段下行、确认纪律与其冻结预算、两槽位测试预算的允许差异集为**空集**；新字段/新文件一律加性；不改变既有 `.status` 行格式。 | 简报的 preserve 要求；同时满足 `closed-set-claims.md` 的五要件（基线、比较单元、允许集来源、补集断言、无未定义聚合词）。 |
-| **A-10** | **迁移 = 前向加性 + 旧记录显式标注**：新格式记录声明结算契约版本；无版本的历史记录/报告按 dated record 不改写，但在审计输出中标注 legacy，**不得**被报成「符合新契约」。 | 历史记录是当时事实，不是待修缺陷；「legacy 沉默通过」才是盲检类失效。 |
+| **A-10** | **迁移 = 前向加性 + 旧记录显式标注**：新格式记录以**加性字段**声明结算契约版本（随结算承载记录声明，不改既有行格式）；无版本的历史记录/报告按 dated record 不改写，但在**结算判定/审计输出**中标注 legacy，**不得**被报成「符合新契约」，且 legacy 标注本身**不构成失败退出码**。不新增预造拒绝机制：证据不可读由 [[STR-002]] 承担确定性拒绝语义；不兼容的活面变更按 FR-035 自带迁移/拒绝并附测试（本特性的允许差异集为空集，即不发生）。 | 历史记录是当时事实，不是待修缺陷；「legacy 沉默通过」才是盲检类失效。标注、拒绝、禁止三分闭合，避免第二套拒绝机制。 |
 | **A-11** | **两顶帽子**：契约与文本落框架源（`shared/`、`skills/`、`templates/`、`scripts/`、`src/`）；本仓 `.specify/` 的镜像由既有同步/安装流程再生，不手改；客户项目经 init/refresh 获得。 | 直接改运行时副本不传播，且会被下一次刷新覆盖。 |
 | **A-12** | **确认纪律预算零新增**：在扫描面上新增/改写的规范文本 MUST 对 `scan-confirmation-gates.py` 的阻断模式零新增命中；冻结的 total 与相等判定必须保持绿色。采用**设计规避**（换措辞/按路径引用），不得扩大豁免集。 | 预算余量为 0 是已实测约束（`.specify/shared/guidelines/confirmation-gates.md` 与对应契约测试）；放宽门禁等于把「响亮失败」换回「静默分歧」。 |
 | **A-13** | **不动的面**：不自动 kill/stop 活进程；不推送、不合并、不删除分支、不改写远端；不删除/覆盖证据；不改 SDD 阶段链、授权与两槽位预算。 | 简报的 non-goals 与破坏性动作纪律；watcher 只读、处置归驱动者（watch-model §0/§3）。 |
 | **A-14** | **测试经济**：新增测试经唯一入口 `scripts/bash/run-tests.sh` 运行，不新增第三个全量槽位；用确定性夹具/假 CLI/事件文件，不用固定 `sleep`。 | owner：`.specify/shared/guidelines/test-execution-efficiency.md`、sdd-loop-driver 的两槽位预算。 |
-| **A-15** | **命名**：`silent-end` 是新概念名；实现期经词汇表的用户确认通道提议，不在本规格内直接写入 `.specify/glossary.md`。本规格的定义在该词条被确认前对本特性有效，确认后由词汇表条目接管语义引用。 | 词汇表「提议 ≠ 落地」；无人值守流程不得被确认门卡死。 |
-| **A-16** | **Feature 绑定留待 `/speckit.clarify`**：本阶段保持 `Related Feature: Need clarification`，不创建、不绑定 Feature。 | Feature Integration Protocol 的绑定时点在 clarify。 |
+| **A-15** | **命名**：`silent-end` 是新概念名；**plan 阶段 wrap-up 经 `glossary-utils.py --action add`（先 `detect-conflict`；`origin=auto`、`status=proposed`）提议**，结构冲突即停并交用户裁定，不在本规格内直接写入 `.specify/glossary.md` 的确认态；implement 阶段 wrap-up 为后备检查点。本规格的定义在该词条被确认前对本特性有效，确认后由词汇表条目接管语义引用。 | 词汇表「提议 ≠ 落地」；`status=proposed` 即既有用户确认通道形态；无人值守流程不得被确认门卡死。 |
+| **A-16** | **Feature 绑定在 `/speckit.clarify` 完成**：requirements 阶段保持 `Need clarification`；clarify 阶段绑定 Feature 095（切片行 106，`Draft`），不新建 Feature。 | Feature Integration Protocol 的绑定时点在 clarify；绑定依据见 `## Clarifications` Session 2026-11-25。 |
 | **A-17** | **并发读数**：本阶段是一个执行体、单叶、无派发，按 `single-unit` 记录 `requested=1` / `effective=not_evaluated` / `effective_reason=single-unit`。 | owner：`subagent-definitions.md` § The Concurrency Obligation。 |
 | **A-18** | **无人值守**：不向用户提问；所有取舍记录在本表；实现阶段遇到需要裁定的歧义按 fast-fail 停在异常点上报，不得就地发明意图。 | 简报的 unattended 约束。 |
 
@@ -203,7 +203,7 @@
 #### D. 可执行判定与证据（Enforcement）
 
 - **FR-028**: MUST 有一个确定性、只读的结算判定面，从既有载体为每个尝试给出结算与证据发现；它 MUST 零写入、零新存储，分类表 MUST 只有一个 owner 并被测试钉住。
-- **FR-029**: 判定面 MUST 接入至少一条能转红的守卫，覆盖：集合外值；无完成证据却声称 `completed`；无活证据却声称 `running`；无「消失+缺席」证据却声称 [[STR-001]]；被派发却无结算行；[[STR-002]] 被当成通过。边判定面优先复用 `scripts/python/role-edge-check.py`（修订其 owner 页以增加违规种类）；新引擎只有在 plan 记录「既有 owner 不覆盖」裁定后允许。
+- **FR-029**: 判定面 MUST 接入至少一条能转红的守卫，覆盖：集合外值；无完成证据却声称 `completed`；无活证据却声称 `running`；无「消失+缺席」证据却声称 [[STR-001]]；被派发却无结算行；[[STR-002]] 被当成通过。判定面 MUST 是 `scripts/python/role-edge-check.py` 的**加性扩展**（其 owner 页即本特性修订的 superagent 定义页；违规种类由封闭四类扩为「四类边违规 + 结算违规集合」）；引擎今天不读的载体证据（C-2 加性起点/终止记录、C-4 尝试记录、C-6 runner 记录）在 plan 中要么加性接入同一引擎的输入集，要么在 plan 记录「既有 owner 不覆盖」裁定；该裁定落盘之前 MUST NOT 引入第二判定引擎。
 - **FR-030**: MUST 有变异演练：移除/削弱「静默终止检测」「活证据要求」「unknown 不得通过」「证据指针要求」中任一项，至少一条测试 MUST 转红；演练 MUST 留证。
 - **FR-031**: 每个清单内的后台载体 MUST 有至少一个确定性测试模拟其静默终止形态并断言结算与反应；缺测试的载体 MUST 被判缺陷。
 - **FR-032**: 测试 MUST 经 `scripts/bash/run-tests.sh` 运行、使用确定性夹具/假 CLI/事件文件而非固定等待，并 MUST 同时断言正向与反向（活着的尝试不得被误报为静默终止）。
@@ -211,7 +211,7 @@
 #### E. 兼容、迁移、文档与范围（Compatibility & Scope）
 
 - **FR-033**: 既有哨兵字面量、watcher 判定/退出码/`--self-test`、五要素上行、七字段下行、破坏性动作纪律与其冻结预算、两槽位测试预算 MUST 保持不变（允许差异集为空集）；所有新增字段/文件 MUST 为加性。
-- **FR-034**: 新格式记录 MUST 声明结算契约版本 [[STR-004]]；无该版本的旧尝试/旧报告 MUST 在审计中被标为 legacy 且 MUST NOT 被报成符合新契约；dated record MUST NOT 被改写。
+- **FR-034**: 新格式记录 MUST 以**加性字段**声明结算契约版本 [[STR-004]]（随结算承载记录声明，MUST NOT 改动既有行格式）；无该版本的旧尝试/旧报告 MUST 在结算判定/审计输出中被标为 legacy 且 MUST NOT 被报成符合新契约；dated record MUST NOT 被改写；legacy 标注本身 MUST NOT 产生失败退出码（它不是拒绝）。
 - **FR-035**: 任何对既有路径/文件/字段/状态行契约的不兼容变更 MUST 附带迁移路径或确定性拒绝，并 MUST 有测试；MUST NOT 出现静默混合态。
 - **FR-036**: 两顶帽子：改动 MUST 落框架源与模板；本仓 `.specify/` 镜像经既有同步/安装流程再生，不手改；客户项目经 init/refresh 获得同一契约。
 - **FR-037**: 文档 MUST 更新唯一 owner 章节、引用它的技能/命令与 `docs/reference/` 页面；取值与代码一致；MUST NOT 复制第二份集合/映射。
@@ -299,7 +299,9 @@
 
 ## Clarifications
 
-<!--
-This section will be populated by /speckit.clarify command with questions and answers.
-Format: - Q: <question> → A: <answer>
--->
+### Session 2026-11-25（无人值守 clarify 阶段，Feature 绑定与残留歧义裁决）
+
+- Q: `Related Feature` 绑定到哪个既有 Feature，是否新建？ → A: 绑定 Feature 095（Super Agent Role），以索引切片行 106 登记 `Draft`（先例：097/100/105 的 slice-row 形态）；不新建 Feature，父行状态保持 `Ready for Review` 不回退。依据：095 拥有本特性修订的 `superagent-definitions.md` § Termination 与拟扩展的 `role-edge-check.py`；058 只拥有 C-1 载体与 watcher 判定（本特性明令不改），064 拥有生命周期/归属，065 拥有中断恢复，均非结算契约 owner。095 无既往切片 → 本规格为其首个切片；直接 scope-match 优先于「无同主题兄弟」的 create 信号。
+- Q: A-15 的 `silent-end` 词条如何在「用户确认通道」中提议、何时落地？ → A: 不在本阶段写 `.specify/glossary.md` 的确认态；plan 阶段 wrap-up 经 `glossary-utils.py --action add`（先 `detect-conflict`，`--origin auto --status proposed`）提议，结构冲突即停并交用户裁定（glossary protocol §3）；implement 阶段 wrap-up 为后备检查点；确认前本规格定义有效（A-15 已记录）。
+- Q: FR-028/FR-029 的确定性结算判定面复用哪个既有引擎？ → A: 复用 `scripts/python/role-edge-check.py` 作为唯一判定引擎（零写入只读、已读团队报告映射表/驱动 sidecar 与四件套/run-agent dispatch record/registry 交叉校验、退出码 0/1/2 天然承载「干净 / 违例 / 不可读→[[STR-002]]」），违规种类在其 owner 页由封闭四类扩为「四类边违规 + 结算违规集合」；对引擎今天不读的载体证据（C-2 加性记录、C-4 尝试记录、C-6 runner 记录），plan 只能加性接入同一引擎，或先记录「既有 owner 不覆盖」裁定才可引入第二引擎（A-6 保持成立）。
+- Q: A-10/FR-034 的 legacy 标注落在哪个面，客户项目是否需要显式拒绝路径？ → A: 三分闭合：版本声明 = 加性字段随结算承载记录声明（不改既有行格式）；legacy = 只在结算判定/审计输出中标注，旧记录不改写、不计合规、**不产生失败退出码**；拒绝 = 证据不可读由 [[STR-002]] 承担唯一确定性拒绝语义，不新增预造拒绝机制——不兼容活面变更被 FR-033 的允许差异集（空集）禁止，未来若发生则由 FR-035 强制自带迁移/拒绝与被测行为。
