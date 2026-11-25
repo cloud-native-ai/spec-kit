@@ -118,11 +118,11 @@
 
 **Why this priority**: 「必须归档并可审计」是用户原话；不约束载体就会长出第二套登记。
 
-**Independent Test**: 取一组夹具决策（分别落在 requirements、plan、checkpoint、run report），只用 register + 载体重建全部字段；删掉任一必填字段或改坏任一指针，断言守卫转红。
+**Independent Test**: 取一组夹具决策（分别落在 requirements、plan、checkpoint、run report），只用 register + 载体重建每条记录的适用层全部字段（基础层 + 触发成立的条件族）；删掉任一适用层必填字段或改坏任一指针，断言守卫转红。
 
 **Acceptance Scenarios**:
 
-1. **Given** 一个清单内生产者产出决策项，**When** 决策完成，**Then** 其记录落在该生产者对应的既有载体中，含 FR-014 的封闭字段集，且 `D-NNN` 已登记于 register。
+1. **Given** 一个清单内生产者产出决策项，**When** 决策完成，**Then** 其记录落在该生产者对应的既有载体中，含 FR-014 分层文法的适用层字段（基础层 + 触发成立的条件族），且 `D-NNN` 已登记于 register。
 2. **Given** 一份承重决策，**When** 检查记录，**Then** 决策记录引用对应的 `T-NNN`，且不重复六个张力字段；重复即缺陷（FR-017）。
 3. **Given** 任一记录的 evidence 指针，**When** 审计者解析，**Then** 指针全部可解析；任一不可解析即缺陷。
 4. **Given** 一条本特性落地前创建的旧形态记录，**When** 审计者读取，**Then** 它被报告为 `legacy` 并可解析，不被判无效、不被改写（FR-028）。
@@ -182,7 +182,7 @@
 ### Edge Cases
 
 - **同一 `D-NNN` 出现在两个载体**：编号按载体密集，引用 MUST 同时给载体指针；同一载体内重复即缺陷（dup-id 类守卫）；register 行以「载体 + 区间」分组消歧（A-6）。
-- **决策被推翻/取代**：保留两条记录（原件 + 取代件），原件标 `superseded` 并指向新编号；MUST NOT 删除或改写原件；推翻本身也是一条决策记录。
+- **决策被推翻/取代**：保留两条记录（原件 + 取代件），原件以 `superseded_by` 指向新编号（在场即 `superseded` 标记）；MUST NOT 删除或改写原件；推翻本身也是一条决策记录。
 - **决策在传递后失效**：子代理停在异常点快速失败上送（`shared/guidelines/fast-fail.md`），父侧重决并新增记录；旧记录与旧回执保留，审计链不断。
 - **只有一个可行选项**：决策项声明 `forced` 与理由；伪装成多选是缺陷；没有选项的「决策」不是决策项。
 - **`other` 选项**：仅在定义 `path`（谁、何时、如何新增选项并回写记录）时合法；否则守卫转红。
@@ -200,7 +200,7 @@
 **所有者与边界**
 
 - **FR-001**: MUST 创建单一所有者页 [[STR-001]]，拥有本特性的封闭词汇表（decision item / decision class / human-interactive decision / ai-autonomous decision / decision record / decision archive / decision transmission / implementation receipt / decision producer）、两类决策的强调与呈现要求、选项集契约、决策记录字段闭集、传递与实施回执义务、机器可判/行为类边界、以及字段→所有者映射。其他面（instruct、模板、技能、agents、文档）MUST 以指针抵达，MUST NOT 复述其判据表。
-- **FR-002**: 相邻所有者保留各自事实并只新增指针行：`confirmation-gates.md`（是否问、授权级别轴）、`decision-tension.md`（承重取舍六字段 `T-NNN`）、`fast-fail.md`（纠正/裁定）、`register.md`（编号登记）、`superagent-definitions.md`（角色边/载荷/上行）、goal/anchor/team/checkpoint/analyze/review/probe 的既有所有者。每个决策记录字段 MUST 在本规格 § Decision Record Field Ownership 表中恰有一个定义所有者。
+- **FR-002**: 相邻所有者保留各自事实并只新增指针行：`confirmation-gates.md`（是否问、授权级别轴）、`decision-tension.md`（承重取舍六字段 `T-NNN`）、`fast-fail.md`（纠正/裁定）、`register.md`（编号登记）、`superagent-definitions.md`（角色边/载荷/上行）、goal/anchor/team/checkpoint/analyze/review/probe 的既有所有者。每个决策记录字段（基础层与条件层全部字段）MUST 在本规格 § Decision Record Field Ownership 表中恰有一个定义所有者。
 - **FR-003**: MUST 维护**封闭的 Decision Producer Inventory**（本规格 § Decision Producer Inventory）；每个生产者 MUST 取 `record` / `record-when-decision` / `exempt` 之一并给出载体与所有者；实现期 MUST 以代码面扫描核对「表中之外无决策入口」；清单外入口产出决策项即缺陷；扩展 MUST 以修订所有者页/清单的形式进行。
 - **FR-004**: MUST NOT 新建第二套决策登记、队列、存储或调度器；决策档案 MUST 是既有载体的投影，`.specify/register.md` MUST 是持久编号的唯一索引；载体保留各自格式与 owner。
 - **FR-005**: MUST 产出新决策词汇的 glossary 提案（`origin=auto`、`status=proposed`）并留在 run 证据中；未获用户确认前 MUST NOT 写入 `.specify/glossary.md`；写入时必须走 `glossary-utils.py` 的冲突检测。
@@ -221,21 +221,21 @@
 
 **归档与审计**
 
-- **FR-014**: 每个决策项 MUST 在决策完成时恰产生一条决策记录，落在其生产者在清单中对应的既有载体；记录字段闭集：[[STR-009]]、[[STR-002]]、context、options、chosen option、rationale、evidence pointers、actor、timestamps（创建/传递/确认/实施）、[[STR-007]]；缺任一字段即缺陷。字段名以所有者页与本规格 Shared Strings 为准，生产面 MUST NOT 改名。传递动作与实施回执 MUST NOT 生成第二条决策记录——一条决策项恰一条记录；回执只更新该记录的 [[STR-007]] 与审计链（FR-019、FR-021）。
-- **FR-015**: 决策编号 MUST 取 `D-NNN`（三位、按载体密集、不复用），并 MUST 在编号诞生时登记于 `.specify/register.md`（可逐条或按载体+区间分组）；跨载体引用 MUST 同时携带载体指针；被取代的编号保留并标 `superseded`，MUST NOT 重用或删除。
-- **FR-016**: 决策记录 MUST 可只凭既有载体 + register 重建；evidence 指针 MUST 全部可解析（可由机器判定解析性的是 M-09：指针指向的载体路径/锚必须存在且可读；证据是否充分属评审）；无法重建（缺字段、断指针、无记录）即缺陷，MUST NOT 以对话记忆补足。
+- **FR-014**: 每个决策项 MUST 在决策完成时恰产生一条决策记录，落在其生产者在清单中对应的既有载体；记录文法 MUST **分层封闭**，两层之外 MUST NOT 出现任何顶格字段（须先修订所有者页），缺层内必填字段即缺陷。**(a) 基础层（每条记录必填，10 字段）**：[[STR-009]]、[[STR-002]]、context、options、chosen option、rationale、evidence pointers、actor、`created_at`、[[STR-007]]。**(b) 条件层（触发成立时必填，按触发族封闭）**：**同名族**——`same_name_conflict` + `resource_locator`（同名冲突风险存在时成对在场，FR-007；[[STR-006]] 为 true 而无 [[STR-005]] 由 M-02 判）；**取代族**——`superseded_by`（记录被取代时必填；其在场即 `superseded` 标记，FR-015）；**传递族**——`dispatched_at` / `acknowledged_at` / `implemented_at`（仅当决策被传递时，按 [[STR-007]] 相位在场：`dispatched` 起必填 `dispatched_at`，`acknowledged` 起必填 `acknowledged_at`，`implemented` / `diverged` 必填 `implemented_at`；时点在事件发生时追加，未到相位不设占位；`blocked` 按已达相位判）。选项级辅助声明（`other` 的 `path`、单可行选项的 `forced` + 理由）与人的选择信号是 `options` / `chosen option` 字段的值形状成员（FR-012、FR-013），不单独成为顶格记录字段。字段名以所有者页与本规格 Shared Strings 为准，生产面 MUST NOT 改名。传递动作与实施回执 MUST NOT 生成第二条决策记录——一条决策项恰一条记录；确认与回执只更新该记录的 [[STR-007]]、传递族时点与审计链（FR-019、FR-021）。
+- **FR-015**: 决策编号 MUST 取 `D-NNN`（三位、按载体密集、不复用），并 MUST 在编号诞生时登记于 `.specify/register.md`（可逐条或按载体+区间分组）；跨载体引用 MUST 同时携带载体指针；被取代的编号保留并以条件层字段 `superseded_by` 指向取代件（在场即 `superseded` 标记，FR-014），MUST NOT 重用或删除。
+- **FR-016**: 决策记录 MUST 可只凭既有载体 + register 重建（每条记录按其适用层重建：基础层必填字段 + 触发成立的条件族字段；未触发的条件族不属重建范围）；evidence 指针 MUST 全部可解析（可由机器判定解析性的是 M-09：指针指向的载体路径/锚必须存在且可读；证据是否充分属评审）；无法重建（缺字段、断指针、无记录）即缺陷，MUST NOT 以对话记忆补足。
 - **FR-017**: 承重决策 MUST 同时满足 `decision-tension.md` 的六字段，并由决策记录交叉引用对应 `T-NNN`；决策记录 MUST NOT 复制 `antithesis`/`binding_constraints`/`discriminating_evidence`/`expected_sacrifice`/`revision_trigger` 的内容（单一定义点）。
 
 **传递与实施（superagent → subagent）**
 
 - **FR-018**: 交办实施的决策 MUST 以**决策块**搭乘既有派发载荷通道下行：块内 MUST 含 `decision_id`、`decision_class`、选中项（完整标签）、实施约束、档案指针；缺项 MUST 拒绝派发；`decision_class` MUST 与被传递决策记录的 `decision_class` 一致（传递不改变类别；人持有的决策被交办实施仍为 `human-interactive`）；七角色字段与四项既有注入保持不变（A-7）。
-- **FR-019**: 子代理回传 MUST 含决策确认与 [[STR-008]]：[[STR-009]]、实施摘要、证据指针、偏离声明（`none` 或 `diverged` + 理由）；回执 MUST 更新记录的 [[STR-007]] 实施状态；缺任一项即回传不完整，父侧 MUST NOT 消费或补齐（沿用 `superagent-definitions.md` 上行规则）。
+- **FR-019**: 子代理回传 MUST 含决策确认与 [[STR-008]]：[[STR-009]]、实施摘要、证据指针、偏离声明（`none` 或 `diverged` + 理由）；确认与回执 MUST 按相位推进记录的 [[STR-007]] 与传递族时点（FR-014 条件层）；缺任一项即回传不完整，父侧 MUST NOT 消费或补齐（沿用 `superagent-definitions.md` 上行规则）。
 - **FR-020**: 子代理 MUST NOT 静默重决：上下文变化导致决策失效时 MUST 停在异常点并以 fast-fail 上送；无决策记录/编号的决策 MUST NOT 被派发实施；无法解析的 `decision_id` MUST NOT 被实施。
 - **FR-021**: 每条传递决策 MUST 留下可审计链：决策记录 → 派发尝试（角色边 identity / run report）→ 实施回执；断链 MUST 是可上报的显式异常，MUST NOT 沉默。
 
 **强制**
 
-- **FR-022**: MUST 为机器可判子集提供守卫，且每个守卫 MUST 能转红：M-01 记录字段/类取值/时间戳形态；M-02 [[STR-006]] 为 true 时 [[STR-005]] 存在且具名维度数达下限；M-03 选项闭集（空集/重复标签/`other` 无 `path`/五要素缺失）；M-04 新式记录（`^### D-\d{3}` 标题且携带记录字段文法）的 `D-NNN` 形态、同载体密集性与 register 可解析（legacy 标题与 register 行不判）；M-05 [[STR-008]] 存在且 [[STR-009]] 可解析；M-06 决策 backed 派发的决策块完整性；M-07 审计链三段在场；M-08 结构化决策主体命中 glossary 已登记 variant（canonical 存在）时转红（只覆盖已登记词）；M-09 evidence 指针可解析（指向的载体路径/锚不存在或不可读即转红；只判解析不判充分性）。
+- **FR-022**: MUST 为机器可判子集提供守卫，且每个守卫 MUST 能转红：M-01 记录分层文法/类取值/时点形态；M-02 [[STR-006]] 为 true 时 [[STR-005]] 存在且具名维度数达下限；M-03 选项闭集（空集/重复标签/`other` 无 `path`/五要素缺失）；M-04 新式记录（`^### D-\d{3}` 标题且携带记录字段文法）的 `D-NNN` 形态、同载体密集性与 register 可解析（legacy 标题与 register 行不判）；M-05 [[STR-008]] 存在且 [[STR-009]] 可解析；M-06 决策 backed 派发的决策块完整性；M-07 审计链三段在场；M-08 结构化决策主体命中 glossary 已登记 variant（canonical 存在）时转红（只覆盖已登记词）；M-09 evidence 指针可解析（指向的载体路径/锚不存在或不可读即转红；只判解析不判充分性）。
 - **FR-023**: 行为类规则 MUST 点名评审承接面并 MUST NOT 冒充机器覆盖：B-01 完整名称是否足够完整；B-02 定位维度是否足够区分；B-03 人工可读性与后果/可逆陈述的真实性；B-04 AI 决策谓词/假设/确定性是否成立；B-05 理由是否充分；B-06 类别是否选对。承接面至少覆盖 `/speckit.analyze`（产物一致性）、`/speckit.review`（产物/实现/代码段）与人工决策评审。
 - **FR-024**: 每个守卫 MUST 配一个逆向/变异样本（把被检查对象改坏后守卫转红），无逆向样本的守卫视为缺陷；守卫 MUST 经唯一测试入口执行；新增脚本若存在 MUST 满足 `script-interface-definitions.md`。
 - **FR-025**: 本特性 MUST NOT 新增阻塞式确认门控；`scan-confirmation-gates.py` 的治理后复扫 MUST 零新增命中；既有哨兵字面量、watcher verdict/退出码与两槽测试预算 MUST 保持不变，除非有记录在案的裁定。
@@ -251,7 +251,7 @@
 ### Key Entities
 
 - **Decision Item（决策项）**：一个被呈现给人或由 agent 持有的选择；属性：类别、完整名称与定位、上下文、选项集、选中项、理由、证据、持有者。
-- **Decision Record（决策记录）**：决策项在既有载体中的归档投影；字段闭集见 FR-014；以 `D-NNN` 标识。
+- **Decision Record（决策记录）**：决策项在既有载体中的归档投影；分层封闭文法见 FR-014（基础层 + 条件层）；以 `D-NNN` 标识。
 - **Option（选项）**：label、consequences、reversibility、default 标记、evidence，以及可选的 `other` path。
 - **Decision Class（决策类别）**：`human-interactive` / `ai-autonomous` 闭集。
 - **Decision Producer（决策生产者）**：封闭清单内的一个会产生决策项的既有面；携带 obligation、载体与 owner。
@@ -259,29 +259,38 @@
 - **Decision Transmission（决策传递）**：派发载荷中的决策块 + 子代理确认。
 - **Implementation Receipt（实施回执）**：回传中的 `implementation_receipt`，把实施结果钉回 `decision_id`。
 
-### Decision Record Field Ownership (closed)
+### Decision Record Field Ownership (closed at each layer)
 
-每字段恰有一个定义所有者；载体保留自己的排版，MUST NOT 改名或另立取值域。
+每字段恰有一个定义所有者；载体保留自己的排版，MUST NOT 改名或另立取值域。层级与 FR-014 的分层文法一一对应：**基础层**每字段每条记录必填；**条件层**字段仅在其触发族成立时必填；两层合起来是全部合法顶格字段，两层之外无记录字段。
 
-| Field | 定义所有者（取值域/形态） | 载体/登记所有者 | 说明 |
-|-------|--------------------------|------------------|------|
-| `decision_id` | `decision-definitions.md`（`D-NNN` 形态） | `.specify/register.md`（登记） | 编号在诞生时登记；引用同时给载体指针 |
-| `decision_class` | 同上（闭集 `human-interactive` / `ai-autonomous`） | 同上 | 类决定模板与检查集 |
-| context | 同上（内容下限） | 各载体 | 决策所处情境与约束 |
-| options / chosen option | 同上（五要素与闭集） | 各载体 | 承重决策的理据由 `T-NNN` 承载 |
-| rationale | 同上（一般）；承重时指向 `T-NNN` | `decision-tension.md`（承重六字段） | 一处事实一个定义点 |
-| evidence pointers | 同上（必须可解析） | 各证据载体（feedback/evidence/artifact） | 指针解析义务归本契约 |
-| actor | `superagent-definitions.md`（边身份）/ run 身份 | 各载体 | 谁持有/实施了该决策 |
-| timestamps | `decision-definitions.md`（创建/传递/确认/实施四个时点） | 各载体自己的时间格式 | 四个时点必须齐全 |
-| `transmission_status` | `decision-definitions.md`（值域在其页声明） | run report / 角色边载体 | 传递与确认状态 |
-| implementation status | `decision-definitions.md`（值域在其页声明） | 实施回执 + 产物 | 由回执驱动；是 [[STR-007]] 状态面承载的实施结果维度，不是第 11 个记录字段（FR-014 封闭集不变；见 § Clarifications 2026-11-25） |
+| 层 | Field | 定义所有者（取值域/形态） | 载体/登记所有者 | 说明 |
+|----|-------|--------------------------|------------------|------|
+| 基础 | `decision_id` | `decision-definitions.md`（`D-NNN` 形态） | `.specify/register.md`（登记） | 编号在诞生时登记；引用同时给载体指针 |
+| 基础 | `decision_class` | 同上（闭集 `human-interactive` / `ai-autonomous`） | 同上 | 类决定模板与检查集 |
+| 基础 | context | 同上（内容下限） | 各载体 | 决策所处情境与约束 |
+| 基础 | options | 同上（五要素与闭集；选项级 `path`、`forced` 与人的选择信号是该字段的值形状成员，不是顶格字段） | 各载体 | 选项集形态由 M-03 判 |
+| 基础 | chosen option | 同上（须为 `options` 中具名成员） | 各载体 | 选择信号与重放义务见 FR-013 |
+| 基础 | rationale | 同上（一般）；承重时指向 `T-NNN` | `decision-tension.md`（承重六字段） | 一处事实一个定义点；承重决策的理据由 `T-NNN` 承载 |
+| 基础 | evidence pointers | 同上（必须可解析） | 各证据载体（feedback/evidence/artifact） | 指针解析义务归本契约 |
+| 基础 | actor | `superagent-definitions.md`（边身份）/ run 身份 | 各载体 | 谁持有/实施了该决策 |
+| 基础 | `created_at` | `decision-definitions.md`（ISO-8601 UTC 创建时点） | 各载体自己的时间格式 | 每条记录必填 |
+| 基础 | `transmission_status` | `decision-definitions.md`（值域在其页声明） | run report / 角色边载体 | 每条记录必填；未传递记录取 `not-transmitted` |
+| 条件：同名族 | `same_name_conflict` | `decision-definitions.md`（bool） | 各载体 | 同名冲突风险存在时声明（FR-007） |
+| 条件：同名族 | `resource_locator` | `decision-definitions.md`（具名维度；下限业务资源组 + region id） | 各载体 | 与 `same_name_conflict` 成对；M-02 判在场与维度数 |
+| 条件：取代族 | `superseded_by` | `decision-definitions.md`（`D-NNN` + 载体指针） | 各载体 | 记录被取代时必填；在场即 `superseded` 标记（FR-015） |
+| 条件：传递族 | `dispatched_at` | `decision-definitions.md`（ISO-8601 UTC 事件时点） | 各载体自己的时间格式 | [[STR-007]] 达 `dispatched` 起必填；事件发生时追加 |
+| 条件：传递族 | `acknowledged_at` | 同上 | 同上 | [[STR-007]] 达 `acknowledged` 起必填 |
+| 条件：传递族 | `implemented_at` | 同上 | 同上 | [[STR-007]] 为 `implemented` / `diverged` 时必填 |
+| 条件：传递族（回传项） | `acknowledgement` | `decision-definitions.md`（回传项形态：回显 [[STR-009]] + 接受声明） | 回传载体（run report / 角色边） | 非记录字段；驱动 `acknowledged_at` 与状态相位 |
+| 条件：传递族（回传项） | `implementation_receipt` | `decision-definitions.md`（四成员形态，FR-019） | 回传载体（run report / 角色边） | 非记录字段；驱动 `implemented_at` / `diverged` 与实施结果维度 |
+| — | implementation status | `decision-definitions.md`（值域在其页声明） | 实施回执 + 产物 | 由回执驱动；是 [[STR-007]] 状态面承载的实施结果维度，不是记录字段（第 11 字段读法不成立；FR-014 分层闭集不变；见 § Clarifications 2026-11-25、2026-11-26） |
 
 ### Enforcement Boundary (closed)
 
 | Rule ID | Rule | Judge（承接面） | 转红条件 | 覆盖声明 |
 |---------|------|----------------|----------|----------|
-| M-01 | 决策记录字段/类取值/时间戳形态 | 确定性守卫 | 缺字段、类值域外、四个时点缺失或形态错 | 机器覆盖 |
-| M-02 | 同名冲突的定位信息 | 确定性守卫 | `same_name_conflict: true` 且 `resource_locator` 空或具名维度数低于下限 | 机器覆盖（只判在场与维度数） |
+| M-01 | 决策记录分层文法/类取值/时点形态 | 确定性守卫 | 缺基础层字段、条件层字段在触发成立时缺失、类值域外、[[STR-007]] 值域外、时点形态错或与 [[STR-007]] 相位不符 | 机器覆盖 |
+| M-02 | 同名冲突的定位信息（条件层同名族） | 确定性守卫 | `same_name_conflict: true` 且 `resource_locator` 空或具名维度数低于下限 | 机器覆盖（只判在场与维度数） |
 | M-03 | 选项闭集 | 确定性守卫 | 空集、重复标签、`other` 无 `path`、五要素缺失 | 机器覆盖 |
 | M-04 | 决策编号（只判新式记录） | 确定性守卫 | 新式记录（`^### D-\d{3}` 标题且携带记录字段文法）的 `D-NNN` 形态错、同载体不密集、register 不可解析；legacy 标题与 register 行不判 | 机器覆盖 |
 | M-05 | 实施回执 | 确定性守卫 | 回执缺失、`decision_id` 缺失或不可解析 | 机器覆盖 |
@@ -332,7 +341,7 @@
 - **SC-002**: 两条生产事故被挡住：夹具 A（同名资源，[[STR-006]] 为 true 但无 [[STR-005]]）触发 M-02 转红，补业务资源组 + region id 后转绿；夹具 B（主体命中已登记 glossary variant）触发 M-08 转红，改完整名称后转绿；两条规则同时出现在生成的 instruction 与所有者页。**Path**: final
 - **SC-003**: 两类决策分离：类缺失/值域外触发 M-01 转红；`human-interactive` 夹具含 FR-008 的全部要素并通过 B-03 评审；`ai-autonomous` 夹具含 FR-009 的全部要素并通过 B-04 评审；类别与持有者不符触发 B-06 评审发现。**Path**: final
 - **SC-004**: 选项闭集：空选项集、重复标签、`other` 无 `path`、五要素缺失分别触发 M-03 转红；补齐后转绿；`ai-autonomous` 的选中项经记录输入 + 谓词重放一致。**Path**: final
-- **SC-005**: 归档可重建：对夹具决策集（覆盖 requirements/plan/checkpoint/run report 四类载体），仅用 register + 载体即可重建 FR-014 的全部字段；删任一字段触发 M-01（`decision_id` 不可解析时另由 M-04 判）转红，改坏任一 evidence 指针触发 M-09 转红；承重决策的记录不含六字段副本且 `T-NNN` 可解析。**Path**: final
+- **SC-005**: 归档可重建：对夹具决策集（覆盖 requirements/plan/checkpoint/run report 四类载体），仅用 register + 载体即可重建每条记录的适用层全部字段（基础层 + 触发成立的条件族；四类载体均非传递生产者，只判基础层与到场条件族）；删任一适用层必填字段触发 M-01（`decision_id` 不可解析时另由 M-04 判）转红，改坏任一 evidence 指针触发 M-09 转红；承重决策的记录不含六字段副本且 `T-NNN` 可解析。**Path**: final
 - **SC-006**: 传递与实施可审计：决策 backed 派发含完整决策块（M-06 绿），回传含确认与 [[STR-008]]（M-05 绿），三段链可解析（M-07 绿）；静默改选夹具产生显式异常；无记录决策派发被拒绝；缺 [[STR-009]] 的回执使 M-05 转红。**Path**: final
 - **SC-007**: 强制诚实：§ Enforcement Boundary 的每条 M 规则都有对应守卫与一个逆向样本，逐条 mutation 演练全部转红且定位到规则；每条 B 规则都有具名承接面；守卫清单与两表逐行一致，缺一即红。**Path**: supporting
 - **SC-008**: 落地与镜像干净：`regen-command-copies.py --check` rc 0；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员（绝对读数如实报告）；instruction 模板与活副本的「Decision Items」段逐字一致且在声明的字节上限内；`scan-confirmation-gates.py` 零新增门控命中；空客户项目 init 夹具收到该段。**Path**: supporting
@@ -398,3 +407,9 @@
 - Q: A-9 把「引用可解析」划入机器可判集、FR-016 把不可解析 evidence 指针定为缺陷，但封闭 M 表（M-01…M-08）没有承接行，SC-005 却把「改坏指针」映射到 M-01/M-04——怎么办？ → A: 新增 **M-09**（evidence 指针可解析：确定性守卫，只判解析不判充分性），封闭 M 表扩为 M-01…M-09；M-01/M-04 的转红条件不变，SC-005 的指针破坏读数改映射到 M-09。折叠进 M-01 的读法被拒：那会改变 M-01 已声明的转红条件（字段在场/类取值/时间戳形态），且仍无具名规则承接 A-9 的「引用可解析」。
 - Q: P-09 把 superagent→subagent 传递的类别固定为 `ai-autonomous` 且义务写作 `record`，与 A-4（类别看持有者）和 FR-014（一条决策项恰一条记录）如何一致？ → A: 传递不产生新决策项——被传递决策的**唯一**记录是其在产出载体的记录；决策块的 `decision_class` MUST 与该记录一致（人持有的决策被交办实施仍为 `human-interactive`）；传递与实施回执 MUST NOT 生成第二条记录，只更新该记录的 `transmission_status` 与审计链（FR-014、FR-018、FR-019、FR-021）。
 - Q: C-502 的零改写验收读数（`08b59695c..HEAD` 文件级空 diff）在 plan 落地后已不可满足，如何重述？ → A: 改为**行级包含**读数：既有记录路径上 `git diff --numstat` 的删除列为 0、无删除文件，追加与新增文件（如 register 的 `T-019…T-021` 行、新 `plan.md`）允许且属预期；文件级空 diff 只适用于本特性未触碰的记录路径（与 tasks § Notes「零改写读数」一致）。
+
+### Session 2026-11-26（无人值守 analyze 修复第二轮，自行裁决并记录）
+
+- Q: FR-014 的「记录字段闭集」只列十个顶格字段，但本规格其他处要求记录携带 `same_name_conflict` / `resource_locator`（FR-007、M-02、US1 场景 1）与 `superseded_by`（FR-015、Edge Cases），§ Decision Record Field Ownership 又标 (closed)——字段无处安放怎么办？ → A: 记录文法改为**分层封闭**：**(a) 基础层 10 字段**（每条记录必填：`decision_id`、`decision_class`、context、options、chosen option、rationale、evidence pointers、actor、`created_at`、`transmission_status`）；**(b) 条件层三族**（触发成立时必填）：同名族 `same_name_conflict` + `resource_locator`（FR-007）、取代族 `superseded_by`（在场即 `superseded` 标记）、传递族三时点。两层合起来是全部合法顶格字段，两层之外无记录字段；选项级 `path`、单选项 `forced` 与人的选择信号是 `options` / `chosen option` 的值形状成员（FR-012、FR-013），不单列为字段。Field Ownership 表逐层枚举每个字段（含回传项 `acknowledgement` / `implementation_receipt` 的登记行，二者是回传项、不是记录字段）。
+- Q: FR-014 旧文要求每条记录的 timestamps（创建/传递/确认/实施）四个时点齐全、M-01 对缺失即转红，但非传递生产者（P-02/P-03/P-04/P-05/P-08 等）从不传递，传递/确认/实施事件不可能发生——如何避免合法记录被判红，又不在「缺省」与占位字面量之间留两种表示？ → A: 时点义务改为**按适用层与相位条件在场**：`created_at` 每条记录必填；`dispatched_at` / `acknowledged_at` / `implemented_at` 仅在决策被传递时适用，并各按 [[STR-007]] 相位在场（`dispatched` 起 / `acknowledged` 起 / `implemented`·`diverged`），事件发生时追加，未到相位**不设占位**（不再使用 `not-yet` 字面量；单一表示，无二义）。`blocked` 按已达相位判；非传递记录只带 `created_at`，`transmission_status` 取 `not-transmitted`。M-01、Field Ownership 表、data-model E2、C-202 与 SC-005 同步按此读法。
+- Q: 确认（acknowledgement）与实施回执（implementation_receipt）是否随本次分层成为记录字段？ → A: 否。二者仍是回传载体中的回传项（E5/E6），在 Field Ownership 表中以「条件层：传递族（回传项）」两行登记形态所有者与载体，其在场驱动记录的传递族时点与 [[STR-007]] 相位；「传递与回执不生成第二条记录」的 2026-11-25 裁定不变（FR-014、FR-019、FR-021）。

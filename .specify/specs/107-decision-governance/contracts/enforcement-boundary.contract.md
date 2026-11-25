@@ -12,8 +12,8 @@
 
   | Rule | Judge (`validate-decisions.py`) | Red condition | Reverse sample |
   |------|----------------------------------|---------------|----------------|
-  | M-01 | `--action records` | missing mandatory field, class outside the closed set, missing/malformed timestamp point | `fixtures/m01/*` |
-  | M-02 | `--action records` | `same_name_conflict: true` with an empty `resource_locator` or fewer than two named dimensions | `fixtures/m02/*` |
+  | M-01 | `--action records` | a missing base-layer field, a conditional-layer field missing while its trigger holds, a class outside the closed set, a `transmission_status` outside its closed domain, a malformed timepoint, or a timepoint contradicting the `transmission_status` phase | `fixtures/m01/*` |
+  | M-02 | `--action records` | `same_name_conflict: true` with an empty `resource_locator` or fewer than two named dimensions (the same-name conditional family) | `fixtures/m02/*` |
   | M-03 | `--action records` | empty set, duplicate label, `other` without `path`, a missing option element | `fixtures/m03/*` |
   | M-04 | `--action records` | new-form record (`^### D-\d{3}` heading carrying the record field grammar): `D-NNN` form error, non-dense per carrier, id unresolvable in the register; legacy headings and register rows are never judged | `fixtures/m04/*` |
   | M-05 | `--action chain` | receipt missing, `decision_id` missing or unresolvable | `fixtures/m05/*` |

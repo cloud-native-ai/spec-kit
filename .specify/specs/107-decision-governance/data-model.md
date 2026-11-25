@@ -19,28 +19,32 @@ A single presented-or-held choice.
 | `resource_locator` | structured text | machine-parseable named dimensions; floor = business resource group + region id | owner page (conditional field) |
 | `held_by` | identity | the holder (person or agent run identity) | `superagent-definitions.md` (edge/run identity) + owner page |
 
+When the item is archived, the same-name pair travels as E2's same-name conditional family.
+
 ### E2 — Decision Record（决策记录）
 
 The archive projection of one decision item in its producer's existing carrier. One decision item at completion ⇒ exactly one record (FR-014, [[STR-001]] owner).
 
-| Field | Type | Value domain | Owner |
-|-------|------|--------------|-------|
-| `decision_id` | id | `D-NNN` (three digits); dense per carrier; never reused; registered | owner page (form) / `.specify/register.md` (registration) |
-| `decision_class` | enum | `human-interactive` / `ai-autonomous` | owner page |
-| `context` | text | content floor on the owner page | owner page |
-| `options` | Option[] | see E3; closed set | owner page |
-| `chosen_option` | option label | must be one named member of `options` | owner page |
-| `rationale` | text / reference | general: text; load-bearing: `T-NNN` cross-reference, six fields NOT copied | owner page (general) / `decision-tension.md` (load-bearing six fields) |
-| `evidence` | pointer[] | every pointer resolvable from the repository (or the carrier) | owner page |
-| `actor` | identity | who held / implemented; identity form owned by `superagent-definitions.md` | `superagent-definitions.md` + run identity |
-| `created_at` | timestamp | ISO-8601 UTC; mandatory value | owner page |
-| `dispatched_at` | timestamp / literal | ISO-8601 UTC or `not-yet`; line presence mandatory | owner page |
-| `acknowledged_at` | timestamp / literal | ISO-8601 UTC or `not-yet` | owner page |
-| `implemented_at` | timestamp / literal | ISO-8601 UTC or `not-yet` | owner page |
-| `transmission_status` | enum | see E9 state domain; carries the implementation-result dimension per the clarify ruling (not an 11th field) | owner page |
-| `superseded_by` | id / conditional | `D-NNN` of the replacing record; required when superseded | owner page (conditional field) |
+| Layer | Field | Type | Value domain | Owner |
+|-------|-------|------|--------------|-------|
+| base | `decision_id` | id | `D-NNN` (three digits); dense per carrier; never reused; registered | owner page (form) / `.specify/register.md` (registration) |
+| base | `decision_class` | enum | `human-interactive` / `ai-autonomous` | owner page |
+| base | `context` | text | content floor on the owner page | owner page |
+| base | `options` | Option[] | see E3; closed set | owner page |
+| base | `chosen_option` | option label | must be one named member of `options` | owner page |
+| base | `rationale` | text / reference | general: text; load-bearing: `T-NNN` cross-reference, six fields NOT copied | owner page (general) / `decision-tension.md` (load-bearing six fields) |
+| base | `evidence` | pointer[] | every pointer resolvable from the repository (or the carrier) | owner page |
+| base | `actor` | identity | who held / implemented; identity form owned by `superagent-definitions.md` | `superagent-definitions.md` + run identity |
+| base | `created_at` | timestamp | ISO-8601 UTC; mandatory on every record | owner page |
+| base | `transmission_status` | enum | see E9 state domain; `not-transmitted` on every non-transmitted record; carries the implementation-result dimension per the clarify ruling (not an 11th field) | owner page |
+| condition: same-name | `same_name_conflict` | bool | `true` / `false`; declared when same-name risk exists | owner page (conditional) |
+| condition: same-name | `resource_locator` | structured text | machine-parseable named dimensions; floor = business resource group + region id; required with `same_name_conflict: true` | owner page (conditional) |
+| condition: supersession | `superseded_by` | id | `D-NNN` of the replacing record; present exactly when superseded (its presence is the `superseded` marker) | owner page (conditional) |
+| condition: transmission | `dispatched_at` | timestamp | ISO-8601 UTC; required once `transmission_status` reaches `dispatched` | owner page (conditional) |
+| condition: transmission | `acknowledged_at` | timestamp | ISO-8601 UTC; required once `transmission_status` reaches `acknowledged` | owner page (conditional) |
+| condition: transmission | `implemented_at` | timestamp | ISO-8601 UTC; required when `transmission_status` is `implemented` or `diverged` | owner page (conditional) |
 
-**Field-closure reading (authoritative)**: FR-014's ten fields are the mandatory closed set. `same_name_conflict`, `resource_locator` and `superseded_by` are conditional fields declared by the owner page and required exactly when their trigger holds (FR-007, A-6). No other field is admitted without revising the owner page.
+**Field-closure reading (authoritative)**: FR-014's grammar is closed at each layer, and the two layers are the only admitted top-level fields. The base layer's ten fields are mandatory on every record. The conditional layer is enumerated by trigger family and each member is required exactly when its trigger holds: same-name (`same_name_conflict` + `resource_locator`, when same-name risk exists — C-103's trigger), supersession (`superseded_by`, when superseded), and transmission (`dispatched_at` / `acknowledged_at` / `implemented_at`, only for transmitted decisions, each appended as `transmission_status` reaches its phase — `dispatched` / `acknowledged` / `implemented`|`diverged`; no placeholder before the event). The acknowledgement (E5) and the implementation receipt (E6) are return items, not record fields: their presence drives the transmission-family timepoints and the status phase. Option-level auxiliaries (`path`, `forced`) and the human choice signal are value-shape members of `options` / `chosen_option`. No other field is admitted without revising the owner page.
 
 **Serialization grammar**: a level-3 heading `### D-NNN — <one-line title>` carries the id once; each field is one line `- **<field>**: <value>`; options are indented sub-lines under `options`; continuations indent ≥2 spaces; fenced code blocks inside the carrier do not count (same rule as the tension grammar). Chosen in T-002.
 
@@ -103,7 +107,7 @@ Not a store: the union of `{producer × existing carrier}` plus the register ind
 |----|-----------|-------------|
 | I-01 | One decision item at completion yields exactly one record in its producer's carrier; a record without a producer is a defect | FR-014, FR-003 |
 | I-02 | `decision_id` matches `D-NNN`, is dense and unique within one carrier; cross-carrier references carry the carrier pointer; ids are never reused | FR-015, A-6 |
-| I-03 | Every mandatory field (E2 ten) is present; conditional fields are present exactly when their trigger holds | FR-014, FR-007 |
+| I-03 | Every base-layer field (E2) is present on every record; each conditional-layer field is present exactly when its trigger holds; transmission timepoints follow the `transmission_status` phase | FR-014, FR-007 |
 | I-04 | `chosen_option` is a named member of `options`; `options` is non-empty; labels are unique; `other` carries a `path`; a single option carries `forced` + reason | FR-012, FR-013 |
 | I-05 | Every evidence pointer resolves; a broken pointer is a defect (no memory backfill) | FR-016 |
 | I-06 | A load-bearing decision's record cross-references its `T-NNN` and does not copy the six tension fields | FR-017 |

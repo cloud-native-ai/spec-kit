@@ -7,7 +7,7 @@
 
 ## Scenario 1 — Author one ai-autonomous decision record (planned surface)
 
-1. Write the record into its producer's existing carrier (e.g. a checkpoint or a run report) using the record grammar owned by `shared/definitions/decision-definitions.md` § Decision Record: heading `### D-NNN — <title>`, then one `- **<field>**: <value>` line per mandatory field, options as indented sub-lines, four timestamps (`created_at` + three `…-at` lines carrying ISO-8601 UTC or `not-yet`).
+1. Write the record into its producer's existing carrier (e.g. a checkpoint or a run report) using the record grammar owned by `shared/definitions/decision-definitions.md` § Decision Record: heading `### D-NNN — <title>`, then one `- **<field>**: <value>` line per base-layer field, options as indented sub-lines, `created_at` (ISO-8601 UTC) on every record, and — only for a transmitted decision — the transmission-family timepoints (`dispatched_at` / `acknowledged_at` / `implemented_at`) appended as `transmission_status` reaches each phase; same-name and supersession fields only when their trigger holds.
 2. Register the id in `.specify/register.md` (one row or a carrier+range grouped row) at birth.
 3. Validate:
 

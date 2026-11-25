@@ -1,0 +1,50 @@
+# analyze-repair2 deterministic readings — 2026-11-26 (final tree, pre-commit)
+
+## pre-analyze summaries (requirements / plan / tasks)
+- requirements: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+- plan: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+- tasks: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+
+## rule / clause / producer counts
+- M rows: 9
+- B rows: 6
+- P rows: 12
+- BC rows (plan): 6
+- contract clause definitions: 38
+
+## layered Field Ownership table (requirements.md)
+- base-layer rows: 10
+- 条件：同名族 rows: 2
+- 条件：取代族 rows: 1
+- 条件：传递族 rows: 3
+- 条件：传递族（回传项） rows: 2
+- dimension (non-field) rows: 1
+- total rows: 19
+- FR-014 base enumeration items: 10
+- data-model E2 rows (Layer column): 16
+
+## stale-restatement sweep (live artifacts only)
+- hits: (none)
+
+## git diff --numstat (tracked, this round)
+2	2	.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+1	1	.specify/specs/107-decision-governance/contracts/archive-and-audit.contract.md
+2	2	.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md
+2	2	.specify/specs/107-decision-governance/contracts/transmission-and-implementation.contract.md
+23	19	.specify/specs/107-decision-governance/data-model.md
+1	1	.specify/specs/107-decision-governance/quickstart.md
+44	29	.specify/specs/107-decision-governance/requirements.md
+3	3	.specify/specs/107-decision-governance/research.md
+7	7	.specify/specs/107-decision-governance/tasks.md
+
+## untracked round inputs (analyze round-2 evidence)
+?? .specify/specs/107-decision-governance/test-evidence/analyze-domain-w1-r2.jsonl
+?? .specify/specs/107-decision-governance/test-evidence/analyze-domain-w2-r2.jsonl
+?? .specify/specs/107-decision-governance/test-evidence/analyze-domain-w3-r2.jsonl
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-decomposition.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-pre-analyze-plan.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-pre-analyze-requirements.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-pre-analyze-tasks.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-readings.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-validate-requirements.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair2-validate-tasks.txt

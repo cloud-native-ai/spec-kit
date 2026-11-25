@@ -27,13 +27,13 @@
 - [ ] CHK008 - 每个退化选项形态是否各有预期结局——空集（不构成决策项）、重复标签、`other` 无 `path`、单可行选项未声明 `forced` + 理由、零可行选项——且全部落在 M-03 的机器判定范围内？[Edge Cases, Req §FR-012, C-106, Req §Enforcement Boundary M-03, SC-004]
 - [ ] CHK009 - 五要素选项契约（label、consequences、reversibility、default 标记、evidence）是否完整，`default` 的基数是否被量化（恰一个 / 至多一个 / 哪些情形允许零个），`other.path` 是否给出"谁、何时、如何新增选项并回写记录"的 owner？[Clarity, Req §FR-012, C-106]
 - [ ] CHK010 - 选中项的三条义务是否按类分置——所有决策的选中项须是选项集中的具名成员、`ai-autonomous` 须可由记录输入 + 谓词确定性重放、`human-interactive` 须记录人的选择信号（信号词汇以指针抵达既有门控观察协议、不复述）？[Consistency, Req §FR-013, C-107, C-108, SC-004]
-- [ ] CHK011 - 文本/选项规则引入的辅助声明——单选项的 `forced` 标记、`other` 选项的 `path`、人的选择信号——是否在封闭记录文法（FR-014 的十个必填字段 + C-202 的三个条件字段）中有被声明的落位，还是字段闭包让它们无处安放？[Conflict, Req §FR-012, Req §FR-013, Req §FR-014, C-201, C-202]
+- [ ] CHK011 - 文本/选项规则引入的辅助声明——单选项的 `forced` 标记、`other` 选项的 `path`、人的选择信号——是否在分层封闭记录文法（FR-014 基础层十字段 + 条件层三族）中有被声明的落位（作为 `options` / `chosen option` 的值形状成员，还是顶格字段），从而字段闭包不留无处安放的声明？[Conflict, Req §FR-012, Req §FR-013, Req §FR-014, C-201, C-202]
 
 ## 三、归档、审计与单一所有者
 
 - [ ] CHK012 - 需求是否声明单一所有者页 [[STR-001]] 并列出它拥有的全部面（词汇闭集、按类强调、选项契约、记录字段闭包、传递义务、M/B 边界、字段→所有者映射），同时禁止其他面复述其判据表（指针形）？[Completeness, Req §FR-001, Req §FR-002, Req §A-2]
 - [ ] CHK013 - "一个决策项完成时恰产生一条记录、落在其生产者的既有载体"是否与投影安全义务成对——不新建第二套登记/队列/存储/调度器、无载体的生产者走清单修订（不得静默丢弃）、只读命令的处置只进自己的报告、并行分支按载体逐文件/逐条目写入且 register 为手工唯一写入者（冲突按 renumber 修复）？[Completeness, Non-Functional, Req §FR-014, Req §FR-004, Req §A-3, Req §Edge Cases, C-207, C-208]
-- [ ] CHK014 - 记录字段闭包是否权威（FR-014 的十个必填字段），每个条件字段的触发条件是否精确（`same_name_conflict` + `resource_locator` 在 C-103 触发条件成立时；`superseded_by` 在被取代时），四个时间点的在场与形态义务是否写明？[Completeness, Req §FR-014, C-202, SC-005, data-model.md E2]
+- [ ] CHK014 - 记录字段闭包是否分层权威（FR-014 基础层十字段 + 条件层三族），每个条件族的触发条件是否精确（同名族在 C-103 触发条件成立时；`superseded_by` 在被取代时；传递族时点按 `transmission_status` 相位追加），非传递记录只带 `created_at`、无占位字面量的义务是否写明？[Completeness, Req §FR-014, C-202, SC-005, data-model.md E2]
 - [ ] CHK015 - 字段→所有者表是否给每个记录字段**恰一个**定义所有者，且 clarify 裁定（implementation status 是 `transmission_status` 状态面的实施结果维度、不是第 11 个记录字段）是否在 FR-014、FR-019 与字段表三处一致？[Consistency, Req §FR-002, Req §FR-014, Req §Decision Record Field Ownership, Req §Clarifications]
 - [ ] CHK016 - 编号可判定性是否从头到尾写清——`D-NNN` 三位形态、按载体密集且唯一、不复用、诞生时登记、跨载体重复的语义（同一决策的两次投影，还是两个决策允许撞号）、密度计算的"载体"单位、以及"载体 + 区间"分组 register 行在 M-04 下如何保持可解析？[Ambiguity, Consistency, Req §FR-015, Req §A-6, Req §Edge Cases, C-203, Req §Enforcement Boundary M-04]
 - [ ] CHK017 - 可重建性是否定义到可测量——要重建的字段全集、指针解析基准与允许的指针形态、evidence 指针全部可解析、不得以对话记忆补足——并且给定 A-9 把"引用可解析"划入机器可判集、FR-016 把不可解析指针定为缺陷，封闭 M 表（M-01…M-09）由 M-09 承接指针可解析性（只判解析、不判充分性）？[Measurability, Gap, Req §FR-016, Req §FR-022, Req §A-9, Req §Enforcement Boundary, C-204, SC-005]
