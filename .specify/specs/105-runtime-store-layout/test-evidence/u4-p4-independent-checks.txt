@@ -1,0 +1,28 @@
+# U4 independent checks — implement P4 (T025–T033) — 2026-11-25T06:49:10Z
+
+## Store layout
+$ test ! -d .specify/memory
+retired-root-absent (exit 0)
+$ ls -d .specify/{session,knowledge,feedback,evidence,exec-quant,migrate}
+.specify/evidence
+.specify/exec-quant
+.specify/feedback
+.specify/knowledge
+.specify/migrate
+.specify/session
+
+## Focused tests
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_store_layout_live_refs.py tests/contract/test_runtime_store_layout.py tests/integration/test_store_layout_migration_us1_us2.py -q
+15 passed in 9.83s (exit 0)
+
+## Mirrors
+$ /usr/local/bin/python3 scripts/python/sync-mirrors.py --check
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (116 files, byte-identical)
+exit 0 — all pairs byte-identical
+$ /usr/local/bin/python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates. (exit 0)
+
+Interpreter note: a bare python3 sync-mirrors --check exits 2 because the internal regen step needs typer; R-10 applies to sync-mirrors too, not only regen-command-copies.
