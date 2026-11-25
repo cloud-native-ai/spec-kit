@@ -1,0 +1,24 @@
+usage: role-edge-check.py [-h] [--version] [--action {report,query}]
+                          [--parent PARENT] [--child CHILD]
+                          [--state-dir STATE_DIR] [--teams-dir TEAMS_DIR]
+                          [--logs-dir LOGS_DIR] [--registry-dir REGISTRY_DIR]
+                          [--format {json,text}]
+
+Read-only role-edge judgement over existing run records: edge existence, per-edge roles, role sets, depth and the closed four violation kinds.
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --action {report,query}
+  --parent PARENT       query: parent identity
+  --child CHILD         query: child identity
+  --state-dir STATE_DIR
+  --teams-dir TEAMS_DIR
+  --logs-dir LOGS_DIR
+  --registry-dir REGISTRY_DIR
+                        line-registry cross-check root (default: the owning
+                        engine's resolution)
+  --format {json,text}
+
+Side effects: read-only; no file is written and no temporary file is created.
+Exit codes: 0 judged clean (an empty edge set is explicitly summarized); 1 violations found; 2 unreadable or malformed input.

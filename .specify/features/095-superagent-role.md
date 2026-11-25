@@ -5,7 +5,7 @@
 **Description**: 把事实上的 super agent 归一为派发边上的相对逻辑角色：定义 owner、判定引擎、super↔sub 协议与身份转变注入、digest 角色视图与 harness 落点。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-25（clarify：绑定切片 106 background dispatch settlement；父状态保持 `Ready for Review` 不回退）
+**Last Updated**: 2026-11-25（clarify：绑定切片 106 background dispatch settlement；plan：切片 106 plan 集落盘，切片行 `Draft → Planned`；父状态保持 `Ready for Review` 不回退）
 
 ## Overview
 
@@ -96,3 +96,12 @@
 - **Blocked**: 任务已关但至少一条 `final` 路径 SC 非 pass；或闭包判定 `block`。
 - **Ready for Review**: review 证据齐、`code-review.md` 无 blocking、无未豁免的 `final` 路径非 pass。
 - **Completed**: 人工 / 治理最终验收。
+
+## Plan Notes — Slice 106（2026-11-25，plan 阶段）
+
+- **设计落点**：结算契约的唯一 owner 仍是本 Feature 拥有的 `shared/definitions/superagent-definitions.md` § Termination（修订：封闭七值集合、每值正证据、反应义务、`settlement_version`/legacy、载体证据表、结算违例三 kind）；判定面复用 `scripts/python/role-edge-check.py` 的加性 `--action settle`，不新建第二引擎（A-6 保持成立）。
+- **产物**：`.specify/specs/106-background-silent-failure/` 下 plan / research（14 B + 8 R）/ data-model（9 实体、12 不变量）/ 3 份契约（34 条款：C-01…C-12 结算、C-13…C-24 载体一致性、C-25…C-34 执行与迁移）/ quickstart（8 场景，逐例 premises + 钉住测试）/ feature-ref；门读数 pre-analyze `pass errors=0 advisories=20`、decision-tensions `0 error 0 warning`。
+- **载体证据**：C1 四件套与 watcher 判定不变（sha 与 `fbab7a45c` 相等、self-test 39/0）；C2 加性 `.attempt`/`.end` + pid + TERM/INT/HUP trap，`.status` 行格式不变；C3 报告映射表加性 `end_state` + `evidence` 列与 `## Verification` 结算覆盖；C4 父侧尝试记录 + 期限/无返回规则；C5 显式排除并保留「未完成不得报成功」；C6 只允许合规 runner 后台形态或前台终结，含混 stall 表述按结算值逐项拆清。
+- **披露的基线事实**：`scan-confirmation-gates.py` 冻结 `total == 27` 的相等判定测试在阶段基线即为红（实测 total 31），plan 以 EP-005 `falsified` + `fallback` 记录，本特性改判为「被触及文件的阻断命中数零新增」，不声称已冻结基线绿。
+- **上游标识符纠正**：requirements 的载体编号由连字符形态改为 `C1`…`C6`，与框架契约条款语法（`C-NN`）分离；语义与 FR/SC 不变，requirements 校验器重跑 0 error / 0 warning，并已 append-only 记录在 `## Clarifications`。
+- **注册裁决**：不新增 Feature、不新增 skill/command 单元、不新增 flow-class/probe 行；仅切片行 106 状态推进与本详情 plan note。

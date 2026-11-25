@@ -1,0 +1,157 @@
+{
+  "stage": "plan",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 24,
+      "message": "path does not exist under the repo: tests/fixtures/settlement/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 48,
+      "message": "path does not exist under the repo: tests/fixtures/settlement/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 55,
+      "message": "path does not exist under the repo: tests/fixtures/settlement/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 140,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_preservation.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 170,
+      "message": "path does not exist under the repo: tests/fixtures/settlement/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 19,
+      "message": "path does not exist under the repo: tests/fixtures/settlement/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 21,
+      "message": "path does not exist under the repo: agents/execution/logs/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 57,
+      "message": "path does not exist under the repo: tests/fixtures/settlement/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 58,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_contract_definitions.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 59,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 60,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_carriers.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 61,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_migration.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 62,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_preservation.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 63,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_scope.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/carrier-conformance.contract.md",
+      "line": 4,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_carriers.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/carrier-conformance.contract.md",
+      "line": 4,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_scope.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/enforcement-and-migration.contract.md",
+      "line": 4,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/enforcement-and-migration.contract.md",
+      "line": 4,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_migration.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/enforcement-and-migration.contract.md",
+      "line": 4,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_preservation.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/settlement-contract.contract.md",
+      "line": 4,
+      "message": "path does not exist under the repo: tests/contract/test_settlement_contract_definitions.py"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 20,
+    "waived": 0,
+    "fr": 41,
+    "sc": 9,
+    "tasks": 0,
+    "clauses": 34,
+    "files": 10
+  },
+  "checked_at": "2026-11-25T12:13:13Z"
+}
