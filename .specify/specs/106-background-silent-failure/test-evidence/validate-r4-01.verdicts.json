@@ -1,0 +1,13 @@
+[
+  {
+    "id": "validate-r4-01",
+    "verdict": {
+      "finding_id": "R4-01",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "All five cited locations verified verbatim: data-model.md:100 scopes all three E7 predicates to version-bearing records defined as a claim or record carrying settlement_version; data-model.md:88 defines E6 legacy as the claim/record carrying no settlement_version; data-model.md:74 makes an absent settlement_version a legacy claim not judged by any E7 predicate; data-model.md:96 scopes settlement-unrecorded to a versioned slot and names a team-report row missing end_state/evidence while exempting a legacy 5-column row; carrier-conformance.contract.md:22 (C-16) fixes new reports at 7 columns (5 mapping columns plus end_state and evidence, no settlement_version column), declares an empty end_state/evidence row settlement-unrecorded, and states a 5-column row is version-less because it has no end_state/evidence columns. The current create-team SKILL.md § Report confirms the 5 mapping columns (label, role, dispatch_duty, workspace, parent), so C-16's 7-column total leaves no settlement_version slot; quickstart S-3 line 80 likewise calls a 7-column row versioned and expects exit 1 when either cell is missing, while a 5-column row exits 0. A malformed 7-column row is therefore simultaneously version-bearing (C-16, E7:96, quickstart S-3) and versionless-legacy under E6:88/E7:100's field test; exit 1 (C-26) and legacy exit 0 both have textual support, so the engine verdict is undecidable and the contradiction is internal to E7's own scope sentence.",
+      "evidence_not_supported": "No implement-stage engine exists (quickstart S-3/S-4 are marked not-implemented-yet), so the exit-1-versus-0 conflict is demonstrated between normative artifacts rather than by an observed runtime verdict; the claim that the team-report-row shape has no settlement_version slot holds at the physical row surface fixed by C-16, although E5's table does list settlement_version generically for the claim shape, so the precise defect is the gap between that field and the row surface; a charitable reading that the 7-column header itself carries the row version is implied by C-16's hence version-less contrast, but that rule is written nowhere and contradicts E7:100's explicit field parenthetical and E6:88, so it cannot resolve the finding.",
+      "notes": "severity retained: the undecidable exit code governs the primary enforcement target (malformed 7-column rows) and would let a contract test pin either reading while the other clause is silently violated, which is the silent-failure class this feature exists to remove."
+    }
+  }
+]
