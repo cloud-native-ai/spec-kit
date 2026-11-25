@@ -5,7 +5,7 @@
 **Description**: 把事实上的 super agent 归一为派发边上的相对逻辑角色：定义 owner、判定引擎、super↔sub 协议与身份转变注入、digest 角色视图与 harness 落点。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-25（clarify：绑定切片 106 background dispatch settlement；plan：切片 106 plan 集落盘，切片行 `Draft → Planned`；父状态保持 `Ready for Review` 不回退）
+**Last Updated**: 2026-11-25（clarify：绑定切片 106 background dispatch settlement；plan：切片 106 plan 集落盘，切片行 `Draft → Planned`；tasks：切片 106 任务清单落盘（37 行 / 5 故事 / 34 条款各被认领一次）；父状态保持 `Ready for Review` 不回退）
 
 ## Overview
 
@@ -105,3 +105,11 @@
 - **披露的基线事实**：`scan-confirmation-gates.py` 冻结 `total == 27` 的相等判定测试在阶段基线即为红（实测 total 31），plan 以 EP-005 `falsified` + `fallback` 记录，本特性改判为「被触及文件的阻断命中数零新增」，不声称已冻结基线绿。
 - **上游标识符纠正**：requirements 的载体编号由连字符形态改为 `C1`…`C6`，与框架契约条款语法（`C-NN`）分离；语义与 FR/SC 不变，requirements 校验器重跑 0 error / 0 warning，并已 append-only 记录在 `## Clarifications`。
 - **注册裁决**：不新增 Feature、不新增 skill/command 单元、不新增 flow-class/probe 行；仅切片行 106 状态推进与本详情 plan note。
+
+## Tasks Note — Slice 106（2026-11-25，tasks 阶段）
+
+- **产物**：`.specify/specs/106-background-silent-failure/tasks.md` — 37 行依赖有序任务，按 5 个用户故事组织（US1/US2 P1 = MVP，US3/US4 P2，US5 P3），Foundational 承载 owner 章节修订；34 条款逐条被一行 `[green:]` 认领一次，认领行序与条款序号单调一致；Requirement Coverage Map 41/41。
+- **门读数**：`validate-tasks.py` PASS（0 error / 0 warning / 34 green claims）；`pre-analyze-check.py --stage tasks` decision=pass errors=0 advisories=55（全部为 missing-path：50 条指向本阶段规划的新测试/夹具文件、1 条指向 quickstart teardown 临时目录、4 条为 plan 集既有引用）；`account-clause-coverage.py` claimed clauses 34、clause-uncovered beyond-baseline 0，`fr-uncovered` 37/41（FR-036 / FR-037 / FR-039 / FR-040 不被任何契约条款引用——如实报告，不作通过判据；FR 覆盖权威判据是本文件的 Requirement Coverage Map + runtime-stack-row errors=0）。
+- **测试模式**：ON（Constitution Principle IV）；两处回归守卫按 migration/regression 例外置于实现之后（T023 保留面、T028 version/legacy），红能力由 T021 / T025 / T032 的演练读数证明。
+- **冻结基线**：`coverage-baseline.txt` 已在生成时冻结（787 行，base-sha `1f06dceaf`）。
+- **注册裁决**：切片行 106 维持 `Planned`（tasks 阶段无状态迁移权）；本 Feature 状态保持 `Ready for Review`，不回退。
