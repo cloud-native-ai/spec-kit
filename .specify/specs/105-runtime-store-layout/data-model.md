@@ -57,7 +57,7 @@ State table (old = `legacy_source`, new = `target`):
 
 | old authoritative | new authoritative | disposition | action |
 |---|---|---|---|
-| none | none | none (converged) | nothing; if old dir exists (only non-content) remove it only when it is empty, else report preserved residue |
+| none | none | none (converged) | no store item; an old dir whose only entries are non-content relocates them per M-3 (superseding duplicates) and the container pass removes it when empty |
 | none | any | none (converged) | new is authoritative; never touch; remove an empty old dir if present |
 | content | none | `archive` / `relocate` | build E-4 manifest, move each entry, verify digests |
 | content | content | `refuse` / `none` | name both paths; move/overwrite/delete nothing |
@@ -79,7 +79,7 @@ One row of a store's pre-move manifest; the archive record for recovery and the 
 | `digest` | string | SHA-256 via the existing `_migrate_digest` semantics (regular file content; symlink target; directory aggregate) |
 | `from` | path | `.specify/memory/<name>/<relpath>` |
 | `to` | path | `.specify/<name>/<relpath>` |
-| `status` | enum | `planned` \| `moved` \| `left-in-place` |
+| `status` | enum | `planned` \| `moved` \| `superseded` \| `left-in-place` |
 
 The manifest is written to the run receipt **before** the first move of that store. `recover` is the ordered inverse: move `to` back to `from` for every `moved` row.
 
@@ -92,7 +92,7 @@ The existing per-run receipt (`<workspace>/.specify/migrate/receipts/<run-id>.js
 | `receiptVersion` | int | `2` for new runs; version 1 receipts remain readable as resume inputs (dated records) |
 | `items[]` | list | dimension items as today; store items add `entries[]` and the E-3 fields |
 | `storeLayout` | object | `{ "stores": N, "resolved": N, "refused": N, "blocked": N, "container": "removed"\|"preserved"\|"absent", "manifestDigest": "..." }` |
-| `recover[]` | list | existing shape; for store items each row carries `path`(from), `archiveTo`(to), `change: "relocated"`, `digest` |
+| `recover[]` | list | existing shape; for store items each row carries `path`(from), `archiveTo`(to), `change: "relocated"`, `digest`; superseded duplicates appear only in `entries[]` (status `superseded`) with their preserved new-side copy as the recovery reference, never in `recover[]` |
 | `status` | enum | `running` \| `completed` \| `aborted` (existing domain) |
 
 Validation: `receiptVersion=2` iff a `storeLayout` object exists; every store item's `entries[]` digest set equals its `recover[]` digest set; no path appears in two store items.
@@ -105,7 +105,7 @@ The tombstone entity for `.specify/memory/`.
 |---|---|---|
 | `literal` | literal | `.specify/memory/` |
 | `tombstone_row` | path | `shared/definitions/framework-map.md`（唯一墓碑行） |
-| `allowed_contexts` | closed set | tombstone row · the retired-root declaration (`runtime-store-layout.yaml`) · migration engine and its tests · legacy-residue scanners |
+| `allowed_contexts` | closed set | tombstone row · the retired-root declaration (`runtime-store-layout.yaml`) · `anchor-layout-migrate.py` legacy anchor engine · `sanitize-utils.py` legacy-residue scanner; `tests/**` is outside the measured classes and a guard test may carry the literal |
 | `forbidden` | list | create / read / write as a live store by any engine, template, skill, doc, or test outside `allowed_contexts`; runtime fallback; second authority |
 
 Validation: a guard test measures the literal's occurrence file set per artifact class against the declared allowlist and asserts equality in both directions (L-5).
@@ -180,11 +180,11 @@ relocated ──re-run──▶ relocated (no-op; idempotence)
 ## Invariants
 
 - **I-1 Zero-write dry-run**: a dry-run writes nothing anywhere, including receipts and temp files (097 I-1 preserved).
-- **I-2 No object destroyed**: every entry is present at its old path or its new path after every run step; recovery = apply `recover[]` in reverse.
+- **I-2 No object destroyed**: every entry is present at its old path or its new path after every run step; recovery = apply `recover[]` in reverse. Sole exception: a superseded non-content duplicate, whose relative target already holds the preserved new-side copy and whose path+digest are recorded in the receipt.
 - **I-3 Idempotence**: a second apply after success moves nothing, creates nothing, and emits no store items.
 - **I-4 No silent skip**: every store has a disposition and every item a final status.
-- **I-5 Authoritative-only conflict**: non-content entries never make a store "non-empty"; new-side non-content is never overwritten or deleted.
-- **I-6 No runtime dual path**: after completion no engine reads the old root; only the allowlisted migration/residue readers may name it.
+- **I-5 Authoritative-only conflict**: non-content entries never make a store "non-empty"; new-side non-content is never overwritten or deleted; an old-side duplicate of a new-side non-content entry is superseded with path+digest recorded (generated/placeholder only).
+- **I-6 No runtime dual path**: after completion no engine reads the old root; the literal is carried only by the four L-5 allowlisted files, and the migration engine derives it from the declaration's `retired_container`.
 - **I-7 Receipt per run**: one file per run, distinct run ids, no shared aggregate.
 - **I-8 Memory invariance**: two scopes, entry schema, derived index and six actions unchanged; only roots move.
 - **I-9 Injection invariance**: seven/four/five field sets unchanged; memory source paths new.

@@ -73,7 +73,7 @@ Every backward-incompatible change this feature introduces is closed over a test
   - pole_a: 复用——计划/执行/回执/续跑只有一份实现（用户请求与 A-6 明令复用）。
   - pole_b: 既有封闭契约的稳定性——097 C-1 声明维度集封闭，扩维须修订 requirements。
 - **discriminating_evidence**: 逐项核对既有引擎对维度的耦合：`MigrateItem._validate` 只校验成员身份；`_migrate_plan_and_run` 按 `MIGRATE_DIMENSIONS` 迭代；执行器按 `mechanism` 分派，不按维度。结论二值：执行机制维度无关（真）→ 独立步骤会复制全部机制（伪优势）。实测见 `research.md` R-3。
-- **expected_sacrifice**: 触碰一个 dated record 所记载的封闭集；两个 097 维度 pin 测试必须改为「前缀保持 + 本契约全集」守卫；本特性承担该 owner 转移的说明成本。
+- **expected_sacrifice**: SC-004 Source ↓ 触碰一个 dated record 所记载的封闭集；两个 097 维度 pin 测试必须改为「前缀保持 + 本契约全集」守卫；本特性承担该 owner 转移的说明成本。
 - **revision_trigger**: 若评审判定维度集不可由后续 feature 扩展（要求先改 097 requirements），则回退为独立步骤并新建其回执 schema。
 
 ### T-002 — 重命名包内种子目录 `memory/` → `seed/`
@@ -84,18 +84,18 @@ Every backward-incompatible change this feature introduces is closed over a test
   - pole_a: 语义——A-2 裁定 memory 是系统名，不再作任何目录名。
   - pole_b: 变更成本——包目录名不进入运行时，改名只影响安装器与打包。
 - **discriminating_evidence**: 实测包内 `memory/` 只含 4 个条目（2 锚点 + 2 tier 占位）且没有其它消费者；`grep -rn '"memory"' src/` 的命中全部是本特性要更新的安装路径。二值：改名是否只触及 `pyproject.toml` + `copy_local_templates` + `migrate_placeholder_dir` + 测试夹具——是（改名成本可控）。
-- **expected_sacrifice**: 触及打包清单与 `tests/contract/test_upgrade_end_state.py` 等夹具；实现期需重跑安装夹具。
+- **expected_sacrifice**: SC-005 Source ↓ 触及打包清单与 `tests/contract/test_upgrade_end_state.py` 等夹具；实现期需重跑安装夹具。
 - **revision_trigger**: 若打包/构建链无法在不破坏 wheel 资产定位的前提下改名，则回退为保留 `memory/` 种子目录并记录其唯一含义。
 
 ### T-003 — SC-007 采用「成员集无新增漂移」的实测口径，而不是绝对 `--check` rc 0
 
-- **decision**: 镜像判据为「本特性触及的源文件镜像均已再生成，且触及面的漂移成员集相对基线无新增成员」；绝对 rc 0 作为实测事实如实报告，不由本特性声明达成（除非收敛全部成员）。
+- **decision**: 镜像判据为「`regen-command-copies.py --check` rc 0；本特性触及的源文件镜像均已再生成且逐字节一致；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员」；`sync-mirrors` 的绝对读数（基线 rc 2 / 450 DIFF）作为实测事实如实报告，绝对 rc 0 不由本特性声明达成（除非收敛全部成员）。
 - **antithesis**: 坚持 SC-007 的字面 `--check` rc 0，要求本特性把 450 个既有漂移成员全部收敛（一次全量 `sync-mirrors --write`）。
 - **binding_constraints**:
   - pole_a: 诚实测量——基线实测 450 DIFF，绝对绿不可由本特性单独达成。
   - pole_b: 变更面纪律——把 450 个无关成员拖入本特性会淹没真实改动，且可能把无关内容改写进本变更。
 - **discriminating_evidence**: 实测基线：`sync-mirrors --check` rc 2，450 DIFF（skills 262 / shared 103 / scripts 65 = 59 plain + 6 projected / agents 20 / templates 0），0 MISS / 0 ORPHAN；regen rc 0。项目既有教训 `docs/reference/history/00-cross-cutting-lessons.md:154` 明确：既有漂移先于特性存在时，判据必须写成「无新增成员」而不是条数或绝对绿。二值：绝对 rc 0 是否需要收敛与本特性无关的 450 成员——是。
-- **expected_sacrifice**: SC-007 的字面 rc-0 子句在基线不可满足；评审需按本口径裁决。若实现顺带收敛了某些 scope，记录成员集差值即可（可改善，不可回归）。
+- **expected_sacrifice**: SC-007 Source ↓ 字面 rc-0 子句在基线不可满足；评审需按成员集口径裁决。若实现顺带收敛了某些 scope，记录成员集差值即可（可改善，不可回归）。
 - **revision_trigger**: 若评审坚持绝对 rc 0，则追加一次全量镜像收敛任务并把 450 成员纳入本特性变更面。
 
 ### T-004 — `docs/archive|static|notes` 归入 dated record 类
@@ -106,7 +106,7 @@ Every backward-incompatible change this feature introduces is closed over a test
   - pole_a: 不伪造历史——改写归档快照会声称当时的事实不是当时的样子（A-11 的同一原则）。
   - pole_b: 判据的可判定性——允许集必须与「现行文档」的真实集合一致，否则守卫要么假红要么假绿。
 - **discriminating_evidence**: `docs/concepts/documentation-model.md` 明写正式目录 append/archive-only、`notes/` 为生命周期短存；三个文件的定位实测为一个归档提议、一份冻结验收报告、一份带 `created/expires/status` 的对账快照。二值：改写它们是否会制造与文档模型冲突的「现行化」——是。
-- **expected_sacrifice**: SC-006 的 measured class 比字面多排除三个子树；守卫测试必须显式声明该扩展与依据。
+- **expected_sacrifice**: SC-006 Source ↓ 测量类比字面多排除三个子树（`docs/archive`、`docs/static`、`docs/notes`）；守卫测试必须显式声明该扩展与依据。
 - **revision_trigger**: 若评审判定 `docs/archive` 属现行面，则改为更新这三个文件并把三类从排除集移除。
 
 ### T-005 — 搬迁以「manifest 先写 + 逐条 move」为归档形态，不做字节复制归档
@@ -117,7 +117,7 @@ Every backward-incompatible change this feature introduces is closed over a test
   - pole_a: 零丢失与可恢复——每个对象在每一步都存在于旧位或新位，恢复按 manifest 逆序进行。
   - pole_b: 仓库成本——2,971 文件 / 18 MB 的字节副本会翻倍存储并进入 git 历史。
 - **discriminating_evidence**: 097 的 `relocate` 已以「move + digest + from→to + recover」被评审 r2 接受（`src/specify_cli/__init__.py:4179-4197`）；实测量级见 R-1。二值：字节副本是否增加数据安全——否（move 不销毁内容），只增加存储。
-- **expected_sacrifice**: 「archive」在此维度是 manifest 而非副本树；恢复依赖回执完整写入（manifest 在首次 move 前落盘）。
+- **expected_sacrifice**: SC-004 Source ↓ 「archive」在此维度是 manifest 而非副本树；恢复依赖回执完整写入（manifest 在首次 move 前落盘）。
 - **revision_trigger**: 若评审要求字节副本，则改为 copy→verify→remove 并接受存储翻倍。
 
 ### T-006 — 跨存储枚举收敛为单一机器声明，而不是各消费者各持一份常量
@@ -127,49 +127,9 @@ Every backward-incompatible change this feature introduces is closed over a test
 - **binding_constraints**:
   - pole_a: 单一 owner——同一存储集出现在七个位置必然漂移（宪法 XIV）。
   - pole_b: 机制成本——新 fact 需要 schema 注册、消费者改造与降级标注。
-- **discriminating_evidence**: 实测跨存储清单 7 处（sanitize MATERIAL_ROOTS、renumber 前缀、seal dated trees、concurrency-check surfaces、non-disposable review surface、migrate planner、init seeder），逐处硬编码时一次布局变更需 7 处同步；声明 mechanism 已存在且支持 `mapping`（`shared/declarations/facts/driver-stage-artifacts.yaml` 为同形先例）。二值：是否存在一个已注册且可被所有消费者读取的单一 owner 机制——是。- **expected_sacrifice**: 新 fact 的注册与降级标注；消费者在声明缺失时以 `owner-unavailable` 标注，不退化为第二份清单。
+- **discriminating_evidence**: 实测跨存储清单 7 处（sanitize MATERIAL_ROOTS、renumber 前缀、seal dated trees、concurrency-check surfaces、non-disposable review surface、migrate planner、init seeder），逐处硬编码时一次布局变更需 7 处同步；声明 mechanism 已存在且支持 `mapping`（`shared/declarations/facts/driver-stage-artifacts.yaml` 为同形先例）。二值：是否存在一个已注册且可被所有消费者读取的单一 owner 机制——是。
+- **expected_sacrifice**: SC-006 Source ↓ 新 fact 的注册与降级标注；消费者在声明缺失时以 `owner-unavailable` 标注，不退化为第二份清单。
 - **revision_trigger**: 若声明层无法装载该结构（subset/注册限制），回退为代码常量 + 跨消费者相等守卫。
-
-## Backward-Incompatible Change Inventory
-
-**Owner of this closed set**: this section (FR-027). It corresponds one-to-one with the state-changing rows of `requirements.md` § Store Inventory — 14 store relocations, the container retirement, the `draft` retirement — and additionally records every other path/contract break this feature introduces (package seed namespace, migrate dimension-set extension). The non-store row (`git-workflow.md`) is unchanged by this feature and is therefore not an incompatible change. Each row names exactly one primary behavior from the closed class set below plus at least one evidence pointer; a row missing either is a plan defect and the guard test fails on it.
-
-**Closed behavior classes**:
-
-- `migrate:relocate` — a `store-layout` item with `disposition=archive`, `mechanism=relocate` (M-2 rule 5): manifest written before the first move, per-entry move, per-run receipt (M-4/M-6).
-- `migrate:container-pass` — the container pass removes `.specify/memory` only when empty; unclaimed members become the `unknown-residue` refusal (M-2 rule 9 / M-4 step 5).
-- `migrate:refuse:<token>` — a deterministic refusal from the closed M-5 table; terminal, data preserved in place, both paths named.
-- `compatibility-bridge` — a contract/format extension whose old inputs remain readable by construction (v1 receipts stay resume inputs); no workspace move.
-- `no-workspace-object` — a package-internal asset namespace that never exists in a workspace; enumerated so the closed set is complete, with its workspace-visible effects carried by the named store rows and the fresh-init fixture. MUST NOT be used for any workspace-state change.
-
-**Forbidden behavior words** (a row using one of these is a plan defect): `manual`, `docs-only`, `fallback`, `runtime-fallback`, `todo`.
-
-| ID | Incompatible change | Store Inventory source | Behavior | Evidence |
-|----|--------------------|------------------------|----------|----------|
-| BC01 | `session/` 从退役根迁往 `.specify/session/` | #1 | `migrate:relocate` | M-8 `build_legacy` 逐字节迁移；`tests/integration/test_store_layout_migration_us1_us2.py`（T011/T016） |
-| BC02 | `knowledge/` → `.specify/knowledge/` | #2 | `migrate:relocate` | 同 BC01（同一夹具逐 store 断言） |
-| BC03 | `feedback/` → `.specify/feedback/` | #3 | `migrate:relocate` | 同 BC01 |
-| BC04 | `evidence/` → `.specify/evidence/` | #4 | `migrate:relocate` | 同 BC01 |
-| BC05 | `exec-quant/` → `.specify/exec-quant/` | #5 | `migrate:relocate` | 同 BC01；`aggregated/` 随存储整体搬迁 |
-| BC06 | `trigger/` → `.specify/trigger/` | #6 | `migrate:relocate` | 同 BC01；`telemetry.jsonl` 按 non-content 保护 |
-| BC07 | `retention/` → `.specify/retention/` | #7 | `migrate:relocate` | 同 BC01 |
-| BC08 | `renumber/` → `.specify/renumber/` | #8 | `migrate:relocate` | 同 BC01 |
-| BC09 | `sanitize/` → `.specify/sanitize/` | #9 | `migrate:relocate` | 同 BC01；机器可再生缓存按 non-content 保护 |
-| BC10 | `housekeeping/` → `.specify/housekeeping/` | #10 | `migrate:relocate` | 同 BC01 |
-| BC11 | `coaching/` → `.specify/coaching/` | #11 | `migrate:relocate` | 同 BC01 |
-| BC12 | `todo/` → `.specify/todo/` | #12 | `migrate:relocate` | 同 BC01 |
-| BC13 | `tools/` 记录迁 `.specify/tools/`；生成 `*.json` 不计冲突、不覆盖；受跟踪记录与忽略清单同域分裂 | #13 | `migrate:relocate` | M-8 `build_seeded_legacy`（生成物不拒绝）；`tests/contract/test_tools_domain.py`（C-4 tracked/ignored，T021/T024） |
-| BC14 | `migrate/receipts/` → `.specify/migrate/receipts/`；本 run 回执不计新侧内容；v1 回执仍可作续跑输入 | #14 | `migrate:relocate` | M-3/M-6；`tests/integration/test_store_layout_migration_us1_us2.py`（T011/T016） |
-| BC15 | 容器 `.specify/memory/` 退役 | #17 | `migrate:container-pass` | M-2 rule 9 / M-4 step 5；M-8 `build_legacy` 容器缺失、`build_residue` 保留并列举（T035） |
-| BC16 | 遗留 `draft/` 退役、不设新家 | #15 | `migrate:refuse:unknown-residue` | M-2 rule 9 / M-5；`tests/fixtures/store-layout-105/builders.py` 的 `build_residue`（T034/T035）；删除仅在用户确认后按 FR-014 进行 |
-| BC17 | 包内种子命名空间 `memory/` → `seed/`（含 installer 源形态 `memory` 段改写移除） | plan T-002 / C-7 | `no-workspace-object` | `tests/integration/test_init_new_layout.py`（C-7，T006/T009）；工作区可见后果由 BC01…BC16 的 store 行与全新初始化夹具覆盖 |
-| BC18 | `MIGRATE_DIMENSIONS` 五 token 闭集扩为六 token（097 dated E-8 的受控扩展） | plan T-001 / M-1 | `compatibility-bridge` | `tests/contract/test_migrate_engine_contract.py` 与 `tests/unit/test_migrate_planner.py` 的「前缀 + 六 token 全集」守卫（T012）；v1 回执可读（M-6） |
-
-**Correspondence and closure rule**: Store Inventory rows 1–15 and 17 map to BC01…BC16（14 relocations + container + `draft`）; row 16 (`git-workflow.md`) is a non-store that this feature does not change, enumerated here as deliberately row-less. BC17 and BC18 are the two additional delivery breaks that have no Store Inventory row. The set is closed: any new path or contract break discovered during implementation is a plan revision (revise this table and the guard), never a silent omission.
-
-**Guard (SC-009)**: `tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed` asserts (a) the cited Store Inventory row numbers cover {1…15, 17} exactly once each; (b) every behavior is in the closed class set and every `migrate:refuse:` token is in M-5's closed table; (c) every row carries an evidence pointer that resolves to an existing test path, evidence file, or task id; (d) none of the forbidden behavior words appears; (e) the mutation drill — delete one row, or replace one behavior with a forbidden word — turns the test red. Readings land in `test-evidence/acceptance-105.md`（SC-009 行）与 `notes/red-first-evidence.md`.
-
-**No fallback**: no row may be satisfied by a runtime dual-path fallback or a manual instruction. M-7/I-6 keep the retired-root readers closed to the migration engine, the anchor-layout engine, and the sanitize legacy scanner.
 
 ## Project Structure
 
@@ -278,6 +238,47 @@ Baseline measured **before** the edit on 2026-11-25 (`test-evidence/sync-mirrors
 **Implementation order**: WP01 → WP02 → {WP03, WP04, WP05} → WP06 → WP07 → WP08 → WP09 → WP10 → WP11 → WP13 → WP12 红先/转绿 → WP14 → WP15。WP12 的守卫与记忆/初始化测试在实现前落地（红）；WP14 让本仓守卫转绿。WP13 的迁移夹具在 WP07 前可先建（它们只依赖声明）。
 
 **Rollback / recovery**: 实现层用 git 提交序列（每 WP 一个逻辑提交）；运行时搬迁不提供全局 undo，恢复路径是回执 `recover[]` 的逐条逆 move；被替换/移除类处置仍走 `.specify/archive/migrate/<run-id>/`；本仓 dogfood 前的状态由 `0cde03ef9` 可达。
+
+## Backward-Incompatible Change Inventory
+
+**Owner of this closed set**: this section (FR-027). It corresponds one-to-one with the state-changing rows of `requirements.md` § Store Inventory — 14 store relocations, the container retirement, the `draft` retirement — and additionally records every other path/contract break this feature introduces (package seed namespace, migrate dimension-set extension). The non-store row (`git-workflow.md`) is unchanged by this feature and is therefore not an incompatible change. Each row names exactly one primary behavior from the closed class set below plus at least one evidence pointer; a row missing either is a plan defect and the guard test fails on it.
+
+**Closed behavior classes**:
+
+- `migrate:relocate` — a `store-layout` item with `disposition=archive`, `mechanism=relocate` (M-2 rule 5): manifest written before the first move, per-entry move, per-run receipt (M-4/M-6).
+- `migrate:container-pass` — the container pass removes `.specify/memory` only when empty; unclaimed members become the `unknown-residue` refusal (M-2 rule 9 / M-4 step 5).
+- `migrate:refuse:<token>` — a deterministic refusal from the closed M-5 table; terminal, data preserved in place, both paths named.
+- `compatibility-bridge` — a contract/format extension whose old inputs remain readable by construction (v1 receipts stay resume inputs); no workspace move.
+- `no-workspace-object` — a package-internal asset namespace that never exists in a workspace; enumerated so the closed set is complete, with its workspace-visible effects carried by the named store rows and the fresh-init fixture. MUST NOT be used for any workspace-state change.
+
+**Forbidden behavior words** (a row using one of these is a plan defect): `manual`, `docs-only`, `fallback`, `runtime-fallback`, `todo`.
+
+| ID | Incompatible change | Store Inventory source | Behavior | Evidence |
+|----|--------------------|------------------------|----------|----------|
+| BC01 | `session/` 从退役根迁往 `.specify/session/` | #1 | `migrate:relocate` | M-8 `build_legacy` 逐字节迁移；`tests/integration/test_store_layout_migration_us1_us2.py`（T011/T016） |
+| BC02 | `knowledge/` → `.specify/knowledge/` | #2 | `migrate:relocate` | 同 BC01（同一夹具逐 store 断言） |
+| BC03 | `feedback/` → `.specify/feedback/` | #3 | `migrate:relocate` | 同 BC01 |
+| BC04 | `evidence/` → `.specify/evidence/` | #4 | `migrate:relocate` | 同 BC01 |
+| BC05 | `exec-quant/` → `.specify/exec-quant/` | #5 | `migrate:relocate` | 同 BC01；`aggregated/` 随存储整体搬迁 |
+| BC06 | `trigger/` → `.specify/trigger/` | #6 | `migrate:relocate` | 同 BC01；`telemetry.jsonl` 按 non-content 保护 |
+| BC07 | `retention/` → `.specify/retention/` | #7 | `migrate:relocate` | 同 BC01 |
+| BC08 | `renumber/` → `.specify/renumber/` | #8 | `migrate:relocate` | 同 BC01 |
+| BC09 | `sanitize/` → `.specify/sanitize/` | #9 | `migrate:relocate` | 同 BC01；机器可再生缓存按 non-content 保护 |
+| BC10 | `housekeeping/` → `.specify/housekeeping/` | #10 | `migrate:relocate` | 同 BC01 |
+| BC11 | `coaching/` → `.specify/coaching/` | #11 | `migrate:relocate` | 同 BC01 |
+| BC12 | `todo/` → `.specify/todo/` | #12 | `migrate:relocate` | 同 BC01 |
+| BC13 | `tools/` 记录迁 `.specify/tools/`；生成 `*.json` 不计冲突、不覆盖；受跟踪记录与忽略清单同域分裂 | #13 | `migrate:relocate` | M-8 `build_seeded_legacy`（生成物不拒绝）；`tests/contract/test_tools_domain.py`（C-4 tracked/ignored，T021/T024） |
+| BC14 | `migrate/receipts/` → `.specify/migrate/receipts/`；本 run 回执不计新侧内容；v1 回执仍可作续跑输入 | #14 | `migrate:relocate` | M-3/M-6；`tests/integration/test_store_layout_migration_us1_us2.py`（T011/T016） |
+| BC15 | 容器 `.specify/memory/` 退役 | #17 | `migrate:container-pass` | M-2 rule 9 / M-4 step 5；M-8 `build_legacy` 容器缺失、`build_residue` 保留并列举（T035） |
+| BC16 | 遗留 `draft/` 退役、不设新家 | #15 | `migrate:refuse:unknown-residue` | M-2 rule 9 / M-5；`tests/fixtures/store-layout-105/builders.py` 的 `build_residue`（T034/T035）；删除仅在用户确认后按 FR-014 进行 |
+| BC17 | 包内种子命名空间 `memory/` → `seed/`（含 installer 源形态 `memory` 段改写移除） | plan T-002 / C-7 | `no-workspace-object` | `tests/integration/test_init_new_layout.py`（C-7，T006/T009）；工作区可见后果由 BC01…BC16 的 store 行与全新初始化夹具覆盖 |
+| BC18 | `MIGRATE_DIMENSIONS` 五 token 闭集扩为六 token（097 dated E-8 的受控扩展） | plan T-001 / M-1 | `compatibility-bridge` | `tests/contract/test_migrate_engine_contract.py` 与 `tests/unit/test_migrate_planner.py` 的「前缀 + 六 token 全集」守卫（T012）；v1 回执可读（M-6） |
+
+**Correspondence and closure rule**: Store Inventory rows 1–15 and 17 map to BC01…BC16（14 relocations + container + `draft`）; row 16 (`git-workflow.md`) is a non-store that this feature does not change, enumerated here as deliberately row-less. BC17 and BC18 are the two additional delivery breaks that have no Store Inventory row. The set is closed: any new path or contract break discovered during implementation is a plan revision (revise this table and the guard), never a silent omission.
+
+**Guard (SC-009)**: `tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed` asserts (a) the cited Store Inventory row numbers cover {1…15, 17} exactly once each; (b) every behavior is in the closed class set and every `migrate:refuse:` token is in M-5's closed table; (c) every row carries an evidence pointer that resolves to an existing test path, evidence file, or task id; (d) none of the forbidden behavior words appears; (e) the mutation drill — delete one row, or replace one behavior with a forbidden word — turns the test red. Readings land in `test-evidence/acceptance-105.md`（SC-009 行）与 `notes/red-first-evidence.md`.
+
+**No fallback**: no row may be satisfied by a runtime dual-path fallback or a manual instruction. M-7/I-6 keep the retired-root readers closed to the migration engine, the anchor-layout engine, and the sanitize legacy scanner.
 
 ## Test-First Coverage (SC-001…SC-009)
 

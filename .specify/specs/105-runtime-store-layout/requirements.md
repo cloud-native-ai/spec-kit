@@ -38,8 +38,8 @@
 | **A-4** | **命名与落点**：沿用既有子目录名作为顶层存储名（`.specify/<store>/`），不新建分组目录、不改名（`session`、`knowledge` 等闭集名保持）。顶层 `.specify/tools/` 与既有 `skills` 域同构（`.specify/skills/` 目录 + `.specify/skills.md` 指南并列），因此 Tool 记录与生成清单同域共存。 | Grounded Naming：名字来自既有存储名；`tools` 有 `skills` 的现行先例。 |
 | **A-5** | **`.specify/tools/` 域合并**：Tool 定义记录（`<name>.md`，权威、受跟踪）与生成清单（`{system,shell,project}.json`，机器生成、忽略）同放 `.specify/tools/`；`.specify/.gitignore` 的 `tools/` 全目录忽略规则收窄为仅忽略生成物，记录保持受跟踪。 | 现状已是「记录在 `memory/tools/`、清单在 `.specify/tools/`」的分裂；并入一个 tools 域消除分裂，且与注册义务一致（目录即概念）。 |
 | **A-6** | **迁移归属安装/升级面**：一次性迁移由 `specify init`（既有项目刷新）与 `specify migrate`（计划 → apply → 回执）承担，不在每个引擎里做隐式懒迁移，也不做运行时旧路径回退。（2026-11-25 clarify：数据搬迁的唯一执行者是 `specify migrate`；`specify init` 只负责播种新布局与资产刷新，见 FR-013。） | 简报要求迁移/拒绝是显式设计输出；`specify migrate` 已拥有「dry-run → apply → archive-first → 回执」的既有结构，复用优于新建。 |
-| **A-7** | **两处并存 = 冲突拒绝**：同一存储的旧位置与新位置**同时存在非空内容**时，MUST 拒绝自动合并，点名两侧路径与修复入口；MUST NOT 静默择一、覆盖或删除。**冲突判定只统计该存储的权威条目**（2026-11-25 clarify 裁定）：机器可再生且被忽略的生成物（如 `.specify/tools/{system,shell,project}.json`）与安装器播种的占位/锚点文件不构成本义上的「内容」——迁移照常执行，且 MUST NOT 覆盖或删除它们（生成物按原 owner 再生或保留，占位留原处）。旧位置存在但为空、新位置任意 ⇒ 属空残留，按 A-2 移除旧目录（不涉数据）。 | 静默合并会伪造权威；拒绝是唯一不丢数据且不复活旧路径的确定行为（fast-fail）。若把生成物/占位计入，任何刷新过新布局的项目都会与旧数据假冲突，迁移永远无法收敛。 |
-| **A-8** | **无运行时双路径回退**：迁移完成后，引擎 MUST NOT 回读旧路径作为兼容层；旧路径字面量只允许出现在墓碑行、迁移引擎与其契约测试、以及遗留残留扫描器中。 | 简报明令「不得静默复活旧路径」；只读回退仍是第二权威，会让「数据在哪」不可判定。 |
+| **A-7** | **两处并存 = 冲突拒绝**：同一存储的旧位置与新位置**同时存在非空内容**时，MUST 拒绝自动合并，点名两侧路径与修复入口；MUST NOT 静默择一、覆盖或删除。**冲突判定只统计该存储的权威条目**（2026-11-25 clarify 裁定）：机器可再生且被忽略的生成物（如 `.specify/tools/{system,shell,project}.json`）与安装器播种的占位/锚点文件不构成本义上的「内容」——迁移照常执行，且新侧 MUST NOT 被覆盖或删除（生成物按原 owner 再生或保留，新侧占位保留原处；旧侧同路径重复项按 Edge Cases 的 supersede 规则在回执记录后作废移除）。旧位置存在但为空、新位置任意 ⇒ 属空残留，按 A-2 移除旧目录（不涉数据）。 | 静默合并会伪造权威；拒绝是唯一不丢数据且不复活旧路径的确定行为（fast-fail）。若把生成物/占位计入，任何刷新过新布局的项目都会与旧数据假冲突，迁移永远无法收敛。 |
+| **A-8** | **无运行时双路径回退**：迁移完成后，引擎 MUST NOT 回读旧路径作为兼容层；旧路径字面量只允许出现在 L-5 的封闭四文件允许集——框架地图墓碑行、`runtime-store-layout.yaml` 的 `retired_container` 声明、`anchor-layout-migrate.py` 的 legacy anchor 语境、`sanitize-utils.py` 的遗留残留扫描——之中。迁移引擎从声明的 `retired_container` 值推导旧根，不拼写字面量；`tests/**` 不在 SC-006 的测量产物类内，守卫测试可携带字面量。 | 简报明令「不得静默复活旧路径」；只读回退仍是第二权威，会让「数据在哪」不可判定。 |
 | **A-9** | **`todo/`、`coaching/`、`housekeeping/` 属运行期记录，迁出**：想法队列（人类 backlog）、教练运行产物、管家运行报告都不是 agent 语境记忆，迁往顶层同名存储。 | 请求把「不是人类语境下的一切需要记住的东西」列为目标；这三者正是其典型。 |
 | **A-10** | **`tools/` 不是运行期存储但是定义存储**：它不按 run 累积、不是瞬态数据；其迁出理由是「memory 不再是容器」，其落点由 A-5 决定。 | 分类的判据是语义而非清单长度；定义记录与运行记录必须各自有名。 |
 | **A-11** | **文档与词汇表只改活引用**：`docs/**` 的现行页面（concepts / reference / tutorials）与 `.specify/glossary.md`、`.specify/instructions.md`、已分发指南（`templates/tools.md` 等）更新到新路径；dated record（`docs/reference/history/**`、`docs/decisions/**`、`.specify/specs/**`、`.specify/archive/**`、记录型存储内的既有条目）**不改写**。 | 根因修复不等同于重写历史；历史文档是「当时的事实」。与 104 的 A-8 先例一致。 |
@@ -122,12 +122,12 @@
 
 **Why this priority**: 框架源与其自用运行时必须同时收敛，否则下一次 `specify init` 会把旧布局重新种回客户项目。
 
-**Independent Test**: 迁移后 `sync-mirrors.py --check` 与 `regen-command-copies.py --check` 均 rc 0；旧路径字面量在活引用面之外为零。
+**Independent Test**: 迁移后 `regen-command-copies.py --check` rc 0；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员（绝对读数如实报告）；旧路径字面量在活引用面之外为零。
 
 **Acceptance Scenarios**:
 
 1. **Given** 本仓的 `.specify/memory/`，**When** 执行迁移，**Then** 受跟踪条目按存储移动到新顶层路径，`git log --follow` 可追溯，未分类残留为零或被显式报告。
-2. **Given** 迁移后的源面变更，**When** 运行镜像同步与命令副本再生成，**Then** 两处检查均 rc 0，且源与镜像逐字节一致。
+2. **Given** 迁移后的源面变更，**When** 运行镜像同步与命令副本再生成，**Then** 命令副本检查 rc 0，`sync-mirrors` 的漂移成员集相对基线无新增成员（绝对读数如实报告），且触及的源与镜像逐字节一致。
 
 ---
 
@@ -151,8 +151,9 @@
 
 - **旧空新空**：旧位置存在但为空——按空残留移除旧目录；新建两个记忆存储占位，不产生回执条目（无数据移动）。
 - **旧空新非空**：只移除空旧目录；新位置为权威，不合并、不覆盖。
-- **旧非空新非空**：冲突拒绝（A-7），即使两侧内容看起来相同也拒绝自动合并；修复入口要求人工裁定（合并或改配），因为「相同」是当时快照，不是持续事实。
-- **旧位置含未知顶层文件**（如遗留 `git-workflow.md`）：不当作任何存储；报告并保留，删除需用户确认（archive-first）。
+- **旧非空新非空（指同一存储两侧均有权威条目）**：冲突拒绝（A-7），即使两侧内容看起来相同也拒绝自动合并；修复入口要求人工裁定（合并或改配），因为「相同」是当时快照，不是持续事实。
+- **旧侧 non-content 条目与新侧同相对路径并存**（如 init 已播种的占位、生成物清单）：不计冲突；新侧条目保留且永不覆盖；旧侧重复项在回执记录其路径与摘要后作废移除（回执即其归档记录，仅限生成物/占位，零权威内容删除）；相对目标空闲时该 non-content 条目随存储整体迁移。seeded-legacy 形态因此完成存储合并、不产生拒绝。
+- **旧位置含未知顶层文件**（如遗留 `git-workflow.md` 或 `draft/`）：不当作任何存储；容器遍历把全部未认领路径列为 `unknown-residue`——容器保留、逐个列出、零删除，运行结局为 `blocked`（exit 3，M-9）；删除需用户确认后按 FR-014 进行。
 - **迁移与引擎写入交错**：迁移是一次性前置动作；迁移未完成时引擎 MUST NOT 在新位置创建同名存储（否则制造并存冲突）。
 - **记忆层与运行记录同名目录**：新顶层命名与既有根目录（项目根的 `feedback/` 入站包目录、spec 内的 `test-evidence/`）不冲突——它们是不同根、不同语义；文档必须消歧。
 - **`tools` 记录名与生成清单名同基名**：`X.md` 与 `X.json` 可共存；生成清单不得覆盖记录。
@@ -168,7 +169,7 @@
 - **FR-001**: 本规格 MUST 维护一份**封闭的存储清点表**（见 § Store Inventory），覆盖基线提交 `23938f22e` 的 `.specify/memory/` 全部子目录、引擎按需创建的存储根（`sanitize/`、`migrate/receipts/`）与被扫描器引用的遗留项（`draft/`、`git-workflow.md`，后者不是存储）；每一项 MUST 有且只有一个处置（迁往具名顶层存储 / 退役）。清点表之外的发现 MUST 走表格修订，MUST NOT 静默保留。
 - **FR-002**: 四个具名存储 MUST 迁为顶层一等存储：session 记忆 → [[STR-002]]，长期记忆 → [[STR-003]]，feedback 存储 → [[STR-004]]，evidence 存储 → [[STR-005]]；内容契约（每条目一文件、派生索引即读即建、无共享聚合）保持不变。
 - **FR-003**: 其余已知存储 MUST 迁往同名顶层根：exec-quant、trigger、retention、renumber、sanitize、housekeeping、coaching、todo、migrate（回执）；Tool 定义记录与生成清单 MUST 归入 [[STR-006]] 这一 tools 域（A-5）；遗留 `draft/` MUST 退役，不设新家。
-- **FR-004**: [[STR-001]] MUST 作为**存储根退役**：任何引擎、模板、技能、文档或测试 MUST NOT 把它创建、读取或写入为活存储；其唯一记录含义 MUST 是框架地图中的墓碑行（A-2 的措辞）。迁移完成后该目录 MUST 不存在；空残留 MUST 移除，未知残留 MUST 按 FR-015 报告而非删除。
+- **FR-004**: [[STR-001]] MUST 作为**存储根退役**：任何引擎、模板、技能、文档或测试 MUST NOT 把它创建、读取或写入为活存储；其唯一记录含义 MUST 是框架地图中的墓碑行（A-2 的措辞）。旧路径字面量在产品面的出现面 MUST 限于 A-8 的封闭四文件允许集（墓碑行、声明 `retired_container`、anchor 迁移引擎、遗留残留扫描器）；迁移引擎从声明推导旧根，测试不得为迁移引擎扮演第二读者。迁移完成后该目录 MUST 不存在；空残留 MUST 移除，未知残留 MUST 按 FR-015 报告而非删除。
 - **FR-005**: 每个顶层存储 MUST 有唯一 owning 组件，写在框架地图行内（owner / 生命周期 / 内容类别）；既有写入关系 MUST 原样保留（记忆只经 memory 引擎、feedback 只经 feedback 引擎、evidence 只经 evidence 引擎等），MUST NOT 引入第二写入者或跨存储写入。
 
 #### B. 记忆系统与临时记忆的保持
@@ -188,7 +189,7 @@
 
 - **FR-013**: 既有客户项目 MUST 有一条一次性迁移路径，把旧布局中每个已知存储的内容移动到对应新顶层路径；迁移 MUST 幂等，且 MUST 按 run 写回执（每条目一文件，MUST NOT 写共享聚合）。**执行者裁定（2026-11-25 clarify）**：数据搬迁的唯一执行者是 `specify migrate`（plan → apply → archive-first → 回执）；`specify init` 只负责全新工作区的布局播种与既有工作区的资产刷新，MUST NOT 搬移旧存储内容——检测到旧位置仍有内容时保持原地不动并指向 `specify migrate`（与 init 对 legacy anchor 的 skip-and-defer 先例一致，A-6、A-8）。
 - **FR-014**: 迁移中任何破坏性步骤 MUST archive-first（先归档再处置），数据零丢失，回执 MUST 记录可恢复路径；MUST NOT 以「删除旧目录」代替迁移。
-- **FR-015**: 同一存储的旧位置与新位置同时含非空内容时，迁移 MUST 拒绝自动合并（A-7）：点名两侧路径与修复入口（人工裁定合并或改配），MUST NOT 移动、覆盖或删除任何一侧；「非空内容」MUST 按 A-7 的权威条目口径判定（机器可再生的忽略生成物与安装器播种占位不计入，且 MUST NOT 被覆盖或删除）；旧位置含未知项时 MUST 逐个报告并保留，删除只在用户确认后按 FR-014 进行。
+- **FR-015**: 同一存储的旧位置与新位置同时含非空内容时，迁移 MUST 拒绝自动合并（A-7）：点名两侧路径与修复入口（人工裁定合并或改配），MUST NOT 移动、覆盖或删除任何一侧；「非空内容」MUST 按 A-7 的权威条目口径判定（机器可再生的忽略生成物与安装器播种占位不计入，新侧 MUST NOT 被覆盖或删除；旧侧同路径重复项按 Edge Cases 的 supersede 规则在回执记录后作废移除）；旧位置含未知项时 MUST 逐个报告并保留，删除只在用户确认后按 FR-014 进行。
 - **FR-016**: 迁移完成后，退役根 [[STR-001]] MUST NOT 被重建或被读取；仍有未处理遗留内容的项目在下次引擎使用时 MUST 得到确定性拒绝或迁移指引，MUST NOT 得到一个掩盖旧数据的空新存储。迁移完成状态 MUST 可由现场事实判定（不依赖对话记忆）。
 - **FR-017**: 全新初始化 MUST 种出新布局（至少两个记忆存储；其余存储按需懒创建）并 MUST NOT 创建退役根；安装包种入内容与安装器核心资产保留清单 MUST 同步更新。
 
@@ -198,7 +199,7 @@
 - **FR-019**: 安装器/升级面 MUST 更新：核心资产保留清单（`.specify/memory` 一项）、包内种子布局（`memory/session`、`memory/knowledge` 的占位与两个锚点文件的特例复制）、非 Claude 工具的路径改写规则与 `memory/features/` 遗留特例 MUST 与退役根一致；已安装副本与包内模板 MUST 由同一变更产出并一致。
 - **FR-020**: 忽略规则 MUST 在同一变更内更新（框架模板与已安装副本逐字一致）：原 `memory/sanitize/`、`memory/trigger/telemetry.jsonl` 等等价规则改到新路径；`.specify/tools/` 的全目录忽略 MUST 收窄为仅生成物（A-5）；`.codexignore` / `.claudeignore` 等忽略模板中的 `!.specify/memory/` 类放行 MUST 改为放行新存储根。
 - **FR-021**: 目录治理登记 MUST 完成：框架地图为每个新顶层存储新增一行（owner / 生命周期 / 内容），并以墓碑行记录退役根；`.specify/instructions.md`（模板源与已安装副本）、`.specify/glossary.md` 的活引用（含 `Memory Layer`、`Session(消歧)`、`三捕获机制`、`Renumber Lane`、`Coaching Run`、自省报告等条目中的路径）与已分发指南（如 `templates/tools.md`）MUST 指向新路径。
-- **FR-022**: 镜像与副本 MUST 在同一变更内再生成：`skills/`、`shared/`、`templates/`、`agents/` 与 `.specify/` 的镜像对、以及每工具命令副本；`sync-mirrors.py --check` 与 `regen-command-copies.py --check` MUST rc 0，MUST NOT 手改镜像面。
+- **FR-022**: 镜像与副本 MUST 在同一变更内再生成：`skills/`、`shared/`、`templates/`、`agents/` 与 `.specify/` 的镜像对、以及每工具命令副本；`regen-command-copies.py --check` MUST rc 0；`sync-mirrors.py --check` 的漂移成员集 MUST 相对基线无新增成员（绝对读数如实报告，见 SC-007）；MUST NOT 手改镜像面。
 - **FR-023**: dated record MUST NOT 改写：`docs/reference/history/**`、`docs/decisions/**`、`.specify/specs/**`、`.specify/archive/**` 与记录型存储中的既有条目保持原文；它们对旧路径的提及是历史事实，不是活引用。
 
 #### F. 质量与验收
@@ -252,7 +253,7 @@
 | RS-003 | POSIX `bash` 运行时（唯一测试入口与安装/迁移脚本） | signed-contract | bash 上游 / 运行环境（本仓只消费） | 不新增显式版本下限；本特性不改动该入口契约 | `scripts/bash/run-tests.sh` | 新增测试全部经该入口执行且一次退出 0 | FR-019, FR-024, FR-026 | EP-001 |
 | RS-004 | 既有记忆引擎与记忆技能（记录/召回/裁剪/重建，两层闭集） | in-scope | 本特性修改的 framework 源（`memory-utils.py` 与 memory-* 技能） | 不适用（仓内实现，无外部版本面） | `scripts/python/memory-utils.py` | 记录→召回往返、`run-determination` 持久化可召回、记忆边界反向夹具通过 | FR-006, FR-007, FR-008, FR-009 | EP-002 |
 | RS-005 | 既有安装/迁移 CLI（`specify init` 刷新与 `specify migrate` 计划/apply/回执） | in-scope | 本特性修改的 framework 源 CLI | 不适用（仓内实现） | `src/specify_cli/__init__.py` | 三形态迁移夹具（仅旧 / 并存拒绝 / 幂等重跑）与全新初始化夹具通过 | FR-013, FR-014, FR-015, FR-016, FR-017, FR-019 | EP-003 |
-| RS-006 | 既有运行期存储引擎族（feedback / evidence / exec-quant / trigger / retention / renumber / sanitize / tools / 技能脚本） | in-scope | 本特性修改的各引擎与技能脚本 | 不适用（仓内实现） | `scripts/python/feedback-utils.py` | 每个引擎在新根上完成一次行为往返；`sync-mirrors.py --check` rc 0 | FR-018, FR-022, FR-026 | EP-002 |
+| RS-006 | 既有运行期存储引擎族（feedback / evidence / exec-quant / trigger / retention / renumber / sanitize / tools / 技能脚本） | in-scope | 本特性修改的各引擎与技能脚本 | 不适用（仓内实现） | `scripts/python/feedback-utils.py` | 每个引擎在新根上完成一次行为往返；`sync-mirrors.py --check` 漂移成员集相对基线无新增成员（绝对读数如实报告） | FR-018, FR-022, FR-026 | EP-002 |
 
 **Contract-cell note**: 每个 `Contract` 单元格只放一个仓内可解析路径；`RS-004`–`RS-006` 指向本特性修改的既有引擎的代表文件，不是第二契约。既有引擎的条目格式与写入协议在本次迁移中零修改，义务只在路径与引用上。
 
@@ -265,8 +266,8 @@
 - **SC-003**: 注入行为保持：一次声明 memory-recall 的派发夹具中，注入的全部记忆引用解析到 [[STR-002]] / [[STR-003]] 中的条目，载荷七字段与五要素齐备；反向夹具证明运行期存储条目不进入记忆召回。**Path**: final
 - **SC-004**: 迁移安全：三形态夹具中，仅旧布局的内容零丢失地到达新根（逐字节比较），并存形态确定性拒绝且两侧数据不变，重跑形态幂等（第二次运行无移动、无重复条目、不重建旧根）。**Path**: final
 - **SC-005**: 全新初始化：在空夹具上执行初始化后，两个记忆存储以新路径存在、退役根不存在、其余存储懒创建；初始化不产生任何指向退役根的活引用。**Path**: final
-- **SC-006**: 活引用面零旧路径：以基线提交 `23938f22e` 加实现起点捕获的允许集为参照，按**产物类**比较（框架源类：`templates/`、`skills/`、`shared/`、`scripts/`、`src/`；运行期指南类：`.specify/instructions.md`、`.specify/glossary.md`；现行文档类：`docs/**` 除 `docs/reference/history/**` 与 `docs/decisions/**`），每类对旧路径字面量 [[STR-001]] 的出现文件集合 MUST 等于声明的允许集（墓碑行、迁移引擎与其契约测试、遗留残留扫描器——该允许集由守卫测试钉住并断言实测 = 声明）；允许集之外的产物 MUST 零出现，允许集之内 MUST 只以墓碑/迁移语境出现。**Path**: supporting
-- **SC-007**: 镜像与副本干净：`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 均 rc 0；严格镜像对逐字节一致，相对基线无新增漂移。**Path**: supporting
+- **SC-006**: 活引用面零旧路径：以基线提交 `23938f22e` 加实现起点捕获的允许集为参照，按**产物类**比较（框架源类：`templates/`、`skills/`、`shared/`、`scripts/`、`src/`；运行期指南类：`.specify/instructions.md`、`.specify/glossary.md`；现行文档类：`docs/**` 除 `docs/reference/history/**` 与 `docs/decisions/**`），每类对旧路径字面量 [[STR-001]] 的出现文件集合 MUST 等于 L-5 的封闭四文件允许集（`shared/definitions/framework-map.md` 墓碑行、`runtime-store-layout.yaml` 的 `retired_container`、`anchor-layout-migrate.py`、`sanitize-utils.py`——该允许集由守卫测试钉住并断言实测 = 声明）；允许集之外的产物 MUST 零出现，允许集之内 MUST 只以墓碑/迁移语境出现。`tests/**` 不在测量产物类内，守卫测试自身以字面量定义被测量对象、不构成类内出现。**Path**: supporting
+- **SC-007**: 镜像与副本干净：`regen-command-copies.py --check` MUST rc 0；`sync-mirrors.py --check` 的绝对读数（基线 rc 2 / 450 DIFF）MUST 如实报告，本特性触及的镜像对 MUST 已再生成且逐字节一致，触及面的漂移成员集相对基线 MUST 无新增成员；无关成员的收敛不是本特性的要求，绝对 rc 0 不被声明为达成（除非顺带收敛全部成员并留证）。**Path**: supporting
 - **SC-008**: 忽略与跟踪各归其位：`.specify/.gitignore` 模板与已安装副本逐字节一致；基线中被忽略的运行期路径在各自新位置仍被忽略、被跟踪的存储条目仍被跟踪；[[STR-006]] 下 `*.md` 被跟踪、生成 `*.json` 被忽略。**Path**: supporting
 - **SC-009**: 向后不兼容变更闭包：plan § Backward-Incompatible Change Inventory 的每一行都映射到一条**被测试的**迁移/拒绝行为；任一 Store Inventory 状态变更行未被映射、或任一映射缺少证据读数，守卫测试 MUST 转红；对全部映射的 store 变更，`/speckit.migrate` 的 dry-run 零写入与 `--apply` 行为 MUST 被演示并留证。**Path**: final
 
@@ -277,8 +278,8 @@
 - **SC-003 Source**: 派发夹具（prompt/载荷快照 + 注入条目路径清单）；`run-role-edge`/载荷字段检查器；记忆边界反向查询结果。实现与 review 各一次。
 - **SC-004 Source**: 三形态夹具的迁移输出（结局 token、回执文件、`diff -r` 逐字节比较、第二次运行输出）。实现与 review 各一次。
 - **SC-005 Source**: 空目录夹具上的 `specify init` 树清单（`find .specify -maxdepth 1`）。实现一次。
-- **SC-006 Source**: 仓内扫描（按类枚举出现文件集合）+ 守卫测试的允许集断言。实现与 review 各一次；扫描命令与输出存证。
-- **SC-007 Source**: 两个 `--check` 命令的 rc 与输出；严格镜像对的 `cmp` 结果。实现与 review 各一次。
+- **SC-006 Source**: 仓内扫描（按三类产物面枚举出现文件集合，`tests/**` 不在测量类内）+ 守卫测试的 L-5 四文件允许集断言（实测 = 声明，双向）。实现与 review 各一次；扫描命令与输出存证。
+- **SC-007 Source**: `regen-command-copies.py --check` 的 rc 与输出（MUST rc 0）；`sync-mirrors.py --check` 的 rc、输出与漂移成员集相对 `test-evidence/sync-mirrors-baseline.txt`（450 DIFF / rc 2 基线）的成员集差值（触及面无新增成员；绝对读数如实记录）；严格镜像对的 `cmp` 结果。实现与 review 各一次。
 - **SC-008 Source**: `git check-ignore -v` 夹具；模板与已安装副本的 `cmp`。实现一次。
 - **SC-009 Source**: `tests/contract/test_runtime_store_layout.py::test_backward_incompatible_inventory_is_closed` 的清单 / 行为闭集 / 证据指针断言与变异演练；M-8 夹具套件的 dry-run 零写入与 `--apply` 读数（legacy / dual / residue）。读数写入 `test-evidence/acceptance-105.md` 的 SC-009 行。实现与 review 各一次。
 
@@ -323,3 +324,9 @@
 - Q: 哪些变更必须由 `/speckit.migrate` 承担？ → A: 凡涉及工作区状态的变更（存储路径、容器、记录/清单分裂）都由 `store-layout` 维度执行（`migrate:relocate` / `migrate:container-pass`）或按 M-5 封闭词表确定性拒绝；不进入任何工作区的包内资产命名空间以 `no-workspace-object` 登记，其工作区可见后果由对应的 store 行与全新初始化夹具覆盖。两类都不允许以运行时双路径回退或人工操作说明替代（与 A-8、FR-013 的执行者裁定一致且更严格）。
 - Q: 迁移不安全的形态如何处理？ → A: 复用 M-5 的封闭拒绝词表（`dual-content`、`unknown-residue`、`symlink-source`、`symlink-target`、`permission-denied`、`path-collision:<relpath>`）；拒绝是终态（run `blocked`，exit 3），数据原地保留、两侧路径点名，不回退、不静默跳过、不以「新建空存储」冒充成功。
 - Q: 与 097 既有结构的衔接？ → A: 不新建迁移引擎；第六维 `store-layout` 复用既有 plan → apply → archive-first → 回执；旧 v1 回执继续作为续跑输入（`compatibility-bridge`），两个 097 维度 pin 测试改为「前缀保持 + 六 token 全集」守卫（M-1 / M-6 / M-10）。
+
+### Session 2026-11-25（无人值守 analyze-repair，三项 analyze 裁定回写）
+
+- Q: SC-007 的镜像判据采用绝对 `--check` rc 0 还是相对基线口径？ → A: 采相对口径（I-01）：`regen-command-copies.py --check` MUST rc 0；`sync-mirrors.py --check` 的绝对读数（基线 rc 2 / 450 DIFF）如实报告，本特性触及面的漂移成员集 MUST 相对基线无新增成员；无关成员收敛不是本特性要求，绝对 rc 0 不被声明达成。已回写 SC-007 及其 Measurement Source、plan T-003、FR-022、US5 文本与 RS-006 联合验收。
+- Q: SC-006 的允许集包含哪些文件，迁移引擎与其契约测试是否在内？ → A: 与 L-5 对齐的封闭四文件（I-02）：`shared/definitions/framework-map.md` 墓碑行、`runtime-store-layout.yaml` 的 `retired_container`、`anchor-layout-migrate.py`、`sanitize-utils.py`；迁移引擎从声明推导旧根、不拼写字面量，其契约测试不获许可；`tests/**` 不在测量产物类内，守卫测试自身可携带字面量。已回写 A-8、FR-004、SC-006 及其 Measurement Source。
+- Q: 容器遍历的终态如何定义（旧侧 non-content 重复、遗留 `git-workflow.md` / `draft/`）？ → A: non-content 不计冲突（I-03）：新侧同路径条目保留且永不覆盖；旧侧重复项在回执记录路径+摘要后作废移除（仅生成物/占位，零权威删除）；目标空闲时随存储迁移；容器遍历把全部未认领路径（含 `git-workflow.md`、`draft/`）列为 `unknown-residue`——容器保留、零删除、运行结局 `blocked`（M-9）。seeded-legacy 因此完成存储合并不拒绝，真实残留夹具则被阻断并逐路径列举。已回写 Edge Cases、M-2 rule 9、M-3、M-4 steps 2/3/5 与 M-8。

@@ -1,0 +1,20 @@
+# analyze-repair gate summary — spec 105-runtime-store-layout
+# captured 2026-11-25T04:18:37Z (UTC) on branch: 105-runtime-store-layout at HEAD 6fe1adea2 (working tree)
+# repair scope: DT-01, DT-02, DT-03 (plan.md) · I-01, I-02, I-03 (requirements + contracts/data-model) · F-01 (feature registry)
+
+1. validate-requirements.py                 exit 0    status ok · 0 error / 0 warning · scanned 333 lines, 36 definition rows, 6 shared strings
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-requirements-validator.txt
+2. validate-decision-tensions.py --spec     exit 0    status ok · 0 error / 0 warning · 339 lines, 6 records · channel high=0
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-decision-tensions.txt
+3. validate-tasks.py                        exit 0    PASS · 0 error / 0 warning
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-tasks-validator.txt
+4. pre-analyze-check.py --stage requirements exit 0   decision=pass errors=0 advisories=176 waived=0 · fr=27 sc=9 tasks=43 clauses=8
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-pre-analyze-requirements.json
+   pre-analyze-check.py --stage plan          exit 0  decision=pass errors=0 advisories=176 waived=0 · fr=27 sc=9 tasks=43 clauses=8
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-pre-analyze-plan.json
+   pre-analyze-check.py --stage tasks         exit 0  decision=pass errors=0 advisories=176 waived=0 · fr=27 sc=9 tasks=43 clauses=8
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-pre-analyze-tasks.json
+5. decomposition-check.py --mode tasks       exit 0  decision=proceed · fr_count=27 task_count=43 (ceilings 120 / 160)
+   evidence: .specify/specs/105-runtime-store-layout/test-evidence/analyze-repair-decomposition-tasks.txt
+
+concurrency reading: requested=1 / effective=not_evaluated / effective_reason=single-unit (one bounded cross-artifact repair; no sub-unit dispatch intervals exist)

@@ -25,14 +25,15 @@ For each declared store, with `old = .specify/memory/<name>` and `new = .specify
 6. **Empty old** — `old` exists but has no entries: no store item; the container pass removes it (M-4).
 7. **No old** — no item (converged), including the case where init already seeded a placeholder-only `new`.
 8. **Permission** — if the dry-run's `os.access` probe says the target parent (or the source tree needed for the move) is unwritable: `disposition=refuse`, `reason=permission-denied` naming the path. Apply re-checks before acting.
-9. **Container item** — if `.specify/memory` exists after the store items: one item `target=.specify/memory`, `current=empty-residue|unknown-residue`, expected `container-absent`. Unknown members are every remaining path not claimed by a store item, the anchor dimension, or the legacy non-store owner. Unknown residue item is `refuse` with `reason=unknown-residue` listing each path; empty residue item is `archive` with `mechanism=none` ("remove empty directory only").
+9. **Container item** — if `.specify/memory` exists after the store items: one item `target=.specify/memory`, `current=empty-residue|unknown-residue`, expected `container-absent`. Unknown members are **every remaining unclaimed path** not claimed by a store item or the anchor dimension — including the legacy non-store `git-workflow.md` and `draft/`. Any remaining path makes the item `refuse` with `reason=unknown-residue` listing every path; the container is preserved, nothing is deleted, and the run outcome is `blocked` (M-9). Only when no path remains is the item `archive` with `mechanism=none` ("remove empty directory only").
 
 Planner output MUST be deterministic: items sorted by (dimension order, target, relpath); repeated dry-runs on one tree serialize byte-identically (097 FR-006 preserved).
 
 ## M-3 Conflict predicate
 
 - Conflict is counted **only** on authoritative entries, on both sides (A-7 as clarified 2026-11-25). The acting run's own receipt file does not count as new-side content.
-- Non-content entries never trigger a conflict; they are never overwritten and never deleted. They move only when their relative target path is free; otherwise the item is refused by M-2 rule 4 and the old copy stays in place.
+- Non-content entries never trigger a conflict, and the new-side copy is never overwritten. When an old non-content entry's relative target already exists on the new side, the old duplicate is **superseded**: the receipt records its path and digest (`status=superseded` in `entries[]`), the old copy is removed, and the new-side copy stays untouched — generated/placeholder only; no authoritative content is ever deleted. The recorded path+digest is the archive record for that duplicate (the T-005 manifest-as-archive form).
+- When the relative target is free, the non-content entry relocates with the store (preserved).
 - "Looks identical" is not a merge licence: dual authoritative content refuses even when byte-equal (requirements Edge Cases).
 - Old-side-only non-content with no authoritative entry is not a conflict; it relocates with the store (preserved), and never counts as content for the "empty old" case.
 
@@ -41,13 +42,13 @@ Planner output MUST be deterministic: items sorted by (dimension order, target, 
 For each `archive` store item, in dimension order:
 
 1. Write the item's `entries[]` manifest into the run receipt (status `planned`) **before** the first move. This manifest is the archive record and the resume oracle; no byte copy is made (T-005; the 097 `relocate` precedent records from→to + digest, and a pure move destroys no content).
-2. For each entry: if already at `to` with the recorded digest, mark `moved` (resume case); if `to` is occupied by a file not in the manifest, abort with `failed` (path collision discovered at execution is never auto-resolved); else `shutil.move(from, to)`.
-3. After all entries: re-walk `old`; any remaining path is `left-in-place` and reported (never deleted).
+2. For each entry: if already at `to` with the recorded digest, mark `moved` (resume case); if `to` is occupied and the entry is non-content, record `superseded` (path + digest) and remove the old duplicate — the new-side copy is never touched; if `to` is occupied and the entry is authoritative, abort with `failed` (path collision discovered at execution is never auto-resolved); else `shutil.move(from, to)`.
+3. After all entries: re-walk `old`; any remaining path is reported as `left-in-place` in the item (never deleted) and is picked up by the container pass (step 5) as unclaimed residue.
 4. Update the item `done`; append one `recover[]` row per moved entry (`path`=from, `archiveTo`=to, `change=relocated`, `digest`).
-5. **Container pass**: after all store items, remove `.specify/memory` only when it is empty (including empty subdirectories left by the anchor dimension); otherwise record the residue item per M-2 rule 9 and leave everything in place.
+5. **Container pass**: after all store items, list every remaining unclaimed path (including the legacy non-store `git-workflow.md` and `draft/`). If any path remains, record the container item as `refuse`/`unknown-residue` listing every path, preserve the container and all contents (zero deletion), and make the run outcome `blocked` (M-9). Only when no path remains is `.specify/memory` removed (empty directories only, including empty subdirectories left by the anchor dimension).
 6. A failure (OSError, digest mismatch, unexpected entry) marks the item `failed`, aborts the run, and leaves `status=aborted`; already-moved entries stay recorded, and the next run resumes from the receipt rather than re-deriving paths (097 C-7). There is no global rollback.
 
-Executor invariants: zero writes in dry-run; no overwrite of any new-side path; no deletion of any object except an empty directory in the container pass; no archive directory under `.specify/archive/` for pure relocation (the manifest is the archive; `.specify/archive/migrate/` is used only by dimensions whose semantics require replacing/removing objects, per 097 C-7).
+Executor invariants: zero writes in dry-run; no overwrite of any new-side path; no deletion of any object except (a) an empty directory in the container pass and (b) a superseded non-content duplicate whose path + digest are recorded and whose relative target exists on the new side (generated/placeholder only; the preserved new-side copy is its recovery reference); no archive directory under `.specify/archive/` for pure relocation (the manifest is the archive; `.specify/archive/migrate/` is used only by dimensions whose semantics require replacing/removing objects, per 097 C-7).
 
 ## M-5 Refusal and blocked classes (closed)
 
@@ -66,7 +67,7 @@ A `refuse`/`blocked` item MUST NOT be silently skipped: it stays in the plan and
 ## M-6 Receipt and resume
 
 - New runs write `receiptVersion=2` receipts at `.specify/migrate/receipts/<run-id>.json` (the store's new root; `migrate_receipts_dir` is updated). The run's own receipt is created with `O_EXCL` before planning-as-applied begins; dry-runs write no receipt.
-- Resume input: the most recent `status=running` receipt (or the last `aborted`). Version-1 receipts are read-only inputs during the transition: before the old receipts store has been relocated, the resume scan MAY read `.specify/memory/migrate/receipts/` as a legacy location — this is the migration engine's allowlisted legacy read (A-8), not a runtime fallback.
+- Resume input: the most recent `status=running` receipt (or the last `aborted`). Version-1 receipts are read-only inputs during the transition: before the old receipts store has been relocated, the resume scan MAY read `.specify/memory/migrate/receipts/` as a legacy location — the literal lives only in the declaration's `retired_container` (L-5), so this is a declaration-derived legacy read (A-8), not a runtime fallback.
 - Resume decisions use the old receipt's `entries[]`/`recover[]` and the current digests, never paths recomputed from the new run's assumptions.
 - Idempotence: after a completed run, a second apply sees no old roots, emits no store items, and exits `clean`. A second dry-run is byte-identical to the first after completion.
 - Concurrency: two simultaneous runs produce distinct run-id paths; the store items are guarded by digest/manifest checks, so a concurrent old-version writer produces a digest mismatch → `failed` + `aborted`, never silent loss.
@@ -96,9 +97,9 @@ Assertions (red-first until the executor exists):
 | Fixture | Required reading |
 |---|---|
 | legacy | dry-run zero writes; apply relocates every entry; `diff -r` byte-identical; old roots gone; receipt v2 per run; container absent |
-| seeded-legacy | generated/placeholder entries do not refuse; they are preserved where they are; merge proceeds |
+| seeded-legacy | generated/placeholder entries do not refuse; placeholder duplicates are superseded (old copy removed after path+digest recorded; new-side copies untouched); the store merge completes without a conflict; container removed; nothing authoritative deleted |
 | dual | `refuse`, `dual-content`, both paths named, both trees unchanged |
-| residue | store items converge; container preserved; every residue path listed; nothing deleted |
+| residue | store items converge; container preserved; every residue path listed (including `draft/` and `git-workflow.md`); nothing deleted; run outcome `blocked` (exit 3) |
 | symlink | `refuse`, named path, link untouched |
 | readonly | `refuse`, `permission-denied`, no partial success (root-skip recorded as a platform fact) |
 | partial | resume moves only the remainder; no duplicate; no second archive record for moved entries |

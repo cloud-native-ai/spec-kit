@@ -1,0 +1,17 @@
+# validate-decision-tensions.py — analyze-repair gate 2/5
+# captured 2026-11-25T04:18:25Z (UTC) on branch: 105-runtime-store-layout at HEAD 6fe1adea2 (working tree)
+# command: /usr/local/bin/python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/105-runtime-store-layout
+
+spec: .specify/specs/105-runtime-store-layout
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 339 lines, 6 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+
+exit: 0

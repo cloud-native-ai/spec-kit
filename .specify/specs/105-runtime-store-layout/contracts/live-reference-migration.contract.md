@@ -25,7 +25,7 @@ No mapping exists for `draft/` (retired) or `git-workflow.md` (non-store; owner 
 1. Apply the mapping mechanically to live surfaces (L-3). A mapping is per path token; prose that discusses the *memory system* (not a path) keeps the word "memory" and is edited only to avoid naming a directory.
 2. Never run a blind repository-wide substitution: dated records (L-4) are excluded by path.
 3. Where a live line's meaning would change (e.g. "the feature registry under `.specify/memory/`" — an already-stale statement), repair to the current authoritative location (`.specify/features/`) and record the repair as `repair-stale`.
-4. A legacy fixture or migration reader keeps the old literal on purpose; that is the only place old literals remain outside the allowlist (L-5), and it must be an explicit test fixture or migration engine.
+4. An explicit legacy test fixture may keep the old literal on purpose; tests are outside SC-006's measured product classes. A migration reader that needs the old root derives it from the declaration's `retired_container` value (L-5); apart from the four allowlisted files, no product file in the measured classes carries the literal.
 5. Generated artifacts (mirrors, per-tool command copies, `.specify/instructions.md`) are regenerated from their source, never hand-edited (L-6).
 
 ## L-3 Surface classes and per-file actions
@@ -34,7 +34,7 @@ No mapping exists for `draft/` (retired) or `git-workflow.md` (non-store; owner 
 
 | Surface | Files | Action |
 |---|---|---|
-| installer | `src/specify_cli/__init__.py` | update seed/core-assets/paths; only the migrate segment may keep the literal |
+| installer | `src/specify_cli/__init__.py` | update seed/core-assets/paths; the migrate segment derives the old root from the declaration's `retired_container` value and does not spell the literal (L-5) |
 | engines | `scripts/python/{memory-utils,feedback-utils,evidence-utils,exec-quant,run-determination,sanitize-utils,renumber-utils,trigger-utils,tools-utils,skills-utils,seal-utils,probe-utils,record-retention,concurrency-check,role-edge-check,non-disposable-check,anchor-layout-migrate}.py` | new roots; cross-store consumers read the declaration (C-6); `anchor-layout-migrate` keeps legacy reader context |
 | scripts | `scripts/bash/create-new-tools.sh` | records at `.specify/tools/`; canonical id updated |
 | templates | `templates/commands/{tools,todo,sanitize,review,migrate,interview,instructions,improve,feedback}.md`, `templates/instructions-template.md`, `templates/tools.md` | rewrite paths; migrate page gains the sixth dimension and the new receipt store |

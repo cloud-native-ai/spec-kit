@@ -133,7 +133,7 @@ grep -n '\.specify/memory/' .specify/instructions.md .specify/glossary.md
 grep -rn '\.specify/memory/' docs/ | grep -vE 'docs/(reference/history|decisions|archive|static)/'
 ```
 
-Observed expectation after the feature: the framework-source output lists only the four allowlisted files (tombstone row, migrate segment, anchor migration engine, legacy residue scanner); the other two classes are empty. The guard asserts measured = declared and fails on mutation.
+Observed expectation after the feature: the framework-source output lists only the four allowlisted files (tombstone row, retired-root declaration, anchor migration engine, legacy residue scanner); the other two classes are empty. The guard asserts measured = declared and fails on mutation.
 
 **Pinned by**: `tests/contract/test_store_layout_live_refs.py`. **Route b**.
 
