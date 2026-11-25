@@ -21,7 +21,7 @@ skill:clarify-artifact run=r20261124T024654Z-7c3e token=not_evaluated elapsed=no
   "feature": "103-team-view",
   "feature_id": "027",
   "determined_at": "2026-11-24T03:10:18Z",
-  "settled_at": null,
+  "settled_at": "2026-11-25T02:49:39Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -96,7 +96,7 @@ skill:clarify-artifact run=r20261124T024654Z-7c3e token=not_evaluated elapsed=no
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -188,8 +188,8 @@ skill:clarify-artifact run=r20261124T024654Z-7c3e token=not_evaluated elapsed=no
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -219,7 +219,7 @@ skill:clarify-artifact run=r20261124T024654Z-7c3e token=not_evaluated elapsed=no
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
