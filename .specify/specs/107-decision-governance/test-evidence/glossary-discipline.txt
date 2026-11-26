@@ -1,0 +1,30 @@
+# Glossary proposal-only discipline — 107-decision-governance (T053)
+# Captured: 2026-11-26 (UTC), worktree decision-governance, branch 107-decision-governance
+
+## No glossary write by this feature (FR-005 / A-11)
+$ git log --oneline d05c3a350..HEAD -- .specify/glossary.md
+```text
+a99d53c6a chore(106-background-silent-failure): analyze repair — resolve 10 HIGH findings
+7eb405a28 chore(106-background-silent-failure): close out plan-stage records and propose silent-end glossary term
+```
+Both commits belong to line 106 (background-silent-failure); the 107 line has never
+touched .specify/glossary.md.
+
+## The only diff vs d05c3a350 is line 106's own proposal row (brought in by the merge)
+$ git diff d05c3a350..HEAD -- .specify/glossary.md
+```text
++| silent-end | silent end, silent termination | 后台派发在起点记录存在、执行主体已消失且完成/失败/异常/取消证据全部缺席时的显式异常终态；对没有 pid 的载体，以「声明等待期限已过、无返回且无活信号」作为「执行主体已消失」的替代判据（同一值的无 pid 分支，不是第
+```
+The appended row is `silent-end` (origin=auto, status=proposed) — line 106's own existing
+proposal, not a Decision term and not written by this feature.
+
+## No Decision term in the glossary file
+$ grep -c "Decision" .specify/glossary.md
+```text
+0
+```
+Zero rows mention Decision; the nine closed terms live only on the owner page.
+
+## The proposal evidence is still the only glossary deliverable
+$ test -s .specify/specs/107-decision-governance/test-evidence/glossary-proposal.md && test -s .specify/specs/107-decision-governance/test-evidence/glossary-proposal-plan-2026-11-25.md
+both present and non-empty (proposal-only; no user confirmation obtained -> no write).

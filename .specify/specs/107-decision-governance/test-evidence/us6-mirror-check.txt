@@ -1,0 +1,67 @@
+# Mirror / copy closure readings — 107-decision-governance (T050)
+# Captured: 2026-11-26 (UTC), worktree decision-governance, branch 107-decision-governance
+
+## sync-mirrors --write then --check
+$ python3 scripts/python/sync-mirrors.py --write
+```text
+DIFF .specify/shared/definitions/framework-map.md
+sync  shared/ -> .specify/shared/ (1 files)
+```
+$ python3 scripts/python/sync-mirrors.py --check   # rc 0
+```text
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (394 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (133 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (117 files, byte-identical)
+```
+Drift members: none (baseline test-evidence/sync-mirrors-baseline.txt also carries none).
+File-count growth vs the baseline (templates 23→23, skills 394→394, internal 139→139,
+agents 20→20, scripts 132→133, shared 116→117) is the two new delivery files (owner page,
+checker); the drift MEMBER set stayed empty, which is the judged reading.
+
+## regen-command-copies
+$ python3 scripts/python/regen-command-copies.py --check   # rc 0
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+## Explicit pair cmp (plan § Mirror Obligations; 19 byte-identical pairs + 1 projected pair)
+SAME  shared/definitions/decision-definitions.md -> .specify/shared/definitions/decision-definitions.md
+SAME  shared/definitions/framework-map.md -> .specify/shared/definitions/framework-map.md
+SAME  shared/guidelines/confirmation-gates.md -> .specify/shared/guidelines/confirmation-gates.md
+SAME  shared/guidelines/decision-tension.md -> .specify/shared/guidelines/decision-tension.md
+SAME  shared/guidelines/fast-fail.md -> .specify/shared/guidelines/fast-fail.md
+SAME  shared/definitions/superagent-definitions.md -> .specify/shared/definitions/superagent-definitions.md
+SAME  shared/definitions/goal-definitions.md -> .specify/shared/definitions/goal-definitions.md
+SAME  shared/definitions/anchor-definitions.md -> .specify/shared/definitions/anchor-definitions.md
+SAME  shared/definitions/agent-definitions.md -> .specify/shared/definitions/agent-definitions.md
+SAME  skills/external/sdd-loop-driver/references/checkpoint-protocol.md -> .specify/skills/sdd-loop-driver/references/checkpoint-protocol.md
+SAME  skills/external/sdd-loop-driver/references/dispatch-recipes.md -> .specify/skills/sdd-loop-driver/references/dispatch-recipes.md
+SAME  skills/external/sdd-loop-driver/references/stage-prompts.md -> .specify/skills/sdd-loop-driver/references/stage-prompts.md
+SAME  skills/internal/run-agent/SKILL.md -> .specify/skills/internal/run-agent/SKILL.md
+SAME  skills/internal/run-team/SKILL.md -> .specify/skills/internal/run-team/SKILL.md
+SAME  skills/internal/analyze-artifacts/SKILL.md -> .specify/skills/internal/analyze-artifacts/SKILL.md
+SAME  skills/internal/review-feature-quality/SKILL.md -> .specify/skills/internal/review-feature-quality/SKILL.md
+SAME  skills/internal/review-sdd-process/SKILL.md -> .specify/skills/internal/review-sdd-process/SKILL.md
+SAME  templates/instructions-template.md -> .specify/templates/instructions-template.md
+SAME  scripts/python/validate-decisions.py -> .specify/scripts/python/validate-decisions.py
+PROJECTED  scripts/bash/generate-instructions.sh -> .specify/scripts/bash/generate-instructions.sh
+           (bash-version-guard block; verified ok by sync-mirrors --check, byte-diff is the projection)
+Both checker copies answer --version: `validate-decisions.py 0.0.22` (rc 0 each).
+
+## Byte budgets (T-001 / A-13)
+Decision Items section: template 1,276 B == live 1,276 B (cmp identical, heading included)
+INSTRUCTIONS_BUDGET_BYTES=40960; live .specify/instructions.md 40,170 B (< 40,960)
+
+## Client init delivery (SC-010; also proven inside test_client_init_receives_section)
+specify init --here --ai qoder --script sh --no-git -> rc 0; delivered
+.specify/templates/instructions-template.md carries the section; the client generator
+(rc 0) writes .specify/instructions.md with the section (1,276 B) and QODER.md -> .specify/instructions.md.

@@ -1,0 +1,29 @@
+# US6 red-first evidence — 107-decision-governance (T048/T050)
+# Captured: 2026-11-26T05:54Z, worktree decision-governance, branch 107-decision-governance
+
+## T046 BC mapping guard — red before T047's test file existed (BC-04 names it)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_migration_map.py -q
+```text
+E       AssertionError: ["BC-04: evidence cell names no existing test path and no row reference"]
+1 failed, 1 passed
+```
+
+## T048 mirror closure guard — red on the real, unmirrored T049 edit
+$ python3 scripts/python/sync-mirrors.py --check
+```text
+DIFF .specify/shared/definitions/framework-map.md
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+rc=2
+```
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py -q -k mirror_and_copy_closure
+```text
+FAILED tests/contract/test_decision_governance_contracts.py::test_mirror_and_copy_closure
+E       assert 2 == 0
+1 failed in 6.60s
+```
+
+Red-ability of C-501/C-502 (mutation form, cells inside the modules):
+- test_bc_row_set_closed_and_mapped: missing row, seventh row, dangling reference, nonexistent test path, resolution outside the closed vocabulary — each turns red.
+- test_no_fallback_only_row: a row resolved by runtime dual-path fallback + manual instruction alone is named BC-05.
+- test_base_corpus_zero_rewrite: the reading is recomputed from git on every run; mutation proof recorded in test-evidence/migration-closure.md.

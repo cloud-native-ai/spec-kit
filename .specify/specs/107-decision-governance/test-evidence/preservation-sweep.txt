@@ -1,0 +1,64 @@
+# Preservation regression sweep — 107-decision-governance (T054)
+
+Captured: 2026-11-26 (UTC), worktree `decision-governance`, branch `107-decision-governance`,
+merged base `0d7519521` (includes the 106 merge), FR-025 effective baseline `fbab7a45c`.
+
+## Sweep run (single entry; the six protected modules)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_watch_iteration.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_role_transition_payload.py tests/contract/test_fast_fail_discipline.py tests/contract/test_decision_tension_contract.py -q
+```text
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioFTerminologyZeroHit::test_a3_alias_list_still_exists
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+FAILED tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+5 failed, 241 passed in 7.38s
+```
+(plus the runner's serial marker pass: `1 passed, 246 deselected`)
+
+## Zero-new-failure reading
+
+$ comm -13 <(sort .specify/specs/107-decision-governance/baseline-failed.txt) <(grep '^FAILED ' <sweep log> | sed 's/^FAILED //' | sort)
+```text
+(no output — zero failure names outside the implement baseline)
+```
+
+All five failures are pre-existing implement-baseline names (`baseline-failed.txt`, measured at
+`0d7519521`: 221 failed / 10152 passed). Their causes are tree state predating this package —
+e.g. `test_g9_total_equals_frozen_baseline` reads the frozen 31-gate baseline against the
+merged-tree 30 reading (the 106 merge's one destroyed member, adjudicated and recorded in
+`test-evidence/gate-neutrality.txt`); none touches a file this line owns.
+
+## One new failure found and repaired at its root (stale pin, same-change bump)
+
+`tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22`
+was NOT in the baseline: feature 107 added the `## Decision Items（决策项）` template section
+(US1/T014) and the section-count pin is required by that test's own protocol to move in the
+same change ("a change that adds or removes a `##` section MUST raise or lower TPL_EXPECTED /
+LIVE_EXPECTED in the same commit").
+
+- Measured tree: template 39 `##` sections, live 40 (was pinned 38/39).
+- Repair: `TPL_EXPECTED` 38 -> 39, `LIVE_EXPECTED` 39 -> 40, with the dated stale-pin note in
+  the test docstring (the file's established form). Re-run: `2 passed` for `-k "a7 or a8"`.
+- Post-repair sweep: the five failures above are the complete set; zero new names.
+
+## FR-025 preservation reading (three protected owners)
+
+$ git diff --quiet fbab7a45c..HEAD -- shared/declarations/facts/driver-completion-sentinels.yaml skills/external/sdd-loop-driver/references/watch-model.md skills/external/sdd-loop-driver/references/efficiency-model.md
+rc=0
+$ git diff --numstat fbab7a45c..HEAD -- <the same three paths> | wc -l
+0
+
+The allowed-delta set is unconditionally empty; no re-baseline ruling exists for these three
+paths and none is needed.
+
+## EP-002 payload field-count statement (unchanged)
+
+Owner `shared/definitions/superagent-definitions.md` § The super↔sub Protocol still carries:
+seven role fields (`parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`,
+`depth_position`, `authority_ref`, `return_channel`), four pre-existing injections (fast-fail
+clause, concurrency obligation, reporting duty, re-anchoring anchor digest) and the five-item
+uplink (deliverable path, evidence pointer(s), explicit anomaly line, concurrency reading
+triple, returning identity) — counts unchanged; the decision block is task-authority content,
+never an eighth role field. (Asserted inside `test_gate_neutrality`; full statement in
+`test-evidence/gate-neutrality.txt`.)

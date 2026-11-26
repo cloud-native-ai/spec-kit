@@ -1,0 +1,111 @@
+{
+  "planVersion": 1,
+  "mode": "dry-run",
+  "workspaceKind": "client",
+  "outcome": "planned",
+  "exitCode": 1,
+  "items": [
+    {
+      "id": "d3a920200058",
+      "dimension": "templates-generated",
+      "target": ".specify/templates/instructions-template.md",
+      "current": "differs",
+      "expected": "byte-equal to installed asset",
+      "disposition": "replace",
+      "mechanism": "replace",
+      "evidence": [
+        "templates/instructions-template.md"
+      ],
+      "archiveTo": null,
+      "status": "planned",
+      "reason": null
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "byDimension": {
+      "templates-generated": 1,
+      "anchor-layout": 0,
+      "compat-links": 0,
+      "mirror-consistency": 0,
+      "migration-residue": 0,
+      "store-layout": 0
+    },
+    "byDisposition": {
+      "replace": 1
+    }
+  },
+  "notes": [
+    "compat-links: instruction target .specify/instructions.md absent; skipped QODER.md"
+  ],
+  "pointers": [
+    {
+      "topic": "goal-team-archive-migration",
+      "ownerCommand": "/speckit.anchor",
+      "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+      "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+    }
+  ],
+  "receipt": {
+    "receiptVersion": 2,
+    "runId": "20261126T055540Z-3d4306f5",
+    "mode": "dry-run",
+    "status": "completed",
+    "startedAt": "2026-11-26T05:55:40Z",
+    "finishedAt": "2026-11-26T05:55:40Z",
+    "workspace": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/.specify/.tmp/p5-probe/client",
+    "resumedFrom": null,
+    "source": {
+      "stampFile": ".specify/source.json",
+      "frameworkCommit": "36bf03649ce54606aee88afed27ebfb4b15d8b9c",
+      "stampedAt": "20261126T055538Z",
+      "reason": null
+    },
+    "target": {
+      "cliVersion": "0.0.22",
+      "frameworkCommit": "36bf03649ce54606aee88afed27ebfb4b15d8b9c",
+      "origin": "git"
+    },
+    "outcome": "planned",
+    "exitCode": 1,
+    "items": [
+      {
+        "id": "d3a920200058",
+        "dimension": "templates-generated",
+        "target": ".specify/templates/instructions-template.md",
+        "current": "differs",
+        "expected": "byte-equal to installed asset",
+        "disposition": "replace",
+        "mechanism": "replace",
+        "evidence": [
+          "templates/instructions-template.md"
+        ],
+        "archiveTo": null,
+        "status": "planned",
+        "reason": null
+      }
+    ],
+    "archives": [],
+    "recover": [],
+    "storeLayout": {
+      "stores": 0,
+      "resolved": 0,
+      "refused": 0,
+      "blocked": 0,
+      "container": "absent",
+      "manifestDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "notes": [
+      "compat-links: instruction target .specify/instructions.md absent; skipped QODER.md"
+    ],
+    "pointers": [
+      {
+        "topic": "goal-team-archive-migration",
+        "ownerCommand": "/speckit.anchor",
+        "ownerEngine": "scripts/python/goal-utils.py --action migrate-archive",
+        "note": "goal/team archive migration is owned by /speckit.anchor (migrate-archive); specify migrate neither detects nor disposes it. /speckit.goal serves action-level, step-shaped guidance only and carries no migrate-archive mode"
+      }
+    ]
+  },
+  "receiptPath": null
+}

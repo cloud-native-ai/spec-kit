@@ -1,0 +1,71 @@
+# US6 green evidence — 107-decision-governance (T052)
+
+Captured: 2026-11-26 (UTC), worktree `decision-governance`, branch `107-decision-governance`.
+Single test entry: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh`
+(no interpreter-level test command).
+
+## Phase run (US6 modules: BC mapping, migrate dry-run, landing closures)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_migration_map.py tests/integration/test_decision_governance_migrate_dryrun.py tests/contract/test_decision_governance_contracts.py -q
+```text
+.....................                                                    [100%]
+21 passed in 13.34s
+```
+
+EXIT=0. Raw log: `notes/us6-green-slots.txt`.
+
+## US6 red-first readings
+
+- T046's guard was red before T047's module existed (`BC-04: evidence cell names no existing
+  test path`) — the mapping guard reds on a real unmapped row.
+- T048's mirror guard was red on the real, unmirrored T049 edit
+  (`DIFF .specify/shared/definitions/framework-map.md`, sync-mirrors rc 2) and turned green
+  after T050's `--write` + `--check` rc 0.
+- Mutation legs inside `test_bc_row_set_closed_and_mapped` (missing row / seventh row / dangling
+  reference / nonexistent test path / resolution outside the vocabulary) and
+  `test_no_fallback_only_row` (fallback-only BC-05) each turn their guard red.
+  Raw log: `test-evidence/us6-red-first.txt`.
+
+## SC-008 — mirror / copy / instruction closure
+
+- `sync-mirrors.py --check` rc 0 with **no drift member at all** (baseline carries none);
+  absolute readings reported: templates 23, skills/external 394, skills/internal 139, agents 20,
+  scripts 133, shared 117 files byte-identical, six projected pairs ok.
+- `regen-command-copies.py --check` rc 0 (`OK: all per-tool command copies match the source templates.`).
+- `Decision Items` section: template 1,276 B == generated live 1,276 B (heading included);
+  live instructions total 40,170 B < declared budget 40,960 B.
+- Client init fixture: `specify init --here --ai qoder --script sh --no-git` rc 0 delivers the
+  template; the client generator (rc 0) writes the section into `.specify/instructions.md`, and
+  the `QODER.md` per-tool copy follows it. Full readings: `test-evidence/us6-mirror-check.txt`.
+
+## SC-009 — migration closure
+
+- Every BC-01…BC-06 row exercised by its named behavior with command + output + pinning test:
+  `test-evidence/migration-closure.md`; the row-set/mapping closure is guarded by
+  `test_decision_governance_migration_map.py` (2 passed) and the zero-rewrite + legacy read by
+  `test_decision_governance_migrate_dryrun.py` (2 passed).
+- Zero-rewrite line-level reading: register `14 0`; 3,127 pre-existing corpus files all present
+  at HEAD; numstat deletion column 0; `--diff-filter=D` empty; clarifications bodies of all 89
+  pre-existing `requirements.md` files append-only.
+- Migrate dry-run fixture: `templates-generated | .specify/templates/instructions-template.md |
+  replace`; dimension set still the closed six (no seventh member). Raw payload:
+  `test-evidence/us6-migrate-dryrun.json`.
+
+## Green-point claims (T052)
+
+[green: contracts/migration-and-compat.contract.md#C-501] — `test_bc_row_set_closed_and_mapped`
+[green: contracts/migration-and-compat.contract.md#C-502] — `test_base_corpus_zero_rewrite`
+[green: contracts/migration-and-compat.contract.md#C-503] — `test_instructions_generated_dimension`
+[green: contracts/migration-and-compat.contract.md#C-504] — `test_m06_dispatch_without_block_refused`
+[green: contracts/migration-and-compat.contract.md#C-505] — `test_no_fallback_only_row`
+[green: contracts/migration-and-compat.contract.md#C-506] — `test_mirror_and_copy_closure`
+
+## Whole-feature regression pass (all five implementation modules)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_migration_map.py tests/unit/test_validate_decisions.py tests/integration/test_decision_governance_migrate_dryrun.py -q
+```text
+...........................................                              [100%]
+43 passed in 13.38s
+```
+
+EXIT=0.

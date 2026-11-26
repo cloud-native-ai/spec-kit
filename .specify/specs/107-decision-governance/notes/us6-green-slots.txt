@@ -1,0 +1,7 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_migration_map.py tests/integration/test_decision_governance_migrate_dryrun.py tests/contract/test_decision_governance_contracts.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.....................                                                    [100%]
+21 passed in 13.34s
