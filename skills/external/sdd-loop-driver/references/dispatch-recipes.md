@@ -45,6 +45,7 @@
 - **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并发上限取运行期槽位上限（读 `shared/declarations/facts/concurrency-slot-and-reserve.yaml` 的 `slot_cap_default` 并与天花板取 min；本文件不写数字）；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
 - **输出纪律**：子派发 brief MUST 要求执行者用工具**分段写文件**（每次 Write/Edit 一部分），禁止在一个回复里输出整段实现或整份测试；每段回传改动清单、测试计数、提交哈希。这样同时规避 output-token 上限。
 - **状态字段**：状态脊记录 `turn_budget`、`sub_dispatch`、`part_scope`、`checkpoint`；预算耗尽/输出上限属 U5 预算触顶，按卡死处置上报，不得伪完成。
+- **决策块（决策 backed 派发，owner 按指针）**：阶段派发实施一个已记录决策时，载荷 MUST 携带 `decision_block`（任务权威内容，不是第八个角色字段）；块的五个字段、确认与实施回执义务归 `shared/definitions/decision-definitions.md` § 传递与实施——按指针抵达，本文件不复述。
 
 ## Recipe 1 — 阶段提示词文件（Stage Prompt File）
 
