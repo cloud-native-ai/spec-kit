@@ -1,0 +1,52 @@
+== W1-01 (R2-108-W1-01) ==
+PASS FR-001 enumerates exactly the five forms
+PASS FR-001 carries the pairing decomposition
+PASS FR-001 compact date pairs only with compact time
+PASS FR-001 ISO date pairs with the three time shapes
+PASS FR-001 closes the set beyond the five
+PASS Clarification answer exists and names five forms
+PASS Clarification names FR-001 as owner
+PASS Clarification compact grouping
+PASS Clarification ISO grouping
+PASS Old cross-product phrase is gone from requirements.md
+PASS Decomposition produces exactly the five enumerated forms
+PASS C-201 enumerates the same five forms
+PASS data-model C2 enumerates the same five forms
+PASS research R-1 names five alternatives
+PASS every listed form parses under the stated rule
+PASS excluded cross-product shapes do not parse
+PASS all production-evidence stamps parse
+PASS date-only / invalid calendar / non-Z samples are rejected
+== W3-01 (R2-108-W3-01) ==
+PASS T029 produces test-evidence/verification-input.md
+PASS T029 no longer produces verification.md
+PASS T029 says verification.md is derived spec-side
+PASS T029 forbids the crew write
+PASS T028 reads the literal baseline 54c6efa8c
+PASS T028 no longer reads verification.md
+PASS every tasks.md verification.md mention is spec-side-derived
+  (tasks.md verification.md mentions: 8)
+PASS DoD-1 points at verification-input.md
+PASS DoD-8 points at verification-input.md and forbids crew write
+PASS GATE-4 checks the derived verification.md
+PASS task-state sigil points at verification-input.md
+PASS checkpoint reads verification-input.md
+PASS incremental delivery reads verification-input.md
+PASS handoff Task Reference states the T029 split
+PASS handoff forbidden line explains the derivation
+PASS handoff write grant covers test-evidence/**
+PASS team.md forbidden list keeps verification.md
+PASS team.md Dynamic Structure states the crew input + derived
+PASS team.md write grant covers test-evidence/**
+PASS SC-008 still maps T029
+== invariants ==
+PASS FR count = 25 (got 25)
+PASS SC count = 8 (got 8)
+PASS STR count = 3 (got 3)
+PASS clause counts 9/8/9/9 = 35 (got {'presentation.contract.md': 9, 'report-recognition.contract.md': 8, 'team-view-program.contract.md': 9, 'view-labels.contract.md': 9})
+PASS task count = 29 (got 29)
+PASS reason set intact
+PASS exit set intact
+PASS T029 dependency order intact
+
+RESULT: ALL PASS (46 pass, 0 fail)

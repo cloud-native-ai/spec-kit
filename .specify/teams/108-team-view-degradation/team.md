@@ -143,7 +143,7 @@ Deliver spec 108 through a serial construction chain. The bound Anchor is author
 | `reporter` | all stages | reporter | Meta | temporary |
 
 ## Dynamic Structure
-Pattern: serial. `implement → verify → integrate`; one writeback record per completed task at `.specify/specs/108-team-view-degradation/writeback/<T-NNN>.yaml`. The design face is read-only to the crew.
+Pattern: serial. `implement → verify → integrate`; one writeback record per completed task at `.specify/specs/108-team-view-degradation/writeback/<T-NNN>.yaml`. The design face is read-only to the crew. The crew assembles its close-out input at `.specify/specs/108-team-view-degradation/test-evidence/verification-input.md` (inside its write territory); `verification.md` is derived spec-side from that input and remains forbidden to every seat.
 
 ## Self-Improvement Contract
 Subject: this team definition. Observe: run reports. Improve: through `improve-team`. Preserve authority, budget, verifier independence.

@@ -14,14 +14,14 @@
 
 ## Definition of Done (DoD)
 
-- DoD-1: 全部任务行为 `[X]`；若出现 `[~]`，其理由逐条记录在 `.specify/specs/108-team-view-degradation/verification.md` 的 `deferred_tasks=`。
+- DoD-1: 全部任务行为 `[X]`；若出现 `[~]`，其理由逐条记录在 `.specify/specs/108-team-view-degradation/test-evidence/verification-input.md` 的 `deferred_tasks=`（`verification.md` 由 spec 侧从该输入派生）。
 - DoD-2: 交付面齐备——单一读取引擎修订 `scripts/python/team-view.py`、`docs/reference/commands/team.md` 的 View Mode、`skills/internal/view-team/SKILL.md` 的错误导航与增补呈现措辞、三支新测试文件（`tests/unit/test_team_view_report_recognition.py`、`tests/contract/test_team_view_degradation_contract.py`、`tests/integration/test_team_view_degradation.py`）与镜像再生成；零新增第三方依赖、零新增读取器/存储/缓存/快照/索引/registry。
 - DoD-3: 覆盖如实记账——FR 25/25、SC 8/8 以 § Requirement Coverage Map 为权威；4 份契约共 35 条款由 § Clause Coverage & Green Partition 逐条恰好认领一次；`validate-tasks.py` 的四项 green 检查零 ERROR，WARN 逐条裁定并记录在 `test-evidence/tasks-validator.txt`。
 - DoD-4: 红先证据完整——每条新行为测试在其 subject 落地前经唯一入口执行并失败，命令、真实输出与退出码记录在 `notes/red-first-evidence.md`；两处回归守卫（T020 的健康保真与只读快照）按行内声明的例外置于实现之后。
 - DoD-5: 封闭集可测——降级原因 2/2 映射退出码 5、退出码闭集 `0/2/3/4/5` 不变、渲染标签相对 `contracts/view-labels.contract.md` 双向闭包、报告识别/最新选择入口唯一、三面（docs / skill / 程序声明）一致，均由契约测试钉住。
 - DoD-6: 健康保真与只读——基线提交 `54c6efa8c` 的程序与变更后程序在同一健康谓词 fixture 上 stdout 逐字节相同、退出码相同（机器 diff 行数 = 0）；healthy / degraded / overview 三个场景调用前后 fixture 工作树内容哈希一致。
 - DoD-7: 无形态变更、无迁移——报告命名 owner（`skills/internal/create-team/SKILL.md` § Report contract）与 `team.md` schema 相对基线逐字节未变，既有团队零迁移，紧凑命名报告仍是运行报告。
-- DoD-8: `verification.md` 逐条记录 SC-001…SC-008 的状态、命令、值与证据指针；`final` 路径判据 SC-001…SC-004 记 `pass`，且一条 smoke 记录齐备（`smoke_command=`、`smoke_exit_code=0`、存在且非空的 `smoke_evidence_path=`）。
+- DoD-8: `.specify/specs/108-team-view-degradation/test-evidence/verification-input.md`（crew 可写的收口输入）逐条记录 SC-001…SC-008 的状态、命令、值与证据指针；`final` 路径判据 SC-001…SC-004 记 `pass`，且一条 smoke 记录齐备（`smoke_command=`、`smoke_exit_code=0`、存在且非空的 `smoke_evidence_path=`）；`verification.md` 由 spec 侧从该输入派生，crew MUST NOT 直接写（handoff/team 禁止面）。
 
 **DoD Status**: pending
 
@@ -30,7 +30,7 @@
 - GATE-1: 任务文件结构合法 — check: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/108-team-view-degradation/tasks.md` exit 0（0 error；WARN 逐条裁定并记录）。
 - GATE-2: 跨产物一致 — check: `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/108-team-view-degradation --stage tasks --repo .` 输出 `decision=pass` 且 errors=0（advisory 逐条裁定）。
 - GATE-3: FR / SC / 条款覆盖 — check: 本文件 § Requirement Coverage Map 为 25/25 与 8/8，§ Clause Coverage & Green Partition 的 35 条款逐条恰认领一次；`validate-tasks.py` 的 `green-dangling` / `green-clause-collision` / `green-cross-phase` / `green-path-divergence` 零 ERROR。
-- GATE-4: final 路径成功判据 + smoke 记录 — check: `verification.md` 中 `**Path**` 为 `final` 的 SC-001…SC-004 全部 `pass`，且 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（存在且非空）齐备（条件集 owner：`shared/workflow/acceptance-hardening.md` § Gates）。
+- GATE-4: final 路径成功判据 + smoke 记录 — check: `verification.md`（spec 侧从 `test-evidence/verification-input.md` 派生，crew 不写该文件）中 `**Path**` 为 `final` 的 SC-001…SC-004 全部 `pass`，且 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（存在且非空）齐备（条件集 owner：`shared/workflow/acceptance-hardening.md` § Gates）。
 - GATE-5: 镜像与副本收敛 — check: `python3 scripts/python/sync-mirrors.py --check` 的漂移成员集相对 `test-evidence/sync-mirrors-baseline.txt` 无新增成员；`python3 scripts/python/regen-command-copies.py --check` exit 0；`scripts/python/team-view.py` ↔ `.specify/scripts/python/team-view.py`、`skills/internal/view-team/SKILL.md` ↔ `.specify/skills/internal/view-team/SKILL.md` 两对字节一致。
 - GATE-6: 封闭集与单一引擎 — check: `tests/contract/test_team_view_degradation_contract.py` 全绿（原因集、退出码映射、信封键、单一识别入口、标签闭包、三面一致）；`git diff --stat <baseline_commit>..HEAD` 对 `scripts/python/goal-utils.py` 为空。
 - GATE-7: 健康保真与只读 — check: run `tests/integration/test_team_view_degradation.py` 通过，且健康保真测试的 stdout diff 行数 = 0、退出码相同，只读快照测试的新增/修改/删除文件数 = 0。
@@ -55,13 +55,13 @@
 
 ### Task State Sigil (REQUIRED)
 
-- `- [ ]` — Open；`- [>]` — Claimed（多代理运行用）；`- [X]` — Closed；`- [~]` — Deferred（理由记录在 `verification.md` 的 `deferred_tasks=` 并在行内加 `<!-- deferred: <reason> -->`）。
+- `- [ ]` — Open；`- [>]` — Claimed（多代理运行用）；`- [X]` — Closed；`- [~]` — Deferred（理由记录在 `test-evidence/verification-input.md` 的 `deferred_tasks=`、由 spec 侧派生进 `verification.md`，并在行内加 `<!-- deferred: <reason> -->`）。
 
 ## Path Conventions
 
 - **框架源（编辑面）**: `scripts/python/team-view.py`、`skills/internal/view-team/SKILL.md`、`docs/reference/commands/team.md`、`tests/**`。
 - **生成面（MUST NOT 手改）**: `.specify/scripts/python/team-view.py`、`.specify/skills/internal/view-team/SKILL.md`（由 `sync-mirrors.py` 投影）；每工具命令副本（由 `regen-command-copies.py` 生成）。
-- **证据落点（本特性）**: `.specify/specs/108-team-view-degradation/notes/{pre-change-measurements.md,red-first-evidence.md,us1-green.txt,us2-green.txt,us3-green.txt,quickstart-run.md}`、`test-evidence/{implement-entry-readings.txt,us1-red-unit.txt,us1-red-integration.txt,us2-red-degraded.txt,us2-red-states.txt,us3-red-contract.txt,us3-guards.txt,tasks-validator.txt,targeted-set.txt,shape-change-guard.txt}`、`coverage-baseline.txt`、`verification.md`。
+- **证据落点（本特性）**: `.specify/specs/108-team-view-degradation/notes/{pre-change-measurements.md,red-first-evidence.md,us1-green.txt,us2-green.txt,us3-green.txt,quickstart-run.md}`、`test-evidence/{implement-entry-readings.txt,us1-red-unit.txt,us1-red-integration.txt,us2-red-degraded.txt,us2-red-states.txt,us3-red-contract.txt,us3-guards.txt,tasks-validator.txt,targeted-set.txt,shape-change-guard.txt}`、`coverage-baseline.txt`、`test-evidence/verification-input.md`（crew 收口输入；`verification.md` 由 spec 侧派生）。
 - **只读面（零修改）**: `.specify/specs/108-team-view-degradation/{plan.md,data-model.md,contracts/,research.md,quickstart.md,feature-ref.md}`（plan-owned，仅小修须 `PLAN-EDIT:` 声明）；`.specify/teams/**`（团队档案永不改写）；其它规格的 `.specify/specs/**`（103 的 data-model 与 program contract 作为日期化记录保留）、`.specify/features.md`、`.specify/register.md` 与 state spine（本阶段零编辑）。
 - **共享写入面（串行）**: `scripts/python/team-view.py`（每个实现行依次追加）、`tests/integration/test_team_view_degradation.py`（三个故事分段追加）、`notes/red-first-evidence.md`（各验证行汇总）。
 
@@ -244,10 +244,10 @@
 
 - [ ] T026 [blockedBy: T025] Execute every scenario in `.specify/specs/108-team-view-degradation/quickstart.md` exactly as written (S-1…S-7, with the S-0 readings re-taken) and record command, output and exit status per scenario in `notes/quickstart-run.md`, teardown included.
 - [ ] T027 [blockedBy: T025] Run the targeted set exactly as quickstart.md § Run the targeted set prescribes (the three new test files plus the four inherited team-view test files) through the single entry per `scripts/bash/run-tests.sh`, capture the failing-test name list and compare it against the implement pre-flight baseline under the `/speckit.implement` § Test runs owner (path and flag owned there, not restated), and record the rc, counts and zero-new-failure reading in `test-evidence/targeted-set.txt` (SC-008).
-- [ ] T028 [blockedBy: T025] Verify the no-shape-change claim: a read-only `git diff --stat <baseline_commit from verification.md>..HEAD` against `skills/internal/create-team/SKILL.md` and `skills/internal/create-team/references/create-mode.md` is empty, and the corpus-replica test still recognizes 13/13 while compact `<YYYYMMDD>T<hhmmss>Z-report.md` names stay reports; record the reading in `test-evidence/shape-change-guard.txt` (FR-023).
-- [ ] T029 [blockedBy: T025,T026,T027,T028] Produce `.specify/specs/108-team-view-degradation/verification.md`: one `SC-001_status`…`SC-008_status` row each with value, note, command and evidence pointer; the `final`-path criteria SC-001…SC-004 read `pass` and the single smoke record carries `smoke_command=`, `smoke_exit_code=0` and an existing non-empty `smoke_evidence_path=`; the `supporting` criteria SC-005…SC-008 record their evidence (condition set owner: `shared/workflow/acceptance-hardening.md` § Gates).
+- [ ] T028 [blockedBy: T025] Verify the no-shape-change claim: a read-only `git diff --stat 54c6efa8c..HEAD` against `skills/internal/create-team/SKILL.md` and `skills/internal/create-team/references/create-mode.md` is empty, and the corpus-replica test still recognizes 13/13 while compact `<YYYYMMDD>T<hhmmss>Z-report.md` names stay reports; record the reading in `test-evidence/shape-change-guard.txt` (FR-023).
+- [ ] T029 [blockedBy: T025,T026,T027,T028] Assemble the crew-side close-out input `.specify/specs/108-team-view-degradation/test-evidence/verification-input.md`: one `SC-001_status`…`SC-008_status` row each with value, note, command and evidence pointer; the `final`-path criteria SC-001…SC-004 read `pass` and the single smoke record carries `smoke_command=`, `smoke_exit_code=0` and an existing non-empty `smoke_evidence_path=`; the `supporting` criteria SC-005…SC-008 record their evidence (condition set owner: `shared/workflow/acceptance-hardening.md` § Gates). `verification.md` is derived spec-side from this input and MUST NOT be written by the crew (handoff/team forbidden list).
 
-**Checkpoint**: quickstart 全场景有实录；定向集零新增失败；命名 owner 与 schema 未变；`verification.md` 可被 review 直接消费。
+**Checkpoint**: quickstart 全场景有实录；定向集零新增失败；命名 owner 与 schema 未变；`test-evidence/verification-input.md` 可被 spec 侧直接派生为 `verification.md` 供 review 消费。
 
 ---
 
@@ -311,7 +311,7 @@ Task: "Author the US1 integration tests in tests/integration/test_team_view_degr
 2. US1 → 真实运行历史可读且最新正确（MVP）。
 3. US2 → 降级团队诚实呈现并给出修复路径。
 4. US3 → 封闭语义、三面一致、健康保真与零写盘。
-5. Polish → quickstart 实录、定向集收口与 `verification.md`。
+5. Polish → quickstart 实录、定向集收口与 `test-evidence/verification-input.md`（spec 侧派生 `verification.md`）。
 
 ### Parallel Team Strategy
 

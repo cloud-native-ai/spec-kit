@@ -1,0 +1,1 @@
+exec-quant: recorded skill:analyze-artifacts run=r20261126T092355Z-108ar2 resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/team-view-degradation/.specify/exec-quant/records/20261126T092410989193Z-8491c499.json

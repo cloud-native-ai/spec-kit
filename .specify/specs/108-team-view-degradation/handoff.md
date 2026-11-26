@@ -23,7 +23,7 @@ None.
 
 ## Task Reference
 
-T001–T029 as defined in `.specify/specs/108-team-view-degradation/tasks.md`.
+T001–T029 as defined in `.specify/specs/108-team-view-degradation/tasks.md`. T029's crew-side deliverable is `.specify/specs/108-team-view-degradation/test-evidence/verification-input.md`; `verification.md` is derived spec-side from that input and is never a crew write.
 
 ## Territory
 
@@ -32,7 +32,7 @@ T001–T029 as defined in `.specify/specs/108-team-view-degradation/tasks.md`.
 - write: `shared/**`, `skills/**`, `scripts/**`, `src/specify_cli/**`, `templates/**`, `agents/**`, `tests/**`, `docs/reference/**`, `docs/concepts/**`, `docs/tutorials/**`
 - write: `.specify/{shared,scripts,templates,agents/templates,skills}/**`, `.github/prompts/**`, `.claude/commands/**`, `.qoder/commands/**`, `.opencode/command/**`, `.specify/instructions.md`, `.specify/glossary.md`, `.specify/.gitignore`, `pyproject.toml`
 
-Forbidden to every seat carrying the expansion (C-62): `requirements.md`, `tasks.md`, `verification.md`, `handoff.md`, `plan.md`, `data-model.md`, `contracts/**`, `quickstart.md`, `research.md`, `feature-ref.md`, `checkpoints/**`, `.specify/anchoring/**`, `.specify/teams/**`, `.specify/state/**`, `.specify/features.md`, `.specify/features/027-team-management.md`, dated documentation trees.
+Forbidden to every seat carrying the expansion (C-62): `requirements.md`, `tasks.md`, `verification.md`, `handoff.md`, `plan.md`, `data-model.md`, `contracts/**`, `quickstart.md`, `research.md`, `feature-ref.md`, `checkpoints/**`, `.specify/anchoring/**`, `.specify/teams/**`, `.specify/state/**`, `.specify/features.md`, `.specify/features/027-team-management.md`, dated documentation trees. `verification.md` stays forbidden because it is derived spec-side from the crew's `test-evidence/verification-input.md`, not written by a seat.
 
 ## Acceptance Criteria
 

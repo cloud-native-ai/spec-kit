@@ -1,0 +1,10 @@
+{
+  "count_since_submission": 588,
+  "threshold": 10,
+  "should_prompt": true,
+  "total_entries": 588,
+  "submitted_at": null,
+  "legacy_remaining": 1,
+  "external_count": 0,
+  "legacy": false
+}
