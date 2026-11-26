@@ -14,3 +14,15 @@
 
 ## Published-state check (5b)
 - trunk `master`; expected/recorded after the push below.
+
+### Published-state reading — 2026-11-26T13:15Z
+
+| remote | refs/heads/master | expected | verdict |
+|---|---|---|---|
+| github | b473838af372 | b473838af372 | converged |
+| gitee | b473838af372 | b473838af372 | converged |
+| gitlab | 89946b9da (re-fetched) | b473838af372 | **diverged — named residue** |
+
+- Read command: `git ls-remote <remote> refs/heads/master` after pushing the ff-merge. github and gitee returned the corrected trunk.
+- **Residue `published-gitlab-diverged`**: gitlab's master carries `89946b9da feat(draw-diagram): runnable per-engine readback, quality gate and shared render client` on top of `54c6efa8c` — a commit not in this line's history and not authored by this run. Per the no-force rule the push was stopped for this remote only; local and the other two remotes are unaffected.
+- **Unblock**: the owner of `89946b9da` reconciles it with the current master (rebase onto / merge from `b473838a` and resolve); after that, `git push gitlab master` converges. No force push is authorized.
