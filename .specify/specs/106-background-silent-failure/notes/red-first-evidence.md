@@ -308,3 +308,59 @@ Prerequisites).
 | C4 | `test_late_completion_after_the_deadline_lands_on_its_own_label` (native `silent-end`, `deadline-passed`); foreground-terminal branch pinned by `test_c4_run_agent_native_settlement_obligations` (`foreground-terminal`, `no settlement edge`) | `test_c4_live_native_inside_its_deadline_is_running` | C4 obligations are behavior-class beyond the text pins (C-34) |
 | C5 | exclusion: `test_c5_virtual_exclusion_is_written_in_three_execution_modes`; no attempt record (engine carriers assert C5/C6 contribute no reader) | n/a — excluded by contract; the assertion IS the exclusion | unfinished virtual work must not be reported `completed` |
 | C6 | through the compliant runner: `test_c2_sigkill_silent_death_settles_silent_end` (real `dispatch.sh` run); per-value dispositions `test_c6_recipes_carry_per_value_dispositions` | through-runner live leg: `test_c2_long_silence_with_a_live_pid_stays_running` | C6 settles only via C1/C2 evidence or foreground-terminal |
+
+## T028 — migration contract, green-on-arrival (declared exception)
+
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_migration.py -q`
+- Exit code: **0** on the first run; real output: `8 passed in 6.30s`.
+- **Planned red did not reproduce (disclosed)**: tasks.md expected the module to stay red
+  until T029 landed the `legacy` field. The field — and the whole version-bearing shape
+  rule — actually shipped inside the T007 settle action (commit `eabebe7bf`:
+  `version_bearing` at `scripts/python/role-edge-check.py:1194`, legacy annotation at
+  `:1571`), because the C-28 legs required 5-column vs 7-column parsing from the start.
+  There is exactly one reading consistent with the recorded intent: T028 is the declared
+  migration/regression **guard** (tasks.md § Tests Mode exception), and its red capability
+  is evidenced by the T021 reaction drill, the T025 mutation drills and the T032 honesty
+  record — not by a manufactured red here. No source was rolled back to fake a red.
+- What the 8 legs pin (all against the already-delivered behaviour):
+  `test_legacy_annotated_not_compliant` (legacy fixture: `legacy: true`, derived
+  `completed`, rc 0, tree hashes unchanged), `test_versioned_claim_is_audited`
+  (`settlement_version: 1`, `legacy: false`, clean audit, hashes unchanged),
+  `test_version_bearing_is_decided_by_claim_shape` (claim file by field, report row by
+  7-column header), `test_legacy_disagreement_is_annotated_not_a_violation` (legacy claim
+  vs derived value: `consistent: false` yet zero violations and rc 0),
+  `test_unreadable_legacy_claim_is_unknown_exit_two_naming_the_pointer` /
+  `test_unreadable_versioned_record_is_unknown_exit_two_naming_the_pointer` (the single
+  deterministic refusal names the pointer in both shapes),
+  `test_incompatible_change_ledger_is_empty` (exactly one declared version across
+  `shared/ skills/ templates/ agents/ scripts/`; owner page declares it the first
+  version), `test_engine_carries_no_prebuilt_version_rejection` (no version comparison
+  in the engine; a `settlement_version: 2` claim is audited — clean claim stays clean,
+  bad value hits the ordinary `settlement-out-of-set` predicate).
+
+## T029 — settle output version / legacy (verification, no code delta)
+
+- T029's deliverable was already present in the T007 commit (see T028 entry). Verified
+  against the task's checklist with real CLI readings on the committed fixture pair
+  (scratch roots `.specify/.tmp/p4-t029/{state,teams}`, empty):
+  - legacy fixture → rc **0**; `legacy-run` `verdict=completed`, `legacy=true`,
+    `claim.settlement_version=null`, `violations=[]`, `consistent=true`.
+  - versioned fixture → rc **0**; `versioned-run` `verdict=completed`, `legacy=false`,
+    `claim.settlement_version=1`, `violations=[]`.
+- Checklist mapping (code pointers, no source change made):
+  - version-bearing by shape — claim file `settlement_version` presence `:1194`;
+    team-report 5-column vs 7-column header `:1209`, `:1224-1250`;
+  - legacy still derives from raw evidence — `_derive_settlement` runs before the claim
+    audit `:1504-1560`; `_audit_claims` exempts legacy from all three predicates
+    `:1587-1590`;
+  - 5-column row exempt from `settlement-unrecorded` (exit 0), 7-column row missing
+    `end_state`/`evidence` → `settlement-unrecorded` (exit 1) — pinned in
+    `test_settlement_carriers.py::test_c3_legacy_five_column_row_is_annotated_not_judged`
+    / `test_c3_missing_end_state_is_settlement_unrecorded`;
+  - compliance counting only on version-bearing records — every violation row is
+    produced by the version-bearing branch of `_audit_claims`; the legacy leg asserts
+    `violations == []` and `summary.violations == 0` (T028);
+  - legacy annotation never affects the exit code — `settle_exit_code` reads only
+    `summary.unknown` and `violations` `:1738-1743`;
+  - no new rejection branch — `test_engine_carries_no_prebuilt_version_rejection`
+    (T028) plus the absence of any version comparison in the engine.
