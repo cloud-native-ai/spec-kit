@@ -1,0 +1,53 @@
+## git status before (porcelain)
+?? .specify/specs/108-team-view-degradation/.specify/
+?? .specify/specs/108-team-view-degradation/test-evidence/review-quickstart.txt
+?? .specify/specs/108-team-view-degradation/test-evidence/review-smoke.txt
+?? .specify/specs/108-team-view-degradation/test-evidence/review-targeted-failed.txt
+?? .specify/specs/108-team-view-degradation/test-evidence/review-targeted.txt
+## S-0 --help
+usage: team-view.py [-h] [--repo-root REPO_ROOT]
+                    [--scope {teams,auto,anchor,goals}] [--spec-dir SPEC_DIR]
+                    [--json] [--version]
+                    [<team-slug>]
+
+Read-only team view: six information groups for one team, or an overview of every team in the archive.
+
+positional arguments:
+  <team-slug>           exact slug under .specify/teams/; omitted = overview
+                        of every team
+
+options:
+  -h, --help            show this help message and exit
+  --repo-root REPO_ROOT
+                        repository root (default: derived from this file's own
+                        resolved path)
+  --scope {teams,auto,anchor,goals}
+                        archive layer selector; teams is the serviced layer,
+                        auto only for one slug
+  --spec-dir SPEC_DIR   forwarded to the binding engine read; a no-slug
+                        overview performs no engine read and refuses the value
+                        with exit 2; never decides a landing point
+  --json                emit the internal test envelope instead of the human-
+                        facing rendering
+  --version             print the script name and the framework version, then
+                        exit
+
+side-effects: none; reads the team archive and prints; a flag-only invocation writes nothing
+exit-codes: 0 rendering produced; 2 input error; 3 team not found; 4 definition corrupt; 5 rendered with a degraded engine read (degradation reasons: engine-degraded | report-recognition-uncertain; owner: .specify/specs/108-team-view-degradation/contracts/team-view-program.contract.md)
+EXIT=0
+## S-0 --version
+team-view.py 0.0.22
+EXIT=0
+## S-0 viz-skill-arena live
+- 运行报告: 已列出（共 5 份，显示最新 5 份，省略 0）
+- 最近报告（latest_report）: 2026-09-15T090000Z-report.md
+EXIT=0
+## S-0 baseline object
+baseline-object-present
+81fad3f9df019319c75d1a73c1ffa27338ac942db6b22c4b90e6b5b61e7bf06b  -
+## git status after
+?? .specify/specs/108-team-view-degradation/.specify/
+?? .specify/specs/108-team-view-degradation/test-evidence/review-quickstart.txt
+?? .specify/specs/108-team-view-degradation/test-evidence/review-smoke.txt
+?? .specify/specs/108-team-view-degradation/test-evidence/review-targeted-failed.txt
+?? .specify/specs/108-team-view-degradation/test-evidence/review-targeted.txt

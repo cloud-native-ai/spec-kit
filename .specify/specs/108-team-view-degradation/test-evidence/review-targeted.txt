@@ -1,0 +1,10 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_team_view_report_recognition.py tests/contract/test_team_view_degradation_contract.py tests/integration/test_team_view_degradation.py tests/unit/test_team_view_parsers.py tests/contract/test_team_view_program_contract.py tests/contract/test_team_view_command.py tests/integration/test_team_view_program.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 48%]
+........................................................................ [ 96%]
+.....                                                                    [100%]
+149 passed in 7.03s
+# failed-name list written: .specify/specs/108-team-view-degradation/test-evidence/review-targeted-failed.txt (0 entries) passes=1

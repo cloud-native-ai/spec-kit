@@ -1,0 +1,7 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_team_view_degradation_contract.py tests/integration/test_team_view_degradation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.....................................                                    [100%]
+37 passed in 6.88s
