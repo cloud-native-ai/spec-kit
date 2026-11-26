@@ -146,39 +146,39 @@ A slot is complete only with all three; prefilled fields below are the skeleton.
 
 ### Slot C-CLOSED-SETS
 
-- **Planned node ids**: `test_reason_set_is_closed`, `test_envelope_keys_unchanged_with_nested_additions`, reverse samples
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py -k "closed or envelope"`
-- **Real output**: _(filled by T019)_
-- **Exit status**: _(filled by T019)_
+- **Planned node ids**: `test_reason_set_is_closed`, `test_exit_mapping_two_of_two`, `test_envelope_keys_unchanged_with_nested_additions`, reverse samples
+- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py -q` (2026-11-26; whole-file run before T021–T023)
+- **Real output**: all three nodes **pass** at authoring time (`17 passed, 1 failed in 6.82s`) — the closed reason set, the 2/2 exit mapping and the ten-key envelope landed with T008–T017, so this cluster is a pinning guard rather than a red slot; the whole-file failure belongs to C-THREE-SURFACE-CONSISTENCY
+- **Exit status**: 1 (whole file; 0 would mean the red capture is not red)
 - **Evidence file**: `test-evidence/us3-red-contract.txt`
-- **Subject matcher**: `{engine-degraded, report-recognition-uncertain}` 2/2 exit-5 mapping; `0/2/3/4/5` unchanged; ten-key envelope with nested additions only; `degraded` true iff a reason is active; reason-outside-set reverse sample.
+- **Subject matcher**: `{engine-degraded, report-recognition-uncertain}` (reverse sample = set equality), 2/2 exit-5 mapping, `0/2/3/4/5` unchanged, ten-key envelope with nested additions only, `degraded` true iff a reason is active.
 
 ### Slot C-SINGLE-ENTRY
 
-- **Planned node ids**: `test_single_recognition_entry_source_scan`, `test_script_interface_stays_closed`
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py -k "single_recognition or script_interface"`
-- **Real output**: _(filled by T019)_
-- **Exit status**: _(filled by T019)_
+- **Planned node ids**: `test_single_recognition_entry_source_scan`, `test_script_interface_stays_closed`, `test_only_the_three_declared_engine_reads`
+- **Command**: same whole-file run (2026-11-26; before T021–T023)
+- **Real output**: all three nodes **pass** at authoring time — exactly one `def classify_runs(` and one compiled timestamp grammar with `build_persistence` / `build_overview_row` as the only call sites, the closed CLI surface with zero-write `-h`/`--help`/`--version`, and exactly the three declared engine reads (`binding team`, `list`, `targets --list`)
+- **Exit status**: 1 (whole file)
 - **Evidence file**: `test-evidence/us3-red-contract.txt`
-- **Subject matcher**: exactly one `def classify_runs(` and one compiled timestamp grammar; overview calls the same entry; closed CLI surface with zero-write `-h`/`--help`/`--version`.
+- **Subject matcher**: C-102 / C-103 / C-106 / C-101.
 
 ### Slot C-LABEL-CLOSURE
 
-- **Planned node ids**: `test_label_closure_both_directions` and the label subset member tests (`test_missing_state_subset_members` … `test_no_substitute_label_or_empty_reason`)
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py -k "label or subset_members or residue_line_form or roster_not_comparable or substitute_label"`
-- **Real output**: _(filled by T019)_
-- **Exit status**: _(filled by T019)_
+- **Planned node ids**: `test_label_closure_both_directions`, `test_missing_state_subset_members`, `test_declaration_subset_members`, `test_derived_label_members`, `test_new_derived_label_members`, `test_residue_line_form_in_owner`, `test_roster_not_comparable_form_in_owner`, `test_no_substitute_label_or_empty_reason`
+- **Command**: same whole-file run (2026-11-26; before T021–T023)
+- **Real output**: all eight nodes **pass** at authoring time — the label constants close against the owner tables in both directions (20 owner members; 17 program constants), the residue / roster line forms match the owner, and no catch-all label or empty reason exists in the program
+- **Exit status**: 1 (whole file)
 - **Evidence file**: `test-evidence/us3-red-contract.txt`
-- **Subject matcher**: label constants ↔ `contracts/view-labels.contract.md` in both directions; label-outside-owner reverse sample; every member has an emitting site.
+- **Subject matcher**: C-401…C-408.
 
 ### Slot C-THREE-SURFACE-CONSISTENCY
 
-- **Planned node ids**: `test_three_surfaces_cite_the_owner`, `test_report_naming_owner_and_schema_unchanged_since_baseline`, import-root audit
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py -k "three_surfaces or naming_owner or import"`
-- **Real output**: _(filled by T019)_
-- **Exit status**: _(filled by T019)_
+- **Planned node ids**: `test_three_surfaces_cite_the_owner`, `test_report_naming_owner_and_schema_unchanged_since_baseline`, `test_goal_utils_is_untouched_since_baseline`, `test_import_roots_are_stdlib_local_or_pytest`
+- **Command**: same whole-file run (2026-11-26; red before T021–T023)
+- **Real output**: `test_three_surfaces_cite_the_owner` → `E AssertionError: docs View Mode does not name reason report-recognition-uncertain` (docs page, skill row 5 and program declaration still carry the pre-108 wording); summary `1 failed, 17 passed in 6.82s`. The other three nodes pass at authoring time (baseline `git show` equality, goal-utils zero-modification, import-root audit) — they guard claims that must keep holding.
+- **Exit status**: 1
 - **Evidence file**: `test-evidence/us3-red-contract.txt`
-- **Subject matcher**: docs page / skill / program declaration each name both reason ids and cite `contracts/team-view-program.contract.md`; `git show 54c6efa8c:` equality for the naming owner and `create-mode.md`; import-root audit (stdlib ∪ repo-local ∪ pytest, zero new third-party).
+- **Subject matcher**: docs / skill / program declaration each name both reason ids and cite `contracts/team-view-program.contract.md`; `git show 54c6efa8c:` equality for the naming owner and `create-mode.md`; import-root audit (stdlib ∪ repo-local ∪ pytest, zero new third-party).
 
 ## Green reading (T012, 2026-11-26)
 

@@ -1,0 +1,36 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_team_view_degradation_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.............F....                                                       [100%]
+=================================== FAILURES ===================================
+______________________ test_three_surfaces_cite_the_owner ______________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_three_surfaces_cite_the_owner():
+        docs = DOCS_PAGE.read_text(encoding="utf-8")
+        view_section = docs[docs.index("## View Mode"):]
+        following = re.search(r"^## ", view_section[len("## View Mode"):], re.MULTILINE)
+        view_section = view_section[: len("## View Mode") + following.start()] if following else view_section
+        skill = SKILL_PAGE.read_text(encoding="utf-8")
+        help_output = run_program("--help")
+        docstring = team_view.__doc__ or ""
+    
+        surfaces = {
+            "docs View Mode": view_section,
+            "skill": skill,
+            "program --help": help_output.stdout,
+            "program docstring": docstring,
+        }
+        for name, text in surfaces.items():
+            for reason in REASONS:
+>               assert reason in text, "%s does not name reason %s" % (name, reason)
+E               AssertionError: docs View Mode does not name reason report-recognition-uncertain
+E               assert 'report-recognition-uncertain' in '## View Mode\n\n`/speckit.team view [team-slug]` is a **strictly read-only** presentation: it writes no\ndefinition, ...`. `--target` carried by view is a\n  mode/parameter conflict and is reported, never silently dropped or rerouted.\n\n'
+
+tests/contract/test_team_view_degradation_contract.py:306: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_team_view_degradation_contract.py::test_three_surfaces_cite_the_owner
+1 failed, 17 passed in 6.82s
+rc=1
