@@ -58,6 +58,8 @@ SDD transforms requirement changes from obstacles into normal workflow. When spe
 
 **Branching for Exploration**: Generate multiple implementation approaches from the same specification to explore different optimization targets—performance, maintainability, user experience, cost.
 
+**Governed Decision Items**: every decision item a producer makes follows the framework's single owner page `shared/definitions/decision-definitions.md` — the two decision classes and their presentation templates, the option-set contract, the record grammar, the transmission obligations and the legacy rules all live there; this page points at it and restates none of its rules.
+
 ## Implementation Approaches
 
 Today, practicing SDD requires assembling existing tools and maintaining discipline throughout the process. The methodology can be practiced with:
