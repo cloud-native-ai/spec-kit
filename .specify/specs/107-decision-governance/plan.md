@@ -17,8 +17,8 @@ Deliver one normative owner page for general AI-agent decision items (`shared/de
 **Target Platform**: framework repository (framework sources + client-runtime mirrors); downstream client projects receive the instruction section through `specify init` / refresh
 **Project Type**: CLI / documentation framework — no application runtime
 **Performance Goals**: N/A — the checker is one read-only pass over text files; no service, no resident process
-**Constraints**: A-13 section cap 1,500 B; total instructions budget ruling 38,912 → 40,960 B (T-001); zero new `scan-confirmation-gates.py` hits against `test-evidence/scan-confirmation-gates-baseline.txt`; the three FR-025 preservation owners (sentinel literals / watcher verdicts-exit codes / two-slot test budget) stay byte-identical to base `fbab7a45c`; `regen-command-copies.py --check` stays rc 0; no new mirror drift against the measured baseline; checker is read-only with `--help` / `--version`; no second registry
-**Scale/Scope**: 12 producers (P-01…P-12), 9 machine rules (M-01…M-09), 6 behavior rules (B-01…B-06), 6 backward-incompatible rows, 1 new owner page, 21 landing files plus mirrors, 5 contracts
+**Constraints**: A-13 section cap 1,500 B; total instructions budget ruling 38,912 → 40,960 B (T-001); zero new `scan-confirmation-gates.py` hits against `test-evidence/scan-confirmation-gates-baseline.txt`; the three FR-025 preservation owners (sentinel literals / watcher verdicts-exit codes / two-slot test budget) stay byte-identical to the effective FR-025 baseline (default `fbab7a45c`, replaced only by a recorded re-baseline ruling; the allowed-delta set stays unconditionally empty); `regen-command-copies.py --check` stays rc 0; no new mirror drift against the measured baseline; checker is read-only with `--help` / `--version`; no second registry
+**Scale/Scope**: 12 producers (P-01…P-12), 9 machine rules (M-01…M-09), 7 behavior rules (B-01…B-07), 6 backward-incompatible rows, 1 new owner page, 21 landing files plus mirrors, 5 contracts
 
 ## Constitution Check
 
@@ -129,9 +129,9 @@ skills/external/sdd-loop-driver/references/dispatch-recipes.md      # + one poin
 skills/external/sdd-loop-driver/references/stage-prompts.md         # + one pointer where dispatches carry decisions (P-09)
 skills/internal/run-agent/SKILL.md                # decision block build/validate + receipt duties (P-09)
 skills/internal/run-team/SKILL.md                 # same pointer + hand-off duty (P-09)
-skills/internal/analyze-artifacts/SKILL.md        # B-04/B-05 named review surface pointer (P-05)
-skills/internal/review-feature-quality/SKILL.md   # B-01…B-06 named review surface pointer (P-06)
-skills/internal/review-sdd-process/SKILL.md       # B-01…B-06 named review surface pointer (P-06)
+skills/internal/analyze-artifacts/SKILL.md        # B-04/B-05/B-07 named review surface pointer (P-05)
+skills/internal/review-feature-quality/SKILL.md   # B-01…B-07 named review surface pointer (P-06)
+skills/internal/review-sdd-process/SKILL.md       # B-01…B-07 named review surface pointer (P-06)
 templates/instructions-template.md                # + whole section `## Decision Items（决策项）`, cap 1,500 B (A-13)
 scripts/bash/generate-instructions.sh             # INSTRUCTIONS_BUDGET_BYTES 38,912 → 40,960 (T-001 ruling)
 scripts/python/validate-decisions.py              # NEW read-only checker (M rules; script-interface compliant)

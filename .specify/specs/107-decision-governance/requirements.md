@@ -160,7 +160,7 @@
 1. **Given** 任一机器可判规则，**When** 移除其守卫或让被检查对象违反它，**Then** 测试转红且定位到该规则。
 2. **Given** 任一行为类规则，**When** 查评审承接面，**Then** 存在具名承接面（analyze / review 段 / 人工评审）；文档或测试不得声称它被机器覆盖。
 3. **Given** 新增守卫，**When** 运行既有测试入口，**Then** 经 `scripts/bash/run-tests.sh` 执行；新脚本若存在，`--help`/`--version` 可用且拒绝未声明选项。
-4. **Given** 治理落地，**When** 运行 `scan-confirmation-gates.py`，**Then** 相对基线 `test-evidence/scan-confirmation-gates-baseline.txt` 无新增阻塞门控命中，且 FR-025 的哨兵 / watcher / 两槽预算三产物保全读数（`git diff --quiet fbab7a45c..HEAD -- …` rc 0）成立，除非有符合 FR-025 形态的记录在案裁定。
+4. **Given** 治理落地，**When** 运行 `scan-confirmation-gates.py`，**Then** 相对基线 `test-evidence/scan-confirmation-gates-baseline.txt` 无新增阻塞门控命中，且 FR-025 的哨兵 / watcher / 两槽预算三产物保全读数（对有效基线的 `git diff --quiet <有效基线>..HEAD -- …` rc 0；有效基线缺省为 `fbab7a45c`，仅由记录在案的重定基线裁定更新，允许差异集恒为空）成立。
 
 ---
 
@@ -236,9 +236,9 @@
 **强制**
 
 - **FR-022**: MUST 为机器可判子集提供守卫，且每个守卫 MUST 能转红：M-01 记录分层文法/类取值/时点形态；M-02 [[STR-006]] 为 true 时 [[STR-005]] 存在且具名维度数达下限；M-03 选项闭集（空集/重复标签/`other` 无 `path`/五要素缺失）；M-04 新式记录（判定式：`^### D-\d{3}` 标题且块内含 ≥1 条 FR-014 字段行 `- **<field>**: <value>`；这是最小合格形态，块不完整由 M-01 判缺字段）的 `D-NNN` 形态、同载体密集性与 register 可解析（legacy 标题与 register 行不判）；M-05 [[STR-008]] 存在且 [[STR-009]] 可解析；M-06 决策 backed 派发的决策块完整性；M-07 审计链三段在场；M-08 结构化决策主体命中 glossary 已登记 variant（canonical 存在）时转红（只覆盖已登记词）；M-09 evidence 指针可解析（指向的载体路径/锚不存在或不可读即转红；只判解析不判充分性）。
-- **FR-023**: 行为类规则 MUST 点名评审承接面并 MUST NOT 冒充机器覆盖：B-01 完整名称是否足够完整；B-02 定位维度是否足够区分；B-03 人工可读性与后果/可逆陈述的真实性；B-04 AI 决策谓词/假设/确定性是否成立；B-05 理由是否充分；B-06 类别是否选对。承接面至少覆盖 `/speckit.analyze`（产物一致性）、`/speckit.review`（产物/实现/代码段）与人工决策评审。
+- **FR-023**: 行为类规则 MUST 点名评审承接面并 MUST NOT 冒充机器覆盖：B-01 完整名称是否足够完整；B-02 定位维度是否足够区分；B-03 人工可读性与后果/可逆陈述的真实性；B-04 AI 决策谓词/假设/确定性是否成立；B-05 理由是否充分；B-06 类别是否选对；B-07 受保护产物改动的裁定充分性（三路径改动是否有符合 FR-025 形态的重定基线裁定，且裁定所具名改动与该裁定引入提交的实际 diff 是否一致）。承接面至少覆盖 `/speckit.analyze`（产物一致性）、`/speckit.review`（产物/实现/代码段）与人工决策评审。
 - **FR-024**: 每个守卫 MUST 配一个逆向/变异样本（把被检查对象改坏后守卫转红），无逆向样本的守卫视为缺陷；守卫 MUST 经唯一测试入口执行；新增脚本若存在 MUST 满足 `script-interface-definitions.md`。
-- **FR-025**: 本特性 MUST NOT 新增阻塞式确认门控。门控读数与保全面各以具名基线判定：① **门控扫描**——`scan-confirmation-gates.py` 的治理后复扫相对基线 `test-evidence/scan-confirmation-gates-baseline.txt`（31 blocking / 0 violations）MUST 零新增命中（命中集差值 = 空、blocking 计数不变）；② **保全面（containment claim）**——比较单元为三个所有者产物的**全文逐字节比较**：`shared/declarations/facts/driver-completion-sentinels.yaml`（哨兵字面量）、`skills/external/sdd-loop-driver/references/watch-model.md`（watcher verdict/退出码）、`skills/external/sdd-loop-driver/references/efficiency-model.md`（两槽测试预算的 §2 规则所在所有者文件，取全文以消除章节抽取歧义）；基线参照物 = requirements 阶段基线提交 `fbab7a45c`（记录于 `test-evidence/requirements-stage-2026-11-25.md`），读数 = `git diff --quiet fbab7a45c..HEAD -- <上述三路径>` MUST rc 0（`--numstat` 零行）；允许差异集在无裁定时为空，补集断言为「三路径对基线逐字节一致」。任何使该读数非零的改动 MUST 先有**记录在案的裁定**：裁定 MUST 是一条符合 FR-014 的决策记录（`D-NNN`，落于改动面所属生产者的既有载体）或阶段检查点 `<spec-dir>/checkpoints/<NN>-<stage>.md` 中的具名裁决，且 MUST 逐一具名被改动的字面量/行为、新值与理由；无此裁定的改动即缺陷（评审承接，不冒充机器覆盖）。
+- **FR-025**: 本特性 MUST NOT 新增阻塞式确认门控。门控读数与保全面各以具名基线判定：① **门控扫描**——`scan-confirmation-gates.py` 的治理后复扫相对基线 `test-evidence/scan-confirmation-gates-baseline.txt`（31 blocking / 0 violations）MUST 零新增命中（命中集差值 = 空、blocking 计数不变）；② **保全面（containment claim，允许差异集恒为空）**——比较单元为三个所有者产物的**全文逐字节比较**：`shared/declarations/facts/driver-completion-sentinels.yaml`（哨兵字面量）、`skills/external/sdd-loop-driver/references/watch-model.md`（watcher verdict/退出码）、`skills/external/sdd-loop-driver/references/efficiency-model.md`（两槽测试预算的 §2 规则所在所有者文件，取全文以消除章节抽取歧义）；基线参照物 = **有效基线**：缺省为 requirements 阶段基线提交 `fbab7a45c`（记录于 `test-evidence/requirements-stage-2026-11-25.md`），仅当存在记录在案的重定基线裁定时替换为该裁定钉定的提交；读数 = `git diff --quiet <有效基线>..HEAD -- <上述三路径>` MUST rc 0（`--numstat` 零行），补集断言为「三路径对有效基线逐字节一致」。**允许差异集恒为空集（∅），与是否存在裁定无关**：裁定不是差异集的扩宽，而是**重定基线（re-baseline）**——把有效基线更新为被裁定改动后的状态，此后补集断言照原样适用于新基线（集合之内无成员，结构不变量一侧为空真，不承载任何豁免）。**裁定形态（唯一）**：任何改动三路径的提交 MUST 与一条**记录在案的裁定**同批落盘（同一提交）；裁定 MUST 是一条符合 FR-014 与 FR-015 的决策记录（`D-NNN`，编号与登记语义按 FR-015），载体为阶段检查点 `<spec-dir>/checkpoints/<NN>-<stage>.md`（生产者 P-04），且 MUST ①逐一具名被改动的字面量/行为、新值与理由；②钉定后继基线 = 引入该裁定记录的同一提交（该提交相对前一有效基线的三路径 diff MUST 恰为裁定所具名的改动）。无裁定的三路径改动即缺陷，由 B-07 承接（评审，不冒充机器覆盖）。
 
 **落地与兼容**
 
@@ -304,6 +304,7 @@
 | B-04 | AI 严谨性 | `/speckit.analyze` + `/speckit.review` | 谓词不可执行、假设缺失、结论不可重放 | 行为类 |
 | B-05 | 理由充分性 | `/speckit.analyze` + `/speckit.review` | 理由未支撑选中项或与证据矛盾 | 行为类 |
 | B-06 | 类别正确性 | `/speckit.review` 产物段 | 类别与持有者不符（如无人值守却标 human-interactive 且未停等） | 行为类 |
+| B-07 | 保全裁定充分性（受保护产物改动） | `/speckit.analyze` + `/speckit.review` 产物段 | 三路径相对有效基线存在非零读数且无符合 FR-025 形态的裁定；或裁定的引入提交未同时承载被裁定改动、该提交的三路径 diff 与裁定所具名改动不符 | 行为类，不声称机器覆盖 |
 
 ### Landing & Compatibility Inventory (candidates; plan owns the closed list)
 
@@ -344,7 +345,7 @@
 - **SC-005**: 归档可重建：对夹具决策集（覆盖 requirements/plan/checkpoint/run report 四类载体），仅用 register + 载体即可重建每条记录的适用层全部字段（基础层 + 触发成立的条件族；四类载体均非传递生产者，只判基础层与到场条件族）；删任一适用层必填字段触发 M-01（`decision_id` 不可解析时另由 M-04 判）转红，改坏任一 evidence 指针触发 M-09 转红；承重决策的记录不含六字段副本且 `T-NNN` 可解析。**Path**: final
 - **SC-006**: 传递与实施可审计：决策 backed 派发含完整决策块（M-06 绿），回传含确认与 [[STR-008]]（M-05 绿），三段链可解析（M-07 绿）；静默改选夹具产生显式异常；无记录决策派发被拒绝；缺 [[STR-009]] 的回执使 M-05 转红。**Path**: final
 - **SC-007**: 强制诚实：§ Enforcement Boundary 的每条 M 规则都有对应守卫与一个逆向样本，逐条 mutation 演练全部转红且定位到规则；每条 B 规则都有具名承接面；守卫清单与两表逐行一致，缺一即红。**Path**: supporting
-- **SC-008**: 落地与镜像干净：`regen-command-copies.py --check` rc 0；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员（绝对读数如实报告）；instruction 模板与活副本的「Decision Items」段逐字一致且在声明的字节上限内；`scan-confirmation-gates.py` 相对基线 `test-evidence/scan-confirmation-gates-baseline.txt` 零新增门控命中；FR-025 的三产物保全读数相对基线 `fbab7a45c` 为零漂移（`git diff --quiet fbab7a45c..HEAD -- <三路径>` rc 0；无记录在案的裁定时）；空客户项目 init 夹具收到该段。**Path**: supporting
+- **SC-008**: 落地与镜像干净：`regen-command-copies.py --check` rc 0；`sync-mirrors.py --check` 的漂移成员集相对基线无新增成员（绝对读数如实报告）；instruction 模板与活副本的「Decision Items」段逐字一致且在声明的字节上限内；`scan-confirmation-gates.py` 相对基线 `test-evidence/scan-confirmation-gates-baseline.txt` 零新增门控命中；FR-025 的三产物保全读数对**有效基线**（缺省 `fbab7a45c`，仅由记录在案的重定基线裁定更新）为零漂移（`git diff --quiet <有效基线>..HEAD -- <三路径>` rc 0 且 `--numstat` 零行；允许差异集恒为空）；空客户项目 init 夹具收到该段。**Path**: supporting
 - **SC-009**: 兼容与迁移闭包：base `fbab7a45c` 的既有决策记录正文零改写（行级零删除读数：既有记录行零删除、零改写，追加与新增文件允许）；旧形态记录被报告为 `legacy` 且可解析；plan § Backward-Incompatible Change Inventory 的每一行都映射到一条被测试的迁移或确定性拒绝行为，未映射行使守卫转红。**Path**: supporting
 - **SC-010**: instruction 最低门槛生效：生成的 `.specify/instructions.md`（含每工具兼容副本）包含「Decision Items」指针段、两条生产规则与两类强调，且在 A-13 声明的字节上限内。**Path**: final
 
@@ -357,7 +358,7 @@
 - **SC-005 Source**: 四类载体夹具 + register 夹具；重建脚本/runbook 输出；M-01/M-04/M-09 输出；`T-NNN` 交叉引用检查结果。实现与 review 各一次。
 - **SC-006 Source**: 派发载荷快照、回传快照、run report；M-05/M-06/M-07 输出；fast-fail 上送件样例。实现与 review 各一次。
 - **SC-007 Source**: mutation 演练记录（逐守卫的逆向样本执行输出）；§ Enforcement Boundary 与守卫清单的对照表；评审承接面清单。实现与 review 各一次。
-- **SC-008 Source**: `regen-command-copies.py --check` 的 rc 与输出；`sync-mirrors.py --check` 的 rc、输出与相对基线 `test-evidence/sync-mirrors-baseline.txt` 的成员集差值；instruction 模板/活副本 `cmp` 与字节计数；`scan-confirmation-gates.py --summary` 的 `violations` 输出相对基线 `test-evidence/scan-confirmation-gates-baseline.txt`（31 blocking / 0 violations）的命中集差值（零新增）；FR-025 保全面读数：`git diff --quiet fbab7a45c..HEAD -- shared/declarations/facts/driver-completion-sentinels.yaml skills/external/sdd-loop-driver/references/watch-model.md skills/external/sdd-loop-driver/references/efficiency-model.md` 的 rc 与 `--numstat` 行数（rc 0 且零行；非零须附 FR-025 裁定的载体指针）；空项目 init 的树与指令片段。实现与 review 各一次。
+- **SC-008 Source**: `regen-command-copies.py --check` 的 rc 与输出；`sync-mirrors.py --check` 的 rc、输出与相对基线 `test-evidence/sync-mirrors-baseline.txt` 的成员集差值；instruction 模板/活副本 `cmp` 与字节计数；`scan-confirmation-gates.py --summary` 的 `violations` 输出相对基线 `test-evidence/scan-confirmation-gates-baseline.txt`（31 blocking / 0 violations）的命中集差值（零新增）；FR-025 保全面读数：对有效基线（缺省 `fbab7a45c`；重定基线裁定的引入提交可解析时取最新一条）的 `git diff --quiet <有效基线>..HEAD -- shared/declarations/facts/driver-completion-sentinels.yaml skills/external/sdd-loop-driver/references/watch-model.md skills/external/sdd-loop-driver/references/efficiency-model.md` 的 rc 与 `--numstat` 行数（rc 0 且零行；非零且无符合 FR-025 形态的裁定即 B-07 缺陷）；空项目 init 的树与指令片段。实现与 review 各一次。
 - **SC-009 Source**: `git diff --numstat <base>..HEAD -- <既有记录路径集>` 的零删除读数（既有文件删除列 = 0、无删除文件；追加与新增文件允许）；旧记录解析夹具与 `legacy` 报告；plan § Backward-Incompatible Change Inventory + `/speckit.migrate` dry-run/apply/refuse 读数。实现与 review 各一次。
 - **SC-010 Source**: `.specify/instructions.md` 与每工具副本的段抽取；字节计数（`wc -c`）；模板与活副本的 `cmp`。实现一次。
 
@@ -418,3 +419,9 @@
 
 - Q: FR-025 的保全命题（既有哨兵字面量、watcher verdict/退出码、两槽测试预算「保持不变」）没有基线参照物、比较单元与「记录在案的裁定」的记录位置——不可判定怎么办？ → A: 改写为**五要件 containment claim**：①基线参照物 = requirements 阶段基线提交 `fbab7a45c`（记录于 `test-evidence/requirements-stage-2026-11-25.md`）；②比较单元 = 三个所有者产物的全文逐字节比较（`shared/declarations/facts/driver-completion-sentinels.yaml` / `skills/external/sdd-loop-driver/references/watch-model.md` / `skills/external/sdd-loop-driver/references/efficiency-model.md`）；③允许差异集在无裁定时为空；④补集断言 = `git diff --quiet fbab7a45c..HEAD -- <三路径>` rc 0（`--numstat` 零行）；⑤裁定位置与形态 = 符合 FR-014 的 `D-NNN` 决策记录（落于改动面所属生产者的既有载体）或阶段检查点中的具名裁决，须具名被改字面量/行为、新值与理由。门控扫描同样以基线 `test-evidence/scan-confirmation-gates-baseline.txt`（31 blocking / 0 violations）的零新增命中读数表达；SC-008、US5 场景 4、C-405、tasks T043/T054 与 DoD-6 同步按此指针口径。
 - Q: C-206 以「`^### D-\d{3}` 标题 + 携带 C-201 记录字段文法」定义新式记录，但块缺任一基础层字段时该判别式不成立、块被报 `legacy` 而不受判——M-01 的「缺基础层字段」转红条件因此永远无法为它点名的缺陷转红，怎么办？ → A: 判定式明确为**最小合格形态**：`^### D-\d{3}` 标题 **且块内含 ≥1 条字段行**（`- **<field>**: <value>`，字段名属 FR-014 的分层字段集）即新式记录；块不完整由 M-01 判缺字段（exit 1），不会出现「既不新式也不 legacy」的块；无任何字段行、一/两位标题与 register 行（含 `D-001`）保持 `legacy`。C-206、FR-022 M-04 与 § Enforcement Boundary M-04 行、C-401 M-04 行、research M-10 与 R-2、plan § Backward-Incompatible Change Inventory 的既有记录块两行、data-model I-13、tasks T024/T029 同步按此阈值表述。
+
+### Session 2026-11-26（无人值守 analyze 修复第四轮，自行裁决并记录）
+
+- Q: FR-025 写「允许差异集在无裁定时为空」（暗示裁定可使差异集非空）而 C-405 写「允许差异集为空」并把裁定当读数例外；被裁定的（集合之内）差异又没有结构不变量——两种读法并存且都不完整，怎么办？ → A: 统一为 **C-405 一侧的读法并补全重定基线语义**：允许差异集**恒为空集（∅）**，与是否存在裁定无关；裁定不是差异集的扩宽，而是**重定基线（re-baseline）**——裁定把有效基线更新为被裁定改动后的状态（钉定为引入该裁定记录的同一提交），此后补集断言照原样适用于新基线；集合之内无成员，结构不变量一侧为空真。FR-025、C-405、SC-008、SC-008 Source、US5 场景 4 与 CHK028 同步此读法。
+- Q: 裁定有两种可采形态（改动面所属生产者载体的 FR-014 `D-NNN` 记录，或阶段检查点中的具名裁决），但三个受保护产物不属任何 P-01…P-12 生产者载体、第一支不可满足，第二支又不要求 FR-014/FR-015 合规——采哪一种？ → A: 收敛为**唯一形态**：符合 FR-014 与 FR-015 的 `D-NNN` 决策记录，载体为阶段检查点 `<spec-dir>/checkpoints/<NN>-<stage>.md`（生产者 P-04，清单内可满足）；裁定 MUST 与被执行裁定的改动**同提交落盘**，并逐一具名被改字面量/行为、新值与理由，钉定后继基线为引入该裁定记录的同一提交。
+- Q: 「无此裁定的改动即缺陷」只写「评审承接」，没有点名 FR-023 的评审承接面、也没有 M/B 承接行——接不住怎么办？ → A: 新增 **B-07**（保全裁定充分性：三路径相对有效基线的非零读数且无符合 FR-025 形态的裁定，或裁定的引入提交未同时承载被裁定改动、其 diff 与裁定所具名改动不符），承接面 `/speckit.analyze` + `/speckit.review` 产物段，不声称机器覆盖；封闭 B 表扩为 B-01…B-07（先例：第二轮新增 M-09）。FR-023、§ Enforcement Boundary、C-402、tasks 与 checklist 相应指针同步。

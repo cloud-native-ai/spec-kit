@@ -1,0 +1,65 @@
+# analyze-repair4 deterministic readings — 2026-11-26 (final tree, pre-commit)
+
+## pre-analyze summaries (requirements / plan / tasks)
+- requirements: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+- plan: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+- tasks: "summary": {"errors": 0, "advisories": 127, "waived": 0, "fr": 30, "sc": 10, "tasks": 56, "clauses": 38, "files": 14}
+
+## rule / clause / producer counts (closed sets; B intentionally 6 → 7)
+- M rows: 9
+- B rows: 7 (was 6; B-07 added this round — same precedent as M-09 in round 2)
+- P rows: 12
+- BC rows (plan): 6
+- contract clause definitions: 38
+- FR rows: 30
+- SC rows: 10 (validator summary reading)
+- STR rows: 9
+
+## R4-01 — ONE reading: allowed-delta set unconditionally empty; ruling = re-baseline
+- FR-025 (requirements.md:241):
+  - `恒为空集（∅），与是否存在裁定无关` → 1 hit; `裁定不是差异集的扩宽，而是**重定基线（re-baseline）**` → present
+  - effective baseline default named once: `缺省为 requirements 阶段基线提交 \`fbab7a45c\`` → 1 hit
+  - reading form: `git diff --quiet <有效基线>..HEAD -- <上述三路径>` MUST rc 0 (`--numstat` zero rows)
+  - inside-set side: `集合之内无成员，结构不变量一侧为空真，不承载任何豁免` (closed-set-claims element 4 made explicit as vacuous, not waived)
+- C-405 (contracts/enforcement-boundary.contract.md:29): `The allowed-delta set is unconditionally empty` → 1 hit; `it re-baselines the claim` → present; `the structural-invariant side is vacuous and carries no exemption` → present
+- SC-008 (requirements.md:347): `对**有效基线**（缺省 \`fbab7a45c\`，仅由记录在案的重定基线裁定更新）为零漂移` → present; `允许差异集恒为空` → present
+- SC-008 Source (requirements.md:360): effective-baseline reading + `非零且无符合 FR-025 形态的裁定即 B-07 缺陷` → present
+- US5 scenario 4 (requirements.md:163): `对有效基线的 \`git diff --quiet <有效基线>..HEAD\`` → present; the former `除非有…裁定` exception wording removed
+- CHK028 (checklists/decision-governance-2026-11-26.md:56): question rewritten to `恒为空` + `重定基线` + single-form ruling; pass note renewed (`修复第四轮`) → 1 hit
+
+## R4-02 — single ruling form (was two)
+- FR-025: `**裁定形态（唯一）**` → 1 hit; `钉定后继基线 = 引入该裁定记录的同一提交` → 1 hit
+- carrier = stage checkpoint `<spec-dir>/checkpoints/<NN>-<stage>.md` (producer P-04 — satisfiable inside the closed P inventory)
+- conformance = FR-014 + FR-015 (D-NNN, register-at-birth, layered grammar) — the weaker "named checkpoint ruling" branch is gone
+- live two-form remnants outside dated Clarifications: 0 (`落于改动面所属生产者的既有载体）或阶段检查点` / `D-NNN decision record in the carrier of the edited producer, or a named ruling` → 0 hits in requirements/contracts/checklists/tasks/plan)
+- C-405 mirrors the same one form: `conforming to FR-014 and FR-015 (carrier: a stage checkpoint file …, producer P-04) that lands in the same commit as the ruled change`
+
+## R4-03 — the unruled-change defect has a closed receiving row: B-07
+- FR-023: `B-07 受保护产物改动的裁定充分性` → 1 hit (roster B-01…B-07)
+- § Enforcement Boundary table: `^| B-07` → 1 row (`/speckit.analyze` + `/speckit.review` 产物段; `行为类，不声称机器覆盖`)
+- C-402: `the seven behavior rules … B-04/B-05/B-07 → /speckit.analyze + /speckit.review` → 1 hit
+- pointer syncs: tasks.md `B-01…B-07` roster (6 lines), plan.md Scope + 3 pointer lines, checklist CHK026 (`七条`) + header/footer count annotations (`7 B`), features/107-decision-governance.md (4 lines), contracts/text-and-options.contract.md (`B-01…B-07`)
+- FR-025 defect clause now reads `由 B-07 承接（评审，不冒充机器覆盖）`
+
+## preserved surfaces check (this round's edits only)
+- three protected artifacts vs `fbab7a45c`: `git diff --quiet fbab7a45c..HEAD -- shared/declarations/facts/driver-completion-sentinels.yaml skills/external/sdd-loop-driver/references/watch-model.md skills/external/sdd-loop-driver/references/efficiency-model.md` → rc 0; `--numstat` rows: 0
+- `.specify/register.md` untouched; dated records untouched (round-1/2/3 Clarifications sessions and analyze-domain w*-r*.jsonl unchanged); other specs untouched
+- `scan-confirmation-gates.py` baseline untouched (no scanner change this round)
+
+## git diff --numstat (tracked, this round)
+4	4	.specify/features/107-decision-governance.md
+4	4	.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+2	2	.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md
+1	1	.specify/specs/107-decision-governance/contracts/text-and-options.contract.md
+5	5	.specify/specs/107-decision-governance/plan.md
+12	5	.specify/specs/107-decision-governance/requirements.md
+8	8	.specify/specs/107-decision-governance/tasks.md
+
+## untracked round inputs / captures
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-validate-requirements.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-pre-analyze-requirements.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-pre-analyze-plan.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-pre-analyze-tasks.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-validate-tasks.txt
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-decomposition.txt
+?? .specify/specs/107-decision-governance/test-evidence/workspace-analyze-repair4.json

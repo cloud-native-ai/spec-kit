@@ -34,5 +34,5 @@
 
 ## FR 覆盖核对
 
-- FR-006…FR-013 由本文件 C-101…C-109 承接；可转红判据见 `enforcement-boundary.contract.md` 的 M-02 / M-03 / M-08 与 B-01…B-06 行。
+- FR-006…FR-013 由本文件 C-101…C-109 承接；可转红判据见 `enforcement-boundary.contract.md` 的 M-02 / M-03 / M-08 与 B-01…B-07 行。
 - 类别的**选错**（B-06）与名称/定位的**充分性**（B-01/B-02）是行为类，本契约不声称机器覆盖。
