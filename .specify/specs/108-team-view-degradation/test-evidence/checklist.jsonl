@@ -1,0 +1,1 @@
+{"stage": "checklist", "row_type": "stage-status", "status": "not-run-docs-only", "selection_basis": "targeted-set-v1: docs-only stage (checklist); no executable path changed", "changed_paths": [".specify/specs/108-team-view-degradation/checklists/"], "evidence_ptr": ".specify/state/team-view-degradation.md # checklist U4"}

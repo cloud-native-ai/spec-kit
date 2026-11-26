@@ -1,0 +1,1 @@
+{"stage": "tasks", "row_type": "stage-status", "status": "not-run-docs-only", "selection_basis": "targeted-set-v1: docs-only stage (tasks); no executable path changed", "changed_paths": [".specify/specs/108-team-view-degradation/tasks.md"], "evidence_ptr": ".specify/state/u4-team-view-degradation-tasks.txt"}
