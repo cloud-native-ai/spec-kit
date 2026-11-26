@@ -163,6 +163,31 @@ maintained inventory.
 - **Foreground-terminal branch**: when the host provides no background form, declare the dispatch foreground-terminal — the tool return is the termination event and no settlement edge is created.
 - **Virtual exclusion**: virtual dispatch is not background settlement (the parent is the executor, no orphan edge); its rule belongs to the settlement owner and `subagent-definitions.md` § Three Execution Modes — handed off by pointer, with no second mode table here.
 
+**Reaction obligations (反应义务, owner by pointer)**: the settlement owner
+(`shared/definitions/superagent-definitions.md` § Termination, § Reactions) owns the three
+reactions and the no-silent-repair list; this block states only what this skill's parent
+side owes.
+
+- **Settle before reporting**: before the outward completion report, settle every attempt
+  this dispatch opened (`python3 .specify/scripts/python/role-edge-check.py --action
+  settle`), and carry each attempt's settlement value with its evidence pointers in the
+  report. An attempt that could not be settled is listed and explicitly marked
+  「未结算」(unsettled) — never silently omitted and never counted as a success.
+- **Per-attempt reporting**: a failed, anomalous, silently-ended or detection-defect
+  (`unknown`) attempt is reported item by item; an aggregate success voice MUST NOT cover
+  it. A parent report that leaves an attempt unaccounted is incomplete and cannot claim
+  success.
+- **Retry is a new attempt**: a retry is a new attempt with a new label; the old attempt's
+  evidence is kept — never rewritten, never deleted — and its late return is never
+  consumed as the current result (the attempts rule of § The super↔sub Protocol).
+- **Retry precondition**: retrying a `silent-end` or `unknown` attempt requires a named
+  diagnosis or the user's ruling; it is never an ordinary re-dispatch by default.
+- **Stop**: stopping a live attempt records `running` + live evidence + the stop reason —
+  never `silent-end`.
+- **No silent repair**: never fabricate a terminal record, never backfill a missing return
+  element, never rewrite a `.status` line, report or evidence file, never delete evidence,
+  never consume a stale return.
+
 **Multi-child visibility（多子代可见性，仅既有载体）**: several children under one superagent
 are read from the existing carriers only — the external **artifact triplet** (liveness and
 completion per child), the `exec-quant` dispatch records (`unit_type=agent` /
