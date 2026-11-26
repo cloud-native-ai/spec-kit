@@ -5,13 +5,15 @@
 **Description**: Create, modify, and run multi-agent teams with persistent definitions and indexed summaries.
 **Status**: Implemented  
 **Created**: 2026-07-13  
-**Last Updated**: 2026-11-24
+**Last Updated**: 2026-11-26
 
 ## Overview
 
 `/speckit.team` routes create, modify, and run to `create-team`, `improve-team`, and `run-team`. Teams persist as `.specify/teams/<slug>/team.md`; creation supports Anchor-driven targets and `focus_target`, while summaries are indexed by team and by `.specify/anchoring/<slug>/summary/`. Ordinary teams execute after a disclosed preview, while continuous loops retain their specific governance gates.
 
 ## Latest Review
+
+2026-11-26 clarify binding: requirement `108-team-view-degradation`（索引切片行 108，`Draft`）was bound directly to Feature 027. It hardens the `view` mode's deterministic reader (`scripts/python/team-view.py` + the `view-team` skill) against real-world degraded team definitions — report-name recognition with a closed timestamp grammar and three-way file classification, residue-uncertainty disclosure, binding/goal normalization pointers (guidance only, zero writes), roster-matrix anomaly presentation, a closed degradation-reason → exit-code mapping, and byte-level preservation of healthy output with one engine — so it is a direct follow-up slice of `103-team-view` on the same `/speckit.team` command surface (precedent: 036 / 042 / 103-team-view bind directly to 027). The brief's leading candidate `103-team-view` is a finalized spec number, not a Feature ID (Feature 103 = Technical Debt Governance); the lookup resolved to its parent Feature. Feature status stays `Ready for Review` (no-status-regression gate); the slice advances its own lifecycle independently. Binding record and rationale: `.specify/specs/108-team-view-degradation/requirements.md` § Related Feature / § Clarifications.
 
 2026-11-24 tasks for requirement `103-team-view`: the task list landed — 44 rows (`T001`…`T044`) organized by US1/US2 (P1), US3 (P2) and US4 (P3), with a shared fixture module as the only Foundational blocker. Tests Mode is ON under Principle IV; the 38 contract clauses are guarded by three pinning test files plus a fixture module, and every FR-001…FR-021 is quoted by at least one task row. Gates: `validate-tasks.py` PASS (0 error / 0 warning), `pre-analyze-check --stage tasks` decision=pass (errors=0; advisories are the not-yet-created delivery paths and INV external namespaces), `decomposition-check --mode tasks` proceed (44 ≤ 160). One plan-surface completion is recorded as a minor reference repair: the delivery surface gained `shared/definitions/probe-definitions.md` (+ mirror) because contract C-22's compiled `## Wrap-up` makes a `skill:view-team` probe object mandatory for `probes --reconcile`. Feature status stays `Implemented` (no-status-regression); the stage is docs-only, so no test run.
 
@@ -100,6 +102,7 @@ Planning completed for requirement `026-agent-team-management`. Clarifications r
 
 - Team Summary Specification: `.specify/specs/036-team-summary/requirements.md`
 - Team View Specification: `.specify/specs/103-team-view/requirements.md`（2026-11-24 `/speckit.clarify` 直接绑定：`/speckit.team` 第四模式 `view`，只读呈现团队结构与状态；027 状态不回退）
+- Team View Degradation Specification: `.specify/specs/108-team-view-degradation/requirements.md`（2026-11-26 `/speckit.clarify` 直接绑定：`view` 读取侧的降级诚实化，`103-team-view` 的后续切片；027 状态不回退）
 - Anchor-Driven Creation Specification: `.specify/specs/042-goal-team-creation/requirements.md`
 - Run Decomposition: `.specify/features/057-decompose-command-skills.md`
 - Anchor / Goal Successor: `.specify/features/101-anchor-goal-realignment.md`

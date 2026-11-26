@@ -13,8 +13,9 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 027
+**Feature Name**: Team Management
+**Binding basis**: 027 owns the `/speckit.team` command surface（create / modify / run / view）与团队档案层；本规格只修订 `view` 模式的读取程序（`scripts/python/team-view.py`）、`view-team` 技能措辞与测试，是 103-team-view（同一命令面的第四模式）的直接后续切片，036 / 042 / 103-team-view 直接绑定 027 的先例成立（binding-precedent heuristic）。Brief 的 leading candidate `103-team-view` 经查找为已定稿的 spec 编号而非 Feature ID（Feature 103 = Technical Debt Governance），其父 Feature 即 027。Bind 分支：不新建 Feature，索引登记切片行 108（`Draft`），027 状态保持 `Ready for Review` 不回退（no-status-regression gate）。
 
 ## Overview
 
@@ -117,18 +118,18 @@
 - **`goal` 与 `goal_slug` 并存或 `goal_slug` 旧拼写**：身份解析维持既有次序（`anchor_slug` > `goal_slug` > 推断），归一建议 MUST NOT 改变本次呈现的身份类型。
 - **非 continuous 团队的脊柱文件部分存在**：已存在者正常列出，缺失者按 pattern 不适用标注；pattern 未声明时披露缺省语义来源。
 - **归档团队（`lifecycle_state: archived`）**：维持既有正常呈现，不因本特性新增拒绝。
-- **概览模式遇到非标准命名/残留团队**：「最近运行」列 MUST 与单团队视图使用同一解析结果；无法判定时 MUST 标注不确定性而不是留空或取旧值。
+- **概览模式遇到非标准命名/残留团队**：「最近运行」列 MUST 与单团队视图使用同一解析与规范化结果；无法判定时 MUST 标注不确定性而不是留空或取旧值。概览不发起引擎读动作、不产生降级原因，退出码维持既有 `0/2` 域；不确定性 MUST 以行内标注披露。
 - **`runs/` 目录本身不可读**（权限）：维持 `不可读` 状态并点名路径（既有行为）。
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: 运行报告识别 MUST 以文件名中的**可解析 UTC 时间戳**为准，MUST NOT 依赖单一字面量模板；识别 MUST 至少覆盖：紧凑 `YYYYMMDDThhmmssZ`、ISO 连字符 `YYYY-MM-DDThh:mm:ssZ`（含全连字符变体）、小时分钟 `YYYYMMDDThhmmZ`，以及带 4-hex 冲突/阶段后缀的真实形态（如 `20261125T121924Z-93cc-stage`、`…-93cc-report.md`）。识别规则 MUST 可判定且文档化于 view 的活契约面。
-- **FR-002**: 「最新报告」MUST 是**解析时间戳最大者**；并列时间戳 MUST 以确定性次序（文件名字典序）决出；MUST NOT 因某文件不匹配窄模板而回落到更旧的已识别报告；`as_of.latest_report_timestamp` MUST 携带被选中报告的解析时间戳，而不是窄模板的捕获组。
-- **FR-003**: `runs/` 内文件 MUST 被显式分为运行报告、辅助产物（如 `-verification.md`、`-seat-result.md`、progress snapshot）与残留三类；辅助产物 MUST NOT 被选为最新报告、MUST NOT 被计入 [[STR-001]] 残留；分类规则 MUST 显式、可判定。
+- **FR-001**: 运行报告识别 MUST 以文件名**起始处**的**可解析 UTC 时间戳**为准，MUST NOT 依赖单一字面量模板；被接受的时间戳语形恰为封闭集 `YYYYMMDDThhmmssZ` / `YYYYMMDDThhmmZ` / `YYYY-MM-DDThh:mm:ssZ` / `YYYY-MM-DDThh-mm-ssZ` / `YYYY-MM-DDThhmmssZ`（日期段紧凑或 ISO 连字符，时间段 `hhmmss` / `hhmm` / `hh:mm:ss` / `hh-mm-ss`，紧随 `T` 与 `Z`），且 MUST 构成合法 UTC 日历时刻；仅日期前缀（如 `2026-10-07-progress-snapshot.md`）、非法月日时分与非 `Z` 时区标记一律不解析、不猜测（A-17）。时间戳之后、`.md` 之前的剩余段匹配 `(?:-[0-9a-f]{4})?-(?:report|stage)`（4-hex 冲突段可选，角色词为 `report` 或 `stage`）者为运行报告形态。识别规则 MUST 可判定且文档化于 view 的活契约面。
+- **FR-002**: 「最新报告」MUST 是**解析时间戳最大者**；并列时间戳 MUST 以确定性次序决出——文件名字典序**升序第一份**（与既有实现的稳定次序一致）；MUST NOT 因某文件不匹配窄模板而回落到更旧的已识别报告；`as_of.latest_report_timestamp` 与概览「最近运行」列 MUST 携带同一**规范化解析值**（UTC、`YYYYMMDDThhmmssZ` 形态、秒精度），而不是窄模板的捕获组或未规范化的文件名片段；紧凑标准命名的文件其规范化值与文件名 token 相同（健康保真不受影响）。
+- **FR-003**: `runs/` 内每个常规文件 MUST 被显式分为运行报告、辅助产物与残留三类，分类 MUST 只依据文件名并按固定次序判定：(1) 无 FR-001 语形的前导可解析时间戳 → 残留（即使角色词形似 progress-snapshot / judgment-contract，或文件不是 `.md`）；(2) 有可解析时间戳且剩余段为 FR-001 的运行报告形态 → 运行报告；(3) 有可解析时间戳但剩余段不是运行报告形态（如 `-verification.md`、`-seat-result.md`）→ 辅助产物。辅助产物 MUST NOT 被选为最新报告、MUST NOT 被计入 [[STR-001]] 残留；残留 MUST NOT 被计为运行报告；分类规则 MUST 显式、可判定。
 - **FR-004**: 无任何可解析时间戳的文件 MUST 以 [[STR-001]] 残留形式呈现：**总数 + 有界示例**（示例上限与省略计数 MUST 同时给出）；MUST NOT 逐名无界转写整目录。
-- **FR-005**: 当残留可能影响「最新」判定（无法证明残留文件均早于已选最新）时，view MUST 显式披露不确定性并以 [[STR-003]] 进入降级语义；MUST NOT 把任何更旧报告冒充为最新，MUST NOT 静默。
+- **FR-005**: `runs/` 目录存在且残留计数 ≥ 1 时，「最新」判定即视为不可证明——残留文件无任何可解析时间戳，view MUST NOT 以文件 mtime 或内容推断其更旧——view MUST 显式披露不确定性并以 [[STR-003]] 进入降级语义；`runs/` 缺失或为空、或全部非报告文件均带可解析时间戳（仅辅助产物）时不产生不确定性。无任何可识别报告而仅有残留时，运行报告状态 MUST NOT 呈现为「为空」或「缺失」，MUST 表达「仅残留、最新不可确定」并由 [[STR-001]] 行给出计数与有界示例。MUST NOT 把任何更旧报告冒充为最新，MUST NOT 静默。
 - **FR-006**: 概览模式的「最近运行」列 MUST 复用与单团队视图相同的识别与解析入口（同一引擎、同一规则、同一提取）；MUST NOT 维护第二套窄匹配或第二套最新选择。
 - **FR-007**: `items.jsonl` 缺失 MUST 呈现为显式 `缺失` 状态并给出后果（无台账聚合计数、无非终态信号）；MUST NOT 以零值、空聚合或占位行冒充；`为空`（存在但无行）与 `不可读` 的既有区分 MUST 保持。
 - **FR-008**: 持续运营脊柱（`constraints.md` / `STATE.md` / `run-log.jsonl`）的存在性 MUST 按团队**声明 pattern** 的适用性呈现：continuous 团队缺失 = 真实缺口；非 continuous 团队缺失 MUST 标注为「按声明 pattern 不适用的产物」并给出 owner 指针；pattern 未声明时 MUST 按 owner 的缺省语义呈现并披露该缺省来源，MUST NOT 发明默认。
@@ -136,12 +137,12 @@
 - **FR-010**: 「缺失 / 为空 / 不可读 / 未记录」四态区分 MUST 维持（103 FR-015 的既有纪律），并 MUST 适用于本特性新增的产物面（残留、辅助产物、不可读报告、pattern 不适用）。
 - **FR-011**: 绑定事实 MUST 仅在引擎读动作成功且三键（`owner` / `owner_id` / `origin`）齐备时呈现为已声明；缺 `binding` 块或键不齐 MUST 呈现引擎给出的精确原因（点名缺失键或无块事实）为 `不可读`；MUST NOT 以缺省值填补、MUST NOT 从其它字段推断。
 - **FR-012**: 绑定不可读时 MUST 给出受制裁修复路径：`/speckit.team modify`（定义修复入口）与引擎写面 `goal-utils.py bind` 的指针，修复记录语义的 owner 是 `.specify/shared/definitions/anchor-definitions.md` § The Binding Record；view MUST NOT 自动执行修复。
-- **FR-013**: frontmatter `goal` 为内联文本（非 slug 形态）时 MUST 呈现为命名状态（如「goal 非 slug 形态，需归一」）并给出修复路径（`/speckit.team modify` 将 `goal` 归一为 `anchor_slug`；需要派生锚点定义时经 `goal-utils.py migrate`）；MUST NOT 把内联文本猜成 slug、MUST NOT 因 `anchor_slug` 已声明而静默略过该键。
+- **FR-013**: frontmatter 声明 `goal` 键时（无论其值为内联长文本还是 slug 形态——`goal` 不是身份解析的声明键，身份次序只读 `anchor_slug` > `goal_slug` > 推断）MUST 呈现为命名状态（如「goal 需归一为 `anchor_slug`」）并给出修复路径（`/speckit.team modify` 将 `goal` 归一为 `anchor_slug`；需要派生锚点定义时经 `goal-utils.py migrate`）；取值形态 MUST NOT 改变该呈现或身份类型，MUST NOT 把任何 `goal` 值猜成身份 slug、MUST NOT 因 `anchor_slug` 已声明而静默略过该键。
 - **FR-014**: `anchor_slug` 已声明时锚点身份 MUST 维持既有解析次序下的 `declared`（`anchor_slug` > `goal_slug` > 推断 slug）；归一建议 MUST NOT 改变本次呈现的身份类型，MUST NOT 触发任何迁移动作。
 - **FR-015**: 正文 `## Static Structure` 矩阵缺 `agent` 列时 MUST 在矩阵组内呈现 `形态异常` 状态并点名缺失列；已解析的矩阵行 MUST 仍被完整呈现，MUST NOT 因缺列而隐藏矩阵或整段留空。
 - **FR-016**: 两侧名册不可比对时 `roster_delta` MUST 呈现为 [[STR-002]] 并附原因；MUST NOT 使用「未记录」标签冒充；frontmatter 成员 MUST 全量呈现；`seats` / `stage_seats` 未声明 MUST 显式标注（含 owner 指针）；MUST NOT 出现静默空段。
-- **FR-017**: 降级原因 MUST 是封闭集合 `{engine-degraded, [[STR-003]]}`：`engine-degraded` 表示引擎读动作未能产出必需事实（binding / anchor），[[STR-003]] 表示最新运行判定不确定；每个原因 MUST 映射到封闭退出码集合 `0/2/3/4/5` 中的恰一个（两者均为 `5`）；映射 MUST 由测试逐项钉住。
-- **FR-018**: 退出码 `5` MUST 表示「呈现已产出，但必需事实组不可读或不可确定」；既有的引擎读失败用例 MUST 保持 `5`；「缺失 / 为空」单独出现 MUST NOT 触发 `5`；MUST NOT 产生集合外退出码。
+- **FR-017**: 降级原因 MUST 是封闭集合 `{engine-degraded, [[STR-003]]}`：`engine-degraded` 表示引擎读动作未能产出必需事实（binding / anchor），[[STR-003]] 表示最新运行判定不确定；每个原因 MUST 映射到封闭退出码集合 `0/2/3/4/5` 中的恰一个（两者均为 `5`）；原因可以并存，一次 view MUST 逐个点名每个活跃原因且退出码仍为 `5`；映射 MUST 由测试逐项钉住。
+- **FR-018**: 退出码 `5` MUST 表示「呈现已产出，但必需事实组不可读或不可确定」；既有的引擎读失败用例 MUST 保持 `5`；「缺失 / 为空」单独出现 MUST NOT 触发 `5`；文件级命名状态（`缺失` / `为空` / `不可读` / `未记录`）本身 MUST NOT 产生降级原因、也 MUST NOT 单独把退出码从 `0` 改为 `5`——`engine-degraded` 仅由引擎读动作失败（binding / anchor）触发，最新报告不可读仅是 FR-009 的命名状态；MUST NOT 产生集合外退出码。
 - **FR-019**: 「不推断」规则 MUST 被钉住：绑定值、goal→slug、最新报告、名册差异 MUST 全都不允许推断或填充；输出的每一处呈现 MUST 是读得的事实或命名状态（含原因），MUST NOT 是猜测值。
 - **FR-020**: 退出码与降级说明 MUST 在三处一致：`docs/reference/commands/team.md` 的 view 小节、`skills/internal/view-team/SKILL.md` 的错误导航闭集表、`scripts/python/team-view.py` 的声明（`--help` / 模块文档）；一致性 MUST 由测试断言（允许以「指向单一 owner 的指针」形态一致）。
 - **FR-021**: 全部固定规则提取 MUST 继续只由单一读取引擎 `scripts/python/team-view.py` 完成；MUST NOT 新增第二读取器、第二存储、缓存、快照、索引或 registry；`goal-utils.py` MUST 零修改（只消费其只读动作）。
@@ -225,3 +226,13 @@ Format: - Q: <question> → A: <answer>
 - Q: 非 continuous 团队的脊柱缺失怎么呈现？ → A: **按声明 pattern 的适用性呈现**，owner 指向 `operating-loops.md`；不发明默认（A-8）。
 - Q: 「既有团队不受影响」与实测三个团队输出会变化如何统一？ → A: 精确化为**健康谓词**上的逐字节保真（A-10）+ 对不满足谓词的输入列出具名纠正增量（A-11）；不迁移任何团队定义。
 - Q: Related Feature 绑定？ → A: 保持 `Need clarification`，由 `/speckit.clarify` 按 Feature Binding Rules 解析（本阶段不建 Feature、不查表）。
+
+### Session 2026-11-26（无人值守 clarify 阶段，Feature 绑定与五点残留歧义裁决）
+
+- Q: `Related Feature` 绑定到哪个既有 Feature，是否新建？ → A: 绑定既有 **Feature 027（Team Management）**，以索引切片行 108 登记 `Draft`（详情指针 `.specify/features/027-team-management.md`）；不新建 Feature，027 状态保持 `Ready for Review` 不回退。依据：027 拥有 `/speckit.team` 命令面与团队档案层，本规格只修订 `view` 读取程序 / 技能 / 测试，是 103-team-view 的直接后续切片；036 / 042 / 103-team-view 直接绑定 027 的先例成立。Brief 的 leading candidate `103-team-view` 是已定稿 spec 编号而非 Feature ID（Feature 103 = Technical Debt Governance），按查找结果绑定其父 Feature（binding-precedent heuristic）。
+- Q: 报告名识别接受哪些时间戳语形、何谓残留？ → A: 封闭语形集 = 日期段 `YYYYMMDD` 或 `YYYY-MM-DD` × 时间段 `hhmmss` / `hhmm` / `hh:mm:ss` / `hh-mm-ss`，紧随 `T` 与 `Z`，且构成合法 UTC 时刻；运行报告形态的剩余段 = `(?:-[0-9a-f]{4})?-(?:report|stage)`。无此前导时间戳的**任何**常规文件（含仅日期前缀 `2026-10-07-progress-snapshot.md`、非法时刻、非 `.md` 文件）一律为 [[STR-001]] 残留；全部判定只看文件名、不做模糊猜测（A-17）；具体 regex 由 plan 契约钉住（骨架见 FR-001 / FR-003）。`as_of.latest_report_timestamp` 与概览列用同一规范化值（UTC、`YYYYMMDDThhmmssZ`）；同时间戳并列取文件名字典序升序第一份（既有稳定次序）。
+- Q: 残留如何进入降级（不确定性判据）？ → A: `runs/` 存在且残留 ≥ 1 即判「最新不可证明」，以 [[STR-003]] 进入降级、退出码 `5`——不存在「证明残留更旧」的受制裁路径（mtime / 内容推断被拒：非确定且超出只读引擎契约）；`runs/` 缺失或为空、或仅带时间戳的辅助产物时不产生不确定性。A-5 中「progress snapshot」示例因此限定为带可解析时间戳者；无时间戳的 snapshot 命名走残留（与实测语料 46 文件 = 28 合规 + 16 带戳非合规 + 2 无戳 的计数一致）。
+- Q: 降级原因到退出码如何映射、边界在哪？ → A: 封闭原因集 `{engine-degraded, [[STR-003]]}` 逐项映射 `5`（2/2），原因可并存且 MUST 逐个点名；文件级命名状态（`缺失` / `为空` / `不可读` / `未记录`）本身不产生原因、不单独改变退出码；最新报告不可读只是 FR-009 命名状态；概览不发起引擎读动作、不产生原因，维持既有 `0/2` 退出域并以行内标注披露不确定性；退出码闭集不变 `0/2/3/4/5`（不新增）。
+- Q: binding / goal 归一是只呈现指引还是执行修复？ → A: **只呈现指引、view 零写**：`/speckit.team modify` 是定义修复入口，`goal-utils.py bind` / `migrate` 只作为引擎写面被点名、不被 view 调用（RS-004 零修改）；`goal` 键的任何取值（含 slug 形态）都呈现为命名状态，身份类型维持既有次序结果（`anchor_slug` > `goal_slug` > 推断）；SC-007 以工作树哈希差钉住零写盘。
+- Q: 矩阵缺 `agent` 列的呈现与名册差异措辞？ → A: 正文矩阵组携带 `形态异常` 并点名缺列 `agent`，已解析矩阵行仍完整呈现（不隐藏、不留空）；`roster_delta` 呈现为 [[STR-002]] 并附原因（MUST NOT 用「未记录」冒充）；frontmatter 成员全量列出；`seats` / `stage_seats` 未声明时显式标注并附 owner 指针；不出现静默空段。
+- Q: 健康保真、单一引擎与迁移 / 拒绝的边界？ → A: 健康谓词 fixture（三键 binding、全部紧凑 `-report.md`、无残留、矩阵含 `agent` 列、无 `goal` 声明、报告可读）上，基线 `54c6efa8c` 程序与变更后程序 stdout 逐字节一致、退出码相同；报告识别 / 最新选择入口唯一且概览列复用同一入口；唯一读取交付面 `scripts/python/team-view.py`，`goal-utils.py` 零修改；不改命名 owner（create-team § Report contract）与 `team.md` schema → 既有团队零迁移；若实现提出任何形态变更 MUST 附带迁移或确定性拒绝，否则 MUST NOT 合并（FR-023）。
