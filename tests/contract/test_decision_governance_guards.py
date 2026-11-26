@@ -100,7 +100,9 @@ def test_m02_locator_red_then_green() -> None:
     assert ok.returncode == 0, (
         f"completed locator exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
     )
-    assert "M-02" not in ok.stdout, f"a completed locator still carries an M-02 verdict: {ok.stdout!r}"
+    assert not re.search(r"(?m)^M-02 ", ok.stdout), (
+        f"a completed locator still carries an M-02 verdict: {ok.stdout!r}"
+    )
 
     assert dir_snapshot(FIXTURES / "m02") == before, "a run mutated the m02 fixture tree"
 
@@ -146,7 +148,9 @@ def test_m08_registered_variant_red() -> None:
     assert ok.returncode == 0, (
         f"full-name subject exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
     )
-    assert "M-08" not in ok.stdout, f"a full-name subject still carries an M-08 verdict: {ok.stdout!r}"
+    assert not re.search(r"(?m)^M-08 ", ok.stdout), (
+        f"a full-name subject still carries an M-08 verdict: {ok.stdout!r}"
+    )
 
     # Green: an unregistered abbreviation — only registered words are covered.
     unreg = run_records("--carrier", str(unregistered), "--glossary", str(glossary))

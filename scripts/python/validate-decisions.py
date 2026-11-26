@@ -8,7 +8,8 @@ field closure, the transmission obligations and the M/B boundary are owned by
 restates them.
 
 Actions (the declared interface; judgement legs land with their user stories):
-  records     judge decision records in their carriers (M-01…M-04, M-08, M-09)
+  records     judge decision records in their carriers (US1: M-02, M-08;
+              M-01, M-03, M-04, M-09 land with their user stories)
   payload     judge decision-backed dispatch payloads (M-06)
   chain       judge the record → dispatch attempt → implementation-receipt chain (M-05, M-07)
   inventory   judge the closed Decision Producer Inventory (FR-003)
@@ -33,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -49,6 +51,22 @@ ACTIONS = ("records", "payload", "chain", "inventory")
 DECLARED_OPTIONS = (
     "--action", "--spec", "--carrier", "--fixture", "--register", "--glossary", "--json",
 )
+
+#: ``### D-NNN — <title>``; the title after the em dash carries the decision subject.
+RECORD_HEADING_RE = re.compile(r"^### (D-\d{3})(?:\s+—\s+(.*))?$")
+#: One top-level field line ``- **<field>**: <value>`` (the C-201 serialization grammar).
+FIELD_RE = re.compile(r"^- \*\*([A-Za-z_][A-Za-z0-9_]*)\*\*:\s*(.*)$")
+ANY_HEADING_RE = re.compile(r"^#{1,3}\s")
+#: One named dimension ``key=value`` inside ``resource_locator`` (``;``-separated).
+DIMENSION_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?)\s*$")
+
+#: The same-name locator floor (C-103): business resource group + region id, as a pair.
+LOCATOR_FLOOR = ("business_resource_group", "region_id")
+
+#: The rules this file's ``records`` action judges today (US1 legs). The remaining legs
+#: (M-01, M-03, M-04, M-09) land with their user stories — an unimplemented leg is never
+#: printed as a pass, because only listed rules produce verdicts at all.
+RECORDS_RULES = ("M-02", "M-08")
 
 
 def repo_root(start=None) -> Path:
@@ -111,14 +129,214 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def display_path(path: Path) -> str:
+    """Repository-relative path when possible, so verdicts are stable across checkouts."""
+    try:
+        return str(path.resolve().relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def parse_records(text: str) -> list[dict]:
+    """Split a carrier into ``### D-NNN`` record blocks (fenced code never counts).
+
+    A block is *new-form* when it carries at least one top-level C-201 field line; a
+    three-digit heading below that threshold is legacy and is never judged (I-13).
+    """
+    records: list[dict] = []
+    current: dict | None = None
+    in_fence = False
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        if line.strip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith("#"):
+            heading = RECORD_HEADING_RE.match(line)
+            if heading:
+                current = {
+                    "id": heading.group(1),
+                    "subject": (heading.group(2) or "").strip(),
+                    "line": lineno,
+                    "fields": {},
+                    "field_lines": {},
+                }
+                records.append(current)
+            elif ANY_HEADING_RE.match(line):
+                current = None
+            continue
+        if current is not None:
+            field = FIELD_RE.match(line)
+            if field:
+                name, value = field.group(1), field.group(2).strip()
+                current["fields"][name] = value
+                current["field_lines"][name] = lineno
+    return records
+
+
+def new_form_records(records: list[dict]) -> list[dict]:
+    return [record for record in records if record["fields"]]
+
+
+def parse_dimensions(value: str) -> dict[str, str]:
+    """Named dimensions of a ``resource_locator`` as ``{key: value}``; empty entries drop."""
+    dimensions: dict[str, str] = {}
+    for part in value.split(";"):
+        match = DIMENSION_RE.match(part)
+        if match:
+            dimensions[match.group(1).lower()] = match.group(2)
+    return dimensions
+
+
+def load_glossary(path: Path) -> list[tuple[str, list[str]]]:
+    """(canonical, variants) rows of a glossary table; header and separator rows drop."""
+    rows: list[tuple[str, list[str]]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        canonical, variants_cell = cells[0], cells[1]
+        if not canonical or canonical.lower() == "canonical":
+            continue
+        if set(canonical) <= set("-: "):
+            continue
+        variants = [v.strip() for v in variants_cell.split(",") if v.strip() and v.strip() != "-"]
+        rows.append((canonical, variants))
+    return rows
+
+
+def variant_regex(variant: str) -> re.Pattern:
+    """A variant as a standalone token: ASCII letters/digits/underscore are boundaries."""
+    return re.compile(
+        r"(?<![A-Za-z0-9_])" + re.escape(variant) + r"(?![A-Za-z0-9_])",
+        re.IGNORECASE,
+    )
+
+
+def check_m02(record: dict) -> list[dict]:
+    """M-02: ``same_name_conflict: true`` needs the locator floor (C-103)."""
+    if record["fields"].get("same_name_conflict", "").strip().lower() != "true":
+        return []
+    locator = record["fields"].get("resource_locator", "")
+    line = record["field_lines"].get(
+        "resource_locator", record["field_lines"].get("same_name_conflict", record["line"])
+    )
+    dimensions = parse_dimensions(locator)
+    missing = [key for key in LOCATOR_FLOOR if not dimensions.get(key)]
+    if locator.strip() and not missing:
+        return []
+    if not locator.strip():
+        message = ("same_name_conflict: true requires a machine-parseable resource_locator "
+                   "carrying at least the business resource group + region id pair "
+                   "(the locator is empty)")
+    else:
+        message = ("same_name_conflict: true requires a machine-parseable resource_locator "
+                   "carrying at least the business resource group + region id pair "
+                   f"(missing named dimension(s): {', '.join(missing)})")
+    return [{"rule": "M-02", "line": line, "message": message}]
+
+
+def check_m08(record: dict, glossary_rows: list[tuple[str, list[str]]]) -> list[dict]:
+    """M-08: a registered glossary variant in the structured subject turns red."""
+    subject = record["subject"]
+    if not subject:
+        return []
+    for canonical, variants in glossary_rows:
+        for variant in variants:
+            if variant.lower() == canonical.lower():
+                # A variant that differs from its canonical only by letter case is the
+                # canonical's own case-folded spelling; it cannot be told apart.
+                continue
+            if variant_regex(variant).search(subject):
+                return [{
+                    "rule": "M-08",
+                    "line": record["line"],
+                    "message": (f"decision subject uses the registered glossary variant "
+                                f"{variant!r}; use the full name {canonical!r}"),
+                }]
+    return []
+
+
+def collect_carriers(carriers: list[str], fixture: str | None, spec: str | None) -> list[Path]:
+    """Every carrier file the run judges: explicit files, a fixture path, a spec directory."""
+    paths: list[Path] = []
+    for raw in carriers:
+        paths.append(Path(raw))
+    for raw in (fixture, spec):
+        if not raw:
+            continue
+        base = Path(raw)
+        if base.is_dir():
+            paths.extend(sorted(base.rglob("*.md")))
+        else:
+            paths.append(base)
+    return paths
+
+
+def run_records(args) -> int:
+    """Judge the landed ``records`` legs (M-02, M-08); the run mutates nothing."""
+    carriers = collect_carriers(args.carrier, args.fixture, args.spec)
+    if not carriers:
+        print("error: --action records needs --carrier, --fixture or --spec input",
+              file=sys.stderr)
+        return EXIT_INPUT
+
+    glossary_path = Path(args.glossary) if args.glossary else REPO_ROOT / ".specify" / "glossary.md"
+    try:
+        glossary_rows = load_glossary(glossary_path) if glossary_path.is_file() else []
+    except OSError as exc:
+        print(f"error: cannot read glossary {glossary_path}: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    if args.glossary and not glossary_path.is_file():
+        print(f"error: glossary not found: {glossary_path}", file=sys.stderr)
+        return EXIT_INPUT
+
+    violations: list[dict] = []
+    for carrier in carriers:
+        try:
+            text = carrier.read_text(encoding="utf-8")
+        except OSError as exc:
+            print(f"error: cannot read carrier {carrier}: {exc}", file=sys.stderr)
+            return EXIT_INPUT
+        for record in new_form_records(parse_records(text)):
+            found = check_m02(record) + check_m08(record, glossary_rows)
+            for verdict in found:
+                verdict["path"] = display_path(carrier)
+                violations.append(verdict)
+    violations.sort(key=lambda v: (v["path"], v["line"], v["rule"]))
+
+    status = "fail" if violations else "pass"
+    if args.json:
+        print(json.dumps({
+            "action": "records",
+            "status": status,
+            "rules": list(RECORDS_RULES),
+            "violations": violations,
+        }, ensure_ascii=False, indent=2))
+    elif violations:
+        for verdict in violations:
+            print(f"{verdict['rule']} {verdict['path']}:{verdict['line']}: {verdict['message']}")
+        print(f"FAIL: {len(violations)} violation(s)")
+    else:
+        print(f"PASS: 0 violation(s) (rules: {', '.join(RECORDS_RULES)})")
+    return EXIT_CHECK_FAILED if violations else EXIT_OK
+
+
 def main(argv=None) -> int:
     _sig_guard(argv, declared=DECLARED_OPTIONS)
     parser = build_parser()
     args = parser.parse_args(argv if argv is not None else sys.argv[1:])
 
-    # Interface final, judgement legs pending: every declared action reports
-    # not-implemented and exits as an input error, so an unimplemented check can never be
-    # mistaken for a pass. The legs land with US1–US5 of feature 107.
+    if args.action == "records":
+        return run_records(args)
+
+    # Interface final, judgement legs pending: the remaining declared actions report
+    # not-implemented and exit as an input error, so an unimplemented check can never be
+    # mistaken for a pass. The legs land with US3–US5 of feature 107.
     if args.json:
         print(json.dumps({"action": args.action, "status": "not-implemented",
                           "root": str(REPO_ROOT)}, ensure_ascii=False))
