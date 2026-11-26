@@ -139,6 +139,16 @@ MUST NOT merge or normalize configuration itself:
    (`shared/definitions/subagent-definitions.md` § The Concurrency Obligation), the
    reporting duty (`shared/guidelines/reporting-obligations.md`) and the re-anchoring anchor
    digest (`shared/definitions/re-anchoring-definitions.md`).
+   **Decision-backed dispatch (duties, owner by pointer)**: when this dispatch implements a
+   recorded decision, the payload MUST carry the `decision_block` (five fields) and a
+   decision-backed dispatch MUST be refused when the block is absent or incomplete
+   (FR-018); the return MUST carry the acknowledgement and the `implementation_receipt`
+   (four members), and an incomplete return MUST NOT be consumed or backfilled (FR-019);
+   a decision invalidated by new context MUST be routed to the fast-fail surface report at
+   the anomaly point, never silently re-decided (FR-020). The block fields, the
+   acknowledgement and the receipt forms are owned by
+   `.specify/shared/definitions/decision-definitions.md` § 传递与实施 and are referenced
+   here, never restated.
 4. **Collect (external only)** — after `dispatch.sh` returns, invoke
    `python3 .specify/scripts/python/exec-quant.py --action collect-dispatch --unit-id
    agent:<slug> --run-id <label> --snapshot <snapshot> --config-id <config_id>

@@ -7,16 +7,20 @@ field closure, the transmission obligations and the M/B boundary are owned by
 ``shared/definitions/decision-definitions.md`` — this checker consumes them and never
 restates them.
 
-Actions (the declared interface; the payload and chain legs land with US4):
+Actions:
   records     judge decision records in their carriers: M-01 (layered field closure,
               class domain, phase-driven timepoints), M-02 (same-name locator), M-03
               (option-set closure and chosen-member membership), M-04 (id form, density,
               register), M-08 (registered glossary variant) and M-09 (evidence-pointer
               resolvability); legacy headings and legacy register rows are reported, never
               judged
-  payload     judge decision-backed dispatch payloads (M-06)
-  chain       judge the record → dispatch attempt → implementation-receipt chain (M-05, M-07)
-  inventory   judge the closed Decision Producer Inventory (FR-003)
+  payload     judge dispatch payload snapshots: M-06 (a decision-backed dispatch carries
+              the complete five-field ``decision_block``; a non-decision dispatch without
+              a block is legal)
+  chain       judge chain snapshots: M-05 (the implementation receipt exists and its
+              ``decision_id`` resolves) and M-07 (record → dispatch attempt → receipt all
+              present with consistent ids)
+  inventory   judge the closed Decision Producer Inventory (FR-003; the leg lands with US5)
 
 Options:
   --action {records,payload,chain,inventory}   required; the judgement to run
@@ -109,6 +113,22 @@ REGISTER_RANGE_RE = re.compile(r"D-(\d{3})\s*[–—…-]\s*(?:D-)?(\d{3})")
 #: user stories — an unimplemented leg is never printed as a pass, because only listed rules
 #: produce verdicts at all.
 RECORDS_RULES = ("M-01", "M-02", "M-03", "M-04", "M-08", "M-09")
+
+#: The five decision-block fields (C-301) a decision-backed dispatch must carry.
+BLOCK_FIELDS = (
+    "decision_id", "decision_class", "chosen_option",
+    "implementation_constraints", "archive_pointer",
+)
+
+#: The rules the ``payload`` and ``chain`` actions judge (C-401 rows M-05…M-07).
+PAYLOAD_RULES = ("M-06",)
+CHAIN_RULES = ("M-05", "M-07")
+
+#: The chain segments of an auditable transmission (C-306), in order.
+CHAIN_SEGMENTS = ("Record", "Dispatch Attempt", "Receipt")
+CHAIN_SECTION_RE = re.compile(r"^##\s+(?!##)(.+?)\s*$")
+#: One indented ``- **<field>**: <value>`` sub-line (a decision block's members).
+SUB_FIELD_RE = re.compile(r"^\s{2,}- \*\*([A-Za-z_][A-Za-z0-9_]*)\*\*:\s*(.*)$")
 
 
 def repo_root(start=None) -> Path:
@@ -756,6 +776,264 @@ def run_records(args) -> int:
     return EXIT_CHECK_FAILED if violations else EXIT_OK
 
 
+def collect_snapshots(carriers: list[str], fixture: str | None) -> list[Path]:
+    """Snapshot files the ``payload`` and ``chain`` actions judge.
+
+    A fixture directory contributes its top-level ``*.md`` files only; return snapshots and
+    record carriers live in subdirectories and are reached by an explicit path, so a
+    directory judgement never silently widens to them.
+    """
+    paths: list[Path] = [Path(raw) for raw in carriers]
+    if fixture:
+        base = Path(fixture)
+        if base.is_dir():
+            paths.extend(sorted(base.glob("*.md")))
+        else:
+            paths.append(base)
+    return paths
+
+
+def parse_payload(text: str) -> dict:
+    """Top-level fields plus the ``decision_block`` sub-fields of one dispatch snapshot."""
+    fields: dict[str, str] = {}
+    field_lines: dict[str, int] = {}
+    block: dict[str, str] = {}
+    block_lines: dict[str, int] = {}
+    in_block = False
+    in_fence = False
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        if line.strip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith("#"):
+            in_block = False
+            continue
+        sub = SUB_FIELD_RE.match(line)
+        if sub and in_block:
+            block[sub.group(1)] = sub.group(2).strip()
+            block_lines[sub.group(1)] = lineno
+            continue
+        top = FIELD_RE.match(line)
+        if top:
+            name, value = top.group(1), top.group(2).strip()
+            fields[name] = value
+            field_lines[name] = lineno
+            in_block = name == "decision_block"
+            continue
+        if line.strip():
+            in_block = False
+    return {"fields": fields, "field_lines": field_lines,
+            "block": block, "block_lines": block_lines}
+
+
+def check_m06(snapshot: dict) -> list[dict]:
+    """M-06: a decision-backed dispatch carries the complete five-field block (C-301/C-302)."""
+    backed = snapshot["fields"].get("decision_backed", "").strip().lower()
+    block_line = snapshot["field_lines"].get("decision_block", 1)
+    if backed == "false":
+        return []
+    declared = "decision_block" in snapshot["fields"]
+    if not declared and not snapshot["block"]:
+        return [{
+            "rule": "M-06",
+            "line": block_line,
+            "message": ("a decision-backed dispatch MUST carry a decision_block with "
+                        "decision_id, decision_class, chosen_option, implementation_constraints "
+                        "and archive_pointer; it is refused at payload construction "
+                        "(the decision_block is absent)"),
+        }]
+    found: list[dict] = []
+    for name in BLOCK_FIELDS:
+        if not snapshot["block"].get(name, "").strip():
+            found.append({
+                "rule": "M-06",
+                "line": block_line,
+                "message": f"the decision_block is missing the required field `{name}`",
+            })
+    return found
+
+
+def parse_chain(text: str) -> dict[str, list[dict]]:
+    """The Record / Dispatch Attempt / Receipt segments of one chain snapshot.
+
+    A segment is one ``## <name>`` section with its top-level field lines; repeated
+    Dispatch Attempt / Receipt sections model a multi-hop chain.
+    """
+    segments: dict[str, list[dict]] = {name: [] for name in CHAIN_SEGMENTS}
+    current: dict | None = None
+    in_fence = False
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        if line.strip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith("## "):
+            heading = CHAIN_SECTION_RE.match(line)
+            name = heading.group(1).strip() if heading else ""
+            current = ({"line": lineno, "fields": {}, "field_lines": {}}
+                       if name in segments else None)
+            if current is not None:
+                segments[name].append(current)
+            continue
+        if line.startswith("#"):
+            current = None
+            continue
+        if current is not None:
+            field = FIELD_RE.match(line)
+            if field:
+                current["fields"][field.group(1)] = field.group(2).strip()
+                current["field_lines"][field.group(1)] = lineno
+    return segments
+
+
+def chain_verdicts(segments: dict[str, list[dict]]) -> list[dict]:
+    """M-05 (receipt presence/resolvability) and M-07 (segments and id consistency)."""
+    found: list[dict] = []
+    records = [seg for seg in segments["Record"] if seg["fields"]]
+    dispatches = [seg for seg in segments["Dispatch Attempt"] if seg["fields"]]
+    receipts = [seg for seg in segments["Receipt"] if seg["fields"]]
+    record_ids = [seg["fields"].get("decision_id", "").strip() for seg in records]
+    record_ids = [rid for rid in record_ids if rid]
+    record_id = record_ids[0] if record_ids else ""
+
+    anchor = records[0]["line"] if records else 1
+
+    if not receipts:
+        found.append({
+            "rule": "M-05", "line": anchor,
+            "message": ("the implementation_receipt is missing; a transmitted decision MUST "
+                        "return a receipt and an incomplete return is never consumed"),
+        })
+    for receipt in receipts:
+        rid = receipt["fields"].get("decision_id", "").strip()
+        line = receipt["field_lines"].get("decision_id", receipt["line"])
+        if not rid:
+            found.append({"rule": "M-05", "line": line,
+                          "message": "the implementation_receipt carries no decision_id"})
+        elif not ID_FORM_RE.match(rid):
+            found.append({"rule": "M-05", "line": line,
+                          "message": (f"the receipt decision_id {rid!r} is not a resolvable "
+                                      "D-NNN id")})
+        elif not record_id or rid != record_id:
+            found.append({"rule": "M-05", "line": line,
+                          "message": (f"the receipt decision_id {rid!r} does not resolve to a "
+                                      "record in this chain")})
+
+    if not records:
+        found.append({"rule": "M-07", "line": anchor,
+                      "message": ("the record segment is missing; an auditable chain MUST "
+                                  "carry the decision record, the dispatch attempt and the "
+                                  "implementation receipt")})
+    elif not record_id:
+        found.append({"rule": "M-07", "line": records[0]["line"],
+                      "message": "the record segment carries no decision_id"})
+    if not dispatches:
+        found.append({"rule": "M-07", "line": anchor,
+                      "message": ("the dispatch attempt segment is missing "
+                                  "(decision record → dispatch attempt → receipt)")})
+    if not receipts:
+        found.append({"rule": "M-07", "line": anchor,
+                      "message": ("the receipt segment is missing "
+                                  "(decision record → dispatch attempt → receipt)")})
+    if record_id:
+        for dispatch in dispatches:
+            did = dispatch["fields"].get("decision_id", "").strip()
+            line = dispatch["field_lines"].get("decision_id", dispatch["line"])
+            if not did:
+                found.append({"rule": "M-07", "line": line,
+                              "message": "the dispatch attempt carries no decision_id "
+                                         "(the chain link is missing)"})
+            elif did != record_id:
+                found.append({"rule": "M-07", "line": line,
+                              "message": (f"the dispatch attempt decision_id {did!r} is "
+                                          f"inconsistent with the record id {record_id!r}")})
+        for receipt in receipts:
+            rid = receipt["fields"].get("decision_id", "").strip()
+            if rid and rid != record_id:
+                found.append({
+                    "rule": "M-07",
+                    "line": receipt["field_lines"].get("decision_id", receipt["line"]),
+                    "message": (f"the receipt decision_id {rid!r} is inconsistent with the "
+                                f"record id {record_id!r}"),
+                })
+    return found
+
+
+def print_action_report(action: str, rules: tuple[str, ...], checked: int,
+                        violations: list[dict], as_json: bool) -> int:
+    """Shared verdict rendering for the snapshot-shaped actions."""
+    violations.sort(key=lambda v: (v["path"], v["line"], v["rule"]))
+    status = "fail" if violations else "pass"
+    if as_json:
+        print(json.dumps({
+            "action": action,
+            "status": status,
+            "rules": list(rules),
+            "checked": checked,
+            "violations": violations,
+        }, ensure_ascii=False, indent=2))
+    else:
+        for verdict in violations:
+            print(f"{verdict['rule']} {verdict['path']}:{verdict['line']}: {verdict['message']}")
+        if violations:
+            print(f"FAIL: {len(violations)} violation(s)")
+        else:
+            print(f"PASS: 0 violation(s) (rules: {', '.join(rules)})")
+    return EXIT_CHECK_FAILED if violations else EXIT_OK
+
+
+def run_payload(args) -> int:
+    """M-06: decision-backed dispatch snapshots carry the complete decision block."""
+    snapshots = collect_snapshots(args.carrier, args.fixture)
+    if not snapshots:
+        print("error: --action payload needs --carrier or --fixture input", file=sys.stderr)
+        return EXIT_INPUT
+    violations: list[dict] = []
+    checked = 0
+    for path in snapshots:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            print(f"error: cannot read snapshot {path}: {exc}", file=sys.stderr)
+            return EXIT_INPUT
+        snapshot = parse_payload(text)
+        backed = snapshot["fields"].get("decision_backed", "").strip().lower()
+        if backed not in ("true", "false"):
+            print(f"error: snapshot {display_path(path)} does not declare "
+                  "`decision_backed: true|false`; the dispatch classification is mandatory",
+                  file=sys.stderr)
+            return EXIT_INPUT
+        checked += 1
+        for verdict in check_m06(snapshot):
+            verdict["path"] = display_path(path)
+            violations.append(verdict)
+    return print_action_report("payload", PAYLOAD_RULES, checked, violations, args.json)
+
+
+def run_chain(args) -> int:
+    """M-05/M-07: chain snapshots carry the three segments with consistent ids."""
+    snapshots = collect_snapshots(args.carrier, args.fixture)
+    if not snapshots:
+        print("error: --action chain needs --carrier or --fixture input", file=sys.stderr)
+        return EXIT_INPUT
+    violations: list[dict] = []
+    checked = 0
+    for path in snapshots:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            print(f"error: cannot read snapshot {path}: {exc}", file=sys.stderr)
+            return EXIT_INPUT
+        checked += 1
+        for verdict in chain_verdicts(parse_chain(text)):
+            verdict["path"] = display_path(path)
+            violations.append(verdict)
+    return print_action_report("chain", CHAIN_RULES, checked, violations, args.json)
+
+
 def main(argv=None) -> int:
     _sig_guard(argv, declared=DECLARED_OPTIONS)
     parser = build_parser()
@@ -763,10 +1041,14 @@ def main(argv=None) -> int:
 
     if args.action == "records":
         return run_records(args)
+    if args.action == "payload":
+        return run_payload(args)
+    if args.action == "chain":
+        return run_chain(args)
 
-    # Interface final, judgement legs pending: the remaining declared actions report
-    # not-implemented and exit as an input error, so an unimplemented check can never be
-    # mistaken for a pass. The legs land with US3–US5 of feature 107.
+    # Interface final, judgement leg pending: the remaining declared action reports
+    # not-implemented and exits as an input error, so an unimplemented check can never be
+    # mistaken for a pass. The leg lands with US5 of feature 107.
     if args.json:
         print(json.dumps({"action": args.action, "status": "not-implemented",
                           "root": str(REPO_ROOT)}, ensure_ascii=False))

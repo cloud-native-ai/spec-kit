@@ -43,6 +43,8 @@
 
 > 上列前四条为 G5 默认纪律的**逐字纪律行**（对齐框架 fast-fail 与 confirmation-gates 两份判据文件的英文真源；执行侧以本文件的行文为准，不解析框架文档）。
 
+**决策 backed 阶段派发（owner 按指针）**：当阶段派发实施一个已记录的决策时，提示词 MUST 携带 `decision_block`（任务权威内容，不是第八个角色字段）；块的五个字段、确认与实施回执义务归 `shared/definitions/decision-definitions.md` § 传递与实施，本骨架不复述，也不得改写既有三段骨架。
+
 ### 第③段：完成尾标与回传契约
 
 ```text

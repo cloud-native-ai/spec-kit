@@ -222,3 +222,40 @@
 | P-11 | run determination（运行判定） | session 记忆中的判定记录（`run-determination.py`） | exempt —— 对已完成运行的测量/评估，不是选项间选择的决策项 | n/a | `shared/workflow/feedback-step.md` § Run Determination |
 | P-12 | 确定性检查器/门的 verdict | 检查器输出 / 检查点引用 | exempt —— 结果由规则唯一决定，没有选项集；围绕它的处置归 P-04/P-05 | n/a | 各检查器与 `shared/workflow/acceptance-hardening.md` § Gates |
 
+
+## 传递与实施(Transmission and Implementation)
+
+决策跨过 superagent→subagent 边时，传递的是既有派发载荷中的**任务权威内容**，不是新的角色字段、消息类别或通道。通道字段、四项既有注入与上行规则归 `shared/definitions/superagent-definitions.md` § The super↔sub Protocol（按指针抵达，本节不复述）。本节拥有决策块、确认与实施回执的形态义务。
+
+### 决策块(decision block)
+
+- **搭乘既有载荷**：交办实施的决策 MUST 以 `decision_block` 搭乘既有派发载荷下行；七个角色字段与四项既有注入保持不变，决策块 MUST NOT 被当作第八个角色字段。
+- **五个字段(five fields)**：`decision_id`（解析到一条记录）、`decision_class`（与被传递记录的类别一致——传递不改变类别）、所选选项完整标签(`chosen_option`)、实施约束(`implementation_constraints`)、档案指针(`archive_pointer`，载体路径 + 标题锚)。
+- **构造处拒绝**：决策 backed 派发缺决策块、或块缺任一字段，MUST 在载荷构造处拒绝（M-06）；非决策派发不带块合法（BC-02 桥）。
+
+### 确认(acknowledgement)
+
+- 子代理回传 MUST 含**确认**：回显 `decision_id`，并声明该决策块已被接受并将据以实施；上下文使决策失效时，同一回传位置给出异常上送（见 § 禁止静默重决）。
+- 确认搭乘既有回传，不新增消息类别或通道；父侧据其推进记录的 `acknowledged_at` 与 `transmission_status` → `acknowledged`（§ 决策记录 的传递族时点）。
+
+### 实施回执(implementation_receipt)
+
+- 回传 MUST 含 `implementation_receipt`，四个成员：`decision_id`、实施摘要(`implementation_summary`)、证据指针(`evidence`)、偏离声明(`divergence`：`none` 或 `diverged` + 理由)。
+- 回执驱动记录的 `implemented_at`、`transmission_status` 的实施结果维度与 `diverged` 相位（§ 决策记录 的传递族时点）。
+- 缺任一项即回传**不完整**：父侧 MUST NOT 消费其结论、MUST NOT 补齐缺项（沿用 `superagent-definitions.md` § The super↔sub Protocol 的上行规则）。
+- 传递动作与回执 MUST NOT 生成第二条决策记录——一条决策项恰一条记录。
+
+### 禁止静默重决(no silent re-decision)
+
+- 子代理 MUST NOT 静默重决：上下文变化使决策失效时，MUST 停在异常点并以 fast-fail 上送件形态报告「证伪了什么预期」（分流判据归 `shared/guidelines/fast-fail.md`，指针）。
+- 无决策记录/编号的决策 MUST NOT 被派发实施；无法解析的 `decision_id` MUST NOT 被实施。
+
+### 审计链(audit chain)
+
+- 每条传递决策 MUST 留下可审计三段链：**决策记录 → 派发尝试**(角色边身份 / run report)**→ 实施回执**。任一环缺失或编号不一致即断链，MUST 作为可上报的**显式异常**报告，MUST NOT 沉默（M-07）。
+- **多跳(multi-hop)**：每一跳的载荷都携带决策块，每一跳的回执都引用同一 `decision_id`；最终回执与原始记录 MUST 连成一条链。
+
+### 重决与取代(re-decision and supersession)
+
+- 重决是**新记录**：父侧新增一条记录，旧记录以条件层 `superseded_by` 指向新编号并**保留**旧记录与旧回执，MUST NOT 删除或改写（§ 决策记录 的取代族）。
+- 取代不改变被传递决策的类别；每条记录的审计链分别成立。
