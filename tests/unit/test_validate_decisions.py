@@ -248,3 +248,107 @@ def test_ai_replay_deterministic() -> None:
     assert ok.returncode == 0, (
         f"the replayable record exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
     )
+
+
+# --------------------------------------------------------------------------- #
+# US3 — record field closure, identifier density and register (T023)
+# --------------------------------------------------------------------------- #
+
+M01 = ROOT / "tests" / "fixtures" / "decision-governance" / "m01"
+M04 = ROOT / "tests" / "fixtures" / "decision-governance" / "m04"
+
+
+def first_verdict(stdout: str, rule: str) -> dict:
+    payload = json.loads(stdout)
+    return next(v for v in payload["violations"] if v["rule"] == rule)
+
+
+def test_m01_field_closure_reverse_samples() -> None:
+    """C-202 / M-01: each layered-closure defect form turns red; a complete record is green."""
+    red_samples = {
+        "red-missing-actor.md": "missing base-layer field",
+        "red-conditional-missing.md": "missing while transmission_status is dispatched",
+        "red-class-outside.md": "outside the closed set",
+        "red-malformed-timepoint.md": "ISO-8601",
+        "red-timepoint-phase.md": "phase contradiction",
+        "red-placeholder.md": "not-transmitted record",
+    }
+    before = snapshot()
+    for name, needle in red_samples.items():
+        path = M01 / name
+        assert path.is_file(), f"missing fixture: {path}"
+        red = run_records("--carrier", str(path))
+        assert red.returncode == 1, (
+            f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+        assert "M-01" in red.stdout, f"{name} carries no M-01 verdict: {red.stdout!r}"
+        payload = json.loads(run_records("--carrier", str(path), "--json").stdout)
+        verdict = next(v for v in payload["violations"] if v["rule"] == "M-01")
+        assert verdict["path"].endswith(name), verdict
+        assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+        assert needle in verdict["message"], (
+            f"{name}: message {verdict['message']!r} lacks {needle!r}"
+        )
+
+    for name in ("green-complete.md", "green-tension-ref.md"):
+        ok = run_records("--carrier", str(M01 / name))
+        assert ok.returncode == 0, (
+            f"{name} exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+        )
+        assert not re.search(r"(?m)^M-01 ", ok.stdout), (
+            f"{name} still carries an M-01 verdict: {ok.stdout!r}"
+        )
+    assert snapshot() == before, "a run mutated the repository tree"
+
+
+def test_m04_id_density_register() -> None:
+    """C-203 / M-04: id form, per-carrier density and register resolvability are judged."""
+    register = M04 / "register.md"
+    for name in ("register.md", "register-missing.md", "green-dense.md",
+                 "red-form.md", "red-non-dense.md", "red-unregistered.md"):
+        assert (M04 / name).is_file(), f"missing fixture: {M04 / name}"
+
+    before = snapshot()
+
+    red_form = run_records("--carrier", str(M04 / "red-form.md"), "--register", str(register))
+    assert red_form.returncode == 1, (
+        f"malformed id exited {red_form.returncode}, expected 1: {red_form.stdout} {red_form.stderr}"
+    )
+    form_verdict = first_verdict(
+        run_records("--carrier", str(M04 / "red-form.md"), "--register", str(register), "--json").stdout,
+        "M-04",
+    )
+    assert "D-NNN" in form_verdict["message"], form_verdict
+
+    red_dense = run_records("--carrier", str(M04 / "red-non-dense.md"), "--register", str(register))
+    assert red_dense.returncode == 1, (
+        f"non-dense ids exited {red_dense.returncode}, expected 1: {red_dense.stdout} {red_dense.stderr}"
+    )
+    dense_verdict = first_verdict(
+        run_records("--carrier", str(M04 / "red-non-dense.md"),
+                    "--register", str(register), "--json").stdout,
+        "M-04",
+    )
+    assert "D-002" in dense_verdict["message"], dense_verdict
+
+    red_unreg = run_records("--carrier", str(M04 / "red-unregistered.md"),
+                            "--register", str(M04 / "register-missing.md"))
+    assert red_unreg.returncode == 1, (
+        f"unregistered id exited {red_unreg.returncode}, expected 1: "
+        f"{red_unreg.stdout} {red_unreg.stderr}"
+    )
+    unreg_verdict = first_verdict(
+        run_records("--carrier", str(M04 / "red-unregistered.md"),
+                    "--register", str(M04 / "register-missing.md"), "--json").stdout,
+        "M-04",
+    )
+    assert "register" in unreg_verdict["message"], unreg_verdict
+
+    ok = run_records("--carrier", str(M04 / "green-dense.md"), "--register", str(register))
+    assert ok.returncode == 0, (
+        f"dense registered ids exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-04 ", ok.stdout), (
+        f"dense registered ids still carry an M-04 verdict: {ok.stdout!r}"
+    )
+    assert snapshot() == before, "a run mutated the repository tree"

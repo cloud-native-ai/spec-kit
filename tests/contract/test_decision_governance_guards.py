@@ -160,3 +160,167 @@ def test_m08_registered_variant_red() -> None:
     )
 
     assert dir_snapshot(FIXTURES / "m08") == before, "a run mutated the m08 fixture tree"
+
+
+# --------------------------------------------------------------------------- #
+# US3 — record closure, evidence pointers, legacy and reconstruction (T024)
+# --------------------------------------------------------------------------- #
+
+M01 = FIXTURES / "m01"
+M09 = FIXTURES / "m09"
+LEGACY = FIXTURES / "legacy"
+RECONSTRUCT = FIXTURES / "reconstruct"
+OWNER = ROOT / "shared" / "definitions" / "decision-definitions.md"
+
+
+def run_records_json(*args: str) -> tuple[subprocess.CompletedProcess, dict]:
+    run = run_records(*args, "--json")
+    return run, json.loads(run.stdout)
+
+
+def test_broken_pointer_red() -> None:
+    """C-204 / M-09: an unresolvable evidence pointer turns red; a resolvable one stays green."""
+    green = M09 / "green-resolvable.md"
+    broken = M09 / "red-broken.md"
+    broken_anchor = M09 / "red-broken-anchor.md"
+    for path in (green, broken, broken_anchor):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    before = dir_snapshot(M09)
+
+    ok = run_records("--carrier", str(green))
+    assert ok.returncode == 0, (
+        f"resolvable pointers exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-09 ", ok.stdout), ok.stdout
+
+    red = run_records("--carrier", str(broken))
+    assert red.returncode == 1, (
+        f"a broken pointer exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+    )
+    assert "M-09" in red.stdout, f"the verdict does not carry M-09: {red.stdout!r}"
+    payload = json.loads(run_records("--carrier", str(broken), "--json").stdout)
+    verdict = next(v for v in payload["violations"] if v["rule"] == "M-09")
+    assert verdict["path"].endswith("red-broken.md"), verdict
+    assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+    assert verdict["message"], verdict
+
+    anchor = run_records("--carrier", str(broken_anchor))
+    assert anchor.returncode == 1, (
+        f"a broken anchor exited {anchor.returncode}, expected 1: {anchor.stdout} {anchor.stderr}"
+    )
+    assert "M-09" in anchor.stdout, f"the anchor verdict does not carry M-09: {anchor.stdout!r}"
+
+    assert dir_snapshot(M09) == before, "a run mutated the m09 fixture tree"
+
+
+def test_no_tension_field_copy() -> None:
+    """C-205: a record copying the tension six fields is red; a T-NNN cross-reference is green."""
+    copy = M01 / "red-tension-copy.md"
+    crossref = M01 / "green-tension-ref.md"
+    for path in (copy, crossref):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    red = run_records("--carrier", str(copy))
+    assert red.returncode == 1, (
+        f"a copied tension field exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+    )
+    assert "M-01" in red.stdout, f"the verdict does not carry M-01: {red.stdout!r}"
+    payload = json.loads(run_records("--carrier", str(copy), "--json").stdout)
+    messages = " ".join(
+        v["message"] for v in payload["violations"] if v["rule"] == "M-01"
+    )
+    assert "antithesis" in messages and "binding_constraints" in messages, messages
+
+    ok = run_records("--carrier", str(crossref))
+    assert ok.returncode == 0, (
+        f"a T-NNN cross-reference exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+
+    owner = (ROOT / "shared" / "definitions" / "decision-definitions.md").read_text(encoding="utf-8")
+    assert "T-NNN" in owner and "MUST NOT 复制" in owner, (
+        "the owner page does not state the cross-reference-only duty"
+    )
+
+
+def test_legacy_two_digit_reported_legacy() -> None:
+    """C-206: legacy headings and register rows are reported, never judged or rewritten."""
+    register = LEGACY / "register.md"
+    legacy_md = LEGACY / "legacy.md"
+    incomplete = LEGACY / "incomplete-new-form.md"
+    for path in (register, legacy_md, incomplete):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    before = dir_snapshot(LEGACY)
+
+    run, payload = run_records_json("--carrier", str(legacy_md), "--register", str(register))
+    assert run.returncode == 0, (
+        f"the legacy carrier exited {run.returncode}, expected 0: {run.stdout} {run.stderr}"
+    )
+    assert payload["status"] == "pass", payload
+    assert payload["violations"] == [], payload["violations"]
+
+    headings = [e for e in payload["legacy"] if e["kind"] == "heading"]
+    texts = [e["text"] for e in headings]
+    for prefix in ("### D-1 ", "### D-12 ", "### D-001 "):
+        assert any(text.startswith(prefix) for text in texts), (prefix, texts)
+
+    row_ids = {e["id"] for e in payload["legacy"] if e["kind"] == "register-row"}
+    assert any(row_id.startswith("D1") for row_id in row_ids), row_ids
+    assert "D-001" in row_ids and "D-001-a" in row_ids, row_ids
+    assert not any("legacy.md" in v["path"] for v in payload["violations"]), (
+        "a legacy heading was judged as a violation"
+    )
+
+    # The pair's other half: a block at the minimal qualifying form is new-form even when
+    # incomplete — its missing fields are M-01's red, not a legacy report.
+    run2, payload2 = run_records_json("--carrier", str(incomplete), "--register", str(register))
+    assert run2.returncode == 1, (
+        f"the incomplete new-form block exited {run2.returncode}, expected 1: "
+        f"{run2.stdout} {run2.stderr}"
+    )
+    assert any(v["rule"] == "M-01" for v in payload2["violations"]), payload2["violations"]
+    assert not any(
+        e["kind"] == "heading" and e["text"].startswith("### D-001 ")
+        for e in payload2["legacy"]
+    ), payload2["legacy"]
+
+    assert dir_snapshot(LEGACY) == before, "a run mutated the legacy fixture tree"
+
+
+def test_reconstruct_from_register_and_carriers() -> None:
+    """C-204: every record is reconstructable from the four carrier types + the register."""
+    run, payload = run_records_json(
+        "--fixture", str(RECONSTRUCT), "--register", str(RECONSTRUCT / "register.md")
+    )
+    assert run.returncode == 0, (
+        f"the four-carrier fixture exited {run.returncode}, expected 0: {run.stdout} {run.stderr}"
+    )
+    assert payload["status"] == "pass", payload["violations"]
+
+    records = payload["records"]
+    assert len(records) == 4, records
+    for suffix in (
+        "reconstruct/requirements.md",
+        "reconstruct/plan.md",
+        "reconstruct/checkpoints/02-implement.md",
+        "reconstruct/run-report.md",
+    ):
+        assert any(record["path"].endswith(suffix) for record in records), (suffix, records)
+
+    base_fields = (
+        "decision_class", "context", "options", "chosen_option", "rationale",
+        "evidence", "actor", "created_at", "transmission_status",
+    )
+    for record in records:
+        assert record["id"] == "D-001", record
+        for field in base_fields:
+            assert record["fields"].get(field), (record["path"], field)
+        assert record["fields"]["transmission_status"] == "not-transmitted", record
+
+    requirements = next(r for r in records if r["path"].endswith("requirements.md"))
+    assert requirements["fields"].get("same_name_conflict") == "true", requirements
+    assert "business_resource_group=" in requirements["fields"].get("resource_locator", ""), (
+        requirements
+    )
+    assert not any(v["rule"] == "M-04" for v in payload["violations"]), payload["violations"]

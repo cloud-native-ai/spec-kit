@@ -308,3 +308,71 @@ def test_human_signal_pointer_only() -> None:
             "§ Option-Set Contract restates the gate-observation signal value "
             f"{literal!r} instead of pointing at its owner"
         )
+
+
+# --------------------------------------------------------------------------- #
+# US3 — record grammar, archive projection and read-only dispositions (T025)
+# --------------------------------------------------------------------------- #
+
+#: The ten base-layer fields (C-202); ``decision_id`` is carried by the heading.
+BASE_FIELDS = (
+    "decision_id", "decision_class", "context", "options", "chosen_option",
+    "rationale", "evidence", "actor", "created_at", "transmission_status",
+)
+
+#: The conditional-layer fields, by trigger family (C-202).
+CONDITIONAL_FIELDS = (
+    "same_name_conflict", "resource_locator", "superseded_by",
+    "dispatched_at", "acknowledged_at", "implemented_at",
+)
+
+
+def test_record_line_grammar() -> None:
+    """C-201: the serialization grammar is stated on the owner page, field names included."""
+    flat = norm(h2_section(read(OWNER), "决策记录", "Decision Record"))
+    for token in (
+        "### D-NNN — <一行标题>",
+        "- **<小写字段名>**: <值>",
+        "缩进子行",
+        "缩进 ≥2 空格",
+        "围栏代码块",
+        "未到相位不设占位",
+        "MUST NOT 以对话记忆补足",
+        "MUST NOT 复制",
+        "密集",
+        "载体指针",
+    ):
+        assert token in flat, f"§ Decision Record lacks {token!r}"
+    for field in BASE_FIELDS + CONDITIONAL_FIELDS:
+        assert f"`{field}`" in flat, f"§ Decision Record does not name the field `{field}`"
+    assert "取代" in flat, "§ Decision Record does not state the supersession rule"
+
+
+def test_no_second_store() -> None:
+    """C-207: the archive is a projection; the register stays the sole id index."""
+    section = h2_section(read(OWNER), "档案即投影", "Archive as Projection")
+    flat = norm(section)
+    for token in (
+        "生产者 × 既有载体",
+        "并集",
+        ".specify/register.md",
+        "不是第二套存储",
+        "MUST NOT 新建第二套登记、队列、存储或调度器",
+        "编号唯一索引",
+    ):
+        assert token in flat, f"§ Archive as Projection lacks {token!r}"
+    producers = re.findall(r"^\| (P-\d{2}) \|", section, re.M)
+    assert set(producers) == {f"P-{n:02d}" for n in range(1, 13)}, (
+        f"the producer inventory rows differ from P-01…P-12: {producers}"
+    )
+
+
+def test_read_only_disposition_carrier() -> None:
+    """C-208: a read-only command's disposition lands in its own report, never by rewrite."""
+    flat = norm(h2_section(read(OWNER), "档案即投影", "Archive as Projection"))
+    for token in (
+        "只读命令的处置",
+        "自己的报告载体",
+        "MUST NOT 通过修改被分析的工件来归档",
+    ):
+        assert token in flat, f"§ Archive as Projection lacks {token!r}"
