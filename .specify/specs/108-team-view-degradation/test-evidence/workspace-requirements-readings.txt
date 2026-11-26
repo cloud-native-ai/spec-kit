@@ -1,0 +1,14 @@
+workspace-guard readings — 108-team-view-degradation / requirements stage (repair attempt 2)
+captured: 2026-11-26T07:25:35Z (UTC), branch 108-team-view-degradation, worktree /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/team-view-degradation
+
+Reading A — attempt-1 pre-authoring temp snapshot vs repair-start state
+  snapshot: .specify/.tmp/sdd-loop/tmp/team-view-degradation/workspace-guard-requirements.json (taken 2026-11-26T07:19Z; unpersisted, never checked at attempt 1 wrap-up)
+  command:  python3 .specify/scripts/python/workspace-guard.py --check .specify/.tmp/sdd-loop/tmp/team-view-degradation/workspace-guard-requirements.json --repo .
+  result:   clean (rc=0) — branch, 213 refs and .specify/specs listing identical; 108-team-view-degradation present in both
+
+Reading B — persisted post-stage snapshot, checked immediately after write
+  snapshot: .specify/specs/108-team-view-degradation/test-evidence/workspace-requirements.json (written 2026-11-26T07:25:10Z)
+  command:  python3 .specify/scripts/python/workspace-guard.py --check .specify/specs/108-team-view-degradation/test-evidence/workspace-requirements.json --repo .
+  result:   clean (rc=0)
+
+Disclosure: attempt 1 persisted no signature into test-evidence and recorded no wrap-up check; Reading B is a post-stage reading. The post-artifact-commit signature is workspace-requirements-postcommit.json with its own check in workspace-requirements-postcommit.txt.
