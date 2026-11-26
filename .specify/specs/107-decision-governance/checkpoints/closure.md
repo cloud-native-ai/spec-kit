@@ -19,3 +19,13 @@
 - trunk: `master` (contains line 106 since `f19310783`)
 - expected: recorded below after the push
 - published heads: recorded below after the push
+
+### Published-state reading — 2026-11-26T07:00Z
+
+| remote | refs/heads/master | expected | verdict |
+|---|---|---|---|
+| github | 191c96d62f75 | 191c96d62f75 | converged |
+| gitlab | 191c96d62f75 | 191c96d62f75 | converged |
+| gitee | 191c96d62f75 | 191c96d62f75 | converged |
+
+- Read command: `git ls-remote <remote> refs/heads/master` after pushing the 107 ff-merge (`0c3e7bf2`) plus the trigger-index archive commit; all three declared closeout remotes returned the corrected trunk. `origin` (upstream) untouched.
