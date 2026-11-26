@@ -36,6 +36,28 @@ Implementation readings disclosed here, each pinned by the guarding contract tes
 * ``state`` / ``last_activity`` / ``age`` / ``stale`` are digest-view fields, not engine
   output keys (data-model § 4); the digest renders them from its existing sources.
 
+The additive ``--action settle`` (spec 106) is the settlement judgment face owned by
+``superagent-definitions.md`` § Termination. It reads the same existing roots plus the
+additive attempt/end/claim records, derives exactly one closed settlement value per
+attempt from positive evidence, audits recorded claims against that derivation, and
+emits the three closed settlement violation kinds. Its exit codes reuse the engine's
+0 / 1 / 2: 0 every attempt judged (a correctly derived ``silent-end`` included),
+1 settlement violations found, 2 ``unknown`` findings (unreadable evidence or a claimed
+attempt with no resolvable start record). ``report`` and ``query`` are untouched.
+
+Implementation readings disclosed here for the settlement action:
+
+* A team-report row is a claim surface, never the seat's start record; the seat needs
+  its own E2 ``<label>.attempt`` (carrier ``c3-team-seat``) or the same label's C1/C2
+  start evidence, else it settles ``unknown`` with ``start-record-missing``.
+* A parent-written ``<label>.settlement`` claim carrying ``value: cancelled`` is the
+  explicit parent-side cancellation record; a version-less claim (or a 5-column report
+  row) is annotated ``legacy`` and is exempt from the three settlement predicates while
+  still deriving its value from raw evidence.
+* For pid-less carriers the return channel counts as an open live leg only before the
+  attempt's declared wait deadline; after it, no return and no live signal settle
+  ``silent-end``.
+
 Zero write points: this module opens no file for writing, creates no temporary file and
 mutates no input. The importable interface (``read_carrier_inputs`` +
 ``evaluate_role_model``) is the single materialization the digest consumes.
@@ -44,10 +66,13 @@ mutates no input. The importable interface (``read_carrier_inputs`` +
 from __future__ import annotations
 
 import argparse
+import datetime
 import importlib.util
 import json
+import os
 import re
 import sys
+import time
 from collections import deque
 from pathlib import Path
 
@@ -861,6 +886,864 @@ def build_query_answer(model: dict, inputs: dict, parent_arg: str, child_arg: st
 
 
 # --------------------------------------------------------------------------- #
+# settlement judgment (spec 106 — additive ``--action settle``)
+# --------------------------------------------------------------------------- #
+SETTLEMENT_VALUES = (
+    "completed",
+    "failed",
+    "anomaly",
+    "cancelled",
+    "running",
+    "silent-end",
+    "unknown",
+)
+SETTLEMENT_CLASSES = {
+    "completed": "terminal",
+    "failed": "terminal",
+    "anomaly": "terminal",
+    "cancelled": "terminal",
+    "running": "non-terminal",
+    "silent-end": "terminal",
+    "unknown": "detection-defect",
+}
+SETTLEMENT_VIOLATION_KINDS = (
+    "settlement-unrecorded",
+    "settlement-out-of-set",
+    "settlement-unbacked",
+)
+C1_VERDICT_MAP = {
+    "DONE": "completed",
+    "FAILED": "failed",
+    "ANOMALY": "anomaly",
+    "INCOMPLETE": "failed",
+    "DEAD": "silent-end",
+    "NO_SIGNAL": "silent-end",
+    "TIMEOUT": "running",
+    "RUNNING": "running",
+}
+CARRIER_C1 = "c1-fork"
+CARRIER_C2 = "c2-subprocess"
+CARRIER_C3 = "c3-team-seat"
+CARRIER_C4 = "c4-native"
+SETTLE_CARRIERS = (CARRIER_C1, CARRIER_C2, CARRIER_C3, CARRIER_C4)
+CLAIM_MECHANISM_BY_CARRIER = {
+    CARRIER_C1: "u4",
+    CARRIER_C2: "return-record",
+    CARRIER_C3: "team-verification",
+    CARRIER_C4: "five-element",
+}
+SETTLE_MAPPING_5 = ("label", "role", "dispatch_duty", "workspace", "parent")
+SETTLE_MAPPING_7 = SETTLE_MAPPING_5 + ("end_state", "evidence")
+LOG_RECORD_SUFFIXES = (
+    (".attempt", "attempt"),
+    (".settlement", "claim"),
+    (".status", "status"),
+    (".end", "end"),
+    (".live.log", "live"),
+    (".jsonl", "live"),
+)
+ANOMALY_PREFIX = "ANOMALY:"
+
+
+def _positive_int(text):
+    try:
+        value = int(text)
+    except (TypeError, ValueError):
+        raise argparse.ArgumentTypeError("expected a positive integer")
+    if value <= 0:
+        raise argparse.ArgumentTypeError("expected a positive integer")
+    return value
+
+
+def _is_int(value) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _parse_iso_timestamp(value):
+    if not isinstance(value, str) or not value:
+        return None
+    text = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        return datetime.datetime.fromisoformat(text).timestamp()
+    except ValueError:
+        return None
+
+
+def _try_read_text(path: Path):
+    try:
+        return path.read_text(encoding="utf-8"), None
+    except OSError as exc:
+        return None, "unreadable input %s: %s" % (path, exc)
+
+
+def _try_json_object(path: Path):
+    text, error = _try_read_text(path)
+    if error is not None:
+        return None, error
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        return None, "unparseable record %s: %s" % (path, exc)
+    if not isinstance(payload, dict):
+        return None, "malformed record %s: top level is not an object" % (path,)
+    return payload, None
+
+
+def _pid_start_ticks(pid: int):
+    try:
+        stat = Path("/proc/%d/stat" % pid).read_text(encoding="utf-8")
+    except OSError:
+        return None
+    close = stat.rfind(")")
+    if close < 0:
+        return None
+    fields = stat[close + 2 :].split()
+    if len(fields) < 20:
+        return None
+    try:
+        return int(fields[19])
+    except ValueError:
+        return None
+
+
+def _pid_liveness(pid) -> str:
+    if not _is_int(pid) or pid <= 0:
+        return "gone"
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return "gone"
+    except PermissionError:
+        pass
+    except OSError:
+        return "gone"
+    try:
+        stat = Path("/proc/%d/stat" % pid).read_text(encoding="utf-8")
+    except OSError:
+        return "alive"
+    close = stat.rfind(")")
+    if close >= 0 and stat[close + 2 : close + 3] == "Z":
+        return "gone"
+    return "alive"
+
+
+def _last_nonempty_line(path: Path):
+    text, error = _try_read_text(path)
+    if error is not None:
+        return None, error
+    for line in reversed(text.splitlines()):
+        if line.strip():
+            return line.strip(), None
+    return "", None
+
+
+def _resolve_claim_pointer(pointer, bases):
+    if not isinstance(pointer, str) or not pointer:
+        return None
+    candidate = Path(pointer)
+    if candidate.is_absolute():
+        return candidate if candidate.exists() else None
+    for base in bases:
+        if base is None:
+            continue
+        resolved = Path(base) / pointer
+        if resolved.exists():
+            return resolved
+    return None
+
+
+def _blank_attempt(label: str, carrier: str, logs_dir: Path) -> dict:
+    return {
+        "attempt_id": label,
+        "carrier": carrier,
+        "path": None,
+        "logs_dir": logs_dir,
+        "bases": [],
+        "start": [],
+        "terminal": [],
+        "live": [],
+        "unreadable": [],
+        "claims": [],
+        "pid": None,
+        "pid_start_ticks": None,
+        "started_at": None,
+        "wait_deadline_s": None,
+        "start_grace_s": None,
+        "anomaly_line": False,
+    }
+
+
+def _load_attempt_record(path: Path, logs_dir: Path) -> dict:
+    label = path.name[: -len(".attempt")]
+    attempt = _blank_attempt(label, CARRIER_C2, logs_dir)
+    attempt["path"] = path
+    payload, error = _try_json_object(path)
+    if error is not None:
+        attempt["unreadable"].append(
+            {"pointer": str(path), "kind": "unreadable", "note": error}
+        )
+        return attempt
+    carrier = payload.get("carrier")
+    if carrier not in SETTLE_CARRIERS:
+        attempt["unreadable"].append(
+            {
+                "pointer": str(path),
+                "kind": "unreadable",
+                "note": "carrier outside the closed inventory: %r" % (carrier,),
+            }
+        )
+        return attempt
+    missing = [
+        field
+        for field in ("attempt_id", "parent_identity", "started_at")
+        if not isinstance(payload.get(field), str) or not payload.get(field)
+    ]
+    if missing:
+        attempt["unreadable"].append(
+            {
+                "pointer": str(path),
+                "kind": "unreadable",
+                "note": "attempt record missing required fields: %s"
+                % ", ".join(sorted(missing)),
+            }
+        )
+        return attempt
+    attempt["carrier"] = carrier
+    attempt["start"].append({"pointer": str(path), "kind": "start"})
+    attempt["started_at"] = payload.get("started_at")
+    pid = payload.get("pid")
+    if _is_int(pid):
+        attempt["pid"] = pid
+    ticks = payload.get("pid_start_ticks")
+    if _is_int(ticks):
+        attempt["pid_start_ticks"] = ticks
+    for field in ("wait_deadline_s", "start_grace_s"):
+        value = payload.get(field)
+        if _is_int(value) and value > 0:
+            attempt[field] = value
+    return attempt
+
+
+def _apply_end_record(attempt: dict, path: Path) -> None:
+    payload, error = _try_json_object(path)
+    if error is not None:
+        attempt["unreadable"].append(
+            {"pointer": str(path), "kind": "unreadable", "note": error}
+        )
+        return
+    entry = {"pointer": str(path), "kind": "terminal"}
+    exit_code = payload.get("exit")
+    signal = payload.get("signal")
+    if _is_int(exit_code):
+        entry["exit"] = exit_code
+    if isinstance(signal, str) and signal:
+        entry["signal"] = signal
+    if "exit" in entry or "signal" in entry:
+        attempt["terminal"].append(entry)
+    else:
+        attempt["unreadable"].append(
+            {
+                "pointer": str(path),
+                "kind": "unreadable",
+                "note": "termination record carries neither exit nor signal",
+            }
+        )
+
+
+def _apply_status_record(attempt: dict, path: Path) -> None:
+    text, error = _try_read_text(path)
+    if error is not None:
+        attempt["unreadable"].append(
+            {"pointer": str(path), "kind": "unreadable", "note": error}
+        )
+        return
+    match = re.search(r"\bexit=(\d+)\b", text)
+    if not match:
+        attempt["unreadable"].append(
+            {
+                "pointer": str(path),
+                "kind": "unreadable",
+                "note": "status line carries no exit code",
+            }
+        )
+        return
+    attempt["terminal"].append(
+        {"pointer": str(path), "kind": "terminal", "exit": int(match.group(1))}
+    )
+
+
+def _load_claim_file(path: Path):
+    payload, error = _try_json_object(path)
+    if error is not None:
+        return None, error
+    evidence = payload.get("evidence", [])
+    if not isinstance(evidence, list) or not all(
+        isinstance(item, str) for item in evidence
+    ):
+        return None, "claim evidence is not a list of pointers: %s" % (path,)
+    claim = {
+        "surface": "attempt-file",
+        "path": str(path),
+        "line": None,
+        "value": payload.get("value"),
+        "evidence": list(evidence),
+        "mechanism": payload.get("mechanism")
+        if isinstance(payload.get("mechanism"), str)
+        else None,
+        "settlement_version": payload.get("settlement_version"),
+        "version_bearing": "settlement_version" in payload,
+    }
+    return claim, None
+
+
+def _collect_team_claims(teams_dir: Path):
+    claims = []
+    unreadable = []
+    for path in sorted(teams_dir.glob("*/runs/*-report.md")):
+        text, error = _try_read_text(path)
+        if error is not None:
+            unreadable.append({"pointer": str(path), "kind": "unreadable", "note": error})
+            continue
+        for header, table_rows, _start in _tables_in_execution_detail(text):
+            header_tuple = tuple(header)
+            if header_tuple not in (SETTLE_MAPPING_5, SETTLE_MAPPING_7):
+                continue
+            for lineno, cells in table_rows:
+                if len(cells) != len(header_tuple):
+                    unreadable.append(
+                        {
+                            "pointer": "%s:%d" % (path, lineno),
+                            "kind": "unreadable",
+                            "note": "mapping row width differs from its header",
+                        }
+                    )
+                    continue
+                label = cells[0]
+                if not label:
+                    continue
+                if header_tuple == SETTLE_MAPPING_5:
+                    claim = {
+                        "surface": "team-report-row",
+                        "path": str(path),
+                        "line": lineno,
+                        "value": None,
+                        "evidence": [],
+                        "mechanism": None,
+                        "settlement_version": None,
+                        "version_bearing": False,
+                    }
+                else:
+                    evidence = [
+                        item.strip()
+                        for item in re.split(r"[,;]", cells[6])
+                        if item.strip()
+                    ]
+                    claim = {
+                        "surface": "team-report-row",
+                        "path": str(path),
+                        "line": lineno,
+                        "value": cells[5] or None,
+                        "evidence": evidence,
+                        "mechanism": CLAIM_MECHANISM_BY_CARRIER[CARRIER_C3],
+                        "settlement_version": None,
+                        "version_bearing": True,
+                    }
+                claims.append((label, claim))
+    return claims, unreadable
+
+
+def _settle_state_stems(state_dir: Path) -> list:
+    stems = set()
+    for path in sorted(state_dir.iterdir()):
+        if not path.is_file():
+            continue
+        name = path.name
+        if name.startswith("prompt-") and name.endswith(SIDECAR_SUFFIX):
+            stems.add(name[len("prompt-") : -len(SIDECAR_SUFFIX)])
+            continue
+        for prefix in STAGE_ARTIFACT_PREFIXES:
+            if not name.startswith(prefix):
+                continue
+            rest = name[len(prefix) :]
+            if rest.endswith(".log"):
+                rest = rest[:-4]
+            if rest:
+                stems.add(rest)
+    return sorted(stems)
+
+
+def _load_c1_attempt(state_dir: Path, stem: str, logs_dir: Path) -> dict:
+    attempt = _blank_attempt(stem, CARRIER_C1, logs_dir)
+    sidecar = state_dir / ("prompt-%s%s" % (stem, SIDECAR_SUFFIX))
+    pid_path = state_dir / ("pid-%s" % stem)
+    status_path = state_dir / ("status-%s" % stem)
+    log_path = state_dir / ("log-%s.log" % stem)
+    heartbeat_path = state_dir / ("heartbeat-%s.log" % stem)
+    started_at = None
+    if sidecar.is_file():
+        attempt["start"].append({"pointer": str(sidecar), "kind": "start"})
+        attempt["path"] = sidecar
+        payload, error = _try_json_object(sidecar)
+        if error is not None:
+            attempt["unreadable"].append(
+                {"pointer": str(sidecar), "kind": "unreadable", "note": error}
+            )
+        else:
+            started_at = payload.get("started_at")
+            role_edge = payload.get("role_edge")
+            if started_at is None and isinstance(role_edge, dict):
+                started_at = role_edge.get("started_at")
+    else:
+        for candidate in (pid_path, status_path, log_path, heartbeat_path):
+            if candidate.is_file():
+                attempt["start"].append({"pointer": str(candidate), "kind": "start"})
+                attempt["path"] = candidate
+                break
+    attempt["started_at"] = started_at if isinstance(started_at, str) else None
+    if pid_path.is_file():
+        text, error = _try_read_text(pid_path)
+        if error is not None:
+            attempt["unreadable"].append(
+                {"pointer": str(pid_path), "kind": "unreadable", "note": error}
+            )
+        elif text.strip().isdigit():
+            attempt["pid"] = int(text.strip())
+        else:
+            attempt["unreadable"].append(
+                {
+                    "pointer": str(pid_path),
+                    "kind": "unreadable",
+                    "note": "pid file is not an integer",
+                }
+            )
+    if status_path.is_file():
+        text, error = _try_read_text(status_path)
+        if error is not None:
+            attempt["unreadable"].append(
+                {"pointer": str(status_path), "kind": "unreadable", "note": error}
+            )
+        else:
+            exit_match = re.search(r"\bexit=(\d+)\b", text)
+            sentinel_match = re.search(r"\bsentinel=([01])\b", text)
+            if exit_match is None:
+                attempt["unreadable"].append(
+                    {
+                        "pointer": str(status_path),
+                        "kind": "unreadable",
+                        "note": "status file carries no exit code",
+                    }
+                )
+            else:
+                entry = {
+                    "pointer": str(status_path),
+                    "kind": "terminal",
+                    "exit": int(exit_match.group(1)),
+                }
+                if sentinel_match is not None:
+                    entry["sentinel"] = int(sentinel_match.group(1))
+                attempt["terminal"].append(entry)
+    if log_path.is_file():
+        attempt["live"].append(str(log_path))
+        line, error = _last_nonempty_line(log_path)
+        if error is not None:
+            attempt["unreadable"].append(
+                {"pointer": str(log_path), "kind": "unreadable", "note": error}
+            )
+        elif line and line.startswith(ANOMALY_PREFIX):
+            attempt["anomaly_line"] = True
+    if heartbeat_path.is_file():
+        attempt["live"].append(str(heartbeat_path))
+    return attempt
+
+
+def read_settlement_inputs(*, state_dir, teams_dir, logs_dir, registry_dir=None) -> dict:
+    """Parse the existing roots plus the additive records into one settlement snapshot."""
+    state_path = Path(state_dir)
+    teams_path = Path(teams_dir)
+    logs_path = Path(logs_dir)
+    for option, path in (
+        ("--state-dir", state_path),
+        ("--teams-dir", teams_path),
+        ("--logs-dir", logs_path),
+    ):
+        if not path.is_dir():
+            raise RoleEdgeInputError(
+                "required root %s is missing or not a directory: %s" % (option, path)
+            )
+    bases = [logs_path, state_path, teams_path, REPO_ROOT]
+    attempts = {}
+    claims_by_label = {}
+    stray_unreadable = []
+
+    for path in sorted(logs_path.iterdir()):
+        if not path.is_file():
+            continue
+        name = path.name
+        match = next(
+            ((suffix, kind) for suffix, kind in LOG_RECORD_SUFFIXES if name.endswith(suffix)),
+            None,
+        )
+        if match is None:
+            continue
+        suffix, kind = match
+        label = name[: -len(suffix)]
+        if not label:
+            continue
+        if kind == "attempt":
+            attempts[label] = _load_attempt_record(path, logs_path)
+            continue
+        if kind == "claim":
+            claim, error = _load_claim_file(path)
+            if error is not None:
+                attempt = attempts.get(label) or _blank_attempt(
+                    label, CARRIER_C2, logs_path
+                )
+                attempts[label] = attempt
+                attempt["unreadable"].append(
+                    {"pointer": str(path), "kind": "unreadable", "note": error}
+                )
+            else:
+                claims_by_label.setdefault(label, []).append(claim)
+            continue
+        attempt = attempts.get(label) or _blank_attempt(label, CARRIER_C2, logs_path)
+        attempts[label] = attempt
+        if attempt["path"] is None:
+            attempt["path"] = path
+        if kind == "status":
+            _apply_status_record(attempt, path)
+        elif kind == "end":
+            _apply_end_record(attempt, path)
+        else:
+            attempt["live"].append(str(path))
+
+    for attempt in attempts.values():
+        live_paths = [Path(item) for item in attempt["live"] if item.endswith(".live.log")]
+        if not live_paths:
+            continue
+        line, error = _last_nonempty_line(live_paths[0])
+        if error is not None:
+            attempt["unreadable"].append(
+                {"pointer": str(live_paths[0]), "kind": "unreadable", "note": error}
+            )
+        elif line and line.startswith(ANOMALY_PREFIX):
+            attempt["anomaly_line"] = True
+
+    for stem in _settle_state_stems(state_path):
+        if stem in attempts:
+            continue
+        attempts[stem] = _load_c1_attempt(state_path, stem, logs_path)
+
+    team_claims, team_unreadable = _collect_team_claims(teams_path)
+    stray_unreadable.extend(team_unreadable)
+    for label, claim in team_claims:
+        attempt = attempts.get(label) or _blank_attempt(label, CARRIER_C3, logs_path)
+        attempts[label] = attempt
+        claims_by_label.setdefault(label, []).append(claim)
+
+    for label, claims in claims_by_label.items():
+        attempt = attempts.get(label) or _blank_attempt(label, CARRIER_C2, logs_path)
+        attempts[label] = attempt
+        attempt["claims"].extend(
+            sorted(
+                claims,
+                key=lambda claim: (
+                    0 if claim["surface"] == "attempt-file" else 1,
+                    claim["path"],
+                    claim["line"] or 0,
+                ),
+            )
+        )
+
+    for index, item in enumerate(stray_unreadable):
+        label = "unreadable-%d" % (index + 1)
+        attempt = _blank_attempt(label, CARRIER_C3, logs_path)
+        attempt["unreadable"].append(item)
+        attempts[label] = attempt
+
+    for attempt in attempts.values():
+        attempt["bases"] = bases
+
+    return {
+        "roots": {
+            "state_dir": str(state_path),
+            "teams_dir": str(teams_path),
+            "logs_dir": str(logs_path),
+            "registry_dir": None if registry_dir is None else str(registry_dir),
+        },
+        "attempts": [attempts[label] for label in sorted(attempts)],
+    }
+
+
+def _claim_primary(attempt: dict):
+    return attempt["claims"][0] if attempt["claims"] else None
+
+
+def _evidence_resolves(claim: dict, bases) -> bool:
+    if not claim["evidence"]:
+        return False
+    return all(_resolve_claim_pointer(pointer, bases) for pointer in claim["evidence"])
+
+
+def _claim_backed(claim: dict, attempt: dict, derived: str) -> bool:
+    value = claim["value"]
+    if value == "completed":
+        if claim["surface"] == "team-report-row":
+            expected = CLAIM_MECHANISM_BY_CARRIER[CARRIER_C3]
+        else:
+            expected = CLAIM_MECHANISM_BY_CARRIER[attempt["carrier"]]
+        if claim["mechanism"] != expected:
+            return False
+        return _evidence_resolves(claim, attempt["bases"])
+    if value == "running":
+        return derived == "running"
+    if value == "silent-end":
+        return derived == "silent-end" and _evidence_resolves(claim, attempt["bases"])
+    return True
+
+
+def _derive_settlement(attempt: dict, *, wait_deadline_s: int, start_grace_s: int, now: float):
+    if attempt["unreadable"]:
+        return "unknown", "unreadable"
+    if not attempt["start"]:
+        return "unknown", "start-record-missing"
+    primary = _claim_primary(attempt)
+    if primary is not None and primary["value"] == "cancelled":
+        return "cancelled", "cancellation-record"
+    if attempt["terminal"]:
+        exit_code = None
+        signal = None
+        for entry in attempt["terminal"]:
+            if exit_code is None and "exit" in entry:
+                exit_code = entry["exit"]
+            if signal is None and entry.get("signal"):
+                signal = entry["signal"]
+        if exit_code is not None and exit_code != 0:
+            return "failed", "non-zero-terminal"
+        if signal:
+            return "failed", "signal-terminal"
+        if attempt["anomaly_line"]:
+            return "anomaly", "anomaly-signal"
+        if (
+            primary is not None
+            and primary["value"] == "completed"
+            and _claim_backed(primary, attempt, "completed")
+        ):
+            return "completed", "verified-completion"
+        return "failed", "incomplete"
+    if primary is not None:
+        value = primary["value"]
+        if value in ("failed", "anomaly") and _evidence_resolves(primary, attempt["bases"]):
+            return value, "claim-recorded-%s" % value
+        if (
+            value == "completed"
+            and attempt["carrier"] in (CARRIER_C3, CARRIER_C4)
+            and _claim_backed(primary, attempt, "completed")
+        ):
+            return "completed", "verified-completion"
+    if attempt["pid"] is not None:
+        if _pid_liveness(attempt["pid"]) == "alive":
+            if attempt["pid_start_ticks"] is not None:
+                current = _pid_start_ticks(attempt["pid"])
+                if current is not None and current != attempt["pid_start_ticks"]:
+                    return "silent-end", "pid-reused"
+            return "running", "live-check"
+        return "silent-end", "pid-gone"
+    started = _parse_iso_timestamp(attempt["started_at"])
+    if attempt["carrier"] in (CARRIER_C1, CARRIER_C2):
+        grace = attempt["start_grace_s"] or start_grace_s
+        if started is not None and now < started + grace:
+            return "running", "within-start-grace"
+        return "silent-end", "start-grace-expired"
+    deadline = attempt["wait_deadline_s"] or wait_deadline_s
+    if started is not None and now < started + deadline:
+        return "running", "return-channel-open"
+    return "silent-end", "deadline-passed"
+
+
+def _settlement_violation_problem(claim: dict, kind: str) -> dict:
+    return {"kind": kind, "path": claim["path"], "line": claim["line"]}
+
+
+def _audit_claims(attempt: dict, derived: str):
+    problems = []
+    consistent = True
+    primary = _claim_primary(attempt)
+    legacy = bool(primary is not None and not primary["version_bearing"])
+    if derived == "unknown":
+        # A detection defect is the single deterministic refusal, never a settlement
+        # judgment: the claim is not audited against an ending that does not exist.
+        return consistent, problems, legacy
+    for claim in attempt["claims"]:
+        value = claim["value"]
+        if claim["surface"] == "team-report-row" and claim["version_bearing"]:
+            if value is None or not claim["evidence"]:
+                problems.append(_settlement_violation_problem(claim, "settlement-unrecorded"))
+                if value is not None and value != derived:
+                    consistent = False
+                continue
+        elif claim["version_bearing"] and value is None:
+            problems.append(_settlement_violation_problem(claim, "settlement-unrecorded"))
+            continue
+        if not claim["version_bearing"]:
+            if value is not None and value != derived:
+                consistent = False
+            continue
+        if value is None:
+            continue
+        if value not in SETTLEMENT_VALUES:
+            problems.append(_settlement_violation_problem(claim, "settlement-out-of-set"))
+            consistent = False
+            continue
+        if not _claim_backed(claim, attempt, derived):
+            problems.append(_settlement_violation_problem(claim, "settlement-unbacked"))
+            consistent = False
+        if value != derived:
+            consistent = False
+            problems.append(_settlement_violation_problem(claim, "settlement-unbacked"))
+    deduped = []
+    seen = set()
+    for problem in problems:
+        key = (problem["kind"], problem["path"], problem["line"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(problem)
+    return consistent, deduped, legacy
+
+
+def _finding_evidence(attempt: dict, derived: str) -> list:
+    items = []
+    items.extend(attempt["start"])
+    items.extend(attempt["terminal"])
+    for claim in attempt["claims"]:
+        items.append(
+            {
+                "pointer": claim["path"],
+                "kind": "claim",
+                "note": claim["surface"],
+            }
+        )
+    items.extend(attempt["unreadable"])
+    if derived == "running":
+        pointer = (
+            attempt["live"][0]
+            if attempt["live"]
+            else (str(attempt["path"]) if attempt["path"] is not None else attempt["attempt_id"])
+        )
+        items.append({"pointer": pointer, "kind": "live"})
+    if derived == "silent-end":
+        for suffix in (".end", ".status"):
+            items.append(
+                {
+                    "pointer": str(Path(attempt["logs_dir"]) / (attempt["attempt_id"] + suffix)),
+                    "kind": "lack",
+                    "note": "absent",
+                }
+            )
+    return items
+
+
+def _claim_snapshot(attempt: dict):
+    primary = _claim_primary(attempt)
+    if primary is None:
+        return None
+    return {
+        "surface": primary["surface"],
+        "path": primary["path"],
+        "line": primary["line"],
+        "value": primary["value"],
+        "evidence": list(primary["evidence"]),
+        "mechanism": primary["mechanism"],
+        "settlement_version": primary["settlement_version"],
+    }
+
+
+def evaluate_settlements(
+    inputs: dict, *, live_window_s: int = 120, wait_deadline_s: int = 1800, start_grace_s: int = 30
+) -> dict:
+    """Judge the parsed settlement snapshot into the per-attempt findings payload."""
+    now = time.time()
+    findings = []
+    violations = []
+    value_counts = {value: 0 for value in SETTLEMENT_VALUES}
+    unknown_count = 0
+    for attempt in inputs["attempts"]:
+        derived, detail = _derive_settlement(
+            attempt,
+            wait_deadline_s=wait_deadline_s,
+            start_grace_s=start_grace_s,
+            now=now,
+        )
+        consistent, problems, legacy = _audit_claims(attempt, derived)
+        problem_rows = []
+        for problem in problems:
+            pointer = problem["path"] or ""
+            if problem.get("line"):
+                pointer = "%s:%d" % (pointer, problem["line"])
+            row = {
+                "kind": problem["kind"],
+                "attempt_id": attempt["attempt_id"],
+                "subjects": [attempt["attempt_id"]],
+                "paths": [pointer] if pointer else [],
+            }
+            problem_rows.append(row)
+            violations.append(row)
+        finding = {
+            "attempt_id": attempt["attempt_id"],
+            "carrier": attempt["carrier"],
+            "verdict": derived,
+            "value": derived,
+            "class": SETTLEMENT_CLASSES[derived],
+            "evidence": _finding_evidence(attempt, derived),
+            "claim": _claim_snapshot(attempt),
+            "consistent": consistent,
+            "legacy": legacy,
+            "detail": detail,
+            "violations": problem_rows,
+        }
+        if derived == "unknown":
+            finding["unknown_cause"] = detail
+            unknown_count += 1
+        value_counts[derived] += 1
+        findings.append(finding)
+    findings.sort(key=lambda row: row["attempt_id"])
+    violations.sort(
+        key=lambda row: (row["kind"], row["attempt_id"], tuple(row["paths"]))
+    )
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "action": "settle",
+        "inputs": {
+            "state_dir": inputs["roots"]["state_dir"],
+            "teams_dir": inputs["roots"]["teams_dir"],
+            "logs_dir": inputs["roots"]["logs_dir"],
+            "registry_dir": inputs["roots"]["registry_dir"],
+            "live_window_s": live_window_s,
+            "wait_deadline_s": wait_deadline_s,
+            "start_grace_s": start_grace_s,
+        },
+        "findings": findings,
+        "violations": violations,
+        "summary": {
+            "attempts": len(findings),
+            "values": {
+                value: count for value, count in value_counts.items() if count
+            },
+            "violations": len(violations),
+            "unknown": unknown_count,
+        },
+    }
+
+
+def settle_exit_code(payload: dict) -> int:
+    if payload["summary"]["unknown"]:
+        return 2
+    if payload["violations"]:
+        return 1
+    return 0
+
+
+# --------------------------------------------------------------------------- #
 # rendering
 # --------------------------------------------------------------------------- #
 def _dash(value):
@@ -892,9 +1775,40 @@ def _violation_line(row: dict) -> str:
     )
 
 
+def _settlement_line(row: dict) -> str:
+    return (
+        "attempt %s carrier=%s verdict=%s class=%s consistent=%s legacy=%s "
+        "evidence=%s"
+        % (
+            row["attempt_id"],
+            row["carrier"],
+            row["verdict"],
+            row["class"],
+            "true" if row["consistent"] else "false",
+            "true" if row["legacy"] else "false",
+            ",".join(item["pointer"] for item in row["evidence"]),
+        )
+    )
+
+
 def render(payload: dict, output_format: str) -> None:
     if output_format == "json":
         sys.stdout.write(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+        return
+    if payload.get("action") == "settle":
+        lines = [_settlement_line(row) for row in payload["findings"]]
+        for row in payload["violations"]:
+            lines.append(_violation_line(row))
+        summary = payload["summary"]
+        lines.append(
+            "summary attempts=%d violations=%d unknown=%d"
+            % (
+                summary["attempts"],
+                summary["violations"],
+                summary["unknown"],
+            )
+        )
+        sys.stdout.write("\n".join(lines) + "\n")
         return
     lines = []
     if payload.get("action") == "query":
@@ -948,8 +1862,10 @@ def build_parser() -> argparse.ArgumentParser:
         epilog=(
             "Side effects: read-only; no file is written and no temporary file is "
             "created.\n"
-            "Exit codes: 0 judged clean (an empty edge set is explicitly summarized); "
-            "1 violations found; 2 unreadable or malformed input."
+            "Exit codes: 0 judged clean (an empty edge set is explicitly summarized; a "
+            "settlement run judged every attempt, a correctly derived silent-end "
+            "included); 1 violations found; 2 unreadable or malformed input "
+            "(settlement: unknown findings)."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -958,7 +1874,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="version",
         version="role-edge-check.py " + _framework_version(),
     )
-    parser.add_argument("--action", choices=("report", "query"), default="report")
+    parser.add_argument("--action", choices=("report", "query", "settle"), default="report")
     parser.add_argument("--parent", help="query: parent identity")
     parser.add_argument("--child", help="query: child identity")
     parser.add_argument("--state-dir", default=".specify/state")
@@ -968,6 +1884,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--registry-dir",
         default=None,
         help="line-registry cross-check root (default: the owning engine's resolution)",
+    )
+    parser.add_argument(
+        "--live-window",
+        type=_positive_int,
+        default=120,
+        help="settle: liveness window in seconds (positive integer)",
+    )
+    parser.add_argument(
+        "--wait-deadline",
+        type=_positive_int,
+        default=1800,
+        help="settle: pid-less wait deadline in seconds (positive integer)",
+    )
+    parser.add_argument(
+        "--start-grace",
+        type=_positive_int,
+        default=30,
+        help="settle: process start grace in seconds (positive integer)",
     )
     parser.add_argument("--format", choices=("json", "text"), default="json")
     return parser
@@ -981,22 +1915,38 @@ def main(argv=None) -> int:
             raise RoleEdgeInputError(
                 "--action query requires both --parent and --child"
             )
-        inputs = read_carrier_inputs(
-            state_dir=args.state_dir,
-            teams_dir=args.teams_dir,
-            logs_dir=args.logs_dir,
-            registry_dir=args.registry_dir,
-        )
-        model = evaluate_role_model(inputs)
-        payload = (
-            build_query_answer(model, inputs, args.parent, args.child)
-            if args.action == "query"
-            else model
-        )
+        if args.action == "settle":
+            settlement_inputs = read_settlement_inputs(
+                state_dir=args.state_dir,
+                teams_dir=args.teams_dir,
+                logs_dir=args.logs_dir,
+                registry_dir=args.registry_dir,
+            )
+            payload = evaluate_settlements(
+                settlement_inputs,
+                live_window_s=args.live_window,
+                wait_deadline_s=args.wait_deadline,
+                start_grace_s=args.start_grace,
+            )
+        else:
+            inputs = read_carrier_inputs(
+                state_dir=args.state_dir,
+                teams_dir=args.teams_dir,
+                logs_dir=args.logs_dir,
+                registry_dir=args.registry_dir,
+            )
+            model = evaluate_role_model(inputs)
+            payload = (
+                build_query_answer(model, inputs, args.parent, args.child)
+                if args.action == "query"
+                else model
+            )
     except RoleEdgeInputError as exc:
         sys.stderr.write("role-edge-check.py: error: %s\n" % exc)
         return 2
     render(payload, args.format)
+    if args.action == "settle":
+        return settle_exit_code(payload)
     return 1 if payload["violations"] else 0
 
 

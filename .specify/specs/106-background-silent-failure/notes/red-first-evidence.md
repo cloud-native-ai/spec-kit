@@ -19,4 +19,60 @@ Prerequisites).
 - Red-first ordering note: the pinning test was authored **before** the owner-section
   amendment (T002/T003) precisely so the red is real, not a missing-file artifact; the
   named assertions quote the contract clauses C-01…C-12.
+- Turn-green: after the owner-section amendment the same command returned **rc 0,
+  19 passed in 6.24s**. The existing sibling guard
+  `tests/contract/test_superagent_definitions.py` also stayed green (29 passed for the
+  pair), and the shared mirror was regenerated through
+  `sync-mirrors.py --write --only shared` (check rc 0).
+
+## T005 — deterministic fixture tree
+
+- Created `tests/fixtures/settlement/builders.py` + the committed sample dirs
+  `c1-state/`, `c3-report/{teams,logs}/`, `legacy/logs/`, `versioned/logs/`.
+- Builders cover the six terminal classes, the unreadable attempt, the missing start
+  record, a live child (open stdin pipe; no fixed `sleep`), and pid-reuse (recorded
+  start ticks deliberately offset). Every record carries a fixed timestamp, so the
+  same fixture yields the same settlement.
+
+## T006 — settlement engine contract (red-first)
+
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_engine.py -q`
+- Exit code: **1**
+- Real output: `23 failed in 6.40s`; the first failure is
+  `role-edge-check.py: error: argument --action: invalid choice: 'settle' (choose from 'report', 'query')`
+  — the action does not exist yet, so every leg fails on its own named assertion.
+
+## T007/T008 — settle action implemented; US1 green
+
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_contract_definitions.py tests/contract/test_settlement_engine.py tests/contract/test_role_edge_engine.py -q`
+- Exit code: **0**; real output: `67 passed in 6.49s` (19 owner pins + 23 engine pins +
+  25 existing role-edge pins, including the engine-mirror byte-equality leg).
+- Repeated-run identity and zero writes (static fixture
+  `c1-state` + `c3-report/{teams,logs}`):
+  - `--action settle` run twice → both rc **2** (the one `unknown` seat), stdout
+    byte-identical (`settle_runs_byte_identical=yes`)
+  - fixture tree list sha256 before == after:
+    `f5edf63f71436e86049071bdd2354e1791b00fb1f79212d216c07f11de7a6ee0`
+    (`fixture_tree_unchanged=yes`; the list covers every file, `__pycache__` excluded)
+  - summary: `{"attempts": 4, "unknown": 1, "values": {"completed": 1, "failed": 1, "silent-end": 1, "unknown": 1}, "violations": 0}`
+    — findings: `seat-ok completed`, `seat-legacy silent-end (legacy=true)`,
+    `seat-missing-start unknown (start-record-missing)`, `demo-line-implement failed
+    (incomplete)`.
+- `report` / `query` byte comparison against the pre-change engine (the un-synced
+  runtime mirror was verified byte-identical to `HEAD` before the sync):
+
+| Input | Action | rc (old = new) | stdout |
+|-------|--------|----------------|--------|
+| `superagent-role/empty` | report | 0 | byte-identical |
+| `superagent-role/root-a-b` | report | 0 | byte-identical |
+| `superagent-role/fanout-10` | report | 0 | byte-identical |
+| `superagent-role/violations/self-dispatch` | report | 1 | byte-identical |
+| `superagent-role/root-a-b` (root→A) | query | 0 | byte-identical |
+
+- Mirror: `sync-mirrors.py --write --only scripts` then `--check` rc 0;
+  `cmp` source/mirror rc 0 (engine copy byte-identical).
+- Confirmation-gate reading after the owner edit:
+  `scan-confirmation-gates.py --root . --json` → total **30** (base 31); the touched
+  file `shared/definitions/superagent-definitions.md` carries **0** hits
+  (base 1) — zero NEW hits, per-file count not above base (EP-005 fallback).
 
