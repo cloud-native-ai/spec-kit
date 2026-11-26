@@ -1,0 +1,62 @@
+# Analyze-Repair Round 3 Record — 108-team-view-degradation — 2026-11-26
+
+- **Trigger**: analyze gate, round 3 — **1 validator-confirmed HIGH finding** (R3-108-W3-06), recorded in `test-evidence/analyze-domain-w3-r3.jsonl`; the other round-3 findings (W3-01 / W3-02 MEDIUM, W3-03 / W3-04 / W3-05 LOW, and the W1 / W2 domain sets) are outside the authorized set and remain open by design.
+- **Disclosure carried from the dispatch (driver prompt-construction defect)**: the validator's payload had **mismatched locations/evidence lines**; the finding still confirmed against `tasks.md:18`. This seat re-read every cited location and quote against the pre-edit file (`tasks.md:18 / 22 / 34 / 35 / 226`) and found all five quotations accurate, so the finding stands on its own text independently of the driver-side payload defect.
+- **Route**: analyze-gate autonomous upstream repair. Authority: the dispatch's single HIGH finding; no user questions (unattended), no dispatch, no implementation, no push.
+- **Unit / run**: `skill:analyze-artifacts` · `r20261126T093658Z-108ar3` · feature key `108-team-view-degradation` · branch `108-team-view-degradation` (worktree) · stage base commit `fa2e12891`.
+- **Scope discipline**: only `tasks.md` was edited (five lines: DoD-2, GATE-6, T005, T019, Notes § 单一引擎). No plan-owned path (`plan.md`, `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `feature-ref.md`), no `requirements.md`, no `handoff.md` / `team.md` and no dated record was touched. FR ids (25), SC ids (8), STR ids (3), task rows (29), contract clause ids (35) and every `[green:]` attribution are unchanged; DoD and GATE counts stay 8 / 8.
+- **Concurrency reading**: requested=1 · effective=not_evaluated · effective_reason=single-unit (one executor, single leaf, no dispatch).
+
+## 1. Finding → change → evidence map
+
+### R3-108-W3-06 — DoD-2's zero-new-dependency / zero-new-reader-store claim was a void containment claim
+
+**Void grounds** (per `.specify/shared/guidelines/closed-set-claims.md`): no baseline referent, no per-class comparison unit, no mechanically derivable allowed-delta set, no complement assertion, and no gate checked the complement (GATE-5 covered only mirror pairs, GATE-6 only `goal-utils.py` emptiness, the T019 scan only the recognition/read entry).
+
+**Resolution** — the claim's substance is kept and every closed-set element is now supplied. DoD-2 is the single owner of the containment declaration; GATE-6 consumes it without restating it; the Notes line is demoted to a pointer.
+
+- `tasks.md:18` (DoD-2) —
+  - **基线参照物**: implement-start commit — T005 records `implement_start_commit=` (`git rev-parse HEAD`) and the same-point dependency readings in `test-evidence/implement-entry-readings.txt`; comparison window is `<BASELINE>`..implement stage closing commit; explicitly separated from DoD-6's program baseline `54c6efa8c`.
+  - **逐类比较单元** — (a) third-party dependencies: unit 1 = the `pyproject.toml` `[project].dependencies` + `[project.optional-dependencies]` requirement strings (`git diff <BASELINE>..HEAD -- pyproject.toml` empty); unit 2 = the delivery code's import-root set (T019 audit; every root ∈ stdlib ∪ repo-local module ∪ the existing `pytest` declaration). (b) readers: the engine's recognition/read entry inventory (single `classify_runs`, single compiled grammar, only the three declared `goal-utils.py` reads), pinned by the T019 read-only source scan; a second reader can only exist as a new file outside the declared change surface and is caught by (c). (c) stores/caches/snapshots/indexes/registries: unit 1 (runtime) = T020's three-scenario pre/post fixture-tree snapshot with zero additions/modifications/deletions; unit 2 (committed) = the changed-path set (`git diff --name-only <BASELINE>..HEAD` ∪ `git ls-files --others --exclude-standard`) minus the declared change surface = ∅.
+  - **允许差异集**: declared empty (∅) for every class.
+  - **补集断言**: difference = ∅ ⇔ every path outside the declared change surface is byte-identical to the baseline (`--name-only` reports all modifications/deletions, the untracked list all additions; ignored runtime scratch is outside the version face). Inside the surface, structural invariants are carried by GATE-5 mirror byte-equality, the T019/T025 contract tests and C-108's `git show` equality assertions. Driver close-out registry/state-spine writes are declared outside the window (boundary owned by the handoff forbidden list).
+  - **未定义聚合词清零**: no 「其余」/「未受影响」 acceptance wording remains in DoD-2.
+  - The declared change surface is anchored, not invented: the 8 delivery files are the delivery half of the same DoD item (now naming the two mirror projections explicitly), the spec-directory record subtrees are the handoff write area plus the stage machine's dated `checkpoints/**` and `coverage-baseline.txt`, and the record-class store group is the handoff.md § Territory grant verbatim (probe P18 asserts string equality with `handoff.md`).
+- `tasks.md:35` (GATE-6) — retitled 封闭集、单一引擎与交付面包含性; the goal-utils emptiness check resolves the old `<baseline_commit>` placeholder to the `implement_start_commit=` value read from `test-evidence/implement-entry-readings.txt`; the three class readings (pyproject diff empty, T020 snapshot counts 0, changed-path difference ∅) are named as required evidence, with commands/sets referenced to DoD-2 (`见 DoD-2`) instead of restated.
+- `tasks.md:165` (T005) — captures the baseline side: the `implement_start_commit=` line plus the `pyproject.toml` dependency requirement sets; the "environment reading, never a second failing-test baseline" clause is preserved.
+- `tasks.md:226` (T019) — adds the read-only import-root audit against `scripts/python/team-view.py` and the three new test files (every root ∈ standard library ∪ repository-local module, e.g. `script_interface_cli` ∪ the existing `pytest` declaration; zero new third-party import) — the dependency class's code-level pinning surface (DoD-2 unit 2).
+- `tasks.md:326` (Notes § 单一引擎) — now pointer-shaped to DoD-2 instead of restating the enumeration.
+- **Evidence**: `analyze-repair3-resolution-probe.txt` — `RESULT: ALL PASS (31 pass, 0 fail)` covering the five required elements (P01–P11), the three consumption sites (P12–P16), the pointer shape (P17), grounding against `handoff.md` and `pyproject.toml` (P18–P20), the untouched premises (P21–P24), and the invariant set (P25–P31, including change locality = exactly lines 18 / 35 / 165 / 226 / 326).
+
+**In-passing correction (disclosed)**: the first probe run (rc 1) found that the import-root unit as first drafted (「标准库 ∪ 既有 `pytest` 声明 ∪ `tests/` 内 helper」) was factually incomplete — the baseline engine also imports the repo-local `script_interface_cli`. The unit was corrected in both DoD-2 and T019 to 「标准库 ∪ 仓库内本地模块（如 `script_interface_cli`）∪ 既有 `pytest` 声明」 and the dependency-class grounding then passed (P19 / P20). The remaining rc-1 failures of that first run were probe defects (table-name typo, `单一` vs `唯一` phrasing, a hand-rolled TOML parser, a green-tag regex that counted the format example); the probe was corrected, not the artifact. No decision-class anomaly occurred.
+
+## 2. PLAN-EDIT declarations (plan-owned touches)
+
+**None.** No plan-owned path was touched and no contract edit was needed: C-101/C-102 already pin the read-only program and the single recognition entry, and C-107's empty allowed-delta set remains its own claim. The repaired DoD-2 references those clauses instead of redefining them.
+
+## 3. Invariants held
+
+- FR 25 / SC 8 / STR 3; task rows 29 with the identical task-id sequence; contract clause definition rows 9 / 8 / 9 / 9 = 35; `[green:]` attributions = 35 and identical to HEAD; DoD 8 / GATE 8 (probe P25–P31).
+- The delivery half of DoD-2 keeps all six original file paths; only the two mirror projections were given explicit names (they were already the GATE-5/T024 subject). The degradation reason set, exit-code set `0/2/3/4/5`, envelope keys, label owner and report-naming owner are untouched.
+- The baseline premises of the claim are intact at repair time: the three new test files are still absent (P21), the four existing team-view test files still match the Measured Premises sha256 prefixes (P22), `coverage-baseline.txt` is still absent (P23), and all 12 currently untracked paths lie inside the claim's declared change surface (`test-evidence/**`, P24).
+- No implementation, no test run, no program edit; `goal-utils.py` and `scripts/python/team-view.py` untouched; nothing pushed.
+
+## 4. Deterministic gate readings (verbatim)
+
+- `python3 .specify/scripts/python/validate-tasks.py …/tasks.md` → `PASS: … — 0 error(s), 0 warning(s)`, rc 0 (`analyze-repair3-tasks-validator.txt`). One intermediate re-run reported a `parallel-safe` WARN caused by the first drafting of the T019 audit clause (the path token preceded by a non-governor phrase); the clause was re-phrased with the read-only governor and the warning is gone — the final reading above is the recorded one.
+- `python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir … --stage {requirements|plan|tasks} --repo .` → all three rc 0, `decision=pass errors=0 advisories=70 waived=0`, summary `fr=25 sc=8 tasks=29 clauses=35 files=13` (`analyze-repair3-pre-analyze-{requirements,plan,tasks}.{txt,json}`).
+  - Advisory adjudication: the finding set is **identical to rounds 1–2** — same check / path / line / message multiset, zero added, zero removed: **40 `external-clause`** (`data-model.md` INV-01…INV-10, legacy clause-id shape) and **30 `missing-path`** (the three planned test files, a red-first premise, plus one driver-owned out-of-worktree state path).
+- `decomposition-check.py --mode plan --requirements …` → `decision=proceed`, `fr_count=25`, rc 0; `--mode tasks --requirements … --tasks …` → `decision=proceed`, `fr_count=25`, `task_count=29`, rc 0 (`analyze-repair3-decomposition-{plan,tasks}.{txt,json}`).
+- Machine resolution probe → `RESULT: ALL PASS (31 pass, 0 fail)` (`analyze-repair3-resolution-probe.txt`).
+
+## 5. Deviations and residual risk
+
+1. **Pre-existing untracked analyze evidence carried into the records commit (disclosed)**: `test-evidence/analyze-domain-w{1,2,3}-r3.jsonl` existed untracked before this dispatch (the round-3 analyze-stage findings, 1 HIGH + 5 MEDIUM/LOW in W3 plus the W1/W2 sets). This seat did not author or alter them; they are carried into the records commit so the trigger finding cited above is resolvable in history.
+2. **Placeholder resolution beyond the literal finding text**: round 2 deliberately left GATE-6's `<baseline_commit>` placeholder as-is ("not part of the finding"). Round 3's finding names GATE-6 as a consumption site, so resolving the placeholder to the named `implement_start_commit=` capture is inside the authorized alignment, not a new claim.
+3. **Declared change surface includes stage-machine records**: `checkpoints/**` and the handoff record-store group are included in DoD-2's declared change surface because they are dated records / record-class runtime stores churned by any stage run (the implement seats' mandatory wrap-up accounting writes `.specify/session/**`, `.specify/exec-quant/**`, `.specify/feedback/**`). Excluding them would make the complement assertion false-positive on lawful record writes; including them cannot mask new machinery, because any new reader/store/cache/snapshot/index/registry file still lands in the difference. `checkpoints/**` remains forbidden to crew writes (handoff list) — inclusion in the claim's window is not a write grant.
+4. **Open by design**: W3-01 (`coverage-baseline.txt` outside the crew write territory, MEDIUM) and W3-02…W3-05 (MEDIUM/LOW) remain open; none was authorized. T002 and the `coverage-baseline.txt` evidence-landing entry were deliberately left unchanged again.
+5. **Registry/spine**: `.specify/features.md`, `.specify/features/027-team-management.md` and the state spine were not edited; nothing was pushed.
+
+## 6. Anomaly
+
+- 未发现异常 (no decision-class anomaly). One in-passing correction was applied and is disclosed in § 1: the import-root unit as first drafted omitted the repo-local `script_interface_cli` class; it was corrected in DoD-2 and T019 after the probe caught it. The remaining first-run probe failures were probe defects, corrected in the probe. No user question was asked, nothing was pushed, and no dated record was rewritten.

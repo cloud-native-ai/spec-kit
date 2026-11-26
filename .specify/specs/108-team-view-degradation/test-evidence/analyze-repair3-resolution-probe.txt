@@ -1,0 +1,35 @@
+RESOLUTION PROBE — R3-108-W3-06 (108-team-view-degradation, round 3)
+==============================================================================
+PASS  P01 baseline-capture             DoD-2 names the baseline capture (T005 line key, command, sink)
+PASS  P02 rule-owner+consumer          DoD-2 names the rule owner and declares GATE-6 consume-only
+PASS  P03 window+distinct-baseline     DoD-2 states the window and separates its referent from DoD-6's program baseline
+PASS  P04 three-class-units            DoD-2 gives per-class comparison units for all three DoD classes
+PASS  P05 dependency-units             dependency class has declaration-set and import-root units
+PASS  P06 reader-unit                  reader class unit is the engine entry inventory, pinned by the T019 scan
+PASS  P07 store-units                  store/cache/snapshot/index/registry class has runtime and committed-path units with commands
+PASS  P08 allowed-delta-empty          allowed-delta set is declared empty for every class
+PASS  P09 complement                   complement assertion present (outside surface byte-identical)
+PASS  P10 eight-delivery-files         DoD-2 names all 8 delivery files and refers to the set as the 8
+PASS  P11 no-undefined-aggregate       DoD-2 carries no undefined aggregate word as acceptance semantics
+PASS  P12 placeholder-resolved         the old <baseline_commit> placeholder is gone; GATE-6 defines <BASELINE> at its capture sink
+PASS  P13 gate6-consumes               GATE-6 consumes DoD-2 without restating the change surface; dependency audit named
+PASS  P14 gate5-untouched              GATE-5 stays the mirror/copy claim; it neither restates nor half-restates the containment claim
+PASS  P15 t005-baseline-capture        T005 captures the implement-start commit and the dependency baseline at the same point
+PASS  P16 t019-import-audit            T019 pins the dependency class with a read-only import-root audit
+PASS  P17 notes-pointer                the Notes **单一引擎** line is pointer-shaped to DoD-2
+PASS  P18 handoff-grounding            DoD-2's record-store group equals handoff.md § Territory's grant: `.specify/{session,knowledge,feedback,evidence,exec-quant,trigger,retention,renumber,sanitize,housekeeping,coaching,todo,tools,migrate}/**`
+PASS  P19 pyproject-grounding          dependency declaration point present: runtime=['httpx', 'readchar', 'rich', 'truststore', 'typer'] dev⊇['pytest', 'pytest-xdist', 'ruff']
+PASS  P20 engine-imports-closed        engine import roots are stdlib or repo-local modules (local: ['script_interface_cli'])
+PASS  P21 red-first-premise            3/3 new test files still ABSENT (red-first and T005 premise intact)
+PASS  P22 existing-test-fingerprints   the four existing team-view test files still match the Measured Premises sha256 prefixes
+PASS  P23 coverage-baseline-absent     coverage-baseline.txt still ABSENT (T002 setup duty unchanged)
+PASS  P24 command-smoke                GATE-6 commands execute: range diff empty, untracked paths all inside test-evidence/** (12 files)
+PASS  P25 requirement-counts           FR/SC/STR = 25/8/3
+PASS  P26 task-rows                    task rows = 29 and identical to HEAD
+PASS  P27 green-tags                   [green:] tags = 35 and identical to HEAD
+PASS  P28 dod-gate-counts              DoD=8 GATE=8, identical to HEAD
+PASS  P29 clause-rows                  contract clause definition rows = 35
+PASS  P30 delivery-substance           the original delivery surface and the closed exit/reason sets are untouched
+PASS  P31 change-locality              changed hunk starts = [18, 35, 165, 226, 326] (expected the 5 authorized lines)
+==============================================================================
+RESULT: ALL PASS (31 pass, 0 fail)
