@@ -89,3 +89,136 @@
 - **B-01** 承接**文本完整性(completeness)**：名称是否完整、解释是否足够。
 - **B-02** 承接**定位充分性(locator adequacy)**：具名维度是否足以区分同名对象。
 - 二者都是行为类评审面，MUST NOT 被机器声称覆盖；机器只判形态与在场性（M-02 / M-08）。
+
+## 选项集契约(Option-Set Contract)
+
+选项集是决策项的可比较面：封闭、可枚举，每个成员带齐五要素。本节规定的形态由 M-03 判；AI 重放与人的选择信号按各自承接面处理，MUST NOT 机器声称覆盖。
+
+### 封闭可枚举集(closed enumerable set)
+
+- **声明计数(declared count)**：`options` 字段的取值 MUST 以声明计数开头——`- **options**: <N>`；N 是选项集合的声明大小，0/1 退化情形同样声明。声明计数缺失、或与选项条目数不一致，即集合不封闭（M-03）。
+- **空集不是决策项**：`options: 0`（或无任何选项条目）不构成决策项（M-03）；没有任何可行选项的情形 MUST 按重开条件处理，MUST NOT 以空集冒充决策。
+- **唯一标签(unique labels)**：同一选项集内标签 MUST 唯一（去首尾空白后按字面比较）；重复即缺陷（M-03）。
+
+### 每个选项的五要素(five elements)
+
+每个选项是 `options` 下以 `- label: <完整名称>` 起始的缩进子行，随后以缩进 ≥2 空格的续行逐项给出：
+
+| 要素 | 行形态 | 含义 |
+|------|--------|------|
+| `label` | `- label: <完整名称>` | 选项的完整名称；与决策主体适用同一完整名称规则（§ 决策文本契约 R1） |
+| `consequences` | `consequences: <文本>` | 选择该选项的后果 |
+| `reversibility` | `reversibility: <文本>` | 可逆性：`reversible` / `irreversible`，并给出适用条件 |
+| `default` | `default: yes|no` | 默认项标记；每个选项集恰一个默认成员 |
+| `evidence` | `evidence: <指针>` | 选择所需证据；指针可解析性由 M-09 判 |
+
+五要素缺一即缺陷（M-03）。选项级 `path` 与 `forced` 是 `options` 字段的值形状成员，不是顶格记录字段。
+
+- **`other` 的合法形态**：名为 `other` 的选项只有在携带 `path: <谁/何时/如何新增选项并回写记录>` 子行时才合法；没有 `path` 的 `other` 不是选项（M-03）。
+- **单一可行项(forced)**：选项集只有一个成员时，MUST 在 `options` 块内声明 `forced: <理由>`，MUST NOT 伪装成多选；未声明即缺陷（M-03）。`forced` 是集合级声明，不是第六个选项要素。
+- **零可行项**：没有任何可行选项时不构成决策项（同空集）。
+
+### 选中项(chosen member)
+
+`chosen_option` MUST 是选项集中的一个具名成员（按 label 匹配；M-03）；不是成员即缺陷。`human-interactive` 决策在 `chosen_option` 中同时记录人的选择信号：取值域归 `shared/guidelines/confirmation-gates.md` § 门控观察协议（指针，不复述；C-108）。
+
+### AI 可重放(replayability duty)
+
+`ai-autonomous` 记录 MUST 记录判定谓词与判定输入——二者是 `rationale` 字段的值形状成员（缩进 ≥2 空格的续行）；把谓词应用到记录输入 MUST 确定性地重推 `chosen_option`，重放不一致是缺陷。重放可复现性由守卫测试演示（`tests/unit/test_validate_decisions.py::test_ai_replay_deterministic`）；谓词是否成立、假设是否缺失归 B-04 评审承接，MUST NOT 声称机器覆盖。
+
+## 决策记录(Decision Record)
+
+决策记录是决策项在其生产者既有载体中的档案投影：一条决策项在完成时恰产生一条记录。记录文法由 M-01 判，编号由 M-04 判，证据指针可解析性由 M-09 判；三条规则的转红条件见 § 强制边界。
+
+### 序列化文法(serialization grammar)
+
+- 记录以三级标题 `### D-NNN — <一行标题>` 承载；编号只在标题中出现一次，不另设顶格字段行。
+- 每个字段是一行 `- **<小写字段名>**: <值>`；字段名小写、不加引号、不含空格。
+- `options` 的选项是缩进子行（每个选项的五要素各占一行，见 § 选项集契约）；续行 MUST 缩进 ≥2 空格。
+- 围栏代码块内的行不计入文法——不解析为记录、标题或字段。
+
+### 分层封闭(layered field closure)
+
+记录字段在每一层封闭；两层之外 MUST NOT 出现任何顶格字段——新增字段 MUST 先修订本节，生产面 MUST NOT 改名。
+
+**基础层(十条，每条记录必填)**：
+
+| 字段 | 含义 |
+|------|------|
+| `decision_id` | `D-NNN`；由标题承载（标题中出现恰一次） |
+| `decision_class` | 闭集 `human-interactive` / `ai-autonomous`（§ 决策类别） |
+| `context` | 决策所处情境与约束 |
+| `options` | 封闭选项集（§ 选项集契约） |
+| `chosen_option` | 选项集中的具名成员；`human-interactive` 时同时承载人的选择信号 |
+| `rationale` | 理由；承重决策交叉引用 `T-NNN` 而不复制六字段；`ai-autonomous` 时同时承载判定谓词与记录输入 |
+| `evidence` | 证据指针；每一条 MUST 可解析（M-09） |
+| `actor` | 持有/实施身份（身份形态归 `shared/definitions/superagent-definitions.md`） |
+| `created_at` | ISO-8601 UTC 创建时点，必有值 |
+| `transmission_status` | 未传递记录取 `not-transmitted`；值域见 § 状态与时间戳 |
+
+**条件层(按触发族封闭，触发成立时必填)**：
+
+- **同名族**：`same_name_conflict` + `resource_locator`——同名冲突风险存在时成对在场（§ 决策文本契约 R2）。
+- **取代族**：`superseded_by`——记录被取代时必填；它的在场即 `superseded` 标记。
+- **传递族**：`dispatched_at` / `acknowledged_at` / `implemented_at`——仅当决策被传递，按 `transmission_status` 相位追加：到 `dispatched` 必填 `dispatched_at`，到 `acknowledged` 必填 `acknowledged_at`，`implemented` / `diverged` 必填 `implemented_at`；事件发生时才追加，**未到相位不设占位**；`blocked` 按已达相位判。确认(acknowledgement)与 `implementation_receipt` 是回传项，不是记录字段——它们驱动这些时点与状态相位（§ 传递与实施）。
+
+### 状态与时间戳(state and timepoints)
+
+- `transmission_status` 的封闭值域：`not-transmitted` / `dispatched` / `acknowledged` / `implemented` / `diverged` / `blocked`。相位只能向前推进；`blocked` 自 `acknowledged` 起合法；`diverged` 只与 `divergence: diverged` 的回执同批；向后回退非法；重决是新记录取代旧记录。
+- 时点形态 MUST 为 ISO-8601 UTC（`YYYY-MM-DDTHH:MM:SSZ`，可带小数秒或 `+00:00` 偏移）；形态错、后相位时点出现在前相位、或未传递记录携带传递族时点，都是缺陷（M-01）。
+
+### 取代(supersession)
+
+被取代的记录 MUST 保留，`superseded_by` 指向取代件；被取代的编号 MUST NOT 删除或重用。
+
+### 编号(id rules)
+
+`decision_id` MUST 为 `D-NNN`（三位数字），同一载体内**密集**（自 `D-001` 起连续、不重复），永不重用；编号在诞生时登记于 `.specify/register.md`（逐条或按「载体 + 区间」分组行）；跨载体引用 MUST 同时给出**载体指针**。跨载体允许同号出现，但引用必须可回指载体。
+
+### 重建义务(reconstruction duty)
+
+每条记录 MUST 可只凭既有载体 + `.specify/register.md` 重建其**适用层**字段——基础层十条 + 触发成立的条件族；未触发的条件族不在重建范围。无法重建（缺字段、断指针、无记录）即缺陷，MUST NOT 以对话记忆补足。
+
+### 字段到所有者(field ownership)
+
+每字段恰有一个定义所有者；本表只登记所有权，取值域正文归各所有者。
+
+| 层 | 字段 | 定义所有者 | 载体/登记 |
+|----|------|-----------|-----------|
+| 基础 | `decision_id` 形态 | 本节 | `.specify/register.md`（登记） |
+| 基础 | `context` / `options` / `chosen_option` / `rationale` / `evidence` / `created_at` / `transmission_status` | 本节（值形状见各节） | 各载体 |
+| 基础 | `actor` | `shared/definitions/superagent-definitions.md`（边身份）/ run 身份 | 各载体 |
+| 基础 | 承重决策的 `rationale` 六字段内容 | `shared/guidelines/decision-tension.md` | `T-NNN` 记录 |
+| 条件 | `same_name_conflict` / `resource_locator` / `superseded_by` / `dispatched_at` / `acknowledged_at` / `implemented_at` | 本节 | 各载体 |
+
+承重决策的决策记录 MUST 交叉引用对应 `T-NNN`，MUST NOT 复制 `antithesis` / `binding_constraints` / `discriminating_evidence` / `expected_sacrifice` / `revision_trigger` 的内容（C-205；六字段归 `shared/guidelines/decision-tension.md`）。
+
+### 旧记录规则(legacy rules)
+
+- **新式记录的最小合格形态(minimal qualifying form)**：`^### D-\d{3}` 标题 **且** 块内含 ≥1 条 `- **<字段名>**: <值>` 字段行（字段名属 § 分层封闭 的字段集）。达到阈值即为新式记录——**即使不完整**（缺字段是 M-01 的转红）；低于阈值（无字段行的三位数字标题、一/两位数标题）一律 `legacy`。id 形态单凭 `D-001` 之类 register 行不判新式。
+- **只读判别(report, never judge)**：本契约落地前的旧记录 MUST 被报告为 `legacy`，保持可读，MUST NOT 被判为无效、MUST NOT 改写或删除。
+- **判定范围(scan scope)**：`legacy` 以本次运行的载体集为范围——register 行仅当不与本次扫描到的新式记录 id 相交时才报告 `legacy`；它与新式记录 id 相交时即视为该编号的诞生登记。
+
+## 档案即投影与决策生产者清单(Archive as Projection and Decision Producer Inventory)
+
+**决策档案不是新存储**：它是「生产者 × 既有载体」的持续**并集**，加 `.specify/register.md` 的**编号唯一索引**。每个清单内生产者恰映射一个既有载体；一个 `D-NNN` 编号解析到（载体，标题）。本节是生产者清单的规范主页；需求规格中的同名表是 requirements 阶段的 dated 声明。
+
+- **不是第二套存储**：MUST NOT 新建第二套登记、队列、存储或调度器；档案的「写入」就是在生产者自己的既有载体里按 § 决策记录 写一条记录。
+- **清单封闭与修订义务(inventory closure)**：清单外的入口若产出决策项即缺陷，MUST 走清单修订（修订本节与依赖它的测试同批落盘），MUST NOT 静默丢弃记录；新增或删除生产者同样修订单侧同批。
+- **只读命令的处置(read-only dispositions)**：只读命令的处置 MUST 写进该命令**自己的报告载体**，MUST NOT 通过修改被分析的工件来归档（C-208）。
+
+| ID | 生产者 | 既有载体 | 义务 | 类别(按持有者) | 事实所有者 |
+|----|--------|----------|------|----------------|-----------|
+| P-01 | 确认门 / 用户决策 | 门控执行报告 + 门控观察条目（`.specify/feedback/` 既有条目面） | record-when-decision（门控触发即是决策；可逆动作的自动执行不是决策项） | 交互运行 `human-interactive`；无人值守 `ai-autonomous` | `shared/guidelines/confirmation-gates.md`（是否问）；本页（记录形态） |
+| P-02 | requirements 阶段裁决（无人值守自裁） | `requirements.md` § Clarifications（Session 行）+ 规格 A 表 | record | `ai-autonomous` | `skills/internal/create-requirements/SKILL.md` |
+| P-03 | plan 阶段取舍与承重决策 | `plan.md`（含 § Decision Tensions 的 `T-NNN`） | record（显式呈现的取舍）；承重决策另加 `T-NNN` 并交叉引用 | 通常 `ai-autonomous` | `shared/guidelines/decision-tension.md`（六字段）；本页（决策记录） |
+| P-04 | 阶段检查点裁决 | `<spec-dir>/checkpoints/<NN>-<stage>.md` | record-when-decision（并发/名册/方向裁决是决策；纯事实核验不是） | `ai-autonomous` | `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` |
+| P-05 | analyze 处置 | analyze findings report | record（每个 carried finding 的 fixed/deferred/rejected + 理由） | `ai-autonomous` | `skills/internal/analyze-artifacts/SKILL.md` |
+| P-06 | review 发现处置 | review report（`review.md` 与分段报告） | record-when-decision（接受/修复/拒绝是决策；纯观察不是） | 由持有者定 | `skills/internal/review-feature-quality/SKILL.md`、`skills/internal/review-sdd-process/SKILL.md` |
+| P-07 | fast-fail 裁定 | fast-fail 上送件 + 处置回执（执行报告） | record-when-decision（裁定是决策；异常报告本身不是） | 由持有者定（用户裁定 `human-interactive`；无人值守自裁 `ai-autonomous`） | `shared/guidelines/fast-fail.md` |
+| P-08 | goal / anchor / team 决策 | `.specify/goals/<slug>/goal.md`、`.specify/anchoring/<slug>/anchor.md`、`.specify/teams/<slug>/team.md` 的既有决策/History 面 | record | 由持有者定 | `shared/definitions/goal-definitions.md`、`anchor-definitions.md`、`agent-definitions.md` |
+| P-09 | superagent → subagent 传递决策 | 派发载荷（决策块）+ run report / 角色边载体 | record（被传递决策的唯一记录在其产出载体；传递与回执不生成第二条记录，只更新状态与审计链）+ 传递 + 实施回执 | 随被传递记录的类别 | `shared/definitions/superagent-definitions.md`、`skills/internal/run-agent/SKILL.md`、`skills/internal/run-team/SKILL.md` |
+| P-10 | probe / feedback 处置 | `.specify/feedback/` 条目 + probe 注册面 | record-when-decision（阈值提示不是决策；接受/延后/拒绝处置是决策） | 通常 `ai-autonomous` | `shared/definitions/probe-definitions.md`、`shared/workflow/feedback-step.md` |
+| P-11 | run determination（运行判定） | session 记忆中的判定记录（`run-determination.py`） | exempt —— 对已完成运行的测量/评估，不是选项间选择的决策项 | n/a | `shared/workflow/feedback-step.md` § Run Determination |
+| P-12 | 确定性检查器/门的 verdict | 检查器输出 / 检查点引用 | exempt —— 结果由规则唯一决定，没有选项集；围绕它的处置归 P-04/P-05 | n/a | 各检查器与 `shared/workflow/acceptance-hardening.md` § Gates |
+

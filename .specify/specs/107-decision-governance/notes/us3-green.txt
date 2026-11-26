@@ -1,0 +1,170 @@
+# US3 green evidence — 107-decision-governance (T031)
+
+Captured: 2026-11-26, worktree decision-governance, branch 107-decision-governance.
+Single test entry: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh` (no interpreter-level test command).
+
+## Phase run (unit + guards + contracts)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py -q
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" ... -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+
+.......................                                                  [100%]
+23 passed in 7.96s
+EXIT=0
+
+Raw log: `test-evidence/us3-green-slots.txt`.
+
+## SC-005 — four-carrier reconstruction (register + carriers only)
+
+$ python3 scripts/python/validate-decisions.py --action records --fixture tests/fixtures/decision-governance/reconstruct --register tests/fixtures/decision-governance/reconstruct/register.md
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+EXIT=0
+
+JSON reconstruction output (`--json`, records excerpt):
+
+```json
+{
+ "status": "pass",
+ "records": [
+  {"id": "D-001", "path": "tests/fixtures/decision-governance/reconstruct/checkpoints/02-implement.md", "class": "ai-autonomous"},
+  {"id": "D-001", "path": "tests/fixtures/decision-governance/reconstruct/plan.md", "class": "ai-autonomous"},
+  {"id": "D-001", "path": "tests/fixtures/decision-governance/reconstruct/requirements.md", "class": "human-interactive"},
+  {"id": "D-001", "path": "tests/fixtures/decision-governance/reconstruct/run-report.md", "class": "ai-autonomous"}
+ ],
+ "legacy": []
+}
+```
+
+Each record's applicable-layer fields (the ten base fields + the triggered same-name family on
+the requirements carrier) are reconstructable from the carriers + the register stub alone; all
+four carriers are non-transmission producers, so `transmission_status: not-transmitted` and no
+transmission timepoint is judged (`test_reconstruct_from_register_and_carriers`).
+
+## SC-005 — legacy report (C-206) and the minimal qualifying form
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/legacy/legacy.md --register tests/fixtures/decision-governance/legacy/register.md
+LEGACY tests/fixtures/decision-governance/legacy/legacy.md:3: ### D-1 — 一位数旧标题 (legacy record — reported, not judged)
+LEGACY tests/fixtures/decision-governance/legacy/legacy.md:7: ### D-12 — 两位数旧标题 (legacy record — reported, not judged)
+LEGACY tests/fixtures/decision-governance/legacy/legacy.md:11: ### D-001 — 三位数字标题但块内无任何 C-201 字段行 (legacy record — reported, not judged)
+LEGACY tests/fixtures/decision-governance/legacy/register.md:5: D1–D9 (legacy register row — reported, not judged)
+LEGACY tests/fixtures/decision-governance/legacy/register.md:6: D-001 (legacy register row — reported, not judged)
+LEGACY tests/fixtures/decision-governance/legacy/register.md:7: D-001-a (legacy register row — reported, not judged)
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+EXIT=0
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/legacy/incomplete-new-form.md --register tests/fixtures/decision-governance/legacy/register.md
+M-01 tests/fixtures/decision-governance/legacy/incomplete-new-form.md:3: missing base-layer field(s): context, options, chosen_option, rationale, evidence, actor, created_at, transmission_status
+FAIL: 1 violation(s)
+EXIT=1
+
+The pair pins C-206 in both directions: below the threshold (one/two-digit headings, a
+three-digit heading with zero field lines, register rows including the id-shaped `D-001`) is
+`legacy` — reported, never judged; at or above it (≥1 C-201 field line) is new-form even when
+incomplete, and its missing fields are M-01's red.
+
+## SC-005 — M-01 reverse samples (layered closure / class / timepoints)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-missing-actor.md
+M-01 tests/fixtures/decision-governance/m01/red-missing-actor.md:3: missing base-layer field(s): actor
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-conditional-missing.md
+M-01 tests/fixtures/decision-governance/m01/red-conditional-missing.md:3: dispatched_at missing while transmission_status is dispatched
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-class-outside.md
+M-01 tests/fixtures/decision-governance/m01/red-class-outside.md:5: decision_class 'hybrid-interactive' is outside the closed set human-interactive / ai-autonomous
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-malformed-timepoint.md
+M-01 tests/fixtures/decision-governance/m01/red-malformed-timepoint.md:22: created_at is not an ISO-8601 UTC timepoint (e.g. 2026-11-26T00:00:00Z)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-timepoint-phase.md
+M-01 tests/fixtures/decision-governance/m01/red-timepoint-phase.md:25: acknowledged_at present while transmission_status is still dispatched (phase contradiction)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-placeholder.md
+M-01 tests/fixtures/decision-governance/m01/red-placeholder.md:24: dispatched_at present on a not-transmitted record (no placeholder before the event)
+FAIL: 1 violation(s)
+EXIT=1
+
+## SC-005 — M-04 reverse samples (id form / density / register)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m04/red-form.md --register tests/fixtures/decision-governance/m04/register.md
+M-04 tests/fixtures/decision-governance/m04/red-form.md:3: heading id 'D-001-a' does not match the D-NNN form (exactly three digits)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m04/red-non-dense.md --register tests/fixtures/decision-governance/m04/register.md
+M-04 tests/fixtures/decision-governance/m04/red-non-dense.md:3: ids in the carrier are not dense: missing D-002
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m04/red-unregistered.md --register tests/fixtures/decision-governance/m04/register-missing.md
+M-04 tests/fixtures/decision-governance/m04/red-unregistered.md:3: id D-001 is not resolvable in the register
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m04/green-dense.md --register tests/fixtures/decision-governance/m04/register.md
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+EXIT=0
+
+## SC-005 — M-09 evidence-pointer resolvability (C-204)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m09/green-resolvable.md
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+EXIT=0
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m09/red-broken.md
+M-09 tests/fixtures/decision-governance/m09/red-broken.md:20: evidence pointer 'tests/fixtures/decision-governance/m09/does-not-exist.md' does not resolve: the referenced carrier path does not exist
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m09/red-broken-anchor.md
+M-09 tests/fixtures/decision-governance/m09/red-broken-anchor.md:20: evidence pointer 'tests/fixtures/decision-governance/m09/green-resolvable.md#no-such-anchor' does not resolve: the anchor does not appear in the referenced carrier
+FAIL: 1 violation(s)
+EXIT=1
+
+## SC-005 — C-205 tension-field copy guard
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/red-tension-copy.md
+M-01 tests/fixtures/decision-governance/m01/red-tension-copy.md:20: field 'antithesis' is outside the two admitted layers (layered field closure; revise the owner page before adding a field)
+M-01 tests/fixtures/decision-governance/m01/red-tension-copy.md:21: field 'binding_constraints' is outside the two admitted layers (layered field closure; revise the owner page before adding a field)
+FAIL: 2 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m01/green-tension-ref.md
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+EXIT=0
+
+## Mirror and gate readings (T030)
+
+$ python3 scripts/python/sync-mirrors.py --write   # projects the changed pairs, then:
+$ python3 scripts/python/sync-mirrors.py --check
+ok    shared/ == .specify/shared/ (117 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (133 files, byte-identical)
+rc 0 (no drift)
+
+`cmp` byte-identical for every pair touched in this package: the owner page, the seven pointer
+files (`shared/guidelines/{confirmation-gates,decision-tension,fast-fail}.md`,
+`shared/definitions/{goal,anchor,agent}-definitions.md`,
+`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` → its
+`.specify/skills/sdd-loop-driver/references/` mirror) and `scripts/python/validate-decisions.py`.
+
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+
+The owner page and the pointer lines add no blocking hit (the merged-tree measured total is 30;
+the plan's 31 pin lost one hit in the 106 merge — per the P3 dispatch brief).

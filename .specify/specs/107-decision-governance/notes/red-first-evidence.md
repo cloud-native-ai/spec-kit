@@ -9,25 +9,25 @@
 | Slot | Test node | Owning task | State |
 |------|-----------|-------------|-------|
 | S-00 | `tests/unit/test_validate_decisions.py::test_cli_surface` | T006 (red) / T007 (green) | filled |
-| S-01 | `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` | T023 | pending |
+| S-01 | `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` | T023 | filled (red -> green at T029/T031) |
 | S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | filled (red -> green at T013/T017) |
 | S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | filled (red -> green at T020/T022) |
-| S-04 | `tests/unit/test_validate_decisions.py::test_m04_id_density_register` | T023 | pending |
+| S-04 | `tests/unit/test_validate_decisions.py::test_m04_id_density_register` | T023 | filled (red -> green at T029/T031) |
 | S-05 | `tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples` | T032 | pending |
 | S-06 | `tests/contract/test_decision_governance_guards.py::test_m06_block_completeness` | T032 | pending |
 | S-07 | `tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused` | T032 | pending |
 | S-08 | `tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments` | T032 | pending |
 | S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | filled (red -> green at T013/T017) |
-| S-10 | `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (M-09 / C-204) | T024 | pending |
+| S-10 | `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (M-09 / C-204) | T024 | filled (red -> green at T029/T031) |
 | S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | filled (red -> green at T011/T012/T014/T017) |
 | S-12 | `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic` (C-107 replay) | T018 | filled (red -> green at T020/T022) |
-| S-13 | `tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy` (C-205) | T024 | pending |
-| S-14 | `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` (C-206) | T024 | pending |
+| S-13 | `tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy` (C-205) | T024 | filled (red -> green at T029/T031) |
+| S-14 | `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` (C-206) | T024 | filled (red -> green at T029/T031) |
 | S-15 | `tests/contract/test_decision_governance_guards.py::test_acknowledgement_present` (payload/return snapshots) | T032 | pending |
 | S-16 | `tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly` (payload/return snapshots) | T032 | pending |
 | S-17 | `tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id` (chain fixtures) | T032 | pending |
 | S-18 | `tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old` (chain fixtures) | T032 | pending |
-| S-19 | `tests/contract/test_decision_governance_guards.py::test_reconstruct_from_register_and_carriers` (four-carrier fixtures) | T024 | pending |
+| S-19 | `tests/contract/test_decision_governance_guards.py::test_reconstruct_from_register_and_carriers` (four-carrier fixtures) | T024 | filled (red -> green at T029/T031) |
 | S-20 | `tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample` (C-403) | T039 | pending |
 
 ## Slots
@@ -57,11 +57,27 @@ FAILED tests/unit/test_validate_decisions.py::test_cli_surface - AssertionErr...
   - `-h` vs `--help` → `cmp` identical (byte-equal help bodies);
   - `--action records --json` → one JSON line `{"action": "records", "status": "not-implemented", "root": "<worktree root>"}` on stdout, message on stderr, exit 2 — the root resolves from the module's own path to the repository root (mirror guard: a directory named `.specify` is never the root).
 
-### S-01 — `test_m01_field_closure_reverse_samples` (T023)
+### S-01 — `test_m01_field_closure_reverse_samples` (T023 red → T029/T031 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples -q`
-- red output: pending (author lands with T023)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T029; raw log `test-evidence/us3-red-first.txt`):
+
+```text
+>           assert red.returncode == 1, (
+                f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+            )
+E           AssertionError: red-missing-actor.md exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+E           assert 0 == 1
+tests/unit/test_validate_decisions.py:281: AssertionError
+FAILED tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples
+1 failed in 6.76s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the M-01 leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m01/` — missing base field(`actor`), conditional field missing while `transmission_status: dispatched`, class outside the closed set, malformed `created_at`, a later-phase timepoint on an earlier phase, a placeholder on a `not-transmitted` record; green samples `green-complete.md` / `green-tension-ref.md`.
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
+- exit status (green): `0`. The six M-01 reverse-sample engine verdicts (exit 1 each) are recorded in `notes/us3-green.txt` § SC-005.
 
 ### S-02 — `test_m02_locator_red_then_green` (T010 red → T017 green)
 
@@ -113,11 +129,27 @@ FAILED tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_sample
 - green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us2-green-slots.txt`): `............ [100%]` / `12 passed in 7.91s`
 - exit status (green): `0`. The M-03 reverse-sample engine verdicts (exit 1 on each degenerate form, exit 0 on the completed sets) are recorded in `notes/us2-green.txt` § SC-004.
 
-### S-04 — `test_m04_id_density_register` (T023)
+### S-04 — `test_m04_id_density_register` (T023 red → T029/T031 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py::test_m04_id_density_register -q`
-- red output: pending (author lands with T023; fixtures `tests/fixtures/decision-governance/m04/`)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T029; raw log `test-evidence/us3-red-first.txt`):
+
+```text
+>   assert red_form.returncode == 1, (
+        f"malformed id exited {red_form.returncode}, expected 1: {red_form.stdout} {red_form.stderr}"
+    )
+E   AssertionError: malformed id exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+E   assert 0 == 1
+tests/unit/test_validate_decisions.py:314: AssertionError
+FAILED tests/unit/test_validate_decisions.py::test_m04_id_density_register
+1 failed in 6.76s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the M-04 leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m04/` — `register.md` / `register-missing.md` stubs, `green-dense.md`, `red-form.md` (`D-001-a`), `red-non-dense.md` (`D-001` + `D-003`), `red-unregistered.md`.
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
+- exit status (green): `0`. The M-04 engine verdicts (form / non-dense / unregistered, exit 1 each; green dense set exit 0) are recorded in `notes/us3-green.txt` § SC-005.
 
 ### S-05 — `test_m05_receipt_reverse_samples` (T032)
 
@@ -167,11 +199,27 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m08_registered_va
 
 - exit status (green): `0`. The M-08 red -> green engine verdicts (exit 1 on the variant subject, exit 0 on the full name and on the unregistered abbreviation) are recorded in `notes/us1-green.txt` § SC-002.
 
-### S-10 — `test_broken_pointer_red` (T024; M-09 / C-204)
+### S-10 — `test_broken_pointer_red` (T024 red → T029/T031 green; M-09 / C-204)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_broken_pointer_red -q`
-- red output: pending (author lands with T024; fixtures `tests/fixtures/decision-governance/m09/`)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T029; raw log `test-evidence/us3-red-first.txt`):
+
+```text
+>   assert red.returncode == 1, (
+        f"a broken pointer exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+    )
+E   AssertionError: a broken pointer exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+E   assert 0 == 1
+tests/contract/test_decision_governance_guards.py:198: AssertionError
+FAILED tests/contract/test_decision_governance_guards.py::test_broken_pointer_red
+1 failed in 6.76s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the M-09 leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m09/` — `green-resolvable.md`, `red-broken.md` (missing carrier path), `red-broken-anchor.md` (missing anchor in an existing carrier).
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
+- exit status (green): `0`. The M-09 engine verdicts (path and anchor variants, exit 1 each; resolvable pair exit 0) are recorded in `notes/us3-green.txt` § SC-005.
 
 ### S-11 — `test_full_name_minimum_bar_four_surfaces` (T009 red → T017 green)
 
@@ -221,17 +269,46 @@ FAILED tests/unit/test_validate_decisions.py::test_ai_replay_deterministic
 - green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us2-green-slots.txt`): `............ [100%]` / `12 passed in 7.91s`
 - exit status (green): `0`. The replay demonstration (two identical replays, comparison with the recorded choice, and the detectable mismatch) and the membership verdict are recorded in `notes/us2-green.txt` § SC-004.
 
-### S-13 — `test_no_tension_field_copy` (T024; C-205)
+### S-13 — `test_no_tension_field_copy` (T024 red → T029/T031 green; C-205)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy -q`
-- red output: pending (author lands with T024)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T029; raw log `test-evidence/us3-red-first.txt`):
 
-### S-14 — `test_legacy_two_digit_reported_legacy` (T024; C-206)
+```text
+>   assert red.returncode == 1, (
+        f"a copied tension field exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+    )
+E   AssertionError: a copied tension field exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+E   assert 0 == 1
+tests/contract/test_decision_governance_guards.py:225: AssertionError
+FAILED tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy
+1 failed in 6.76s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the layered-closure leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m01/red-tension-copy.md` (copies `antithesis` / `binding_constraints`), `green-tension-ref.md` (cross-references `T-020` only).
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
+- exit status (green): `0`. The engine verdicts (two out-of-layer field verdicts on the copy; green on the cross-reference) and the owner-page cross-reference duty read are recorded in `notes/us3-green.txt` § SC-005.
+
+### S-14 — `test_legacy_two_digit_reported_legacy` (T024 red → T029/T031 green; C-206)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy -q`
-- red output: pending (author lands with T024; fixtures `tests/fixtures/decision-governance/legacy/`)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T029; raw log `test-evidence/us3-red-first.txt`):
+
+```text
+    headings = [e for e in payload["legacy"] if e["kind"] == "heading"]
+>   KeyError: 'legacy'
+tests/contract/test_decision_governance_guards.py:263: KeyError
+FAILED tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy
+1 failed in 6.76s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the JSON output carries no `legacy` report yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/legacy/` — `legacy.md` (one/two-digit headings, a three-digit heading with zero field lines), `incomplete-new-form.md` (one C-201 field line), `register.md` (legacy rows `D1–D9`, `D-001`, `D-001-a`).
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
+- exit status (green): `0`. The legacy report (three headings + three register rows, never judged) and the incomplete new-form block's M-01 red are recorded in `notes/us3-green.txt` § SC-005.
 
 ### S-15 — `test_acknowledgement_present` (T032; payload/return snapshots)
 
@@ -257,11 +334,24 @@ FAILED tests/unit/test_validate_decisions.py::test_ai_replay_deterministic
 - red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/chain/`)
 - exit status: pending
 
-### S-19 — `test_reconstruct_from_register_and_carriers` (T024; four-carrier fixtures)
+### S-19 — `test_reconstruct_from_register_and_carriers` (T024 red → T029/T031 green; four-carrier fixtures)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_reconstruct_from_register_and_carriers -q`
-- red output: pending (author lands with T024; fixtures `tests/fixtures/decision-governance/reconstruct/`)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T029; raw log `test-evidence/us3-red-first.txt`):
+
+```text
+    records = payload["records"]
+>   KeyError: 'records'
+tests/contract/test_decision_governance_guards.py:301: KeyError
+FAILED tests/contract/test_decision_governance_guards.py::test_reconstruct_from_register_and_carriers
+1 failed in 6.76s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the JSON output carries no reconstructed-records array yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/reconstruct/` — one complete record per carrier (`requirements.md`, `plan.md`, `checkpoints/02-implement.md`, `run-report.md`) plus a register stub; the requirements carrier triggers the same-name conditional family.
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
+- exit status (green): `0`. The four-record reconstruction output (ids, carriers, classes, base fields, triggered family) is recorded in `notes/us3-green.txt` § SC-005.
 
 ### S-20 — `test_every_guard_has_reverse_sample` (T039; C-403)
 

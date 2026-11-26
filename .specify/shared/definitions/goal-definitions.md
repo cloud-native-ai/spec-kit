@@ -80,6 +80,8 @@ The value set and transition discipline are owned by `shared/definitions/anchor-
 
 **Versus the Requirement.** A Requirement is a binding clause on a deliverable, verified pass/fail against tests; a Goal's completion conditions describe the state after the guidance has been carried out. Neither audits the other, and a completion condition MUST NOT be presented as a per-feature success criterion.
 
+**Versus the Decision Record.** A decision taken while authoring, ratifying or acting on a Goal is archived as a decision record in this file's own decision surface (producer P-08); the record form, field closure and transmission obligations are owned by `shared/definitions/decision-definitions.md` and are not restated here.
+
 ## Terminology
 
 | Term | Meaning |

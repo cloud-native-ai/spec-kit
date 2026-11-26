@@ -96,6 +96,8 @@ The taxonomy renames nothing — it gives canonical layer names to distinctions 
 | **Agent tool-call list** | The `capability-tools:` frontmatter key (neutral vocabulary; rendered to each tool's own field name at init) — the LLM's callable surface inside one agent | `.specify/agents/{templates,instances}/<slug>.agent.md` frontmatter |
 | **Tool** / Tool record | Pre-verified reusable capability record | `shared/definitions/tool-definitions.md` |
 
+**Decision records are not here.** Decisions held by agents (team roster or engine adjudications, producer P-08) are archived per `shared/definitions/decision-definitions.md`; this file owns the three layers only and restates none of the record's form or fields.
+
 ## Host Registration Surface
 
 The **Host Registration Surface** of a render-mode tool is the directory that tool actually reads agent definitions from — the render pipeline's target surface. One surface per render-mode tool (qoder, claude, copilot, opencode; codex/hermes are annotated-mode and carry no surface); its path comes from the CLI's tool-metadata mapping (`_AGENT_METADATA_MAPPING[tool]["target_dir"]` in `src/specify_cli/__init__.py` — e.g. qoder's project-level `.qoder/agents/`), and its contents are **renderer-produced real files** — never symlinks, never hand-written copies. The render manifest (`.specify/agents/.render-manifest.json`) distinguishes rendered products from user-owned files sharing the directory; user assets are never pruned. Verified 2026-10-08 against official docs (the CLI/IDE shared-path statement lives in `shared/workflow/symlink-model.md`): Qoder CLI and Qoder IDE read the SAME project-level `.qoder/agents/`, and a filename does not define the agent name — the frontmatter `name` field does.
