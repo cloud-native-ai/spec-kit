@@ -600,3 +600,174 @@ def test_review_surfaces_named() -> None:
         )
         for rule in ids:
             assert rule in body, f"{rel} does not name the {rule} review surface"
+
+
+# --------------------------------------------------------------------------- #
+# US6 — landing closures: mirrors, copies, byte budgets, client init (T048)
+# --------------------------------------------------------------------------- #
+
+import os
+
+SYNC_MIRRORS = ROOT / "scripts" / "python" / "sync-mirrors.py"
+REGEN_COPIES = ROOT / "scripts" / "python" / "regen-command-copies.py"
+MIRROR_BASELINE = (
+    ROOT / ".specify" / "specs" / "107-decision-governance" / "test-evidence"
+    / "sync-mirrors-baseline.txt"
+)
+LIVE_INSTRUCTIONS = ROOT / ".specify" / "instructions.md"
+GENERATE_INSTRUCTIONS = ROOT / "scripts" / "bash" / "generate-instructions.sh"
+
+#: A-13 / T-001 byte ceilings.
+SECTION_CAP_BYTES = 1500
+TOTAL_CAP_BYTES = 40960
+
+DRIFT_LINE_RE = re.compile(r"^(MISS|DIFF\[projected\]|DIFF|ORPHAN)\s+(\S+)$", re.M)
+BUDGET_RE = re.compile(r"^INSTRUCTIONS_BUDGET_BYTES=(\d+)$", re.M)
+
+
+def run_engine(script: Path, *args: str) -> subprocess.CompletedProcess:
+    env = dict(os.environ)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return subprocess.run(
+        [sys.executable, str(script), *args],
+        capture_output=True,
+        text=True,
+        env=env,
+        cwd=str(ROOT),
+    )
+
+
+def drift_members(text: str) -> set[str]:
+    return {f"{match.group(1)} {match.group(2)}" for match in DRIFT_LINE_RE.finditer(text)}
+
+
+def raw_section(text: str, token: str = "Decision Items") -> str | None:
+    """One H2 section heading line included, up to the next H2 (byte comparison unit)."""
+    lines = text.splitlines(keepends=True)
+    start = None
+    for index, line in enumerate(lines):
+        if line.startswith("## ") and token in line:
+            start = index
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return "".join(lines[start:end])
+
+
+def test_mirror_and_copy_closure() -> None:
+    """C-506: mirrors/copies converge with no NEW drift, and the two byte budgets hold."""
+    check = run_engine(SYNC_MIRRORS, "--check")
+    assert check.returncode == 0, (
+        f"sync-mirrors --check exited {check.returncode}: {check.stdout[-3000:]}"
+    )
+    baseline = drift_members(read(MIRROR_BASELINE))
+    current = drift_members(check.stdout)
+    assert current - baseline == set(), (
+        f"NEW mirror drift members against the baseline: {sorted(current - baseline)}"
+    )
+
+    regen = run_engine(REGEN_COPIES, "--check")
+    assert regen.returncode == 0, (
+        f"regen-command-copies --check exited {regen.returncode}: {regen.stdout[-2000:]}"
+    )
+
+    template_section = raw_section(read(INSTRUCTION_TEMPLATE))
+    live_section = raw_section(read(LIVE_INSTRUCTIONS))
+    assert template_section, "the instruction template carries no Decision Items section"
+    assert template_section == live_section, (
+        "the template and the generated live file disagree on the Decision Items section"
+    )
+    assert len(template_section.encode("utf-8")) <= SECTION_CAP_BYTES, (
+        f"the section is {len(template_section.encode('utf-8'))} B, over the "
+        f"{SECTION_CAP_BYTES} B ceiling"
+    )
+
+    generator = read(GENERATE_INSTRUCTIONS)
+    budget = BUDGET_RE.search(generator)
+    assert budget, "the generator declares no INSTRUCTIONS_BUDGET_BYTES"
+    assert int(budget.group(1)) == TOTAL_CAP_BYTES, (
+        f"the declared budget is {budget.group(1)}, expected the raised {TOTAL_CAP_BYTES}"
+    )
+    live_bytes = LIVE_INSTRUCTIONS.stat().st_size
+    assert live_bytes < TOTAL_CAP_BYTES, (
+        f"the live instructions are {live_bytes} B, not under the {TOTAL_CAP_BYTES} B budget"
+    )
+
+
+def test_client_init_receives_section(tmp_path: Path) -> None:
+    """SC-010: an empty client project initialized today receives the section and its rules."""
+    project = tmp_path / "fresh-client"
+    project.mkdir()
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(ROOT / "src") + (
+        os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else ""
+    )
+    init = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "from specify_cli import main; main()",
+            "init",
+            "--here",
+            "--ai",
+            "qoder",
+            "--script",
+            "sh",
+            "--no-git",
+        ],
+        cwd=str(project),
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
+        check=False,
+    )
+    assert init.returncode == 0, (
+        f"specify init failed (rc={init.returncode})\n"
+        f"stdout:\n{init.stdout[-3000:]}\nstderr:\n{init.stderr[-3000:]}"
+    )
+
+    delivered = raw_section(
+        (project / ".specify" / "templates" / "instructions-template.md").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert delivered, "the initialized project's instruction template lacks the section"
+
+    generated = subprocess.run(
+        ["bash", ".specify/scripts/bash/generate-instructions.sh"],
+        cwd=str(project),
+        capture_output=True,
+        text=True,
+        timeout=300,
+        check=False,
+    )
+    assert generated.returncode == 0, (
+        f"the client instruction generator failed (rc={generated.returncode})\n"
+        f"{generated.stdout[-2000:]}\n{generated.stderr[-2000:]}"
+    )
+
+    live = raw_section(
+        (project / ".specify" / "instructions.md").read_text(encoding="utf-8")
+    )
+    assert live, "the generated client instructions lack the Decision Items section"
+    flat = norm(live)
+    assert "full name" in flat and "abbreviation" in flat, (
+        "the client section does not carry the full-name production rule"
+    )
+    for token in SAME_NAME_PINS:
+        assert token in flat, f"the client section does not carry {token!r}"
+    assert len(live.encode("utf-8")) <= SECTION_CAP_BYTES, (
+        f"the client section is {len(live.encode('utf-8'))} B, over the ceiling"
+    )
+
+    per_tool = project / "QODER.md"
+    assert per_tool.is_file(), "the init workspace carries no per-tool instruction copy"
+    assert raw_section(per_tool.read_text(encoding="utf-8")), (
+        "the per-tool instruction copy does not carry the section"
+    )
