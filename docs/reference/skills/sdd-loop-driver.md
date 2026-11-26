@@ -49,6 +49,16 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。
 - **pgrep 陷阱**：`pgrep -c` 零匹配会先打印 0 再以退出码 1 结束，`|| echo 0` 会追加第二个 0；存活判据一律用 PID 文件 + `kill -0`，watcher 自测覆盖零匹配、僵尸、PID 复用等反向用例。
 
+## 结算判定（106-background-silent-failure 切片）
+
+**机制一句话**：只读动作 `scripts/python/role-edge-check.py --action settle` 把既有载体证据收敛为恰好一个封闭结算值——静默消失是一个被判定的结果，而不是成功、失败或「仍在运行」之一。
+
+- **owner 指针**：封闭结算值集合、逐值正证据要求、三类结算违例与 legacy 规则归 `shared/definitions/superagent-definitions.md` § Termination；本页与引擎都不复制第二张表。
+- **C1 判定映射指针**：引擎读取 stage 四件套与 sidecar/spine，把 watcher 的判定 token 映射为结算值；映射归契约条款 C-13（钉在 `tests/contract/test_settlement_engine.py`）与实现（`C1_VERDICT_MAP`），本页不复述配对。
+- **输入面**：既有 state/teams/logs 三个根；边界选项 `--live-window` / `--wait-deadline` / `--start-grace` 的缺省、值域与记录字段优先级以 `--help` 与 § Termination 为准。
+- **退出码**：`0` = 每个尝试都被判定（含正确判出的静默结束）、`1` = 结算违例、`2` = `unknown`（证据不可读 / 缺起点记录的确定性拒绝，永不让位为 0）。
+- **只读边界**：零写入、无临时文件；`report` / `query` 两个既有动作的输出逐字节不变。
+
 ## 状态感知快照（065a-state-awareness）
 
 **机制一句话**：一次调用把一条线的脊、Registry、四件套、watchbeat、产物与提交证据、watcher 判定聚合成一个 JSON 信封，给出唯一恢复动作建议。**只读**——不写脊、不杀进程、不删证据；字段面 owner 是本技能参考手册 `references/state-awareness.md`，本页只给入口与关系。

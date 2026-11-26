@@ -364,3 +364,46 @@ Prerequisites).
     `summary.unknown` and `violations` `:1738-1743`;
   - no new rejection branch — `test_engine_carries_no_prebuilt_version_rejection`
     (T028) plus the absence of any version comparison in the engine.
+
+## T030 — docs settlement pointers
+
+- Pages edited (framework dev docs; no mirror, no generated copy):
+  - `docs/reference/skills/sdd-loop-driver.md` — new `## 结算判定（106-background-silent-failure 切片）`
+    section: owner pointer (§ Termination), C1-mapping pointer (contract C-13 + the
+    engine's `C1_VERDICT_MAP`), boundary-option pointer (`--help`), exit-code interface
+    line, read-only boundary;
+  - `docs/reference/commands/agents.md` — Run Mode settlement paragraph (parent settles
+    every attempt before reporting; silent end is never success or "still running";
+    owner + run-agent reaction pointers);
+  - `docs/reference/teams/orchestration.md` — `### Seat Settlement` under Step
+    Verification (report `end_state` / `evidence` columns owned by create-team § Report;
+    owner + settle-engine pointers).
+- No second value table / mapping copied: the value table scan over
+  `shared/ skills/ templates/ agents/ docs/` stayed green —
+  `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_scope.py tests/contract/test_settlement_contract_definitions.py -q`
+  → rc **0**, `29 passed in 6.31s` (run after the docs edits).
+
+## T031 — mirrors and per-tool copies regenerated (no hand edits)
+
+- Regeneration commands and readings (`.venv/bin/python`, the measured generator
+  interpreter):
+  - `sync-mirrors.py --write --only shared` / `scripts` / `skills/internal` /
+    `skills/external` / `agents` — each rc **0**;
+  - `sync-mirrors.py --check` → rc **0**: `templates/` 23, `skills/external/` 394,
+    `skills/internal/` 139, `agents/` 20, `scripts/` 132, `shared/` 116 files, all
+    byte-identical (drift members versus the T001 baseline: **0 new**);
+  - `regen-command-copies.py` → `Regenerated command copies for 4 tools.` rc **0**;
+    `regen-command-copies.py --check` → `OK: all per-tool command copies match the
+    source templates.` rc **0**;
+  - `specify render-agents --ai qoder` → `rendered 25 agent(s) for qoder; unmapped
+    intents on 25 agent(s)` rc **0**; refreshes the four `.qoder/agents/sdd-*-coordinator`
+    surfaces with the T017 settlement pointer line and the render manifest timestamp.
+- Byte-equality of the touched pairs (`cmp` rc 0 each): engine
+  (`scripts/python/role-edge-check.py` ↔ `.specify/scripts/python/…`), owner, subagent
+  definitions and recipes (`shared/…` ↔ `.specify/shared/…`).
+- Command copies carry the pointer: each of the eight per-tool `agents` / `team` copies
+  (`.claude/`, `.github/`, `.qoder/`, `.opencode/`) contains exactly 1
+  `superagent-definitions.md … § Termination` pointer line.
+- No hand edits: the only non-generated modifications in the tree are the three T030
+  docs pages; every `.specify/…`, `.qoder/agents/…` and command-copy change came from
+  the sanctioned generators.

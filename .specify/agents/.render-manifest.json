@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261125T123120Z",
+  "rendered_at": "20261126T030101Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -337,7 +337,7 @@
     },
     ".qoder/agents/sdd-implement-coordinator.agent.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
-      "sha256": "86fed6b5b800a16ce3f3d1816bb56dd5c153363c33df5c4948163ff8c6ff94c9"
+      "sha256": "bf73d5c145b57f90e3a80a922154175a02ca656a9721618d700f39ffc151b8d3"
     },
     ".qoder/agents/sdd-implement-executor.agent.md": {
       "source": "templates/sdd-implement-executor.agent.md",
@@ -357,7 +357,7 @@
     },
     ".qoder/agents/sdd-plan-coordinator.agent.md": {
       "source": "templates/sdd-plan-coordinator.agent.md",
-      "sha256": "f4f7f869e89b63b570624bed87288d108cf4eebf1df4d1c545beaa2fb9af549d"
+      "sha256": "a0d069836ad36de94978bc9a92fac8b90624b45ff0d1fb42c8426d95b1cbac4b"
     },
     ".qoder/agents/sdd-plan-executor.agent.md": {
       "source": "templates/sdd-plan-executor.agent.md",
@@ -369,7 +369,7 @@
     },
     ".qoder/agents/sdd-review-coordinator.agent.md": {
       "source": "templates/sdd-review-coordinator.agent.md",
-      "sha256": "119fe964b575b09440267e1478bf9a93f60e62cbe210bb24a45bb4f01e64fdfa"
+      "sha256": "7482558c411ccdcec52d59949fd953f3b4aba087203d90797bdbc6f80abaa12d"
     },
     ".qoder/agents/sdd-review-executor.agent.md": {
       "source": "templates/sdd-review-executor.agent.md",
@@ -389,7 +389,7 @@
     },
     ".qoder/agents/sdd-task-coordinator.agent.md": {
       "source": "templates/sdd-task-coordinator.agent.md",
-      "sha256": "5963b2d73fd2d821450a927229c97bce779d3ccca5548bad1b26e9908bef69fb"
+      "sha256": "31c9128d94ff77f105131214538905991330440c162b5c4a6cd05a71512a4eb7"
     },
     ".qoder/agents/sdd-task-executor.agent.md": {
       "source": "templates/sdd-task-executor.agent.md",

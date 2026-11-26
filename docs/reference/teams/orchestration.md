@@ -166,6 +166,17 @@ predecessor's handoff before it begins its own work**:
 This is deliberately lightweight (a gate, not a full evaluator). For heavyweight, scored
 convergence use the **iteration** pattern instead.
 
+### Seat Settlement
+
+Report mapping rows carry `end_state` and `evidence` alongside the five identity columns;
+the columns, the 7-column header and the legacy 5-column carve-out are owned by
+`skills/internal/create-team/SKILL.md` § Report. A seat that disappears without terminal
+evidence settles as a silent end rather than being read as completed — the closed
+settlement values, their per-value evidence and the violation kinds are owned by
+`shared/definitions/superagent-definitions.md` § Termination, and the read-only judgment
+face is `scripts/python/role-edge-check.py --action settle`. This page restates neither
+the values nor the evidence matrix.
+
 ### File Handshake Protocol
 
 The file handshake lets stages communicate context without token-heavy prompt chaining:
