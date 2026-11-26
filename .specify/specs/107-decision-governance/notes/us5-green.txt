@@ -1,0 +1,101 @@
+# US5 green evidence — 107-decision-governance (T045)
+
+Captured: 2026-11-26, worktree decision-governance, branch 107-decision-governance.
+Single test entry: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh` (no interpreter-level test command).
+
+## Phase run (guards + contracts modules)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py -q
+```text
+................................                                         [100%]
+32 passed in 7.57s
+```
+
+EXIT=0. Raw log: `notes/us5-green-slots.txt`.
+
+## SC-007 — per-guard mutation drill
+
+Every machine rule M-01…M-09 was executed against its reverse sample and turned red with its own rule id:
+
+$ python3 scripts/python/validate-decisions.py --action <records|payload|chain> --fixture/--carrier <sample>
+```text
+M-01 tests/fixtures/decision-governance/m01/red-missing-actor.md:3: missing base-layer field(s): actor
+LEGACY .specify/register.md:11: D1–D9 (legacy register row — reported, not judged)
+LEGACY .specify/register.md:25: D-A (legacy register row — reported, not judged)
+LEGACY .specify/register.md:26: D-B (legacy register row — reported, not judged)
+LEGACY .specify/register.md:104: D-001-a (legacy register row — reported, not judged)
+LEGACY .specify/register.md:188: D-1 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:189: D-2 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:190: D-3 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:191: D-4 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:192: D-5 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:193: D-6 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:194: D-7 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:195: D-8 (092) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:196: D-9 (用户裁定 2026-11-10) (legacy register row — reported, not judged)
+LEGACY .specify/register.md:255: D-098-01 (legacy register row — reported, not judged)
+LEGACY .specify/register.md:256: D-102-01 (legacy register row — reported, not judged)
+FAIL: 1 violation(s)
+EXIT=1
+M-07 tests/fixtures/decision-governance/m07/red-missing-dispatch.md:5: the dispatch attempt segment is missing (decision record → dispatch attempt → receipt)
+FAIL: 1 violation(s)
+EXIT=1
+```
+
+Full per-guard table (nine rows, exit 1 each, verdict line per rule) and the parity/B-surface lists: `test-evidence/mutation-drill.md`.
+
+## SC-007 — table–guard parity and the B-surface roster
+
+The owner page § 强制边界 M table carries M-01…M-09 and the B table B-01…B-07; the test-side
+rosters are row-identical and each M row names exactly one judge action matching the roster
+(measured by `test_table_guard_parity`). Every B row carries a named review surface and the
+explicit "不声称机器覆盖" statement (\`test_behavior_surfaces_named\`); the producer-side pointers
+live in analyze-artifacts (B-04/B-05/B-07) and the two review skills (B-01…B-07, enumerated).
+
+## SC-007 — inventory closure (C-406 / SC-001)
+
+$ grep -rEl "shared/definitions/decision-definitions\.md" templates skills agents scripts src --include=*.md --include=*.py --include=*.sh | sort
+$ python3 scripts/python/validate-decisions.py --action inventory --fixture <scan-output>
+scripts/python/validate-decisions.py
+skills/external/sdd-loop-driver/references/checkpoint-protocol.md
+skills/external/sdd-loop-driver/references/dispatch-recipes.md
+skills/external/sdd-loop-driver/references/stage-prompts.md
+skills/internal/analyze-artifacts/SKILL.md
+skills/internal/review-feature-quality/SKILL.md
+skills/internal/review-sdd-process/SKILL.md
+skills/internal/run-agent/SKILL.md
+skills/internal/run-team/SKILL.md
+templates/instructions-template.md
+
+PASS: observed == declared ± exempt (declared 12, exempt 2, observed 10)
+EXIT=0
+
+Mutations: an unregistered face turns it red; a vanished declared producer face turns it red (both in `test_inventory_closure`).
+
+## C-405 — gate neutrality and FR-025 preservation
+
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+
+Effective baseline: the merged-tree re-baselined 30 (recorded in `test-evidence/gate-neutrality.txt`
+with the membership adjudication: one destructive hit lost in the 106 merge; added set empty).
+The touched faces carry only the two pre-existing `dispatch-recipes.md` members.
+
+$ git diff --quiet fbab7a45c..HEAD -- <three protected paths>; echo rc=$?
+rc=0
+
+EP-002 payload shape: seven role fields + four injections + five uplink items — unchanged
+(read inside `test_gate_neutrality` and recorded in `test-evidence/gate-neutrality.txt`).
+
+## Mirror readings (T044)
+
+$ python3 scripts/python/sync-mirrors.py --write && python3 scripts/python/sync-mirrors.py --check
+rc 0 — 5 pairs projected (owner page, three skill files, the checker); `ok shared/ == .specify/shared/ (117 files, byte-identical)`.
+cmp byte-identical 5/5; raw log `test-evidence/us5-mirror-check.txt`.
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates. rc 0

@@ -729,7 +729,7 @@ def test_every_guard_has_reverse_sample() -> None:
     # directory must be the one the executable roster actually drives.
     section = owner_section("强制边界", "Enforcement Boundary")
     for rule in M_RULES:
-        row = re.search(rf"^\| {rule} \|(.*)$", section, re.M)
+        row = re.search(rf"^\| {rule}[^|]*\|(.*)$", section, re.M)
         assert row, f"the owner page M table carries no {rule} row"
         fixture_dir = GUARD_ROSTER[rule][1].parent.relative_to(ROOT).as_posix()
         assert fixture_dir in row.group(1), (
@@ -854,8 +854,8 @@ def test_inventory_closure(tmp_path: Path) -> None:
 def test_table_guard_parity() -> None:
     """C-407: the owner page's M/B tables and the test-side rosters are row-identical."""
     section = owner_section("强制边界", "Enforcement Boundary")
-    m_rows = re.findall(r"^\| (M-\d{2}) \|", section, re.M)
-    b_rows = re.findall(r"^\| (B-\d{2})[\s|]", section, re.M)
+    m_rows = re.findall(r"^\| (M-\d{2})[^|]*\|", section, re.M)
+    b_rows = re.findall(r"^\| (B-\d{2})[^|]*\|", section, re.M)
     assert tuple(sorted(m_rows)) == M_RULES, (
         f"the owner page M table carries {sorted(m_rows)}, the roster {M_RULES}"
     )
@@ -867,7 +867,7 @@ def test_table_guard_parity() -> None:
     )
     # Each M row names exactly one deterministic judge action, matching the roster's action.
     for rule in M_RULES:
-        row = re.search(rf"^\| {rule} \|(.*)$", section, re.M)
+        row = re.search(rf"^\| {rule}[^|]*\|(.*)$", section, re.M)
         assert row, f"missing M row {rule}"
         cells = [cell.strip() for cell in row.group(1).split("|")]
         judge_cell = cells[0]

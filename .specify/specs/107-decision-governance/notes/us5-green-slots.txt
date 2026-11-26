@@ -1,0 +1,7 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+................................                                         [100%]
+32 passed in 7.57s

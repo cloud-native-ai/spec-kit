@@ -459,7 +459,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_every_guard_has_r
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the owner page declares no reverse-sample table yet), never an import error.
 - fixtures: the nine roster samples — `m01/red-missing-actor.md`, `m02/red-empty-locator.md`, `m03/red-empty-set.md`, `m04/red-form.md`, `m05/red-no-id.md`, `m06/red-no-block.md`, `m07/red-missing-dispatch.md`, `m08/red-variant.md`, `m09/red-broken.md`.
-- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+- command (green): same single-test command, run as part of the US5 phase run `tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us5-green-slots.txt`): `................................ [100%]` / `32 passed in 7.57s`
+- exit status (green): `0`. The SC-007 readings (nine-row mutation drill, parity, B surfaces, inventory closure) are recorded in `notes/us5-green.txt` and `test-evidence/mutation-drill.md`.
 
 ### S-21 — `test_inventory_closure` (T039 red → T045 green; C-406)
 
@@ -474,7 +476,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_inventory_closure
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the `inventory` leg does not exist yet), never an import error.
 - observation: the test runs the documented code-face scan (grep for the owner-page path over `templates/ skills/ agents/ scripts/ src/`, recorded in the checker docstring) and feeds the output to the action; mutations add an unregistered face and remove a declared producer's owner face.
-- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+- command (green): same single-test command, run as part of the US5 phase run `tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us5-green-slots.txt`): `................................ [100%]` / `32 passed in 7.57s`
+- exit status (green): `0`. The SC-007 readings (nine-row mutation drill, parity, B surfaces, inventory closure) are recorded in `notes/us5-green.txt` and `test-evidence/mutation-drill.md`.
 
 ### S-22 — `test_table_guard_parity` (T039 red → T045 green; C-407)
 
@@ -489,7 +493,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_table_guard_parit
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the owner page carries no M/B tables yet), never an import error.
 - comparison unit: the owner page's M/B table row sets against the test-side `GUARD_ROSTER` / `B_RULES`, plus each M row's single judge action against the roster's action.
-- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+- command (green): same single-test command, run as part of the US5 phase run `tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us5-green-slots.txt`): `................................ [100%]` / `32 passed in 7.57s`
+- exit status (green): `0`. The SC-007 readings (nine-row mutation drill, parity, B surfaces, inventory closure) are recorded in `notes/us5-green.txt` and `test-evidence/mutation-drill.md`.
 
 ### S-23 — `test_behavior_surfaces_named` (T039 red → T045 green; C-402)
 
@@ -504,7 +510,9 @@ FAILED tests/contract/test_decision_governance_contracts.py::test_behavior_surfa
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the B table does not exist yet), never an import error.
 - comparison unit: each B row's surface cell and its explicit no-machine-coverage statement; the M table's complementary machine-coverage claim; the guards module quotes no behavior rule id.
-- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+- command (green): same single-test command, run as part of the US5 phase run `tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us5-green-slots.txt`): `................................ [100%]` / `32 passed in 7.57s`
+- exit status (green): `0`. The SC-007 readings (nine-row mutation drill, parity, B surfaces, inventory closure) are recorded in `notes/us5-green.txt` and `test-evidence/mutation-drill.md`.
 
 ### S-24 — `test_gate_neutrality` (T039 red → T045 green; C-405)
 
@@ -519,7 +527,9 @@ FAILED tests/contract/test_decision_governance_contracts.py::test_gate_neutralit
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the re-baselined gate record does not exist yet), never an import error.
 - comparison unit: the live scan summary against the recorded effective baseline (re-baselined 31 → 30 on the merged tree), the touched-face hit membership, the FR-025 three-path containment against `fbab7a45c`, and the EP-002 payload field counts.
-- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+- command (green): same single-test command, run as part of the US5 phase run `tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us5-green-slots.txt`): `................................ [100%]` / `32 passed in 7.57s`
+- exit status (green): `0`. The SC-007 readings (nine-row mutation drill, parity, B surfaces, inventory closure) are recorded in `notes/us5-green.txt` and `test-evidence/mutation-drill.md`.
 
 ### S-25 — `test_review_surfaces_named` (T039 red → T045 green; C-109)
 
@@ -534,4 +544,6 @@ FAILED tests/contract/test_decision_governance_contracts.py::test_review_surface
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the B rows and the producer-side review-surface pointers do not exist yet), never an import error.
 - comparison unit: B-03/B-04/B-06 surfaces in the owner tables and § Decision Classes, plus the analyze/review skill pointer blocks.
-- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+- command (green): same single-test command, run as part of the US5 phase run `tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_contracts.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us5-green-slots.txt`): `................................ [100%]` / `32 passed in 7.57s`
+- exit status (green): `0`. The SC-007 readings (nine-row mutation drill, parity, B surfaces, inventory closure) are recorded in `notes/us5-green.txt` and `test-evidence/mutation-drill.md`.
