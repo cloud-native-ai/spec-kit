@@ -89,3 +89,40 @@
 - **B-01** 承接**文本完整性(completeness)**：名称是否完整、解释是否足够。
 - **B-02** 承接**定位充分性(locator adequacy)**：具名维度是否足以区分同名对象。
 - 二者都是行为类评审面，MUST NOT 被机器声称覆盖；机器只判形态与在场性（M-02 / M-08）。
+
+## 选项集契约(Option-Set Contract)
+
+选项集是决策项的可比较面：封闭、可枚举，每个成员带齐五要素。本节规定的形态由 M-03 判；AI 重放与人的选择信号按各自承接面处理，MUST NOT 机器声称覆盖。
+
+### 封闭可枚举集(closed enumerable set)
+
+- **声明计数(declared count)**：`options` 字段的取值 MUST 以声明计数开头——`- **options**: <N>`；N 是选项集合的声明大小，0/1 退化情形同样声明。声明计数缺失、或与选项条目数不一致，即集合不封闭（M-03）。
+- **空集不是决策项**：`options: 0`（或无任何选项条目）不构成决策项（M-03）；没有任何可行选项的情形 MUST 按重开条件处理，MUST NOT 以空集冒充决策。
+- **唯一标签(unique labels)**：同一选项集内标签 MUST 唯一（去首尾空白后按字面比较）；重复即缺陷（M-03）。
+
+### 每个选项的五要素(five elements)
+
+每个选项是 `options` 下以 `- label: <完整名称>` 起始的缩进子行，随后以缩进 ≥2 空格的续行逐项给出：
+
+| 要素 | 行形态 | 含义 |
+|------|--------|------|
+| `label` | `- label: <完整名称>` | 选项的完整名称；与决策主体适用同一完整名称规则（§ 决策文本契约 R1） |
+| `consequences` | `consequences: <文本>` | 选择该选项的后果 |
+| `reversibility` | `reversibility: <文本>` | 可逆性：`reversible` / `irreversible`，并给出适用条件 |
+| `default` | `default: yes|no` | 默认项标记；每个选项集恰一个默认成员 |
+| `evidence` | `evidence: <指针>` | 选择所需证据；指针可解析性由 M-09 判 |
+
+五要素缺一即缺陷（M-03）。选项级 `path` 与 `forced` 是 `options` 字段的值形状成员，不是顶格记录字段。
+
+- **`other` 的合法形态**：名为 `other` 的选项只有在携带 `path: <谁/何时/如何新增选项并回写记录>` 子行时才合法；没有 `path` 的 `other` 不是选项（M-03）。
+- **单一可行项(forced)**：选项集只有一个成员时，MUST 在 `options` 块内声明 `forced: <理由>`，MUST NOT 伪装成多选；未声明即缺陷（M-03）。`forced` 是集合级声明，不是第六个选项要素。
+- **零可行项**：没有任何可行选项时不构成决策项（同空集）。
+
+### 选中项(chosen member)
+
+`chosen_option` MUST 是选项集中的一个具名成员（按 label 匹配；M-03）；不是成员即缺陷。`human-interactive` 决策在 `chosen_option` 中同时记录人的选择信号：取值域归 `shared/guidelines/confirmation-gates.md` § 门控观察协议（指针，不复述；C-108）。
+
+### AI 可重放(replayability duty)
+
+`ai-autonomous` 记录 MUST 记录判定谓词与判定输入——二者是 `rationale` 字段的值形状成员（缩进 ≥2 空格的续行）；把谓词应用到记录输入 MUST 确定性地重推 `chosen_option`，重放不一致是缺陷。重放可复现性由守卫测试演示（`tests/unit/test_validate_decisions.py::test_ai_replay_deterministic`）；谓词是否成立、假设是否缺失归 B-04 评审承接，MUST NOT 声称机器覆盖。
+
