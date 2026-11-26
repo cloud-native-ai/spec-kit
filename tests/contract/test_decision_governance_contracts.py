@@ -154,3 +154,131 @@ def test_no_adjacent_owner_criteria_heading_restated() -> None:
             assert heading not in page_headings, (
                 f"owner page restates the adjacent heading {heading!r} from {rel}"
             )
+
+
+# --------------------------------------------------------------------------- #
+# US1 — decision text contract and the two decision classes (T009)
+# --------------------------------------------------------------------------- #
+
+INSTRUCTION_TEMPLATE = ROOT / "templates" / "instructions-template.md"
+FIXTURES = ROOT / "tests" / "fixtures" / "decision-governance"
+
+#: C-102's full-name rule, as the owner page states it (whitespace-normalised pin).
+FULL_NAME_PIN = "MUST 使用对象的完整名称，MUST NOT 只用简称"
+
+#: C-103's same-name family, as both the owner page and the instruction section carry it.
+SAME_NAME_PINS = ("`same_name_conflict: true`", "`resource_locator`",
+                  "business resource group", "region id")
+
+
+def instruction_section() -> str:
+    """Body of the ``## Decision Items（决策项）`` section of the instruction template."""
+    return h2_section(read(INSTRUCTION_TEMPLATE), "Decision Items", "决策项")
+
+
+def test_class_declaration_closed() -> None:
+    """C-101: exactly one class from the closed set, judged by holder (A-4)."""
+    section = h2_section(read(OWNER), "决策类别", "Decision Classes")
+    flat = norm(section)
+    assert "持有者(holder)" in flat, (
+        "§ Decision Classes does not state that the class is judged by the holder"
+    )
+    assert "MUST 声明恰一个 `decision_class`" in flat, (
+        "§ Decision Classes does not require exactly one decision_class declaration"
+    )
+    assert "闭集 `human-interactive` / `ai-autonomous`" in flat, (
+        "§ Decision Classes does not name the closed class set"
+    )
+    assert "类缺失、类混合或值域外是缺陷" in flat, (
+        "§ Decision Classes does not name the three defect forms"
+    )
+    assert "类别决定适用的模板与检查集" in flat, (
+        "§ Decision Classes does not state that the class picks the template and check set"
+    )
+    assert "传递不改变类别" in flat, (
+        "§ Decision Classes does not state that transmission never re-classes"
+    )
+
+
+def test_full_name_minimum_bar_four_surfaces() -> None:
+    """C-102: the two production rules land on four surfaces together."""
+    # Surface 1 — the owner page's § Decision Text Contract.
+    text_contract = norm(h2_section(read(OWNER), "决策文本契约", "Decision Text Contract"))
+    assert FULL_NAME_PIN in text_contract, (
+        "owner page § Decision Text Contract does not carry the full-name rule"
+    )
+    for token in SAME_NAME_PINS:
+        assert token in text_contract, (
+            f"owner page § Decision Text Contract does not carry {token!r}"
+        )
+    assert "同名对象 MUST NOT 在没有定位信息时被呈现" in text_contract, (
+        "owner page does not ban presenting a same-name object without a locator"
+    )
+
+    # Surface 2 — the instruction section (a whole section, not a bullet elsewhere).
+    raw = instruction_section()
+    instr = norm(raw)
+    assert "full name" in instr and "abbreviation" in instr, (
+        "instruction section does not carry the full-name rule"
+    )
+    for token in SAME_NAME_PINS:
+        assert token in instr, f"instruction section does not carry {token!r}"
+    assert ".specify/shared/definitions/decision-definitions.md" in instr, (
+        "instruction section does not point at the owner page"
+    )
+    assert "**本节字节上限：1,500 B**" in raw, (
+        "instruction section does not declare its byte ceiling"
+    )
+    assert not any(line.strip().startswith("|") for line in raw.splitlines()), (
+        "instruction section copies a table from the owner page"
+    )
+
+    # Surface 3 — the decision-item templates (owner page § Decision Classes).
+    classes = norm(h2_section(read(OWNER), "决策类别", "Decision Classes"))
+    assert "完整名称与定位信息(full names and locator)" in classes, (
+        "the decision-item templates do not carry the full-name/locator element"
+    )
+    assert "§ 决策文本契约" in classes, (
+        "the decision-item templates do not reach the text contract by pointer"
+    )
+
+    # Surface 4 — the guard fixtures plus the named B-01/B-02 review surfaces.
+    assert (FIXTURES / "m02" / "red-empty-locator.md").is_file(), (
+        "missing M-02 guard fixture"
+    )
+    assert (FIXTURES / "m08" / "red-variant.md").is_file(), (
+        "missing M-08 guard fixture"
+    )
+    for surface in ("B-01", "B-02"):
+        assert surface in text_contract, (
+            f"owner page § Decision Text Contract does not name the {surface} review surface"
+        )
+
+
+def test_human_template_elements() -> None:
+    """C-104: the human-interactive template carries every readability element."""
+    flat = norm(h2_section(read(OWNER), "决策类别", "Decision Classes"))
+    for token in (
+        "平实语言",
+        "上下文(context)",
+        "后果(consequences)与可逆性(reversibility)",
+        "默认项(default)",
+        "完整名称与定位信息(full names and locator)",
+        "shared/guidelines/user-facing-comprehension.md",
+        "MUST NOT 只给形式化谓词",
+    ):
+        assert token in flat, f"human-interactive template lacks {token!r}"
+
+
+def test_ai_template_elements() -> None:
+    """C-105: the ai-autonomous template carries every rigor element."""
+    flat = norm(h2_section(read(OWNER), "决策类别", "Decision Classes"))
+    for token in (
+        "封闭选项集(closed options)",
+        "决策谓词/规则",
+        "显式假设(assumptions)",
+        "可机器核查的证据指针(evidence pointers)",
+        "确定性结论与重开条件",
+        "MUST NOT 只有散文",
+    ):
+        assert token in flat, f"ai-autonomous template lacks {token!r}"

@@ -10,16 +10,16 @@
 |------|-----------|-------------|-------|
 | S-00 | `tests/unit/test_validate_decisions.py::test_cli_surface` | T006 (red) / T007 (green) | filled |
 | S-01 | `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` | T023 | pending |
-| S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | pending |
+| S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | red captured; green at T017 |
 | S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | pending |
 | S-04 | `tests/unit/test_validate_decisions.py::test_m04_id_density_register` | T023 | pending |
 | S-05 | `tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples` | T032 | pending |
 | S-06 | `tests/contract/test_decision_governance_guards.py::test_m06_block_completeness` | T032 | pending |
 | S-07 | `tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused` | T032 | pending |
 | S-08 | `tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments` | T032 | pending |
-| S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | pending |
+| S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | red captured; green at T017 |
 | S-10 | `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (M-09 / C-204) | T024 | pending |
-| S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | pending |
+| S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | red captured; green at T017 |
 | S-12 | `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic` (C-107 replay) | T018 | pending |
 | S-13 | `tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy` (C-205) | T024 | pending |
 | S-14 | `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` (C-206) | T024 | pending |
@@ -63,11 +63,21 @@ FAILED tests/unit/test_validate_decisions.py::test_cli_surface - AssertionErr...
 - red output: pending (author lands with T023)
 - exit status: pending
 
-### S-02 — `test_m02_locator_red_then_green` (T010)
+### S-02 — `test_m02_locator_red_then_green` (T010 red → T017 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green -q`
-- red output: pending (author lands with T010; fixtures `tests/fixtures/decision-governance/m02/`)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T013; raw log `test-evidence/us1-red-first.txt`):
+
+```text
+E       AssertionError: empty resource_locator exited 2, expected 1: error: action 'records' is declared but not implemented yet (read-only skeleton)
+tests/contract/test_decision_governance_guards.py:73: AssertionError
+FAILED tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green
+1 failed in 6.24s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the `records` leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m02/` — `red-empty-locator.md` (`same_name_conflict: true` + empty `resource_locator`), `red-single-dimension.md` (region id only), `green-complete.md` (business resource group + region id).
+- green output: pending (captured at T017).
 
 ### S-03 — `test_m03_option_set_reverse_samples` (T018)
 
@@ -105,11 +115,21 @@ FAILED tests/unit/test_validate_decisions.py::test_cli_surface - AssertionErr...
 - red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/m07/`, `chain/`)
 - exit status: pending
 
-### S-09 — `test_m08_registered_variant_red` (T010)
+### S-09 — `test_m08_registered_variant_red` (T010 red → T017 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red -q`
-- red output: pending (author lands with T010; fixtures `tests/fixtures/decision-governance/m08/` with a stubbed glossary variant)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T013; raw log `test-evidence/us1-red-first.txt`):
+
+```text
+E       AssertionError: registered-variant subject exited 2, expected 1:  error: action 'records' is declared but not implemented yet (read-only skeleton)
+tests/contract/test_decision_governance_guards.py:121: AssertionError
+FAILED tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red
+1 failed in 6.23s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion, never an import error.
+- fixtures: `tests/fixtures/decision-governance/m08/` — `glossary.md` (stubbed variant row), `red-variant.md` (subject uses `spec-kit`), `green-full-name.md` (`Spec Kit`), `green-unregistered.md` (`SK`, unregistered → covered by B-01 only).
+- green output: pending (captured at T017).
 
 ### S-10 — `test_broken_pointer_red` (T024; M-09 / C-204)
 
@@ -117,11 +137,20 @@ FAILED tests/unit/test_validate_decisions.py::test_cli_surface - AssertionErr...
 - red output: pending (author lands with T024; fixtures `tests/fixtures/decision-governance/m09/`)
 - exit status: pending
 
-### S-11 — `test_full_name_minimum_bar_four_surfaces` (T009; C-102 four-surface)
+### S-11 — `test_full_name_minimum_bar_four_surfaces` (T009 red → T017 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces -q`
-- red output: pending (author lands with T009; each surface asserted separately)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T011/T012/T014; raw log `test-evidence/us1-red-first.txt`):
+
+```text
+E       AssertionError: missing H2 section carrying ('决策文本契约', 'Decision Text Contract')
+tests/contract/test_decision_governance_contracts.py:107: AssertionError
+FAILED tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces
+1 failed in 6.24s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the text-contract section does not exist yet), never an import error.
+- green output: pending (captured at T017); the four surfaces are asserted separately inside the test.
 
 ### S-12 — `test_ai_replay_deterministic` (T018; C-107 replay)
 

@@ -1,0 +1,116 @@
+== S-11 red ==
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_full_name_minimum_bar_four_surfaces ___________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_full_name_minimum_bar_four_surfaces() -> None:
+        """C-102: the two production rules land on four surfaces together."""
+        # Surface 1 — the owner page's § Decision Text Contract.
+>       text_contract = norm(h2_section(read(OWNER), "决策文本契约", "Decision Text Contract"))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_contracts.py:206: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# 决策项定义(Decision Definitions)\n\n**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、决策记录字...引；它是既有载体的投影，不是第二套存储。 |\n| **Decision Class** | 按持有者判定的类别，取 `human-interactive`（人持有）或 `ai-autonomous`（无人在场的代理持有）之一。 |\n'
+tokens = ('决策文本契约', 'Decision Text Contract')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 42
+
+    def h2_section(text: str, *tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('决策文本契约', 'Decision Text Contract')
+E       assert None is not None
+
+tests/contract/test_decision_governance_contracts.py:107: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces
+1 failed in 6.24s
+EXIT=1
+== S-02 red ==
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_m02_locator_red_then_green ________________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m02_locator_red_then_green() -> None:
+        """C-103 / M-02: the same-name family needs the locator floor, and nothing else."""
+        red_empty = FIXTURES / "m02" / "red-empty-locator.md"
+        red_one_dim = FIXTURES / "m02" / "red-single-dimension.md"
+        green = FIXTURES / "m02" / "green-complete.md"
+        for path in (red_empty, red_one_dim, green):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        before = dir_snapshot(FIXTURES / "m02")
+    
+        # Red: same_name_conflict: true with an empty resource_locator.
+        red = run_records("--carrier", str(red_empty))
+>       assert red.returncode == 1, (
+            f"empty resource_locator exited {red.returncode}, expected 1: {red.stderr}"
+        )
+E       AssertionError: empty resource_locator exited 2, expected 1: error: action 'records' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor..., returncode=2, stdout='', stderr="error: action 'records' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green
+1 failed in 6.24s
+EXIT=1
+== S-09 red ==
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_m08_registered_variant_red ________________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m08_registered_variant_red() -> None:
+        """M-08: a registered glossary variant in the subject is red; only registered words."""
+        glossary = FIXTURES / "m08" / "glossary.md"
+        red = FIXTURES / "m08" / "red-variant.md"
+        green = FIXTURES / "m08" / "green-full-name.md"
+        unregistered = FIXTURES / "m08" / "green-unregistered.md"
+        for path in (glossary, red, green, unregistered):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        before = dir_snapshot(FIXTURES / "m08")
+    
+        # Red: the subject uses the registered variant `spec-kit`.
+        red_run = run_records("--carrier", str(red), "--glossary", str(glossary))
+>       assert red_run.returncode == 1, (
+            f"registered-variant subject exited {red_run.returncode}, expected 1: "
+            f"{red_run.stdout} {red_run.stderr}"
+        )
+E       AssertionError: registered-variant subject exited 2, expected 1:  error: action 'records' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor..., returncode=2, stdout='', stderr="error: action 'records' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:121: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red
+1 failed in 6.23s
+EXIT=1
