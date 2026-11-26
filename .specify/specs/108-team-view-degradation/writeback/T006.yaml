@@ -1,0 +1,5 @@
+task: T006
+outcome: done
+run_id: r20261126T100325Z-108p2
+evidence: tests/unit/test_team_view_report_recognition.py — 6 red-first nodes (grammar five forms + rejected samples, fixed three-way order, latest max/tie-break, normalized token, bounded residue, uncertainty predicate); command `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_team_view_report_recognition.py -q` exit 1 with 6 failed (missing parse_stamp/classify_run_file/classify_runs); raw output test-evidence/us1-red-unit.txt; slots U-GRAMMAR…U-UNCERTAINTY filled in notes/red-first-evidence.md
+at: 2026-11-26T10:03:25Z

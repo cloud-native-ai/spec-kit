@@ -1,0 +1,5 @@
+task: T007
+outcome: done
+run_id: r20261126T100325Z-108p2
+evidence: tests/integration/test_team_view_degradation.py — US1 segment 6 red-first nodes (production replica latest/classification/residue/exit 5; corpus replica 13/13; residue-only state; auxiliary-never-latest; same-stamp tie-break; overview token equality + inline uncertainty marker); command `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -q` exit 1 with 6 failed; raw output test-evidence/us1-red-integration.txt; slots I-PRODUCTION-REPLICA…I-OVERVIEW-REUSE filled in notes/red-first-evidence.md
+at: 2026-11-26T10:03:25Z

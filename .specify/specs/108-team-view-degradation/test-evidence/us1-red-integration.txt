@@ -1,0 +1,281 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_team_view_degradation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_________ test_overview_matches_single_view_and_discloses_uncertainty __________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19557/popen-gw5/test_overview_matches_single_v0')
+
+    def test_overview_matches_single_view_and_discloses_uncertainty(tmp_path):
+        build_team(
+            tmp_path,
+            "clean-team",
+            reports=[("20260102T000000Z-report.md", report_text())],
+        )
+        build_team(
+            tmp_path,
+            "residue-team",
+            reports=[
+                ("2026-01-03T08-30-00Z-report.md", report_text()),
+                ("2026-10-07-progress-snapshot.md", "Snapshot without a time stamp.\n"),
+            ],
+        )
+        overview = view(tmp_path)
+        assert overview.returncode == 0, overview.stderr + overview.stdout
+        output = overview.stdout
+        assert "20260102T000000Z" in output
+>       assert "20260103T083000Z（report-recognition-uncertain：残留 1）" in output
+E       AssertionError: assert '20260103T083000Z（report-recognition-uncertain：残留 1）' in 'Team Overview: 2 teams · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）\n\n| slug | name | pattern | lifecycle | 绑定锚点（anchor...0000Z |\n| residue-team | Fixture Team residue-team | serial | active | inferred — residue-team | 2026-01-02 | 未记录 |\n'
+
+tests/integration/test_team_view_degradation.py:203: AssertionError
+___________________ test_corpus_style_reports_are_recognized ___________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19557/popen-gw1/test_corpus_style_reports_are_0')
+
+    def test_corpus_style_reports_are_recognized(tmp_path):
+        build_team(
+            tmp_path,
+            "corpus-replica",
+            reports=[(name, report_text()) for name in CORPUS_REPLICA_NAMES],
+        )
+        result = view(tmp_path, "corpus-replica")
+        assert result.returncode == 0, result.stderr + result.stdout
+        output = result.stdout
+>       assert "运行报告: 已列出（共 13 份" in output
+E       AssertionError: assert '运行报告: 已列出（共 13 份' in 'Team View: Fixture Team corpus-replica（corpus-replica）\nmode: single · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）\n\n## ...erred）\n  - 生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n'
+
+tests/integration/test_team_view_degradation.py:115: AssertionError
+_____________ test_production_replica_latest_is_the_parsed_maximum _____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19557/popen-gw0/test_production_replica_latest0')
+
+    def test_production_replica_latest_is_the_parsed_maximum(tmp_path):
+        build_team(tmp_path, "prod-replica", reports=PRODUCTION_REPLICA)
+        result = view(tmp_path, "prod-replica")
+>       assert result.returncode == 5, result.stderr + result.stdout
+E       AssertionError: Team View: Fixture Team prod-replica（prod-replica）
+E         mode: single · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）
+E         
+E         ## 1. 身份与绑定（Identity & Binding）
+E         - slug: prod-replica
+E         - name: Fixture Team prod-replica
+E         - description: Fixture team built by team_view_fixtures
+E         - lifecycle: active
+E         - 绑定（binding）: owner=human · owner_id=human · origin=prod-replica
+E         - 锚点身份（anchor_identity）: inferred — prod-replica
+E         - handoff_ref: 未记录
+E         - 其它声明键: 无
+E         
+E         ## 2. 静态结构（Static Structure）
+E         - type 来源（type_source）: 正文矩阵（body-matrix）
+E         - 正文矩阵: 2 行
+E           | role | stage | type | agent | lifecycle | responsibility |
+E           |---|---|---|---|---|---|
+E           | executor | executor | Worker | agent-a | temporary | produce the fixture artifact |
+E           | evaluator | evaluator | Worker | agent-b | temporary | verify the fixture artifact |
+E         - 成员（frontmatter）: 2 名
+E           - agent=agent-a · role=executor · lifecycle=temporary
+E           - agent=agent-b · role=evaluator · lifecycle=temporary
+E         - seats: 未声明（默认值见 create-mode.md § Schema notes）
+E         - stage_seats: 未声明（默认值见 create-mode.md § Schema notes）
+E         - 仅正文矩阵: 无
+E         - 仅 frontmatter: 无
+E         
+E         ## 3. 动态结构（Dynamic Structure）
+E         - pattern: serial
+E         - config:
+E           - config.isolation: none
+E         - 可选键声明（optional keys）:
+E           - lifecycle_state: 已声明 (active)
+E           - anchor_slug: 未声明（默认值见 create-mode.md § Schema notes）
+E           - focus_target: 未声明（默认值见 create-mode.md § Schema notes）
+E           - territory: 未声明（默认值见 create-mode.md § Schema notes）
+E           - preset: 未声明（默认值见 create-mode.md § Schema notes）
+E           - seats: 未声明（默认值见 create-mode.md § Schema notes）
+E           - stage_seats: 未声明（默认值见 create-mode.md § Schema notes）
+E           - config.summary: 未声明（默认值见 create-mode.md § Schema notes）
+E           - config.reporting-reason: 未声明（默认值见 create-mode.md § Schema notes）
+E         - focus_target: 未声明
+E         
+E         ## 4. 持久化清单（Persistence Inventory）
+E         - 团队目录（team_dir）: /tmp/pytest-of-agent/pytest-19557/popen-gw0/test_production_replica_latest0/.specify/teams/prod-replica
+E         - 运行报告: 已列出（共 2 份，显示最新 2 份，省略 0）
+E           - 20261124T074500Z-report.md
+E           - 20261008T214100Z-report.md
+E         - 未识别（unrecognized）: 2026-10-06-S1-judgment-contract.md, 2026-10-07-progress-snapshot.md, 2026-11-25T140000Z-report.md, 20261008T214100Z-seat-result.md, 20261125T121924Z-93cc-stage.md
+E         - 台账: 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw0/test_production_replica_latest0/.specify/teams/prod-replica/items.jsonl）
+E         - constraints.md 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw0/test_production_replica_latest0/.specify/teams/prod-replica/constraints.md）
+E         - STATE.md 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw0/test_production_replica_latest0/.specify/teams/prod-replica/STATE.md）
+E         - run-log.jsonl 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw0/test_production_replica_latest0/.specify/teams/prod-replica/run-log.jsonl）
+E         - summary 送达目录: 未声明（默认值见 create-mode.md § Schema notes）
+E         
+E         ## 5. 最近运行状态（Recent Run State）
+E         - 最近报告（latest_report）: 20261124T074500Z-report.md
+E         - Outcome: completed
+E         - Target 指派: 无（goal 整体）
+E         - Result Summary: Old conforming run.
+E         - Verification: Fixture verification.
+E         - Nested SDD Runs: 未记录
+E         - 台账信号: 缺失
+E         
+E         ## 6. 其他归档层引用（Archive References）
+E         - handoff_ref: 未声明
+E         - 锚点（anchor）: prod-replica（inferred）
+E           - 生命周期: 悬空（dangling）
+E           - 原因: engine list 未返回该 anchor slug
+E           - Targets: 未记录
+E         - 内容入口: /speckit.anchor view
+E         
+E       assert 0 == 5
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n', stderr='').returncode
+
+tests/integration/test_team_view_degradation.py:82: AssertionError
+_________________ test_auxiliary_artifact_never_becomes_latest _________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19557/popen-gw3/test_auxiliary_artifact_never_0')
+
+    def test_auxiliary_artifact_never_becomes_latest(tmp_path):
+        build_team(
+            tmp_path,
+            "aux-team",
+            reports=[
+                ("20261008T214100Z-report.md", report_text(result_summary="Report.")),
+                ("20261008T214100Z-seat-result.md", "Seat result.\n"),
+                ("20261008T214100Z-verification.md", "Verification.\n"),
+            ],
+        )
+        result = view(tmp_path, "aux-team")
+        assert result.returncode == 0, result.stderr + result.stdout
+        output = result.stdout
+        assert "最近报告（latest_report）: 20261008T214100Z-report.md" in output
+>       assert "辅助产物（auxiliary）: 共 2 份" in output
+E       AssertionError: assert '辅助产物（auxiliary）: 共 2 份' in 'Team View: Fixture Team aux-team（aux-team）\nmode: single · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）\n\n## 1. 身份与绑定（Ide...erred）\n  - 生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n'
+
+tests/integration/test_team_view_degradation.py:164: AssertionError
+_____________ test_residue_only_runs_state_is_not_empty_or_missing _____________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0')
+
+    def test_residue_only_runs_state_is_not_empty_or_missing(tmp_path):
+        build_team(
+            tmp_path,
+            "residue-only",
+            reports=[
+                ("2026-10-07-progress-snapshot.md", "Snapshot without a time stamp.\n"),
+                ("2026-10-06-S1-judgment-contract.md", "Judgment contract without a time stamp.\n"),
+            ],
+        )
+        result = view(tmp_path, "residue-only")
+>       assert result.returncode == 5, result.stderr + result.stdout
+E       AssertionError: Team View: Fixture Team residue-only（residue-only）
+E         mode: single · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）
+E         
+E         ## 1. 身份与绑定（Identity & Binding）
+E         - slug: residue-only
+E         - name: Fixture Team residue-only
+E         - description: Fixture team built by team_view_fixtures
+E         - lifecycle: active
+E         - 绑定（binding）: owner=human · owner_id=human · origin=residue-only
+E         - 锚点身份（anchor_identity）: inferred — residue-only
+E         - handoff_ref: 未记录
+E         - 其它声明键: 无
+E         
+E         ## 2. 静态结构（Static Structure）
+E         - type 来源（type_source）: 正文矩阵（body-matrix）
+E         - 正文矩阵: 2 行
+E           | role | stage | type | agent | lifecycle | responsibility |
+E           |---|---|---|---|---|---|
+E           | executor | executor | Worker | agent-a | temporary | produce the fixture artifact |
+E           | evaluator | evaluator | Worker | agent-b | temporary | verify the fixture artifact |
+E         - 成员（frontmatter）: 2 名
+E           - agent=agent-a · role=executor · lifecycle=temporary
+E           - agent=agent-b · role=evaluator · lifecycle=temporary
+E         - seats: 未声明（默认值见 create-mode.md § Schema notes）
+E         - stage_seats: 未声明（默认值见 create-mode.md § Schema notes）
+E         - 仅正文矩阵: 无
+E         - 仅 frontmatter: 无
+E         
+E         ## 3. 动态结构（Dynamic Structure）
+E         - pattern: serial
+E         - config:
+E           - config.isolation: none
+E         - 可选键声明（optional keys）:
+E           - lifecycle_state: 已声明 (active)
+E           - anchor_slug: 未声明（默认值见 create-mode.md § Schema notes）
+E           - focus_target: 未声明（默认值见 create-mode.md § Schema notes）
+E           - territory: 未声明（默认值见 create-mode.md § Schema notes）
+E           - preset: 未声明（默认值见 create-mode.md § Schema notes）
+E           - seats: 未声明（默认值见 create-mode.md § Schema notes）
+E           - stage_seats: 未声明（默认值见 create-mode.md § Schema notes）
+E           - config.summary: 未声明（默认值见 create-mode.md § Schema notes）
+E           - config.reporting-reason: 未声明（默认值见 create-mode.md § Schema notes）
+E         - focus_target: 未声明
+E         
+E         ## 4. 持久化清单（Persistence Inventory）
+E         - 团队目录（team_dir）: /tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0/.specify/teams/residue-only
+E         - 运行报告: 为空（/tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0/.specify/teams/residue-only/runs）
+E         - 未识别（unrecognized）: 2026-10-06-S1-judgment-contract.md, 2026-10-07-progress-snapshot.md
+E         - 台账: 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0/.specify/teams/residue-only/items.jsonl）
+E         - constraints.md 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0/.specify/teams/residue-only/constraints.md）
+E         - STATE.md 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0/.specify/teams/residue-only/STATE.md）
+E         - run-log.jsonl 缺失（/tmp/pytest-of-agent/pytest-19557/popen-gw2/test_residue_only_runs_state_i0/.specify/teams/residue-only/run-log.jsonl）
+E         - summary 送达目录: 未声明（默认值见 create-mode.md § Schema notes）
+E         
+E         ## 5. 最近运行状态（Recent Run State）
+E         - 最近报告（latest_report）: 未记录
+E         - Outcome: 未记录
+E         - Target 指派: 未记录
+E         - Result Summary: 未记录
+E         - Verification: 未记录
+E         - Nested SDD Runs: 未记录
+E         - 台账信号: 缺失
+E         
+E         ## 6. 其他归档层引用（Archive References）
+E         - handoff_ref: 未声明
+E         - 锚点（anchor）: residue-only（inferred）
+E           - 生命周期: 悬空（dangling）
+E           - 原因: engine list 未返回该 anchor slug
+E           - Targets: 未记录
+E         - 内容入口: /speckit.anchor view
+E         
+E       assert 0 == 5
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n', stderr='').returncode
+
+tests/integration/test_team_view_degradation.py:136: AssertionError
+_________________ test_same_stamp_tie_break_is_name_ascending __________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19557/popen-gw4/test_same_stamp_tie_break_is_n0')
+
+    def test_same_stamp_tie_break_is_name_ascending(tmp_path):
+        build_team(
+            tmp_path,
+            "tie-team",
+            reports=[
+                ("20260101T000000Z-report.md", report_text(result_summary="Plain.")),
+                ("20260101T000000Z-93cc-report.md", report_text(result_summary="4-hex.")),
+            ],
+        )
+        result = view(tmp_path, "tie-team")
+        assert result.returncode == 0, result.stderr + result.stdout
+>       assert "最近报告（latest_report）: 20260101T000000Z-93cc-report.md" in result.stdout
+E       AssertionError: assert '最近报告（latest_report）: 20260101T000000Z-93cc-report.md' in 'Team View: Fixture Team tie-team（tie-team）\nmode: single · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）\n\n## 1. 身份与绑定（Ide...erred）\n  - 生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n'
+E        +  where 'Team View: Fixture Team tie-team（tie-team）\nmode: single · as-of: 2026-11-26T10:02:59Z（文件时间；非实时探测）\n\n## 1. 身份与绑定（Ide...erred）\n  - 生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n' = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...生命周期: 悬空（dangling）\n  - 原因: engine list 未返回该 anchor slug\n  - Targets: 未记录\n- 内容入口: /speckit.anchor view\n', stderr='').stdout
+
+tests/integration/test_team_view_degradation.py:182: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_team_view_degradation.py::test_overview_matches_single_view_and_discloses_uncertainty
+FAILED tests/integration/test_team_view_degradation.py::test_corpus_style_reports_are_recognized
+FAILED tests/integration/test_team_view_degradation.py::test_production_replica_latest_is_the_parsed_maximum
+FAILED tests/integration/test_team_view_degradation.py::test_auxiliary_artifact_never_becomes_latest
+FAILED tests/integration/test_team_view_degradation.py::test_residue_only_runs_state_is_not_empty_or_missing
+FAILED tests/integration/test_team_view_degradation.py::test_same_stamp_tie_break_is_name_ascending
+6 failed in 6.31s
