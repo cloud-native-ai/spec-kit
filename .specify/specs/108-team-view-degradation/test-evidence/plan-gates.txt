@@ -1,0 +1,19 @@
+$ python3 .specify/scripts/python/doc-consistency-check.py --action structure --spec-dir .specify/specs/108-team-view-degradation
+doc-consistency-check: structure
+checked_at: 2026-11-26T08:31:53Z
+class=execution source=declaration
+status: not-applicable
+two-way: not-run
+files_scanned: 1
+not-applicable: 结构门禁只适用于表达类；已检视 1 个文件，未做结构判定
+exit=0
+
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:108-team-view-degradation"
+unit_id: spec:108-team-view-degradation
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0

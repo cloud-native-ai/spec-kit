@@ -1,0 +1,12 @@
+{
+  "mode": "plan",
+  "decision": "proceed",
+  "measured": {
+    "fr_count": 25,
+    "task_count": null,
+    "fr_ceiling": 120,
+    "task_ceiling": 160
+  },
+  "reasons": [],
+  "checked_at": "2026-11-26T08:31:04Z"
+}
