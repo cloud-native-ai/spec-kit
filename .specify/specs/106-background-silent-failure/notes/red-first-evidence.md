@@ -243,3 +243,68 @@ Prerequisites).
 
 - Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_engine.py tests/contract/test_settlement_carriers.py -q`
 - Exit code: **0**; real output: `48 passed in 6.45s` (engine module 25, carriers module 23).
+
+## T023 — preservation guard (readings)
+
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_preservation.py -q`
+- Exit code: **0**; real output: `6 passed in 23.29s`.
+- Baselines committed under `test-evidence/`: `watch-target-fbab7a45c.sh` (identical sha256
+  `955ddf78…` to the live watcher), `watch-self-test-baseline.txt` (39 ok names),
+  `super-sub-protocol-fbab7a45c.txt` (Downlink/Uplink paragraphs from `git show
+  fbab7a45c:shared/definitions/superagent-definitions.md`), and
+  `role-edge-report-empty-fbab7a45c.json` (stdout of the **pre-change** engine extracted
+  from `fbab7a45c` on `tests/fixtures/superagent-role/empty`; the live engine reproduces it
+  byte-for-byte, with relative paths so the output is location-independent).
+- Readings pinned: watcher verdict/exit-code pairs, verdict token set (incl. `USAGE`),
+  exit-code set `{0,10,11,12,13,14,15,16,2}`, sentinel literals — all member-for-member
+  equal to the baseline copy; `--self-test` `SELF-TEST: 39 passed, 0 failed` with the same
+  39 case names; five-element/seven-field paragraphs unchanged; `report` byte-identical on
+  two consecutive runs and to the baseline; per-touched-file gate hits never above the
+  baseline (owner page 0 ≤ 1; driver SKILL 1 ≤ 1; all others 0 ≤ 0); the two-slot ledger
+  read through `audit-test-budget.py` `read_fence` + `check_ledger` (`implement`): zero
+  violations, `baseline=1`, `closure≤1`.
+
+## T024 — live / zombie fixtures (readings)
+
+- Builders extended: `c1_live`, `c2_live`, `c3_live`, `c4_live`, `c2_zombie` (with
+  `spawn_zombie_holder`, `/proc` state `Z` readiness polled — no fixed `sleep`), `now_iso`.
+  `c2_pid_reuse` unchanged.
+- Reverse assertions appended (carriers module): C1 live → `running` (live evidence), C2
+  long silence + live pid → `running`; C3/C4 inside their wait deadline → `running`
+  (`return-channel-open`); zombie → `silent-end` (`pid-gone`); recycled pid → `silent-end`
+  (`pid-reused`).
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_carriers.py -q`
+  → rc **0**, `30 passed in 6.29s`.
+
+## T025 — mutation drill (readings)
+
+- Record: `test-evidence/mutation-drill.md`. Four drills (silent-end detection, live
+  evidence, `unknown` exit code, evidence pointer) each turned targeted tests red —
+  3 / 4 / 3 / 1 failing nodes with real output; every drill restored byte-identically
+  (sha256 `4a1b898b…` + empty `git diff`); post-drill engine+carriers run green
+  (`54 passed in 6.44s`).
+
+## T026 — scope guard (readings)
+
+- Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_scope.py -q`
+  → rc **0**, `10 passed in 6.27s`.
+- Meta-mutation recorded in `test-evidence/mutation-drill.md`: an injected second value
+  table in `shared/workflow/external-dispatch-recipes.md` turned the table leg red
+  (`1 failed`), then the file was restored byte-identically (sha256 `1406c61c…`).
+
+## T027 — US4 turn-green and carrier × test coverage matrix
+
+- Commands / readings:
+  - `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_preservation.py tests/contract/test_settlement_scope.py tests/contract/test_settlement_carriers.py -q`
+    → rc **0**, `46 passed in 22.33s` (6 + 10 + 30).
+- Carrier × test coverage matrix (C-31; each listed carrier has a deterministic
+  silent-death/settlement test and a reverse fixture; uncovered carriers = **0**):
+
+| Carrier | Deterministic settlement test(s) | Reverse fixture / assertion | Contract notes |
+|---------|----------------------------------|-----------------------------|----------------|
+| C1 | `test_c1_dead_stage_settles_silent_end` (`silent-end`, `pid-gone`, start+lack evidence); `test_c1_done_without_u4_claim_is_incomplete`; `test_c1_done_with_u4_claim_is_completed` | `test_c1_live_stage_is_running_not_silent_end` (`running`, live evidence) | verdict-mapping pin `test_c1_mapping_function_covers_all_eight_tokens` |
+| C2 | `test_c2_sigkill_silent_death_settles_silent_end`; `test_c2_signal_traps_write_termination_records` (TERM/INT/HUP → `failed`); `test_c2_exit_zero_without_declaration_is_failed_incomplete`; `test_c2_unreadable_evidence_is_unknown_exit_two` | `test_c2_long_silence_with_a_live_pid_stays_running`; `test_c2_zombie_is_silent_end_not_running`; `test_c2_pid_reuse_is_silent_end_not_running` | `.status` baseline reader leg; real `dispatch.sh` + fake CLI |
+| C3 | `test_c3_seat_with_start_record_and_no_report_row_settles_silent_end`; `test_c3_report_row_without_start_record_is_unknown`; 5-/7-column row legs | `test_c3_live_seat_inside_its_deadline_is_running` (`return-channel-open`) | `settlement-unrecorded` / `settlement-unbacked` legs |
+| C4 | `test_late_completion_after_the_deadline_lands_on_its_own_label` (native `silent-end`, `deadline-passed`); foreground-terminal branch pinned by `test_c4_run_agent_native_settlement_obligations` (`foreground-terminal`, `no settlement edge`) | `test_c4_live_native_inside_its_deadline_is_running` | C4 obligations are behavior-class beyond the text pins (C-34) |
+| C5 | exclusion: `test_c5_virtual_exclusion_is_written_in_three_execution_modes`; no attempt record (engine carriers assert C5/C6 contribute no reader) | n/a — excluded by contract; the assertion IS the exclusion | unfinished virtual work must not be reported `completed` |
+| C6 | through the compliant runner: `test_c2_sigkill_silent_death_settles_silent_end` (real `dispatch.sh` run); per-value dispositions `test_c6_recipes_carry_per_value_dispositions` | through-runner live leg: `test_c2_long_silence_with_a_live_pid_stays_running` | C6 settles only via C1/C2 evidence or foreground-terminal |

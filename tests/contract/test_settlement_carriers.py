@@ -784,6 +784,27 @@ def test_run_agent_retry_and_stop_rules_forbid_silent_repair():
 # --------------------------------------------------------------------------- #
 # Reverse fixtures (T024) — a live subject is never misreported as silent-end
 # --------------------------------------------------------------------------- #
+def test_c1_dead_stage_settles_silent_end(tmp_path):
+    """C1 deterministic silent death: start record, recorded pid gone, no status."""
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    builders.write_c1_stage(
+        state,
+        line="dead-line",
+        stage="implement",
+        pid=builders.DEAD_PID,
+        exit_code=None,
+    )
+    proc, payload = run_settle(state, teams, logs)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "dead-line-implement")
+    assert row["carrier"] == "c1-fork"
+    assert row["verdict"] == "silent-end", row
+    assert row["detail"] == "pid-gone", row
+    kinds = {item["kind"] for item in row["evidence"]}
+    assert "start" in kinds and "lack" in kinds, row
+
+
 def test_c1_live_stage_is_running_not_silent_end(tmp_path):
     builders = _load_builders()
     state, teams, logs = builders.make_roots(tmp_path)
