@@ -96,6 +96,38 @@ reader is `scripts/python/team-view.py`; the command renders nothing itself.
   run judgement goes to `/speckit.team run`. `--target` carried by view is a
   mode/parameter conflict and is reported, never silently dropped or rerouted.
 
+### Run-report recognition and degradation semantics
+
+- **Recognition is closed and parseable** — a file under `runs/` is a run report when its
+  name starts with a valid UTC timestamp in one of exactly five forms (`YYYYMMDDThhmmssZ`,
+  `YYYYMMDDThhmmZ`, `YYYY-MM-DDThh:mm:ssZ`, `YYYY-MM-DDThh-mm-ssZ`,
+  `YYYY-MM-DDThhmmssZ`) and the remainder matches `(?:-[0-9a-f]{4})?-(?:report|stage)\.md`;
+  a stamped file with any other remainder is an **auxiliary artifact**; a file with no
+  parseable leading stamp is **unrecognized residue**. The grammar and the fixed
+  classification order are owned by
+  `.specify/specs/108-team-view-degradation/contracts/report-recognition.contract.md`
+  (C-201 / C-202).
+- **Latest = the maximum parsed timestamp** — the latest run report is the report with the
+  largest parsed UTC instant (name-ascending on ties); the reader never falls back to an
+  older report because a file does not match a narrow template. When a readable `runs/`
+  directory also holds residue, the latest determination is unprovable: the output shows
+  the residue count with bounded examples and the view adds the degradation reason
+  `report-recognition-uncertain`.
+- **Missing or empty history alone never degrades** — `缺失` / `为空` (and the file-level
+  states `不可读` / `未记录`) never change the exit code by themselves.
+- **Exit 5 meaning and the closed reason set** — exit `5` means "rendering produced, but a
+  required fact group is unreadable or the latest run is undeterminable". The degradation
+  reason set is exactly `{engine-degraded, report-recognition-uncertain}`; every active
+  reason is named individually in the trailing `降级（degraded）` block. The reason ids and
+  the exit mapping are owned by
+  `.specify/specs/108-team-view-degradation/contracts/team-view-program.contract.md`
+  (C-104) — this page cites the owner and never restates a second definition.
+- **Repair pointers are presented, never executed** — an unreadable binding or a `goal`
+  key needing normalization renders its named state together with the sanctioned repair
+  entries `/speckit.team modify` (definition repair) and the engine write face
+  `goal-utils.py bind` / `goal-utils.py migrate`; the view itself writes nothing and
+  executes no repair.
+
 ## Collaboration Patterns
 
 Four patterns; the anchor decides which fits. The first three are **bounded** (run once and stop); `continuous` is **unbounded** (operates on a cadence). Pick with the decision tree in [`docs/teams/orchestration.md`](../teams/orchestration.md).

@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""team-view.py — deterministic read-only reader behind `/speckit.team view` (103-team-view).
+"""team-view.py — deterministic read-only reader behind `/speckit.team view` (108 amendment).
 
 Owner of the fixed-rule extraction for the view mode: team definition facts, archive
-enumeration, report listing, ledger aggregation and the latest-report summary. Binding and
-anchor facts are composed from the goal-utils reads (`binding`, `list`, `targets --list`);
-this program re-implements none of their semantics and writes nothing.
+enumeration, run-report recognition (closed timestamp grammar, three-way classification,
+latest by parsed timestamp) and the latest-report summary. Binding and anchor facts are
+composed from the goal-utils reads (`binding`, `list`, `targets --list`); this program
+re-implements none of their semantics and writes nothing.
 
-Contract: `.specify/specs/103-team-view/contracts/team-view-program.contract.md`
-(C-24 read-only, C-25 engine composition, C-26 closed CLI surface, C-27 script interface,
-C-28 closed exit codes, C-29 output modes).
+Contract: `.specify/specs/108-team-view-degradation/contracts/team-view-program.contract.md`
+(C-101 read-only program, C-102 one recognition entry, C-103 closed CLI surface, C-104
+closed exit codes and degradation reasons, C-105 envelope shape, C-106 script interface,
+C-107 healthy fidelity, C-108 no shape change, C-109 three-surface consistency). The 103
+program contract is superseded on four points and remains a dated record.
 
 Usage:
   team-view.py [options] [<team-slug>]
@@ -19,7 +22,8 @@ Exit codes:
      no-slug --spec-dir)
   3  team not found (single mode)
   4  definition corrupt (single mode: team.md missing, unreadable or unparseable)
-  5  rendered, but a required fact group is unreadable because an engine read failed
+  5  rendered, but a required fact group is unreadable or the latest run is undeterminable;
+     degradation reasons (closed set): engine-degraded | report-recognition-uncertain
 
 Python >= 3.8, standard library only; the only sibling import is ``script_interface_cli``.
 """
@@ -1458,7 +1462,10 @@ def build_parser() -> argparse.ArgumentParser:
         effects="none; reads the team archive and prints; a flag-only invocation writes nothing",
         codes=(
             "0 rendering produced; 2 input error; 3 team not found; "
-            "4 definition corrupt; 5 rendered with a degraded engine read"
+            "4 definition corrupt; 5 rendered with a degraded engine read "
+            "(degradation reasons: engine-degraded | report-recognition-uncertain; "
+            "owner: .specify/specs/108-team-view-degradation/contracts/"
+            "team-view-program.contract.md)"
         ),
     )
     parser.add_argument(
