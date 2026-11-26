@@ -13,6 +13,12 @@
 #   <log-dir>/<label>.jsonl      raw stream-json events (forensics)
 #   <log-dir>/<label>.status     "<label> exit=<code>" recorded at completion
 #
+# Additive settlement evidence (spec 106; the rule owner is
+# shared/definitions/superagent-definitions.md § Termination):
+#
+#   <log-dir>/<label>.attempt    start record written before the CLI launches
+#   <log-dir>/<label>.end        termination record on normal exit and TERM/INT/HUP
+#
 # Usage:
 #   dispatch.sh <label> <workdir> <prompt-file> [-- <extra cli args>]
 #
@@ -135,17 +141,104 @@ else
 fi
 FILTER="${DISPATCH_FILTER:-${SCRIPT_DIR}/stream-filter.py}"
 CLI_FLAGS="${DISPATCH_CLI_FLAGS:--p --output-format stream-json --dangerously-skip-permissions}"
+DISPATCH_PARENT="${DISPATCH_PARENT:-root}"
 
 mkdir -p "${LOG_DIR}"
 cd "${WORKDIR}" || exit 1
 
-# stream-json -> raw jsonl (tee) -> compact progress lines (filter) -> live log + stdout
-# shellcheck disable=SC2086
-"${CLI}" ${CLI_FLAGS} "$@" "$(cat "${PROMPT_FILE}")" 2>&1 \
-  | tee "${LOG_DIR}/${LABEL}.jsonl" \
-  | python3 -u "${FILTER}" "${LABEL}" \
-  | tee "${LOG_DIR}/${LABEL}.live.log"
+# --- settlement evidence (additive; spec 106) --------------------------------
+# Start/termination records only. The artifact triplet names, the .status line
+# format, the -h/--version guard and the undeclared-option rejection are
+# unchanged; the settlement value set is owned by
+# shared/definitions/superagent-definitions.md § Termination — never restated here.
+_settlement_now() {
+  date -u '+%Y-%m-%dT%H:%M:%SZ'
+}
 
-rc=${PIPESTATUS[0]}
+_settlement_pid_start_ticks() {
+  sed -n 's/^.*) //p' "/proc/$$/stat" 2>/dev/null | awk '{print $20}'
+}
+
+_settlement_attempt_record() {
+  _ticks="$(_settlement_pid_start_ticks)"
+  python3 - "${LOG_DIR}/${LABEL}.attempt" "$LABEL" "$DISPATCH_PARENT" "$1" "$$" "$_ticks" <<'PY'
+import json
+import os
+import sys
+
+path, label, parent, started_at, pid, ticks = sys.argv[1:7]
+payload = {
+    "settlement_version": 1,
+    "attempt_id": label,
+    "carrier": "c2-subprocess",
+    "parent_identity": parent,
+    "started_at": started_at,
+    "pid": int(pid),
+    "contract": "superagent-definitions.md § Termination",
+}
+if ticks.strip():
+    payload["pid_start_ticks"] = int(ticks)
+with open(path + ".tmp", "w", encoding="utf-8") as handle:
+    json.dump(payload, handle, ensure_ascii=False)
+    handle.write("\n")
+os.replace(path + ".tmp", path)
+PY
+}
+
+_settlement_end_record() {
+  python3 - "${LOG_DIR}/${LABEL}.end" "$LABEL" "$(_settlement_now)" "$1" "$2" <<'PY'
+import json
+import os
+import sys
+
+path, label, ended_at, exit_code, signame = sys.argv[1:6]
+payload = {
+    "settlement_version": 1,
+    "attempt_id": label,
+    "ended_at": ended_at,
+}
+if exit_code != "":
+    payload["exit"] = int(exit_code)
+if signame != "":
+    payload["signal"] = signame
+with open(path + ".tmp", "w", encoding="utf-8") as handle:
+    json.dump(payload, handle, ensure_ascii=False)
+    handle.write("\n")
+os.replace(path + ".tmp", path)
+PY
+}
+
+_settlement_on_signal() {
+  _settlement_end_record "$((128 + $2))" "$1"
+  echo "${LABEL} exit=$((128 + $2))" | tee "${LOG_DIR}/${LABEL}.status"
+  exit "$((128 + $2))"
+}
+
+_settlement_attempt_record "$(_settlement_now)"
+trap '_settlement_on_signal TERM 15' TERM
+trap '_settlement_on_signal INT 2' INT
+trap '_settlement_on_signal HUP 1' HUP
+# --- end settlement evidence (spec 106) --------------------------------------
+
+# stream-json -> raw jsonl (tee) -> compact progress lines (filter) -> live log + stdout
+# The pipeline runs in a background subshell so `wait` stays interruptible by the
+# traps above; PIPESTATUS[0] inside the subshell keeps .status = the CLI's exit code.
+# fd 8 carries the caller's stdin across the async boundary (bash otherwise redirects
+# an asynchronous list's stdin from /dev/null when job control is off).
+# shellcheck disable=SC2086
+exec 8<&0
+(
+  "${CLI}" ${CLI_FLAGS} "$@" "$(cat "${PROMPT_FILE}")" 2>&1 \
+    | tee "${LOG_DIR}/${LABEL}.jsonl" \
+    | python3 -u "${FILTER}" "${LABEL}" \
+    | tee "${LOG_DIR}/${LABEL}.live.log"
+  exit "${PIPESTATUS[0]}"
+) <&8 &
+exec 8<&-
+_pipeline_pid=$!
+wait "${_pipeline_pid}"
+rc=$?
+
+_settlement_end_record "${rc}" ""
 echo "${LABEL} exit=${rc}" | tee "${LOG_DIR}/${LABEL}.status"
 exit "${rc}"

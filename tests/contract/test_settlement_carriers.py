@@ -209,6 +209,21 @@ def _poll_until(predicate, timeout=60.0):
     return False
 
 
+def _poll_json(path: Path, timeout=60.0):
+    """Poll until ``path`` holds a complete JSON object (never a half-written record)."""
+    seen = {}
+
+    def ready():
+        try:
+            seen["payload"] = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return False
+        return True
+
+    assert _poll_until(ready, timeout), f"{path.name} was never written as a complete record"
+    return seen["payload"]
+
+
 def _pid_gone(pid: int) -> bool:
     try:
         os.kill(pid, 0)
@@ -294,10 +309,8 @@ class DispatchRun:
         return self.logs / f"{self.label}.status"
 
     def wait_attempt(self) -> dict:
-        assert _poll_until(self.attempt_path.exists), (
-            f"{self.label}.attempt was never written (C-14: before the CLI launches)"
-        )
-        return json.loads(self.attempt_path.read_text(encoding="utf-8"))
+        """C-14: the attempt record must exist (complete) before the CLI launches."""
+        return _poll_json(self.attempt_path)
 
     def wait_cli_pid(self) -> int:
         marker = self.fake_state / "cli.pid"
@@ -371,19 +384,17 @@ def test_c2_signal_traps_write_termination_records(tmp_path, sig, signame, signu
         attempt = run.wait_attempt()
         run.wait_cli_pid()
         os.kill(attempt["pid"], sig)
-        assert _poll_until(run.end_path.exists), (
-            f"{signame}: no <label>.end written (C-14 requires the trap record)"
-        )
-        end = json.loads(run.end_path.read_text(encoding="utf-8"))
+        end = _poll_json(run.end_path)
         assert end["settlement_version"] == 1
         assert end["attempt_id"] == "signal-seat"
         assert end["signal"] == signame
         assert end["exit"] == 128 + signum
         assert end["ended_at"]
-        assert _poll_until(run.status_path.exists), (
-            f"{signame}: the .status exit line was not written"
-        )
-        assert run.status_path.read_text(encoding="utf-8") == f"signal-seat exit={128 + signum}\n"
+        expected_status = f"signal-seat exit={128 + signum}\n"
+        assert _poll_until(
+            lambda: run.status_path.exists()
+            and run.status_path.read_text(encoding="utf-8") == expected_status
+        ), f"{signame}: the .status exit line was not written as {expected_status!r}"
         run.proc.wait(timeout=30)
         assert run.proc.returncode == 128 + signum
         proc, payload = run.settle()
@@ -415,8 +426,7 @@ def test_c2_exit_zero_without_declaration_is_failed_incomplete(tmp_path):
         run.proc.wait(timeout=120)
         assert run.proc.returncode == 0
         attempt = run.wait_attempt()
-        assert _poll_until(run.end_path.exists), "normal exit must write <label>.end"
-        end = json.loads(run.end_path.read_text(encoding="utf-8"))
+        end = _poll_json(run.end_path)
         assert end["settlement_version"] == 1
         assert end["exit"] == 0
         assert "signal" not in end

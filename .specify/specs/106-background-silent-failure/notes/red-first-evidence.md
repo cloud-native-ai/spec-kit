@@ -105,3 +105,50 @@ Prerequisites).
   stdin) and a passthrough stream filter; synchronization is fact-based polling, zero
   fixed `sleep`.
 
+## T010 — C2 additive settlement evidence (dispatch.sh)
+
+- `<label>.attempt` is written before the CLI launches: `settlement_version: 1`,
+  `attempt_id` (= label), `carrier: c2-subprocess`, `parent_identity`
+  (`DISPATCH_PARENT`, default `root`), `started_at` (UTC ISO-8601), `pid` (the wrapper
+  shell), `pid_start_ticks` from `/proc/$$/stat` where `/proc` exists, and the `contract`
+  pointer to § Termination. Both new records are written with an atomic
+  `write-then-os.replace` so a reader never observes a half-written JSON object.
+- `<label>.end` is written on normal exit (`exit`) and on TERM/INT/HUP traps (`signal`,
+  `exit` = 128 + signum, `ended_at`, `settlement_version: 1`); SIGKILL stays untrappable
+  and is the intended `silent-end` fixture.
+- The pipeline now runs in a background subshell so `wait` stays interruptible by the
+  traps; `PIPESTATUS[0]` inside the subshell keeps `.status` = the CLI's own exit code.
+  The wrapper's stdin is carried across the async boundary on fd 8 (bash otherwise
+  redirects an asynchronous list's stdin from `/dev/null` when job control is off) —
+  without it the CLI would see EOF and a live dispatch would end instantly.
+- Preserved surfaces (measured):
+  - `.status` line format unchanged — `fail-seat exit=2` for a failing fake CLI
+    (wrapper rc 2, engine verdict `failed` / `non-zero-terminal`); normal run
+    `seat-x exit=0`.
+  - `-h` rc 0, `--version` rc 0 (`dispatch.sh 0.0.22`), undeclared option rc 2 —
+    the `script-interface:86` generated region was not touched.
+
+## T011 — C2 turn-green and `.status` baseline readers
+
+- Command:
+  `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_carriers.py -q -k "test_c2_"`
+- Exit code: **0**; real output: `7 passed in 6.30s` (three consecutive runs, stable;
+  the signal legs ran 10× in isolation without a flake).
+- Per-reader assertions inside that set (real process, fake CLI):
+  - SIGKILL → recorded pid gone, no `.end` / `.status` → `silent-end`, engine **exit 0**
+  - TERM / INT / HUP → `.end` with `signal` and `exit` 128+signum, `.status`
+    `<label> exit=<128+signum>` → `failed`
+  - live pid → `running` (evidence kind `live`), never `silent-end`
+  - exit 0, no completion declaration → `failed` / detail `incomplete`
+  - unreadable `.attempt` → `unknown` (`unknown_cause: unreadable`), engine **exit 2**
+- Old vs new `.status`, same fake CLI (rc 0), old script materialized from
+  `git show HEAD:…dispatch.sh` (sha256 prefix `877ff955453b6cb3`):
+  - files byte-identical: `cmp` rc **0**, both `seat-x exit=0`
+  - existing readers, old and new readings equal:
+    `journal-utils._field(text, "exit")` → `"0"` / `"0"`;
+    `status-digest.project_exit_record(path)` → `(None, None)` / `(None, None)` (that
+    reader targets the C1 line-start `exit=` shape; identical on both sides — recorded
+    as-is, not claimed as a C2 reading);
+    `role-edge-check._apply_status_record` → terminal `[(0, None)]` / `[(0, None)]`,
+    `unreadable=[]` on both.
+
