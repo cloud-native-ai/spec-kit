@@ -20,10 +20,12 @@ Entry points used by the contract tests are listed in ``__all__``.
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 FIXTURE_ROOT = Path(__file__).resolve().parent
@@ -45,18 +47,25 @@ __all__ = [
     "FIXTURE_ROOT",
     "STARTED_AT",
     "attempt_payload",
+    "c1_live",
     "c2_anomaly",
     "c2_cancelled",
     "c2_completed",
     "c2_failed",
+    "c2_live",
     "c2_missing_start",
     "c2_pid_reuse",
     "c2_running",
     "c2_silent_end",
     "c2_unreadable",
+    "c2_zombie",
+    "c3_live",
+    "c4_live",
     "make_roots",
+    "now_iso",
     "pid_start_ticks",
     "spawn_live_process",
+    "spawn_zombie_holder",
     "stop_live_process",
     "write_attempt",
     "write_c1_stage",
@@ -216,6 +225,66 @@ def pid_start_ticks(pid: int):
         return None
 
 
+def now_iso() -> str:
+    """Current UTC time in the attempt-record stamp shape (live pid-less fixtures)."""
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+ZOMBIE_HOLDER = (
+    "import os, sys\n"
+    "marker = sys.argv[1]\n"
+    "pid = os.fork()\n"
+    "if pid == 0:\n"
+    "    os._exit(0)\n"
+    "with open(marker, 'w') as handle:\n"
+    "    handle.write(str(pid))\n"
+    "sys.stdin.read()\n"
+)
+
+
+def _poll(predicate, timeout=60.0):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if predicate():
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def spawn_zombie_holder(workdir: Path):
+    """Hold an unreaped zombie child alive; returns ``(holder_proc, zombie_pid)``.
+
+    The child exits immediately; the holder never waits, so the pid stays a zombie
+    (state ``Z``) until the holder is stopped. Readiness is polled from ``/proc`` —
+    a fact, never a fixed sleep.
+    """
+    workdir.mkdir(parents=True, exist_ok=True)
+    marker = workdir / "zombie.pid"
+    proc = subprocess.Popen(
+        [sys.executable, "-c", ZOMBIE_HOLDER, str(marker)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    assert _poll(lambda: marker.exists() and marker.stat().st_size > 0), (
+        "zombie holder never wrote its pid"
+    )
+
+    def is_zombie() -> bool:
+        try:
+            text = Path("/proc/%s/stat" % marker.read_text(encoding="utf-8").strip()).read_text(
+                encoding="utf-8"
+            )
+        except OSError:
+            return False
+        close = text.rfind(")")
+        return close >= 0 and text[close + 2 : close + 3] == "Z"
+
+    assert _poll(is_zombie), "the forked child never reached the zombie state"
+    return proc, int(marker.read_text(encoding="utf-8").strip())
+
+
 # --------------------------------------------------------------------------- #
 # C1 — driver stage four-piece
 # --------------------------------------------------------------------------- #
@@ -363,4 +432,66 @@ def c2_unreadable(logs: Path, label: str = "broken") -> str:
 def c2_missing_start(logs: Path, label: str = "claim-only") -> str:
     """A claimed attempt with no start record — the ``start-record-missing`` case."""
     write_claim(logs, label, value="completed", mechanism="return-record", evidence=[])
+    return label
+
+
+# --------------------------------------------------------------------------- #
+# Live / zombie reverse fixtures (T024) — a live subject is never silent-end
+# --------------------------------------------------------------------------- #
+def c1_live(state: Path, *, line: str = "live-line", stage: str = "implement"):
+    """C1 four-piece with a live child pid and no status record → ``running``."""
+    proc = spawn_live_process()
+    write_c1_stage(
+        state,
+        line=line,
+        stage=stage,
+        pid=proc.pid,
+        exit_code=None,
+        log_lines=("step one",),
+    )
+    return proc
+
+
+def c2_live(logs: Path, label: str = "live"):
+    """A long-silent C2 attempt whose recorded pid stays alive → ``running``."""
+    proc = spawn_live_process()
+    overrides = {"pid": proc.pid}
+    ticks = pid_start_ticks(proc.pid)
+    if ticks is not None:
+        overrides["pid_start_ticks"] = ticks
+    write_attempt(logs, label, **overrides)
+    write_live_log(logs, label, ["step one"])
+    return proc
+
+
+def c2_zombie(logs: Path, label: str = "zombie", *, workdir=None):
+    """A recorded pid that is a zombie — the subject is gone, so ``silent-end``."""
+    base = Path(workdir) if workdir is not None else logs.parent / "zombie-holder"
+    holder, zombie_pid = spawn_zombie_holder(base)
+    write_attempt(logs, label, pid=zombie_pid)
+    write_live_log(logs, label, ["step one"])
+    return holder
+
+
+def c3_live(logs: Path, label: str = "live-seat", *, wait_deadline_s: int = 3600) -> str:
+    """A pid-less C3 seat inside its declared wait deadline → ``running``."""
+    write_attempt(
+        logs,
+        label,
+        carrier="c3-team-seat",
+        started_at=now_iso(),
+        wait_deadline_s=wait_deadline_s,
+    )
+    return label
+
+
+def c4_live(logs: Path, label: str = "live-native", *, wait_deadline_s: int = 3600) -> str:
+    """A pid-less C4 native attempt inside its declared wait deadline → ``running``."""
+    write_attempt(
+        logs,
+        label,
+        carrier="c4-native",
+        started_at=now_iso(),
+        wait_deadline_s=wait_deadline_s,
+    )
     return label

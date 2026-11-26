@@ -779,3 +779,88 @@ def test_run_agent_retry_and_stop_rules_forbid_silent_repair():
         "never consume a stale return",
     ):
         assert phrase in body, f"run-agent reaction discipline missing phrase: {phrase!r}"
+
+
+# --------------------------------------------------------------------------- #
+# Reverse fixtures (T024) — a live subject is never misreported as silent-end
+# --------------------------------------------------------------------------- #
+def test_c1_live_stage_is_running_not_silent_end(tmp_path):
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    child = builders.c1_live(state)
+    try:
+        proc, payload = run_settle(state, teams, logs)
+    finally:
+        builders.stop_live_process(child)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "live-line-implement")
+    assert row["verdict"] == "running", row
+    assert row["class"] == "non-terminal"
+    assert any(item["kind"] == "live" for item in row["evidence"]), row
+
+
+def test_c2_long_silence_with_a_live_pid_stays_running(tmp_path):
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    child = builders.c2_live(logs, label="quiet-live")
+    try:
+        proc, payload = run_settle(state, teams, logs)
+    finally:
+        builders.stop_live_process(child)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "quiet-live")
+    assert row["verdict"] == "running", row
+    kinds = {item["kind"] for item in row["evidence"]}
+    assert "live" in kinds and "lack" not in kinds, row
+
+
+def test_c2_zombie_is_silent_end_not_running(tmp_path):
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    holder = builders.c2_zombie(logs, label="zombie")
+    try:
+        proc, payload = run_settle(state, teams, logs)
+    finally:
+        builders.stop_live_process(holder)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "zombie")
+    assert row["verdict"] == "silent-end", row
+    assert row["detail"] == "pid-gone", row
+
+
+def test_c2_pid_reuse_is_silent_end_not_running(tmp_path):
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    child = builders.c2_pid_reuse(logs, label="reused")
+    try:
+        proc, payload = run_settle(state, teams, logs)
+    finally:
+        builders.stop_live_process(child)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "reused")
+    assert row["verdict"] == "silent-end", row
+    assert row["detail"] == "pid-reused", row
+
+
+def test_c3_live_seat_inside_its_deadline_is_running(tmp_path):
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    builders.c3_live(logs, label="seat-live")
+    proc, payload = run_settle(state, teams, logs)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "seat-live")
+    assert row["carrier"] == "c3-team-seat"
+    assert row["verdict"] == "running", row
+    assert row["detail"] == "return-channel-open", row
+
+
+def test_c4_live_native_inside_its_deadline_is_running(tmp_path):
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    builders.c4_live(logs, label="native-live")
+    proc, payload = run_settle(state, teams, logs)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "native-live")
+    assert row["carrier"] == "c4-native"
+    assert row["verdict"] == "running", row
+    assert row["detail"] == "return-channel-open", row
