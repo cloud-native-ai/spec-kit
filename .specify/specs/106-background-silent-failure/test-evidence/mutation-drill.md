@@ -98,3 +98,26 @@ Verdict: red (the empty-evidence claim settled `completed` with exit 0 instead o
 `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_engine.py tests/contract/test_settlement_carriers.py -q`
 → rc **0**, `54 passed in 6.44s`; `git status --porcelain -- scripts/python/role-edge-check.py`
 empty. No drill failed to turn a test red; no guard defect recorded.
+
+## T026 meta-mutation — the scope guard can go red
+
+Proof that `tests/contract/test_settlement_scope.py`'s second-value-table leg is a real
+guarantee, not a vacuous scan: a second settlement value table was injected into a scanned
+declaration surface (`shared/workflow/external-dispatch-recipes.md`, sha256 base
+`1406c61cae4dceed5fa8767ec96095e5ac2e1d42edefbf26270350e6747a5c36`), the guard was run,
+then the file was restored byte-identically.
+
+Command:
+`SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_scope.py -q -k "second_settlement_value_table"`
+
+Real output (tail):
+
+```
+E       AssertionError: a second settlement value table exists outside the owner page: [('shared/workflow/external-dispatch-recipes.md', [['anomaly', 'cancelled', 'completed', 'failed']])]
+FAILED tests/contract/test_settlement_scope.py::test_no_second_settlement_value_table_on_declaration_surfaces
+1 failed in 6.29s
+```
+
+Verdict: red (1 failing test naming the injected file and the four value names). Restored,
+sha256 back to `1406c61c…`, `git diff` empty; the full scope module is green afterwards
+(`10 passed`).
