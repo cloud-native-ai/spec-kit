@@ -1,0 +1,76 @@
+# Review evidence — 107-decision-governance (review stage, 2026-11-26)
+head=3f0200b421bf284c176592afa34549e7a2c07706
+
+## Incident: first smoke capture self-collided (disclosed, not a feature defect)
+The first smoke run streamed its log into this repository path while the suite ran.
+tests/unit/test_validate_decisions.py::test_cli_surface snapshots the repository tree and asserts a checker run writes no file; the growing log tripped it (4 failed, 39 passed, exit 1).
+The same class of snapshot assertion in the m01/m03/m04 tests failed for the same reason.
+Re-run with output written outside the repository: 43 passed, exit 0 (below).
+Failed node ids from the polluted run (kept as the incident record):
+  tests/unit/test_validate_decisions.py::test_cli_surface
+  tests/unit/test_validate_decisions.py::test_m04_id_density_register
+  tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples
+  tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples
+
+## Clean smoke run (the smoke triple's reading)
+command=env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_migration_map.py tests/unit/test_validate_decisions.py tests/integration/test_decision_governance_migrate_dryrun.py -q
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py tests/contract/test_decision_governance_migration_map.py tests/unit/test_validate_decisions.py tests/integration/test_decision_governance_migrate_dryrun.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...........................................                              [100%]
+43 passed in 13.40s
+smoke_exit_code=0
+
+## Preservation sweep re-run (T054 module set)
+command=env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_watch_iteration.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_role_transition_payload.py tests/contract/test_fast_fail_discipline.py tests/contract/test_decision_tension_contract.py -q
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 30; the integer headroom on the budget is 0
+E       assert 30 == 23
+
+tests/contract/test_fast_fail_discipline.py:2014: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioFTerminologyZeroHit::test_a3_alias_list_still_exists
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration
+FAILED tests/contract/test_fast_fail_discipline.py::test_x22_cross_discipline_change_recorded
+FAILED tests/contract/test_fast_fail_discipline.py::test_i10_channel_two_factory_presets_byte_equal
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+5 failed, 241 passed in 7.38s
+.                                                                        [100%]
+1 passed, 246 deselected in 17.44s
+comparison: every failed node id is present in baseline-failed.txt (zero new names)
+
+## Quickstart executable parts (re-run at review)
+S1 validate-decisions --action records --spec: rc 0 PASS 0 violations (16 legacy register rows reported)
+S4 payload m06 dir: rc 1 FAIL 6 violations (reverse-sample set, as recorded); chain m07 dir: rc 1 FAIL 6 violations (reverse-sample set, as recorded)
+S5 git diff --numstat 08b59695c..HEAD over register/checkpoints/plan: deleted column 0 on every line (8 rows; appended or added-after-base only)
+S6 legacy headings: 39 (three-digit: 0); sync-mirrors rc 0; regen-command-copies rc 0; scan-confirmation-gates 30 blocking / 0 violations
+M-02 red direct: rc 1 rule-carrying; M-02 green direct: rc 0. M-08 red direct: FAIL 1 (variant spec-kit -> Spec Kit); M-08 green direct: PASS.
+instructions section: template == live, 1,276 B; live total 40,170 B < budget 40,960 B
+FR-025 three-path: git diff --quiet fbab7a45c..HEAD rc 0, --numstat rows 0
+
+## Code segment receipt and gate
+receipt: base=fbab7a45c head=3f0200b42 base_source=feature-first-commit renderer=text changed=684 judged=27 skipped=657 gap=0 lines_added=4330 lines_deleted=7
+segment_verdict=not-evaluated (skips earn no coverage credit)
+merge_gate: 0 blocking -> allow (1 important answered, 1 suggestion, 1 question, 1 praise)
+
+## Acceptance Reality Check (review run)
+closure-acceptance-check.py --spec-dir .specify/specs/107-decision-governance --json -> verdict=accept rc=0
+final_path=pass 7 / blocked 0 / deferred 0 / partial 0 / fail 0 / unknown 0 / total 7
+
+## Workspace signature (workspace guard)
+snapshot: .specify/specs/107-decision-governance/test-evidence/workspace-review.json (post-run; rc 0)
+self-check: workspace-guard.py --check against that file -> clean rc 0 (trivially true; proves nothing by itself)
+DISCLOSED OMISSION: no pre-run signature was captured at stage start, so the before/after comparison the
+checkpoint protocol requires is not available for this stage. Mitigation reading: branch unchanged
+(107-decision-governance), `.specify/specs` listing unchanged (the review created no spec directory), no git
+refs created by the review; the review's only writes are the files named in the review commit.
