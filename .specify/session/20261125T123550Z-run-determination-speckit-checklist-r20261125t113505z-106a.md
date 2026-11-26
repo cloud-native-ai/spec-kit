@@ -21,7 +21,7 @@ summary: "/speckit.checklist run=r20261125T113505Z-106a token=not_evaluated elap
   "feature": "106-background-silent-failure",
   "feature_id": "106",
   "determined_at": "2026-11-25T12:35:50Z",
-  "settled_at": null,
+  "settled_at": "2026-11-26T08:52:43Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -84,7 +84,7 @@ summary: "/speckit.checklist run=r20261125T113505Z-106a token=not_evaluated elap
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -161,8 +161,8 @@ summary: "/speckit.checklist run=r20261125T113505Z-106a token=not_evaluated elap
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -192,7 +192,7 @@ summary: "/speckit.checklist run=r20261125T113505Z-106a token=not_evaluated elap
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

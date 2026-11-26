@@ -1,0 +1,4 @@
+postcommit self-check on committed checklist
+item count: 40 contiguous: True
+FR covered: 25 /25; SC covered: 8 /8; clauses covered: 35 /35
+prohibited starts: none
