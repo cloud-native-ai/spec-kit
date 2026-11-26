@@ -282,3 +282,29 @@ def test_ai_template_elements() -> None:
         "MUST NOT 只有散文",
     ):
         assert token in flat, f"ai-autonomous template lacks {token!r}"
+
+
+# --------------------------------------------------------------------------- #
+# US2 — option-set contract pointer discipline (T021)
+# --------------------------------------------------------------------------- #
+
+#: The gate-observation protocol's signal value domain (owned by
+#: ``shared/guidelines/confirmation-gates.md`` § 门控观察协议). The owner page reaches it
+#: by pointer only; any of these literals in the section is a restatement.
+GATE_SIGNAL_LITERALS = ("approved-as-is", "asked-questions", "denied", "修改后放行")
+
+
+def test_human_signal_pointer_only() -> None:
+    """C-108: the human choice signal is reached by pointer, never restated."""
+    section = norm(h2_section(read(OWNER), "选项集契约", "Option-Set Contract"))
+    assert "shared/guidelines/confirmation-gates.md" in section, (
+        "§ Option-Set Contract does not reach the gate-observation protocol by path"
+    )
+    assert "门控观察协议" in section, (
+        "§ Option-Set Contract does not name the gate-observation protocol section"
+    )
+    for literal in GATE_SIGNAL_LITERALS:
+        assert literal not in section, (
+            "§ Option-Set Contract restates the gate-observation signal value "
+            f"{literal!r} instead of pointing at its owner"
+        )

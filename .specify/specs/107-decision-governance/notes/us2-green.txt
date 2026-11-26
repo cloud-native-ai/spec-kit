@@ -1,0 +1,95 @@
+# US2 green evidence — 107-decision-governance (T022)
+
+Captured: 2026-11-26, worktree decision-governance, branch 107-decision-governance.
+Single test entry: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh` (no interpreter-level test command).
+
+## Phase run (unit + contracts)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py tests/contract/test_decision_governance_contracts.py -q
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_validate_decisions.py tests/contract/test_decision_governance_contracts.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+............                                                             [100%]
+12 passed in 7.91s
+EXIT=0
+
+Raw log: `test-evidence/us2-green-slots.txt`.
+
+## SC-004 — M-03 reverse samples (engine verdicts, read-only)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-empty-set.md
+M-03 tests/fixtures/decision-governance/m03/red-empty-set.md:7: empty option set; a decision item MUST carry at least one option (zero viable options is not a decision item)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-duplicate-label.md
+M-03 tests/fixtures/decision-governance/m03/red-duplicate-label.md:13: duplicate option label '周末迁移窗口'; labels MUST be unique
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-other-without-path.md
+M-03 tests/fixtures/decision-governance/m03/red-other-without-path.md:13: an option named 'other' is legal only with a path declaring who/when/how options may be added and the record written back
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-missing-reversibility.md
+M-03 tests/fixtures/decision-governance/m03/red-missing-reversibility.md:13: option '工作日夜间迁移窗口' is missing option element(s): reversibility
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-missing-evidence.md
+M-03 tests/fixtures/decision-governance/m03/red-missing-evidence.md:13: option '工作日夜间迁移窗口' is missing option element(s): evidence
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-single-without-forced.md
+M-03 tests/fixtures/decision-governance/m03/red-single-without-forced.md:7: a single viable option MUST declare 'forced' with a reason; it MUST NOT masquerade as a multi-option decision
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-count-mismatch.md
+M-03 tests/fixtures/decision-governance/m03/red-count-mismatch.md:7: declared count 3 does not match the 2 option entry(ies); the set is not closed as declared
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/red-chosen-not-member.md
+M-03 tests/fixtures/decision-governance/m03/red-chosen-not-member.md:18: chosen_option '周五下午迁移窗口' is not a named member of the option set
+FAIL: 1 violation(s)
+EXIT=1
+
+## SC-004 — completed option sets are green
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/green-complete.md
+PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+EXIT=0
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/green-single-forced.md
+PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+EXIT=0
+
+## SC-004 — AI replay (C-107)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m03/ai-replay-green.md
+PASS: 0 violation(s) (rules: M-02, M-03, M-08)
+EXIT=0
+
+The replay demonstration runs inside `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic`:
+the record's own `rationale` continuation lines (`predicate: min(downtime_minutes)` /
+`inputs: plan-a=30; plan-b=45`) are replayed twice with the same result (`plan-a`) and compared
+with the recorded `chosen_option`; the doctored `ai-replay-mismatch.md` (chosen `plan-b`) is shown
+to replay to a different option, so the mismatch is detectable. Predicate soundness itself stays
+with B-04 (review) — the guard claims no machine coverage there.
+
+## C-108 — pointer-only check
+
+`tests/contract/test_decision_governance_contracts.py::test_human_signal_pointer_only` passes:
+§ Option-Set Contract reaches the gate-observation protocol by path and carries none of its
+signal literals (`approved-as-is`, `asked-questions`, `denied`, `修改后放行`).
+
+## Fixture correction (disclosed)
+
+The three P2 `m02` green/red fixtures and the three `m08` fixtures gained the declared option
+count (`- **options**: 2`) required by C-106; without it the newly landed M-03 leg would turn the
+US1 green assertions red. No US1 assertion was changed.

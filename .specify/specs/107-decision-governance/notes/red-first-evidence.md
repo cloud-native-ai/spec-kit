@@ -11,7 +11,7 @@
 | S-00 | `tests/unit/test_validate_decisions.py::test_cli_surface` | T006 (red) / T007 (green) | filled |
 | S-01 | `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` | T023 | pending |
 | S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | filled (red -> green at T013/T017) |
-| S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | pending |
+| S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | filled (red -> green at T020/T022) |
 | S-04 | `tests/unit/test_validate_decisions.py::test_m04_id_density_register` | T023 | pending |
 | S-05 | `tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples` | T032 | pending |
 | S-06 | `tests/contract/test_decision_governance_guards.py::test_m06_block_completeness` | T032 | pending |
@@ -20,7 +20,7 @@
 | S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | filled (red -> green at T013/T017) |
 | S-10 | `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (M-09 / C-204) | T024 | pending |
 | S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | filled (red -> green at T011/T012/T014/T017) |
-| S-12 | `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic` (C-107 replay) | T018 | pending |
+| S-12 | `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic` (C-107 replay) | T018 | filled (red -> green at T020/T022) |
 | S-13 | `tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy` (C-205) | T024 | pending |
 | S-14 | `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` (C-206) | T024 | pending |
 | S-15 | `tests/contract/test_decision_governance_guards.py::test_acknowledgement_present` (payload/return snapshots) | T032 | pending |
@@ -87,11 +87,31 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m02_locator_red_t
 
 - exit status (green): `0`. The M-02 red -> green engine verdicts (exit 1 on both red fixtures, exit 0 on the completed locator) are recorded in `notes/us1-green.txt` § SC-002.
 
-### S-03 — `test_m03_option_set_reverse_samples` (T018)
+### S-03 — `test_m03_option_set_reverse_samples` (T018 red → T020/T022 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples -q`
-- red output: pending (author lands with T018; fixtures `tests/fixtures/decision-governance/m03/`)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T020; raw log `test-evidence/us2-red-first.txt`):
+
+```text
+        for name, needle in red_samples.items():
+            path = M03 / name
+            assert path.is_file(), f"missing fixture: {path}"
+            red = run_records("--carrier", str(path))
+>           assert red.returncode == 1, (
+                f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+            )
+E           AssertionError: red-empty-set.md exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-08)
+E           assert 0 == 1
+tests/unit/test_validate_decisions.py:191: AssertionError
+FAILED tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples
+1 failed in 6.23s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the M-03 leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m03/` — red samples for empty set, duplicate label, `other` without `path`, missing `reversibility`, missing `evidence`, single option without `forced`, declared-count mismatch, chosen option outside the set; green samples `green-complete.md` / `green-single-forced.md`.
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us2-green-slots.txt`): `............ [100%]` / `12 passed in 7.91s`
+- exit status (green): `0`. The M-03 reverse-sample engine verdicts (exit 1 on each degenerate form, exit 0 on the completed sets) are recorded in `notes/us2-green.txt` § SC-004.
 
 ### S-04 — `test_m04_id_density_register` (T023)
 
@@ -176,11 +196,30 @@ FAILED tests/contract/test_decision_governance_contracts.py::test_full_name_mini
 
 - exit status (green): `0`; the four surfaces are asserted separately inside the test (owner page, instruction section, decision-item templates, guard fixtures + named B-01/B-02 review surfaces).
 
-### S-12 — `test_ai_replay_deterministic` (T018; C-107 replay)
+### S-12 — `test_ai_replay_deterministic` (T018 red → T020/T022 green; C-107 replay)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py::test_ai_replay_deterministic -q`
-- red output: pending (author lands with T018)
-- exit status: pending
+- red output (verbatim tail, captured 2026-11-26 before T020; raw log `test-evidence/us2-red-first.txt`):
+
+```text
+        # The chosen option is a named member of the closed set (M-03 membership leg).
+        not_member = run_records("--carrier", str(M03 / "red-chosen-not-member.md"))
+>       assert not_member.returncode == 1, (
+            f"a chosen option outside the set exited {not_member.returncode}, expected 1: "
+            f"{not_member.stdout} {not_member.stderr}"
+        )
+E       AssertionError: a chosen option outside the set exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-08)
+E       assert 0 == 1
+tests/unit/test_validate_decisions.py:240: AssertionError
+FAILED tests/unit/test_validate_decisions.py::test_ai_replay_deterministic
+1 failed in 6.23s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the membership leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m03/ai-replay-green.md` (recorded `predicate: min(downtime_minutes)` + `inputs: plan-a=30; plan-b=45`, chosen `plan-a`), `ai-replay-mismatch.md` (chosen `plan-b`, same inputs), `red-chosen-not-member.md`.
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us2-green-slots.txt`): `............ [100%]` / `12 passed in 7.91s`
+- exit status (green): `0`. The replay demonstration (two identical replays, comparison with the recorded choice, and the detectable mismatch) and the membership verdict are recorded in `notes/us2-green.txt` § SC-004.
 
 ### S-13 — `test_no_tension_field_copy` (T024; C-205)
 
