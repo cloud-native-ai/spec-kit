@@ -133,6 +133,10 @@ STATE_UNDECLARED = "未声明"
 STATE_LISTED = "已列出"
 STATE_FOLDED = "已聚合"
 STATE_UNRECOGNIZED = "未识别（unrecognized）"
+STATE_NOT_COMPARABLE = "不可比对（not comparable）"
+STATE_GOAL_NORMALIZE = "goal 需归一为 anchor_slug"
+STATE_SPINE_BY_PATTERN = "按声明 pattern 不适用"
+STATE_SPINE_UNDETERMINABLE = "适用性不可判定"
 DEFAULT_POINTER = "（默认值见 create-mode.md § Schema notes）"
 NESTED_NONE = "本次无嵌套 SDD 调用"
 TRUNCATION_MARKER = "…（截断）"
@@ -162,6 +166,8 @@ STAMP_FORMATS = (
     ("compact_minutes", "%Y%m%dT%H%MZ"),
 )
 REPORT_SUFFIX_RE = re.compile(r"^(?:-[0-9a-f]{4})?-(?:report|stage)\.md$")
+# Identity grammar owner: `.specify/shared/definitions/goal-definitions.md` § Identity grammar.
+SLUG_FORM_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.\-]*$")
 REQUIRED_MATRIX_COLUMNS = ("role", "stage", "type")
 SPINE_FILES = ("constraints.md", "STATE.md", "run-log.jsonl")
 LEDGER_STATES = ("completed", "in-progress", "delayed", "not-started", "unknown")
@@ -543,6 +549,17 @@ def matrix_columns(rows: list) -> list:
     return order
 
 
+def matrix_header(body: str) -> list:
+    """The lowercased header cells of the ``## Static Structure`` table, or ``[]``."""
+    section = _section_lines(body, "Static Structure")
+    if section is None:
+        return []
+    table = [line for line in section if line.strip().startswith("|")]
+    if not table:
+        return []
+    return [cell.strip().lower() for cell in _cells(table[0])]
+
+
 # --------------------------------------------------------------------------- #
 # Report segments and bounded excerpt (E6, C-33)
 # --------------------------------------------------------------------------- #
@@ -845,6 +862,27 @@ def build_definition(front, problems: dict, slug: str) -> dict:
     }
 
 
+def build_goal_declaration(front, problems: dict, binding_unreadable: bool) -> dict:
+    """The declared ``goal`` key's presentation record (C-302 / C8): never an identity."""
+    declared = "goal" in front or "goal" in problems
+    value = front.get("goal")
+    if not declared:
+        form = "absent"
+    elif (problems.get("goal") is None and isinstance(value, str)
+          and SLUG_FORM_RE.match(value)):
+        form = "slug"
+    else:
+        form = "inline"
+    state = STATE_GOAL_NORMALIZE if declared and (
+        form == "inline" or binding_unreadable) else None
+    return {
+        "declared": declared,
+        "form": form,
+        "state": state,
+        "identity_unchanged": True,
+    }
+
+
 def _roster_names(values) -> list:
     names = []
     for item in values:
@@ -857,6 +895,15 @@ def _roster_names(values) -> list:
 
 def build_static(front, body: str) -> dict:
     rows, matrix_state = parse_static_matrix(body)
+    matrix_note = None
+    if matrix_state is None:
+        agent_columns = matrix_header(body).count("agent")
+        if agent_columns == 0:
+            matrix_state = STATE_MALFORMED
+            matrix_note = "缺列: agent"
+        elif agent_columns > 1:
+            matrix_state = STATE_MALFORMED
+            matrix_note = "重复列: agent"
     members_raw = front.get("members")
     if members_raw is None:
         members = {"state": STATE_UNDECLARED, "rows": []}
@@ -866,16 +913,17 @@ def build_static(front, body: str) -> dict:
         members = {"state": STATE_MALFORMED, "rows": []}
     matrix_names = _roster_names(rows)
     member_names = _roster_names(members["rows"])
-    matrix_has_agent = any("agent" in row for row in rows)
-    comparable = matrix_state is None and matrix_has_agent and members["state"] is None
+    comparable = matrix_state is None and members["state"] is None
     reason = None
-    if not matrix_has_agent:
-        reason = "正文矩阵无 agent 列，两侧名册不可比对"
+    if matrix_state is not None:
+        detail = "（%s）" % matrix_note if matrix_note else ""
+        reason = "正文矩阵%s%s，两侧名册不可比对" % (matrix_state, detail)
     elif members["state"] is not None:
         reason = "frontmatter 名册%s，两侧名册不可比对" % members["state"]
     return {
         "matrix_rows": rows,
         "matrix_state": matrix_state,
+        "matrix_note": matrix_note,
         "members": members,
         "seats": _declared_block_map(front.get("seats")),
         "stage_seats": _declared_block_map(front.get("stage_seats")),
@@ -1079,6 +1127,14 @@ def build_persistence(team_dir: Path, front) -> dict:
                 ledger["state"] = STATE_FOLDED
                 ledger["path"] = str(items_path)
 
+    pattern = _text(front.get("pattern")) or ""
+    if pattern == "continuous":
+        applicability = "applicable"
+    elif pattern:
+        applicability = "not-applicable-by-pattern"
+    else:
+        applicability = "undeterminable"
+
     spine = []
     for name in SPINE_FILES:
         path = team_dir / name
@@ -1087,6 +1143,7 @@ def build_persistence(team_dir: Path, front) -> dict:
             "path": str(path),
             "present": path.is_file(),
             "empty": path.is_file() and path.stat().st_size == 0,
+            "applicability": applicability,
         })
 
     config_raw = front.get("config")
@@ -1100,6 +1157,7 @@ def build_persistence(team_dir: Path, front) -> dict:
         "reports": reports,
         "ledger": ledger,
         "spine": spine,
+        "spine_pattern": pattern,
         "summary_delivery": delivery,
     }
 
@@ -1109,6 +1167,7 @@ def build_latest(persistence: dict) -> dict:
     if not latest_path:
         return {
             "report": None,
+            "path": None,
             "outcome": None,
             "target_assignment": None,
             "result_summary": None,
@@ -1121,6 +1180,7 @@ def build_latest(persistence: dict) -> dict:
     except OSError:
         return {
             "report": Path(latest_path).name,
+            "path": latest_path,
             "outcome": None,
             "target_assignment": None,
             "result_summary": None,
@@ -1131,6 +1191,7 @@ def build_latest(persistence: dict) -> dict:
     parsed = parse_report(text)
     return {
         "report": Path(latest_path).name,
+        "path": latest_path,
         "outcome": parsed["outcome"],
         "target_assignment": parsed["target_assignment"],
         "result_summary": parsed["result_summary"],
@@ -1163,6 +1224,8 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
     definition = build_definition(front, problems, slug)
     definition["binding"] = binding
     definition["binding_error"] = binding_error
+    definition["goal"] = build_goal_declaration(
+        front, problems, binding_error is not None)
 
     static = build_static(front, definition_body(text))
     dynamic = build_dynamic(front)
@@ -1497,6 +1560,9 @@ def _render_identity(view: dict, lines: list) -> None:
     lines.append("- lifecycle: %s" % lifecycle_text)
     if definition["binding_error"]:
         lines.append("- 绑定（binding）: %s（%s）" % (STATE_UNREADABLE, definition["binding_error"]))
+        lines.append(
+            "- 绑定修复（binding repair）: /speckit.team modify（定义修复入口）；"
+            "goal-utils.py bind（引擎写面）；owner: anchor-definitions.md § The Binding Record")
     else:
         binding = definition["binding"] or {}
         lines.append("- 绑定（binding）: owner=%s · owner_id=%s · origin=%s" % (
@@ -1504,6 +1570,11 @@ def _render_identity(view: dict, lines: list) -> None:
             _fact(binding.get("owner_id")),
             _fact(binding.get("origin")),
         ))
+    goal = definition["goal"]
+    if goal["state"]:
+        lines.append(
+            "- goal 归一（goal）: %s —— 修复: /speckit.team modify（将 goal 归一为 anchor_slug）；"
+            "goal-utils.py migrate（派生锚点定义）" % goal["state"])
     identity = definition["anchor_identity"]
     lines.append("- 锚点身份（anchor_identity）: %s — %s" % (identity["kind"], identity["value"]))
     lines.append("- handoff_ref: %s" % _fact(definition["handoff_ref"], "handoff_ref", problems))
@@ -1525,9 +1596,11 @@ def _render_static(view: dict, lines: list) -> None:
     lines.append("- type 来源（type_source）: 正文矩阵（body-matrix）")
     rows = static["matrix_rows"]
     if static["matrix_state"]:
-        lines.append("- 正文矩阵: %s" % static["matrix_state"])
+        note = "（%s）" % static["matrix_note"] if static.get("matrix_note") else ""
+        lines.append("- 正文矩阵: %s%s" % (static["matrix_state"], note))
     else:
         lines.append("- 正文矩阵: %d 行" % len(rows))
+    if rows:
         columns = matrix_columns(rows)
         lines.append("  | " + " | ".join(columns) + " |")
         lines.append("  |" + "|".join("---" for _ in columns) + "|")
@@ -1548,7 +1621,8 @@ def _render_static(view: dict, lines: list) -> None:
         lines.append("- 仅正文矩阵: %s" % (", ".join(delta["only_in_matrix"]) or "无"))
         lines.append("- 仅 frontmatter: %s" % (", ".join(delta["only_in_members"]) or "无"))
     else:
-        lines.append("- 名册差异（roster_delta）: 未记录（%s）" % delta["reason"])
+        lines.append("- 名册差异（roster_delta）: %s（原因：%s）" % (
+            STATE_NOT_COMPARABLE, delta["reason"]))
 
 
 def _render_dynamic(view: dict, lines: list) -> None:
@@ -1609,13 +1683,25 @@ def _render_persistence(view: dict, lines: list) -> None:
             lines.append("  - 非终态: %s (%s)" % (item["item_id"], item["state"]))
     elif ledger["state"] == STATE_UNREADABLE:
         lines.append("- 台账: 不可读（%s；%s）" % (ledger["path"], ledger.get("reason", "")))
+    elif ledger["state"] == STATE_MISSING:
+        lines.append("- 台账: 缺失（%s；后果：无台账聚合计数、无非终态信号）" % ledger["path"])
     else:
         lines.append("- 台账: %s（%s）" % (ledger["state"], ledger["path"]))
     present = [entry["name"] for entry in persistence["spine"] if entry["present"]]
     if present:
         lines.append("- 脊柱文件（存在）: %s" % ", ".join(present))
+    pattern = persistence["spine_pattern"]
     for entry in persistence["spine"]:
-        if not entry["present"]:
+        if entry["present"]:
+            continue
+        if entry["applicability"] == "not-applicable-by-pattern":
+            lines.append("- %s %s（%s；%s：pattern=%s；owner: operating-loops.md § 8）" % (
+                entry["name"], STATE_MISSING, entry["path"],
+                STATE_SPINE_BY_PATTERN, pattern))
+        elif entry["applicability"] == "undeterminable":
+            lines.append("- %s %s（%s；%s：pattern 未声明；owner: create-mode.md § Schema notes）" % (
+                entry["name"], STATE_MISSING, entry["path"], STATE_SPINE_UNDETERMINABLE))
+        else:
             lines.append("- %s %s（%s）" % (entry["name"], STATE_MISSING, entry["path"]))
     delivery = persistence["summary_delivery"]
     lines.append("- summary 送达目录: %s" % (
@@ -1626,12 +1712,19 @@ def _render_latest(view: dict, lines: list) -> None:
     latest = view["latest"]
     ledger = view["persistence"]["ledger"]
     lines.append(GROUP_HEADINGS[4])
-    lines.append("- 最近报告（latest_report）: %s" % (latest["report"] or STATE_UNRECORDED))
-    lines.append("- Outcome: %s" % (latest["outcome"] or STATE_UNRECORDED))
-    lines.append("- Target 指派: %s" % (latest["target_assignment"] or STATE_UNRECORDED))
-    lines.append("- Result Summary: %s" % _excerpt_text(latest["result_summary"]))
-    lines.append("- Verification: %s" % _excerpt_text(latest["verification"]))
-    lines.append("- Nested SDD Runs: %s" % _nested_text(latest["nested_runs"]))
+    if latest["readable"]:
+        lines.append("- 最近报告（latest_report）: %s" % (latest["report"] or STATE_UNRECORDED))
+        lines.append("- Outcome: %s" % (latest["outcome"] or STATE_UNRECORDED))
+        lines.append("- Target 指派: %s" % (latest["target_assignment"] or STATE_UNRECORDED))
+        lines.append("- Result Summary: %s" % _excerpt_text(latest["result_summary"]))
+        lines.append("- Verification: %s" % _excerpt_text(latest["verification"]))
+        lines.append("- Nested SDD Runs: %s" % _nested_text(latest["nested_runs"]))
+    else:
+        lines.append("- 最近报告（latest_report）: %s（%s：%s）" % (
+            latest["report"], STATE_UNREADABLE, latest["path"]))
+        for label in ("Outcome", "Target 指派", "Result Summary", "Verification",
+                      "Nested SDD Runs"):
+            lines.append("- %s: %s" % (label, STATE_UNREADABLE))
     if ledger["state"] == STATE_FOLDED:
         lines.append("- 台账信号: 非终态 %d · 坏行 %d" % (
             len(ledger["non_terminal"]), ledger["bad_lines"]))

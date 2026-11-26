@@ -1,0 +1,5 @@
+task: T016
+outcome: done
+run_id: r20261126T101650Z-108p3
+evidence: scripts/python/team-view.py — matrix 形态异常（缺列: agent / 重复列: agent）with every parsed row still rendered, roster_delta rendered as `不可比对（not comparable）（原因：…）` never `未记录`, full member listing and seats/stage_seats disclosure kept; green nodes test_matrix_without_agent_column_is_malformed_and_roster_not_comparable and test_degraded_definition_names_every_state in notes/us2-green.txt
+at: 2026-11-26T10:20:00Z

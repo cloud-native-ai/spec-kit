@@ -1,0 +1,5 @@
+task: T015
+outcome: done
+run_id: r20261126T101650Z-108p3
+evidence: scripts/python/team-view.py — binding-repair pointer line (verbatim reason kept; /speckit.team modify + goal-utils.py bind + anchor-definitions.md § The Binding Record) and the goal normalization record (`goal 需归一为 anchor_slug` for inline values or an unreadable binding; slug + readable binding adds no line; identity order unchanged); green via test-evidence nodes in notes/us2-green.txt (17 passed)
+at: 2026-11-26T10:20:00Z

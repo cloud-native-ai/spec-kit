@@ -1,0 +1,59 @@
+# US2 green reading — 108-team-view-degradation (T018)
+
+Taken 2026-11-26 on worktree team-view-degradation (branch 108-team-view-degradation) after T015–T017 landed.
+
+## Command (single entry, integration file)
+
+`SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -q`
+
+## Real output
+
+```
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_team_view_degradation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.................                                                        [100%]
+17 passed in 6.80s
+rc=0
+```
+
+The 17 nodes are the 7 US1 integration nodes (unchanged, still green) plus the 10 US2 nodes (red at T013/T014: `test-evidence/us2-red-degraded.txt` 7 failed + 1 guard-pass, `test-evidence/us2-red-states.txt` 3 failed).
+
+## SC-003 six-state evidence (degraded fixture, one view, exit 5)
+
+Fixture: no `binding` block, inline `goal` with `anchor_slug: degraded-anchor`, matrix without the `agent` column, missing `items.jsonl`, `pattern: iteration` with the three spine files missing, nine frontmatter members, one unreadable latest report. Pinned by `test_degraded_definition_names_every_state`; the rendered lines below are from the same fixture under the sanctioned scratch root `.specify/.tmp/sdd-loop/tmp/team-view-degradation/us2-golden/`.
+
+| # | Named state | Rendered evidence |
+|---|-------------|-------------------|
+| 1 | 绑定 `不可读` with the engine's verbatim reason | `绑定（binding）: 不可读（binding-missing: … carries no binding block; a definition without a complete binding record is uninterpretable (owner / owner_id / origin)）`; the partial-keys variant names `missing the binding key(s) owner_id, origin` |
+| 2 | goal named state + repair pointers | `goal 归一（goal）: goal 需归一为 anchor_slug —— 修复: /speckit.team modify（将 goal 归一为 anchor_slug）；goal-utils.py migrate（派生锚点定义）`; identity stays `declared — degraded-anchor` |
+| 3 | matrix `形态异常`, missing column named, rows kept | `正文矩阵: 形态异常（缺列: agent）` followed by all three parsed rows (`lead` / `executor` / `evaluator`); duplicated-column variant renders `形态异常（重复列: agent）` with rows kept |
+| 4 | `roster_delta` = 不可比对 with reason | `名册差异（roster_delta）: 不可比对（not comparable）（原因：正文矩阵形态异常（缺列: agent），两侧名册不可比对）`; never `未记录` |
+| 5 | 台账 `缺失` with consequences | `台账: 缺失（<path>/items.jsonl；后果：无台账聚合计数、无非终态信号）`; zero-line ledger stays `为空` without consequences |
+| 6 | spine 按声明 pattern 不适用 + owner pointer | `constraints.md / STATE.md / run-log.jsonl 缺失（<path>；按声明 pattern 不适用：pattern=iteration；owner: operating-loops.md § 8）` |
+| + | 最新报告不可读 (SC-003 fixture member) | `最近报告（latest_report）: 20260105T000000Z-report.md（不可读：<path>）` and every field line renders `不可读` |
+
+Counts on the same output: frontmatter members **9/9** (`成员（frontmatter）: 9 名` plus nine `agent=member-NN` lines); `seats: 已声明（member-01: sdd-invocation=forbidden）`; `stage_seats: 未声明（默认值见 create-mode.md § Schema notes）`; `/speckit.team modify` appears **2** times (binding repair + goal repair, ≥ 1 as required); `goal-utils.py bind` 1, `goal-utils.py migrate` 1; fabricated zero / placeholder values **0** (`owner=未记录`, `台账: 0`, `运行报告: 0` all absent). The trailing `降级（degraded）` block names `engine-degraded` only (exit 5); no `report-recognition-uncertain` (no residue).
+
+Supporting states in the same run: `test_unreadable_latest_report_is_named_not_unrecorded` — exit 0 (a file-level state alone never changes the exit code), path + `不可读` field lines, no degradation block; `test_four_state_discipline_on_new_surfaces` — 缺失 / 为空 / 不可读 / 未识别 kept distinct, no `0` substitution; `test_undeclared_pattern_and_zero_line_ledger_states` — `适用性不可判定` + `create-mode.md § Schema notes`, zero-line ledger `为空`, six group headings in order with every pre-existing line still present.
+
+## Regression readings (same day, same single entry)
+
+- `tests/unit/test_team_view_report_recognition.py` → 6 passed.
+- `tests/unit/test_team_view_parsers.py` + `tests/contract/test_team_view_program_contract.py` + `tests/contract/test_team_view_command.py` + `tests/integration/test_team_view_program.py` → **106 passed** (no change to the inherited surface: envelope keys, CLI surface, exit set and read-only source scan still hold; `constraints.md 缺失` / `台账: 缺失` substrings the 103 tests pin survive as annotated forms).
+- Healthy byte-fidelity prefix check (not the T020 guard; T020 pins it formally): on a completed-predicate fixture (three-key binding, compact reports, `agent` column, ledger with one line, all three spine files) the baseline program from `git show 54c6efa8c:scripts/python/team-view.py` and the amended program produce **stdout diff lines = 0**, equal exit 0 — in both goal variants (`goal` absent and `goal: anchor-slug-form`).
+
+## Test-side correction during T018 (disclosed)
+
+Two prefixes in `test_undeclared_pattern_and_zero_line_ledger_states` (`- config:` and `- 可选键声明（optional keys）:`) were tightened after the red capture because those rendered lines carry no trailing space. Both assertions target pre-existing lines that already existed at red time, so the recorded red cause is unchanged (the first failing assertion was the absent `适用性不可判定` state); the product rule was not touched.
+
+## Red → green for the US2 slots
+
+| Slot | Node(s) | Red (T013/T014) | Green (T018) |
+|------|---------|-----------------|--------------|
+| I-DEGRADED-DEFINITION | `test_degraded_definition_names_every_state`, `test_binding_unreadable_carries_engine_reason_and_repair_pointers`, `test_partial_binding_keys_name_the_missing_keys`, `test_inline_goal_is_a_named_state_with_repair_pointers`, `test_matrix_without_agent_column_is_malformed_and_roster_not_comparable`, `test_missing_ledger_carries_its_consequences`, `test_spine_applicability_follows_declared_pattern` | goal / repair / matrix / spine / ledger state lines absent (7 failed) | pass |
+| I-DEGRADED-DEFINITION (guard) | `test_slug_form_goal_under_readable_binding_adds_no_state_line` | pass (pins unchanged healthy half of C-302) | pass |
+| I-UNREADABLE-LATEST | `test_unreadable_latest_report_is_named_not_unrecorded` | latest group rendered as readable (1 failed within the 3) | pass |
+| I-LEDGER-SPINE-STATES | `test_four_state_discipline_on_new_surfaces`, `test_undeclared_pattern_and_zero_line_ledger_states` | `不可读` latest member and `适用性不可判定` absent (2 failed within the 3) | pass |

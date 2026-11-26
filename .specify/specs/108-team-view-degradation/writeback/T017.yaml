@@ -1,0 +1,5 @@
+task: T017
+outcome: done
+run_id: r20261126T101650Z-108p3
+evidence: scripts/python/team-view.py — ledger 缺失 carries path and consequences (no zero substitution; 为空 / 不可读 distinctions kept), spine applicability by declared pattern (continuous gap vs 按声明 pattern 不适用 + operating-loops.md § 8 vs 适用性不可判定 + create-mode.md § Schema notes), unreadable latest renders 不可读 with path and 不可读 field lines; green nodes test_missing_ledger_carries_its_consequences, test_spine_applicability_follows_declared_pattern, test_unreadable_latest_report_is_named_not_unrecorded, test_four_state_discipline_on_new_surfaces in notes/us2-green.txt
+at: 2026-11-26T10:20:00Z

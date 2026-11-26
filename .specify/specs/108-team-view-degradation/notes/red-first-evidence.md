@@ -202,6 +202,17 @@ Test-side correction during T012 (disclosed): the U-LATEST fixture originally mi
 
 Supporting real-corpus smoke (read-only, same tree): `viz-skill-arena` now reads `运行报告: 已列出（共 5 份…）` with latest `2026-09-15T090000Z-report.md` at exit 0; `session-driven-self-improvement` exits 5 with the bounded auxiliary/residue lines and the `降级（degraded）` block naming `report-recognition-uncertain`; the overview row for it carries `20261008T090000Z（report-recognition-uncertain：残留 2）` at exit 0.
 
+## Green reading (T018, 2026-11-26)
+
+Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -q` → exit 0, `17 passed in 6.80s` (full capture `notes/us2-green.txt`). The same note records the SC-003 six-state counts (9/9 members, 2 × `/speckit.team modify`, zero fabricated values) and the supporting regression readings (US1 unit 6 passed; the four inherited team-view files 106 passed; healthy-prefix stdout diff 0 for both goal variants).
+
+| Slot | Node | Red (T013/T014) | Green (T018) |
+|------|------|-----------------|--------------|
+| I-DEGRADED-DEFINITION | `test_degraded_definition_names_every_state` and the six C-301…C-305 nodes | goal / repair / matrix / spine / ledger state lines absent | pass (six states, exit 5) |
+| I-DEGRADED-DEFINITION (guard) | `test_slug_form_goal_under_readable_binding_adds_no_state_line` | pass (pins unchanged healthy half of C-302) | pass |
+| I-UNREADABLE-LATEST | `test_unreadable_latest_report_is_named_not_unrecorded` | latest group rendered as readable | pass (不可读 + path + field lines, exit 0) |
+| I-LEDGER-SPINE-STATES | `test_four_state_discipline_on_new_surfaces`, `test_undeclared_pattern_and_zero_line_ledger_states` | `不可读` member and `适用性不可判定` absent | pass |
+
 ## Regression guards (not red slots)
 
 - T020's healthy byte-fidelity and read-only snapshot guards are regression guards: their green

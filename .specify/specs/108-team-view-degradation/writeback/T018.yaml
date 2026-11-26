@@ -1,0 +1,5 @@
+task: T018
+outcome: done
+run_id: r20261126T101650Z-108p3
+evidence: notes/us2-green.txt — `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -q` exit 0, 17 passed in 6.80s; SC-003 six named states with 9/9 members, two `/speckit.team modify` pointers and zero fabricated values at exit 5; unreadable-latest state at exit 0; four-state and undeclared-pattern nodes green; regression: US1 unit 6 passed, four inherited team-view files 106 passed, healthy-prefix stdout diff lines = 0 in both goal variants
+at: 2026-11-26T10:20:00Z
