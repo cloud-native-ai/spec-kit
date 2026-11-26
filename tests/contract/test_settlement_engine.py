@@ -32,6 +32,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -464,6 +465,65 @@ def test_c1_done_with_u4_claim_is_completed(tmp_path):
     row = _finding(payload, "demo-line-implement")
     assert row["verdict"] == "completed", row
     assert row["claim"]["value"] == "completed"
+
+
+def test_c1_reads_the_drivers_pid_line_format(tmp_path):
+    """The live four-piece writes ``pid=<n> start=<ticks> …``; settle consumes it (C-13)."""
+    builders = _load_builders()
+    state = tmp_path / "state"
+    state.mkdir()
+    teams = tmp_path / "teams"
+    logs = tmp_path / "logs"
+    teams.mkdir()
+    logs.mkdir()
+    builders.write_c1_stage(
+        state, line="driver-line", stage="implement", pid=None, exit_code=2
+    )
+    (state / "pid-driver-line-implement").write_text(
+        "pid=99999999 start=2456519550 at=1795628934 line=driver-line "
+        "stage=implement event=pid\n",
+        encoding="utf-8",
+    )
+    proc, payload = settle(state, teams, logs)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    row = _finding(payload, "driver-line-implement")
+    assert row["carrier"] == "c1-fork"
+    assert row["verdict"] == "failed", row
+    assert row["detail"] == "non-zero-terminal", row
+
+
+def test_c1_pid_line_start_token_detects_pid_reuse(tmp_path):
+    """The pid line's ``start=`` token is the pid-reuse guard on the live carrier."""
+    builders = _load_builders()
+    ticks_probe = builders.pid_start_ticks(os.getpid())
+    if ticks_probe is None:
+        pytest.skip("/proc is unavailable on this host")
+    state = tmp_path / "state"
+    state.mkdir()
+    teams = tmp_path / "teams"
+    logs = tmp_path / "logs"
+    teams.mkdir()
+    logs.mkdir()
+    proc_live = builders.spawn_live_process()
+    try:
+        ticks = builders.pid_start_ticks(proc_live.pid)
+        if ticks is None:
+            pytest.skip("/proc is unavailable on this host")
+        builders.write_c1_stage(
+            state, line="reuse-line", stage="implement", pid=None, exit_code=None
+        )
+        (state / "pid-reuse-line-implement").write_text(
+            "pid=%d start=%d at=1795628934 line=reuse-line stage=implement "
+            "event=pid\n" % (proc_live.pid, ticks + 1),
+            encoding="utf-8",
+        )
+        proc, payload = settle(state, teams, logs)
+        assert proc.returncode == 0, (proc.stdout, proc.stderr)
+        row = _finding(payload, "reuse-line-implement")
+        assert row["verdict"] == "silent-end", row
+        assert row["detail"] == "pid-reused", row
+    finally:
+        builders.stop_live_process(proc_live)
 
 
 # --------------------------------------------------------------------------- #

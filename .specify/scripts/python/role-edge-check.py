@@ -1306,16 +1306,26 @@ def _load_c1_attempt(state_dir: Path, stem: str, logs_dir: Path) -> dict:
             attempt["unreadable"].append(
                 {"pointer": str(pid_path), "kind": "unreadable", "note": error}
             )
-        elif text.strip().isdigit():
-            attempt["pid"] = int(text.strip())
         else:
-            attempt["unreadable"].append(
-                {
-                    "pointer": str(pid_path),
-                    "kind": "unreadable",
-                    "note": "pid file is not an integer",
-                }
-            )
+            # The live four-piece writes "pid=<n> start=<ticks> …" (the watcher's
+            # own reader accepts this shape first and a bare integer as fallback);
+            # the start token is /proc field 22, the same unit as pid_start_ticks.
+            pid_match = re.search(r"^pid=(\d+)\b", text, re.M)
+            ticks_match = re.search(r"\bstart=(\d+)\b", text)
+            if pid_match is not None:
+                attempt["pid"] = int(pid_match.group(1))
+                if ticks_match is not None:
+                    attempt["pid_start_ticks"] = int(ticks_match.group(1))
+            elif text.strip().isdigit():
+                attempt["pid"] = int(text.strip())
+            else:
+                attempt["unreadable"].append(
+                    {
+                        "pointer": str(pid_path),
+                        "kind": "unreadable",
+                        "note": "pid file carries neither a pid= line nor a bare pid",
+                    }
+                )
     if status_path.is_file():
         text, error = _try_read_text(status_path)
         if error is not None:
