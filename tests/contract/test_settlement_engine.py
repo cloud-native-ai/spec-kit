@@ -490,3 +490,65 @@ def test_team_report_rows_parse_in_both_shapes():
     missing = _finding(payload, "seat-missing-start")
     assert missing["verdict"] == "unknown"
     assert missing["unknown_cause"] == "start-record-missing"
+
+
+# --------------------------------------------------------------------------- #
+# INV07 — retry is a new attempt; a late return never rewrites the old value
+# --------------------------------------------------------------------------- #
+def test_retry_is_a_new_label_and_the_old_attempt_keeps_its_value(tmp_path):
+    """A retry label is an independent finding; the old attempt and its evidence stay put."""
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    builders.c2_silent_end(logs, label="first-try")
+    # A stale return lands for the OLD attempt after its silent end.
+    (logs / "first-try.return.txt").write_text("stale return\n", encoding="utf-8")
+    builders.c2_completed(logs, label="second-try")
+    before = _tree_hashes(logs)
+    proc, payload = settle(state, teams, logs)
+    after = _tree_hashes(logs)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    assert before == after, "settle rewrote evidence or fabricated a retry record"
+    old_row = _finding(payload, "first-try")
+    new_row = _finding(payload, "second-try")
+    assert old_row["verdict"] == "silent-end", old_row
+    assert old_row["claim"] is None, "a stale return was consumed as a completion claim"
+    assert new_row["verdict"] == "completed", new_row
+    assert new_row["claim"]["path"].endswith("second-try.settlement")
+    assert payload["summary"]["attempts"] == 2
+
+
+def test_late_completion_after_the_deadline_lands_on_its_own_label(tmp_path):
+    """A completion arriving after the first attempt's deadline never revises it."""
+    builders = _load_builders()
+    state, teams, logs = builders.make_roots(tmp_path)
+    builders.write_attempt(
+        logs,
+        "native-first",
+        carrier="c4-native",
+        started_at=builders.STARTED_AT,
+        wait_deadline_s=60,
+    )
+    builders.write_attempt(
+        logs,
+        "native-second",
+        carrier="c4-native",
+        started_at=builders.STARTED_AT,
+        wait_deadline_s=60,
+    )
+    (logs / "native-second.return.txt").write_text("delivered\n", encoding="utf-8")
+    builders.write_claim(
+        logs,
+        "native-second",
+        value="completed",
+        mechanism="five-element",
+        evidence=["native-second.return.txt"],
+    )
+    proc, payload = settle(state, teams, logs)
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    first = _finding(payload, "native-first")
+    second = _finding(payload, "native-second")
+    assert first["verdict"] == "silent-end", first
+    assert first["detail"] == "deadline-passed", first
+    assert first["claim"] is None
+    assert second["verdict"] == "completed", second
+    assert second["claim"]["path"].endswith("native-second.settlement")

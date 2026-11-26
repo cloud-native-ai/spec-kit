@@ -743,3 +743,39 @@ def test_no_dispatch_surface_carries_a_second_value_table():
     assert not offenders, (
         f"a second settlement value table exists on a dispatch surface: {offenders}"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Reaction obligations (T020) — the run-agent text carries its own side
+# --------------------------------------------------------------------------- #
+def test_run_agent_reports_every_attempt_before_the_outward_report():
+    body = _norm(_read(RUN_AGENT))
+    for phrase in (
+        "settle every attempt",
+        "before the outward completion report",
+        "settlement value with its evidence pointers",
+        "「未结算」(unsettled)",
+        "never silently omitted",
+        "reported item by item",
+        "aggregate success voice",
+        "leaves an attempt unaccounted is incomplete",
+    ):
+        assert phrase in body, f"run-agent reaction reporting missing phrase: {phrase!r}"
+
+
+def test_run_agent_retry_and_stop_rules_forbid_silent_repair():
+    body = _norm(_read(RUN_AGENT))
+    for phrase in (
+        "new attempt with a new label",
+        "never rewritten, never deleted",
+        "late return is never consumed as the current result",
+        "named diagnosis or the user's ruling",
+        "`running` + live evidence + the stop reason",
+        "never `silent-end`",
+        "never fabricate a terminal record",
+        "never backfill a missing return element",
+        "never rewrite a `.status` line",
+        "never delete evidence",
+        "never consume a stale return",
+    ):
+        assert phrase in body, f"run-agent reaction discipline missing phrase: {phrase!r}"
