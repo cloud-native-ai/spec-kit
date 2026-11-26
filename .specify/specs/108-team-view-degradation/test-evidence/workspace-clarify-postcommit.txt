@@ -1,0 +1,2 @@
+clean
+workspace rc=0
