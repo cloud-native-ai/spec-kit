@@ -1,0 +1,49 @@
+# Gate neutrality and preservation record — 107-decision-governance (T043)
+
+Captured: 2026-11-26 (UTC), worktree decision-governance, branch 107-decision-governance, base 0d7519521 (includes the line-106 merge).
+
+## Re-baseline adjudication (31 -> 30)
+
+- Recorded baseline: `test-evidence/scan-confirmation-gates-baseline.txt`, captured 2026-11-25 at 08b59695c — blocking 31 (destructive 23 / governance_kept 7 / reversible 1), violations 0.
+- Current merged tree: blocking 30 (destructive 22 / governance_kept 7 / reversible 1), violations 0.
+- Membership comparison by (file, action_class, trigger) against the baseline tree extracted read-only from git object 08b59695c (git archive -> .specify/.tmp/, scanned with the same scanner):
+  - removed: exactly one — `shared/definitions/superagent-definitions.md`, destructive, the `**Termination.** Edge end ...` line; it was reworded by the line-106 merge commits 813986be5 / ec2cb05c8 before this feature's merge, and P1 recorded the 30 reading at 0d7519521.
+  - added: none (empty set).
+- Adjudication: the plan pin 31 is re-baselined to the merged-tree measured 30. The FR-025 direction that matters — no new hit — holds in its strongest form: the added membership set is empty.
+
+effective_baseline_blocking: 30
+effective_baseline_destructive: 22
+effective_baseline_governance_kept: 7
+effective_baseline_reversible: 1
+effective_baseline_violations: 0
+touched_files_pre_existing_hits: 2
+
+## Zero new hits on the feature-touched faces
+
+Touched scanned faces: `shared/definitions/decision-definitions.md`, `shared/definitions/superagent-definitions.md`, `shared/guidelines/confirmation-gates.md`, `shared/guidelines/decision-tension.md`, `shared/guidelines/fast-fail.md`, `shared/definitions/{goal,anchor,agent}-definitions.md`, `templates/instructions-template.md`, `skills/internal/{run-agent,run-team,analyze-artifacts,review-feature-quality,review-sdd-process}/SKILL.md`, `skills/external/sdd-loop-driver/references/{checkpoint-protocol,dispatch-recipes,stage-prompts}.md`.
+
+Current hit membership on those faces (scan --json, filtered): only the two pre-existing `skills/external/sdd-loop-driver/references/dispatch-recipes.md` members (the reversible 回环规则 bullet and the destructive 合并收尾 bullet). Both are baseline members whose line numbers shifted 185/186 -> 186/187 because this package inserted one bullet above them; their trigger texts are unchanged and no other touched face carries any hit.
+
+## Live gate scan after the feature
+
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+
+## FR-025 preservation reading (three protected owners, effective baseline fbab7a45c)
+
+$ git diff --quiet fbab7a45c..HEAD -- shared/declarations/facts/driver-completion-sentinels.yaml skills/external/sdd-loop-driver/references/watch-model.md skills/external/sdd-loop-driver/references/efficiency-model.md
+rc=0
+$ git diff --numstat fbab7a45c..HEAD -- <the three paths> | wc -l
+0
+
+The allowed-delta set is unconditionally empty; no re-baseline ruling exists for these three paths and none is needed.
+
+## EP-002 payload field counts (unchanged; owner superagent-definitions.md § The super↔sub Protocol)
+
+- seven role fields: `parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`, `depth_position`, `authority_ref`, `return_channel` — present, count 7.
+- four pre-existing injections: fast-fail clause, concurrency obligation, reporting duty, re-anchoring anchor digest — present, count 4.
+- five-item uplink: result/deliverable path, evidence pointer(s), explicit anomaly line, concurrency reading triple, returning identity — present, count 5.
