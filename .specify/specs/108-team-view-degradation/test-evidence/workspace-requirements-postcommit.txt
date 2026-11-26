@@ -1,0 +1,9 @@
+post-artifact-commit signature — 108-team-view-degradation / requirements stage (repair attempt 2)
+captured: 2026-11-26T07:26:18Z (UTC), at HEAD ac6723037
+command: python3 .specify/scripts/python/workspace-guard.py --snapshot .specify/specs/108-team-view-degradation/test-evidence/workspace-requirements-postcommit.json --repo .
+         then: python3 .specify/scripts/python/workspace-guard.py --check .specify/specs/108-team-view-degradation/test-evidence/workspace-requirements-postcommit.json --repo .
+result: clean (rc=0)
+
+comparison with the pre-commit reading (workspace-requirements.json):
+changed keys: [] — all three signature components identical (branch, 213 ref names, 91 spec dirs)
+note: the signature records ref NAMES, not SHAs, so the stage commit ac6723037 moves no observed component; the commit hash is the pointer to the committed state.
