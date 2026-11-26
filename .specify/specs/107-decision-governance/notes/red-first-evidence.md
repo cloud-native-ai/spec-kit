@@ -164,7 +164,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m05_receipt_rever
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the owner page section and the not-yet-implemented `chain` leg), never an import error.
 - fixtures: `tests/fixtures/decision-governance/m05/` — `red-no-receipt.md` (record + dispatch, no receipt), `red-no-id.md` (receipt without `decision_id`), `red-unresolvable.md` (no record segment resolves the receipt id); green chain `chain/green-complete.md`.
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-06 — `test_m06_block_completeness` (T032 red → T038 green)
 
@@ -179,7 +181,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m06_block_complet
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the owner page section and the not-yet-implemented `payload` leg), never an import error.
 - fixtures: `tests/fixtures/decision-governance/payload/complete.md` (five-field block) and `m06/red-missing-{id,class,chosen,constraints,archive}.md` (one omission each).
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-07 — `test_m06_dispatch_without_block_refused` (T032 red → T038 green)
 
@@ -194,7 +198,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m06_dispatch_with
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the `payload` leg does not exist yet), never an import error.
 - fixtures: `tests/fixtures/decision-governance/m06/red-no-block.md` (decision-backed, no block) and `payload/non-decision.md` (BC-02 bridge: legal without a block).
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-08 — `test_m07_chain_three_segments` (T032 red → T038 green)
 
@@ -209,7 +215,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m07_chain_three_s
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the `chain` leg does not exist yet), never an import error.
 - fixtures: `tests/fixtures/decision-governance/chain/green-complete.md` and `m07/red-missing-{record,dispatch,receipt}.md` plus `m07/red-inconsistent-id.md`.
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-09 — `test_m08_registered_variant_red` (T010 red → T017 green)
 
@@ -359,7 +367,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_acknowledgement_p
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the owner page section and the producer duties), never an import error.
 - fixtures: `tests/fixtures/decision-governance/payload/returns/return-acknowledged.md` (acknowledgement echoing `D-001` + the four-member receipt).
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-16 — `test_silent_redecision_is_anomaly` (T032 red → T038 green; payload/return snapshots)
 
@@ -374,7 +384,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_silent_redecision
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the `chain` leg does not exist yet), never an import error.
 - fixtures: `tests/fixtures/decision-governance/chain/red-silent-redecision.md` (receipt claims completion under `D-002`) and `payload/returns/return-escalated.md` (the correct explicit-anomaly form: no receipt, `ANOMALY:` line).
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-17 — `test_multi_hop_same_id` (T032 red → T038 green; chain fixtures)
 
@@ -389,7 +401,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the `chain` leg does not exist yet), never an import error.
 - fixtures: `tests/fixtures/decision-governance/chain/multi-hop-green.md` (two hops, five `D-001` references) and `chain/red-multi-hop-id.md` (hop 2 switches to `D-002`).
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-18 — `test_supersession_preserves_old` (T032 red → T038 green; chain fixtures)
 
@@ -404,7 +418,9 @@ FAILED tests/contract/test_decision_governance_guards.py::test_supersession_pres
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the owner page section), never an import error.
 - fixtures: `tests/fixtures/decision-governance/chain/carriers/redecision.md` (old `D-001` with `superseded_by: D-002` + receipt state, new `D-002`), `carriers/redecision-lossy.md` (the old record rewritten and its `implemented_at` lost), `carriers/register.md`.
-- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+- command (green): same single-test command, run as part of the US4 phase run `tests/contract/test_decision_governance_guards.py` on 2026-11-26.
+- green output (verbatim tail, raw log `notes/us4-green-slots.txt`): `.............. [100%]` / `14 passed in 6.61s`
+- exit status (green): `0`. The US4 SC-006 readings (complete block, refusal, receipt and chain reverse outputs, silent-redecision anomaly, multi-hop, supersession) are recorded in `notes/us4-green.txt` § SC-006.
 
 ### S-19 — `test_reconstruct_from_register_and_carriers` (T024 red → T029/T031 green; four-carrier fixtures)
 

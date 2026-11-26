@@ -1,0 +1,181 @@
+# US4 green evidence — 107-decision-governance (T038)
+
+Captured: 2026-11-26, worktree decision-governance, branch 107-decision-governance.
+Single test entry: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh` (no interpreter-level test command).
+
+## Phase run (guards module)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py -q
+```text
+..............                                                           [100%]
+14 passed in 6.61s
+```
+
+EXIT=0. Raw log: `notes/us4-green-slots.txt`.
+
+## SC-006 — dispatch payload with a complete decision block (M-06 green)
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/payload/complete.md
+PASS: 0 violation(s) (rules: M-06)
+EXIT=0
+
+## SC-006 — a decision-backed dispatch without the block is refused (M-06 red)
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/m06/red-no-block.md
+M-06 tests/fixtures/decision-governance/m06/red-no-block.md:1: a decision-backed dispatch MUST carry a decision_block with decision_id, decision_class, chosen_option, implementation_constraints and archive_pointer; it is refused at payload construction (the decision_block is absent)
+FAIL: 1 violation(s)
+EXIT=1
+
+## SC-006 — BC-02 bridge: a non-decision dispatch without a block is legal
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/payload/non-decision.md
+PASS: 0 violation(s) (rules: M-06)
+EXIT=0
+
+## SC-006 — the block-field reverse samples (each omission reds M-06)
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/m06/red-missing-id.md
+M-06 tests/fixtures/decision-governance/m06/red-missing-id.md:11: the decision_block is missing the required field `decision_id`
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/m06/red-missing-class.md
+M-06 tests/fixtures/decision-governance/m06/red-missing-class.md:11: the decision_block is missing the required field `decision_class`
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/m06/red-missing-chosen.md
+M-06 tests/fixtures/decision-governance/m06/red-missing-chosen.md:11: the decision_block is missing the required field `chosen_option`
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/m06/red-missing-constraints.md
+M-06 tests/fixtures/decision-governance/m06/red-missing-constraints.md:11: the decision_block is missing the required field `implementation_constraints`
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action payload --fixture tests/fixtures/decision-governance/m06/red-missing-archive.md
+M-06 tests/fixtures/decision-governance/m06/red-missing-archive.md:11: the decision_block is missing the required field `archive_pointer`
+FAIL: 1 violation(s)
+EXIT=1
+
+## SC-006 — the round-trip chain (M-05/M-07 green) and the multi-hop same id (C-307)
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/chain/green-complete.md
+PASS: 0 violation(s) (rules: M-05, M-07)
+EXIT=0
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/chain/multi-hop-green.md
+PASS: 0 violation(s) (rules: M-05, M-07)
+EXIT=0
+
+## SC-006 — the receipt reverse samples (M-05 red)
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m05/red-no-receipt.md
+M-05 tests/fixtures/decision-governance/m05/red-no-receipt.md:5: the implementation_receipt is missing; a transmitted decision MUST return a receipt and an incomplete return is never consumed
+M-07 tests/fixtures/decision-governance/m05/red-no-receipt.md:5: the receipt segment is missing (decision record → dispatch attempt → receipt)
+FAIL: 2 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m05/red-no-id.md
+M-05 tests/fixtures/decision-governance/m05/red-no-id.md:17: the implementation_receipt carries no decision_id
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m05/red-unresolvable.md
+M-07 tests/fixtures/decision-governance/m05/red-unresolvable.md:1: the record segment is missing; an auditable chain MUST carry the decision record, the dispatch attempt and the implementation receipt
+M-05 tests/fixtures/decision-governance/m05/red-unresolvable.md:14: the receipt decision_id 'D-001' does not resolve to a record in this chain
+FAIL: 2 violation(s)
+EXIT=1
+
+## SC-006 — the chain-segment reverse samples (M-07 red)
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m07/red-missing-record.md
+M-07 tests/fixtures/decision-governance/m07/red-missing-record.md:1: the record segment is missing; an auditable chain MUST carry the decision record, the dispatch attempt and the implementation receipt
+M-05 tests/fixtures/decision-governance/m07/red-missing-record.md:14: the receipt decision_id 'D-001' does not resolve to a record in this chain
+FAIL: 2 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m07/red-missing-dispatch.md
+M-07 tests/fixtures/decision-governance/m07/red-missing-dispatch.md:5: the dispatch attempt segment is missing (decision record → dispatch attempt → receipt)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m07/red-missing-receipt.md
+M-05 tests/fixtures/decision-governance/m07/red-missing-receipt.md:5: the implementation_receipt is missing; a transmitted decision MUST return a receipt and an incomplete return is never consumed
+M-07 tests/fixtures/decision-governance/m07/red-missing-receipt.md:5: the receipt segment is missing (decision record → dispatch attempt → receipt)
+FAIL: 2 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/m07/red-inconsistent-id.md
+M-07 tests/fixtures/decision-governance/m07/red-inconsistent-id.md:15: the dispatch attempt decision_id 'D-003' is inconsistent with the record id 'D-001'
+FAIL: 1 violation(s)
+EXIT=1
+
+## SC-006 — the silent re-decision is an explicit anomaly (C-305)
+
+$ python3 scripts/python/validate-decisions.py --action chain --fixture tests/fixtures/decision-governance/chain/red-silent-redecision.md
+M-05 tests/fixtures/decision-governance/chain/red-silent-redecision.md:19: the receipt decision_id 'D-002' does not resolve to a record in this chain
+M-07 tests/fixtures/decision-governance/chain/red-silent-redecision.md:19: the receipt decision_id 'D-002' is inconsistent with the record id 'D-001'
+FAIL: 2 violation(s)
+EXIT=1
+
+The correct alternative is the explicit escalation return (no receipt, anomaly line) —
+`tests/fixtures/decision-governance/payload/returns/return-escalated.md` carries:
+```text
+# Return snapshot — explicit fast-fail escalation after the decision was invalidated
+- **acknowledgement**: D-001 not accepted for implementation — the context invalidated the decision
+- **escalation**: ANOMALY: a new region constraint invalidated the recorded choice; the child stopped at the anomaly point
+```
+
+## SC-006 — supersession preserves the old record (C-308)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/chain/carriers/redecision.md --register tests/fixtures/decision-governance/chain/carriers/register.md
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+EXIT=0
+
+JSON record projection (both records retained; the old one keeps its supersession and receipt state):
+[
+ {
+  "decision_class": "ai-autonomous",
+  "transmission_status": "diverged",
+  "superseded_by": "D-002 (carrier: tests/fixtures/decision-governance/chain/carriers/redecision.md)",
+  "implemented_at": "2026-11-26T01:00:00Z",
+  "id": "D-001"
+ },
+ {
+  "decision_class": "ai-autonomous",
+  "transmission_status": "not-transmitted",
+  "superseded_by": null,
+  "implemented_at": null,
+  "id": "D-002"
+ }
+]
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/chain/carriers/redecision-lossy.md --register tests/fixtures/decision-governance/chain/carriers/register.md
+M-01 tests/fixtures/decision-governance/chain/carriers/redecision-lossy.md:3: implemented_at missing while transmission_status is diverged
+FAIL: 1 violation(s)
+EXIT=1
+
+## Mirror and gate readings (T037)
+
+$ python3 scripts/python/sync-mirrors.py --write && python3 scripts/python/sync-mirrors.py --check
+rc 0 — `ok shared/ == .specify/shared/ (117 files, byte-identical)`, `ok skills/…`, `ok scripts/…`; raw log `test-evidence/us4-mirror-check.txt`.
+cmp byte-identical for every pair touched in this package: the owner page,
+superagent-definitions, the two driver references, the two skill files and
+scripts/python/validate-decisions.py (7/7 OK).
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates. rc 0
+
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+
+The merged-tree measured total stays 30 with zero hits on the files touched by this
+package (owner page, superagent-definitions, run-agent, run-team); the two
+pre-existing dispatch-recipes hits (lines 185/186) are unchanged members of the
+baseline reading.
