@@ -1,0 +1,26 @@
+# US1 green reading — 108-team-view-degradation (T012)
+
+Taken 2026-11-26 on worktree team-view-degradation (branch 108-team-view-degradation) after T008–T011 landed.
+
+## Command (single entry, both US1 files)
+
+`SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_team_view_report_recognition.py tests/integration/test_team_view_degradation.py -q`
+
+## Real output
+
+```
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_team_view_report_recognition.py tests/integration/test_team_view_degradation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+............                                                             [100%]
+12 passed in 6.59s
+rc=0
+```
+
+## SC evidence
+
+- SC-001 (production replica): `test_production_replica_latest_is_the_parsed_maximum` — latest = `2026-11-25T140000Z-report.md` (parsed maximum), 5/5 classification (four reports + one auxiliary), residue line `共 2 份；示例: …（省略 0）`, exit 5; old compact report and the 4-hex stage file never latest.
+- SC-002 (corpus replica): `test_corpus_style_reports_are_recognized` — 13/13 report-style names recognized, `运行报告: 已列出（共 13 份`, latest token `20260917T115453Z`, exit 0, state neither `为空` nor `缺失`.
+- Also green in the same run: residue-only state, auxiliary-never-latest, same-stamp tie-break, overview-vs-single token equality with the inline `（report-recognition-uncertain：残留 1）` marker at exit 0.

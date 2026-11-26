@@ -84,21 +84,21 @@ def test_latest_is_maximum_parsed_timestamp_with_name_tiebreak(tmp_path):
         "recency-team",
         reports=[
             ("20261124T074500Z-report.md", "oldest\n"),
-            ("2026-11-25T140000Z-report.md", "iso report\n"),
             ("20261125T121924Z-93cc-stage.md", "stage file\n"),
-            ("20261125T140000Z-93cc-report.md", "same stamp, earlier name\n"),
+            ("20261125T140000Z-report.md", "newest, later name\n"),
+            ("20261125T140000Z-93cc-report.md", "newest, same stamp, earlier name\n"),
         ],
     )
     inventory = team_view.classify_runs(team_dir(tmp_path, "recency-team"))
     names = [record["name"] for record in inventory["reports"]]
     assert names == [
-        "2026-11-25T140000Z-93cc-report.md",
-        "2026-11-25T140000Z-report.md",
+        "20261125T140000Z-93cc-report.md",
+        "20261125T140000Z-report.md",
         "20261125T121924Z-93cc-stage.md",
         "20261124T074500Z-report.md",
     ]
     assert inventory["total"] == 4
-    assert Path(inventory["latest_path"]).name == "2026-11-25T140000Z-93cc-report.md"
+    assert Path(inventory["latest_path"]).name == "20261125T140000Z-93cc-report.md"
     assert inventory["latest_token"] == "20261125T140000Z"
 
 

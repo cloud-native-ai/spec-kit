@@ -1,0 +1,5 @@
+task: T009
+outcome: done
+run_id: r20261126T100550Z-108p2
+evidence: scripts/python/team-view.py `_render_persistence()` — carried `已列出` report cap; only-residue state `未识别（unrecognized）—— 仅残留，最新不可确定`; bounded `辅助产物（auxiliary）: 共 N 份；示例: …（省略 K）` emitted only when auxiliaries exist; bounded `未识别（unrecognized）: 共 N 份；示例: …（省略 K）` with ≤3 examples and omitted count; no unbounded transcription; `缺失`/`为空`/`不可读` meanings unchanged. Pinned by test_production_replica_latest_is_the_parsed_maximum, test_residue_only_runs_state_is_not_empty_or_missing, test_auxiliary_artifact_never_becomes_latest
+at: 2026-11-26T10:05:50Z

@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -131,6 +132,7 @@ STATE_CORRUPT = "定义损坏"
 STATE_UNDECLARED = "未声明"
 STATE_LISTED = "已列出"
 STATE_FOLDED = "已聚合"
+STATE_UNRECOGNIZED = "未识别（unrecognized）"
 DEFAULT_POINTER = "（默认值见 create-mode.md § Schema notes）"
 NESTED_NONE = "本次无嵌套 SDD 调用"
 TRUNCATION_MARKER = "…（截断）"
@@ -139,8 +141,27 @@ EXCERPT_LINE_CAP = 10
 EXCERPT_CHAR_CAP = 800
 REPORT_SHOWN_CAP = 20
 SLUG_LIST_CAP = 20
+RESIDUE_EXAMPLE_CAP = 3
 
-REPORT_NAME_RE = re.compile(r"^(\d{8}T\d{6}Z)-report\.md$")
+# One compiled timestamp grammar: the five accepted leading forms of C-201,
+# longest-first inside the alternation. Calendar validity is checked by strptime.
+STAMP_RE = re.compile(
+    r"^(?:"
+    r"(?P<iso_colon>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)"
+    r"|(?P<iso_dashed>\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z)"
+    r"|(?P<iso_compact>\d{4}-\d{2}-\d{2}T\d{6}Z)"
+    r"|(?P<compact_seconds>\d{8}T\d{6}Z)"
+    r"|(?P<compact_minutes>\d{8}T\d{4}Z)"
+    r")"
+)
+STAMP_FORMATS = (
+    ("iso_colon", "%Y-%m-%dT%H:%M:%SZ"),
+    ("iso_dashed", "%Y-%m-%dT%H-%M-%SZ"),
+    ("iso_compact", "%Y-%m-%dT%H%M%SZ"),
+    ("compact_seconds", "%Y%m%dT%H%M%SZ"),
+    ("compact_minutes", "%Y%m%dT%H%MZ"),
+)
+REPORT_SUFFIX_RE = re.compile(r"^(?:-[0-9a-f]{4})?-(?:report|stage)\.md$")
 REQUIRED_MATRIX_COLUMNS = ("role", "stage", "type")
 SPINE_FILES = ("constraints.md", "STATE.md", "run-log.jsonl")
 LEDGER_STATES = ("completed", "in-progress", "delayed", "not-started", "unknown")
@@ -903,42 +924,137 @@ def build_dynamic(front) -> dict:
     }
 
 
-def build_persistence(team_dir: Path, front) -> dict:
+# --------------------------------------------------------------------------- #
+# Run-report recognition (C-201…C-206): one timestamp grammar, one classifier,
+# one latest selection — shared by the single-team view and the overview.
+# --------------------------------------------------------------------------- #
+def _match_stamp(name: str):
+    """``(parsed UTC datetime, match end)`` for a valid leading stamp, else ``None``."""
+    match = STAMP_RE.match(name)
+    if not match:
+        return None
+    for group, fmt in STAMP_FORMATS:
+        candidate = match.group(group)
+        if candidate is None:
+            continue
+        try:
+            parsed = datetime.strptime(candidate, fmt)
+        except ValueError:
+            return None
+        return parsed.replace(tzinfo=timezone.utc), match.end()
+    return None
+
+
+def parse_stamp(name: str):
+    """The leading UTC stamp of a file name, or ``None`` — never guessed (C-201)."""
+    matched = _match_stamp(name)
+    return matched[0] if matched else None
+
+
+def classify_run_file(name: str) -> dict:
+    """One ``runs/`` file name → its C1 record, in the fixed C-202 order."""
+    matched = _match_stamp(name)
+    if matched is None:
+        return {"name": name, "kind": "residue", "timestamp": None, "token": None}
+    parsed, end = matched
+    kind = "report" if REPORT_SUFFIX_RE.match(name[end:]) else "auxiliary"
+    return {
+        "name": name,
+        "kind": kind,
+        "timestamp": parsed.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "token": parsed.strftime("%Y%m%dT%H%M%SZ"),
+    }
+
+
+def classify_runs(team_dir: Path) -> dict:
+    """One pass over ``runs/`` → the C3 inventory both output modes consume."""
     runs = team_dir / "runs"
-    reports = {
+    inventory = {
         "state": STATE_MISSING,
         "path": str(runs),
         "total": 0,
         "shown": [],
         "omitted": 0,
         "unrecognized": [],
+        "reports": [],
+        "auxiliaries": [],
+        "residue": {
+            "count": 0,
+            "examples": [],
+            "omitted": 0,
+            "auxiliary_count": 0,
+            "auxiliary_examples": [],
+            "auxiliary_omitted": 0,
+        },
         "latest_path": None,
+        "latest_token": None,
+        "uncertain": False,
+        "unreadable": False,
     }
-    if runs.is_dir():
-        try:
-            entries = sorted(path for path in runs.iterdir() if path.is_file())
-        except OSError:
-            entries = None
-        if entries is None:
-            reports["state"] = STATE_UNREADABLE
+    if not runs.is_dir():
+        return inventory
+    try:
+        entries = sorted(path for path in runs.iterdir() if path.is_file())
+    except OSError:
+        inventory["state"] = STATE_UNREADABLE
+        return inventory
+
+    report_records = []
+    auxiliary_records = []
+    residue_names = []
+    report_paths = {}
+    for path in entries:
+        record = classify_run_file(path.name)
+        if record["kind"] == "report":
+            report_records.append(record)
+            report_paths[record["name"]] = path
+        elif record["kind"] == "auxiliary":
+            auxiliary_records.append(record)
         else:
-            recognized = []
-            unrecognized = []
-            for path in entries:
-                match = REPORT_NAME_RE.match(path.name)
-                if match:
-                    recognized.append((match.group(1), path.name, path))
-                else:
-                    unrecognized.append(path.name)
-            recognized.sort(key=lambda item: item[1])
-            recognized.sort(key=lambda item: item[0], reverse=True)
-            reports["total"] = len(recognized)
-            reports["omitted"] = max(0, len(recognized) - REPORT_SHOWN_CAP)
-            reports["shown"] = [item[1] for item in recognized[:REPORT_SHOWN_CAP]]
-            reports["unrecognized"] = sorted(unrecognized)
-            reports["state"] = STATE_LISTED if recognized else STATE_EMPTY
-            if recognized:
-                reports["latest_path"] = str(recognized[0][2])
+            residue_names.append(record["name"])
+
+    report_records.sort(key=lambda record: record["name"])
+    report_records.sort(key=lambda record: record["token"], reverse=True)
+    auxiliary_records.sort(key=lambda record: record["name"])
+    residue_names.sort()
+    residue_examples = residue_names[:RESIDUE_EXAMPLE_CAP]
+    auxiliary_names = [record["name"] for record in auxiliary_records]
+    auxiliary_examples = auxiliary_names[:RESIDUE_EXAMPLE_CAP]
+    latest = report_records[0] if report_records else None
+    if report_records:
+        state = STATE_LISTED
+    elif residue_names:
+        state = STATE_UNRECOGNIZED
+    else:
+        state = STATE_EMPTY
+
+    inventory.update({
+        "state": state,
+        "total": len(report_records),
+        "shown": [record["name"] for record in report_records[:REPORT_SHOWN_CAP]],
+        "omitted": max(0, len(report_records) - REPORT_SHOWN_CAP),
+        "unrecognized": residue_names,
+        "reports": report_records,
+        "auxiliaries": auxiliary_records,
+        "residue": {
+            "count": len(residue_names),
+            "examples": residue_examples,
+            "omitted": len(residue_names) - len(residue_examples),
+            "auxiliary_count": len(auxiliary_names),
+            "auxiliary_examples": auxiliary_examples,
+            "auxiliary_omitted": len(auxiliary_names) - len(auxiliary_examples),
+        },
+        "latest_path": str(report_paths[latest["name"]]) if latest else None,
+        "latest_token": latest["token"] if latest else None,
+        "uncertain": bool(residue_names),
+    })
+    if inventory["latest_path"] is not None:
+        inventory["unreadable"] = not os.access(inventory["latest_path"], os.R_OK)
+    return inventory
+
+
+def build_persistence(team_dir: Path, front) -> dict:
+    reports = classify_runs(team_dir)
 
     items_path = team_dir / "items.jsonl"
     ledger = {"state": STATE_MISSING, "path": str(items_path)}
@@ -1060,7 +1176,6 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
         "anchor_pointer": "/speckit.anchor view",
     }
 
-    degraded = binding_error is not None or archive["anchor"]["state"] == STATE_UNREADABLE
     errors = []
     if binding_error is not None:
         errors.append({
@@ -1074,6 +1189,14 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
             "message": "anchor 读取失败: %s" % archive["anchor"].get("reason", ""),
             "path": str(team_dir),
         })
+    if persistence["reports"]["uncertain"]:
+        errors.append({
+            "code": "report-recognition-uncertain",
+            "message": "runs/ 存在 %d 份未识别（unrecognized）残留：最新运行判定不可确定"
+                       % persistence["reports"]["residue"]["count"],
+            "path": persistence["reports"]["path"],
+        })
+    degraded = bool(errors)
 
     consumed = [definition_path]
     ledger_path = persistence["ledger"].get("path")
@@ -1098,10 +1221,7 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
         "degraded": degraded,
         "errors": errors,
         "as_of": _max_mtime_iso(consumed),
-        "latest_report_timestamp": (
-            REPORT_NAME_RE.match(persistence["reports"]["shown"][0]).group(1)
-            if persistence["reports"]["shown"] else None
-        ),
+        "latest_report_timestamp": persistence["reports"]["latest_token"],
     }
 
 
@@ -1119,18 +1239,6 @@ OVERVIEW_HEADERS = (
 )
 
 
-def _latest_report_token(team_dir: Path):
-    runs = team_dir / "runs"
-    if not runs.is_dir():
-        return None
-    try:
-        names = [path.name for path in runs.iterdir() if path.is_file()]
-    except OSError:
-        return None
-    tokens = [match.group(1) for match in map(REPORT_NAME_RE.match, names) if match]
-    return max(tokens) if tokens else None
-
-
 def build_overview_row(repo_root: Path, slug: str) -> dict:
     team_dir = repo_root / ".specify" / "teams" / slug
     definition_path = team_dir / "team.md"
@@ -1142,6 +1250,7 @@ def build_overview_row(repo_root: Path, slug: str) -> dict:
         "anchor_identity": {"kind": "inferred", "value": slug},
         "updated": None,
         "latest_run": None,
+        "latest_residue": 0,
         "state": STATE_CORRUPT,
         "path": str(definition_path),
     }
@@ -1158,7 +1267,9 @@ def build_overview_row(repo_root: Path, slug: str) -> dict:
     row["lifecycle"] = lifecycle_of(front)
     row["anchor_identity"] = anchor_identity_of(front, slug)
     row["updated"] = _text(front.get("updated"))
-    row["latest_run"] = _latest_report_token(team_dir)
+    runs_inventory = classify_runs(team_dir)
+    row["latest_run"] = runs_inventory["latest_token"]
+    row["latest_residue"] = runs_inventory["residue"]["count"]
     return row
 
 
@@ -1255,6 +1366,9 @@ def render_overview(view: dict) -> str:
             lifecycle_text = lifecycle["value"] if lifecycle["declared"] else (
                 lifecycle["value"] + "（" + STATE_UNDECLARED + "）")
             anchor = row["anchor_identity"]
+            latest_text = row["latest_run"] or STATE_UNRECORDED
+            if row["latest_residue"]:
+                latest_text += "（report-recognition-uncertain：残留 %d）" % row["latest_residue"]
             cells = (
                 row["slug"],
                 row["name"] or STATE_UNRECORDED,
@@ -1262,7 +1376,7 @@ def render_overview(view: dict) -> str:
                 lifecycle_text,
                 "%s — %s" % (anchor["kind"], anchor["value"]),
                 row["updated"] or STATE_UNRECORDED,
-                row["latest_run"] or STATE_UNRECORDED,
+                latest_text,
             )
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
@@ -1467,10 +1581,24 @@ def _render_persistence(view: dict, lines: list) -> None:
             reports["total"], min(reports["total"], REPORT_SHOWN_CAP), reports["omitted"]))
         for name in reports["shown"]:
             lines.append("  - %s" % name)
+    elif reports["state"] == STATE_UNRECOGNIZED:
+        lines.append("- 运行报告: %s—— 仅残留，最新不可确定" % STATE_UNRECOGNIZED)
     else:
         lines.append("- 运行报告: %s（%s）" % (reports["state"], reports["path"]))
-    if reports["unrecognized"]:
-        lines.append("- 未识别（unrecognized）: %s" % ", ".join(reports["unrecognized"]))
+    residue = reports["residue"]
+    if residue["auxiliary_count"]:
+        lines.append("- 辅助产物（auxiliary）: 共 %d 份；示例: %s（省略 %d）" % (
+            residue["auxiliary_count"],
+            ", ".join(residue["auxiliary_examples"]),
+            residue["auxiliary_omitted"],
+        ))
+    if residue["count"]:
+        lines.append("- %s: 共 %d 份；示例: %s（省略 %d）" % (
+            STATE_UNRECOGNIZED,
+            residue["count"],
+            ", ".join(residue["examples"]),
+            residue["omitted"],
+        ))
     if ledger["state"] == STATE_FOLDED:
         counts = " · ".join(
             "%s %d" % (state, count) for state, count in sorted(ledger["by_state"].items())
@@ -1557,6 +1685,11 @@ def render_single(view: dict) -> str:
     _render_latest(view, lines)
     lines.append("")
     _render_archive(view, lines)
+    if view["errors"]:
+        lines.append("")
+        lines.append("降级（degraded）:")
+        for error in view["errors"]:
+            lines.append("- %s: %s" % (error["code"], error["message"]))
     return "\n".join(lines)
 
 

@@ -1,0 +1,5 @@
+task: T012
+outcome: done
+run_id: r20261126T100550Z-108p2
+evidence: notes/us1-green.txt — `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_team_view_report_recognition.py tests/integration/test_team_view_degradation.py -q` exit 0, 12 passed in 6.59s; red→green table appended to notes/red-first-evidence.md; SC-001 production replica 5/5 classification with parsed-maximum latest at exit 5; SC-002 corpus replica 13/13 recognized at exit 0; inherited team-view files (4 files) still 106 passed
+at: 2026-11-26T10:05:50Z

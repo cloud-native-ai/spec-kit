@@ -1,0 +1,5 @@
+task: T008
+outcome: done
+run_id: r20261126T100550Z-108p2
+evidence: scripts/python/team-view.py — one compiled STAMP_RE (five C-201 forms, strptime calendar validation), REPORT_SUFFIX_RE `(?:-[0-9a-f]{4})?-(?:report|stage)\.md`, parse_stamp/classify_run_file/classify_runs; build_persistence consumes classify_runs; REPORT_NAME_RE deleted; as_of.latest_report_timestamp now the normalized latest_token. Grep: `def classify_runs(` = 1, `STAMP_RE = re.compile` = 1, zero REPORT_NAME_RE/_latest_report_token references. Unit U-GRAMMAR/U-CLASSIFIER/U-LATEST/U-TOKEN/U-RESIDUE/U-UNCERTAINTY green in notes/us1-green.txt
+at: 2026-11-26T10:05:50Z

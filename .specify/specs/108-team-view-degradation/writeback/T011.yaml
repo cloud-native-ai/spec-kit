@@ -1,0 +1,5 @@
+task: T011
+outcome: done
+run_id: r20261126T100550Z-108p2
+evidence: scripts/python/team-view.py — `_latest_report_token()` and its max() removed; build_overview_row() consumes classify_runs() (latest_token + residue count); render_overview() appends `（report-recognition-uncertain：残留 N）` to a residue-bearing latest cell, keeps an undeterminable row off blank/older values, and the overview stays in the 0/2 exit domain with no reasons. Pinned by test_overview_matches_single_view_and_discloses_uncertainty (token equality + marker, exit 0) and the real-corpus overview smoke in notes/red-first-evidence.md
+at: 2026-11-26T10:05:50Z

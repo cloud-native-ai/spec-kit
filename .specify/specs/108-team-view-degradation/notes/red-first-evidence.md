@@ -177,6 +177,28 @@ A slot is complete only with all three; prefilled fields below are the skeleton.
 - **Evidence file**: `test-evidence/us3-red-contract.txt`
 - **Subject matcher**: docs page / skill / program declaration each name both reason ids and cite `contracts/team-view-program.contract.md`; `git show 54c6efa8c:` equality for the naming owner and `create-mode.md`; import-root audit (stdlib ∪ repo-local ∪ pytest, zero new third-party).
 
+## Green reading (T012, 2026-11-26)
+
+Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_team_view_report_recognition.py tests/integration/test_team_view_degradation.py -q` → exit 0, `12 passed in 6.59s` (full capture `notes/us1-green.txt`).
+
+| Slot | Node | Red (T006/T007) | Green (T012) |
+|------|------|-----------------|--------------|
+| U-GRAMMAR | `test_stamp_grammar_accepts_exactly_the_five_forms` | AttributeError `parse_stamp` | pass |
+| U-CLASSIFIER | `test_classification_order_is_fixed` | AttributeError `classify_run_file` | pass |
+| U-LATEST | `test_latest_is_maximum_parsed_timestamp_with_name_tiebreak` | AttributeError `classify_runs` | pass |
+| U-TOKEN | `test_normalized_token_is_the_single_value` | AttributeError `classify_runs` | pass |
+| U-RESIDUE | `test_residue_presentation_is_bounded` | AttributeError `classify_runs` | pass |
+| U-UNCERTAINTY | `test_uncertainty_predicate_needs_readable_runs_and_residue` | AttributeError `classify_runs` | pass |
+| I-PRODUCTION-REPLICA | `test_production_replica_latest_is_the_parsed_maximum` | latest hidden by the narrow template | pass (latest = parsed maximum, 5/5, exit 5) |
+| I-CORPUS-REPLICA | `test_corpus_style_reports_are_recognized` | all 13 read as unrecognized | pass (13/13, exit 0) |
+| I-RESIDUE-ONLY | `test_residue_only_runs_state_is_not_empty_or_missing` | rendered `运行报告: 为空` | pass (residue-only state, exit 5) |
+| I-AUX-SAMESTAMP | `test_auxiliary_artifact_never_becomes_latest`, `test_same_stamp_tie_break_is_name_ascending` | auxiliary line absent / tie not applied | pass |
+| I-OVERVIEW-REUSE | `test_overview_matches_single_view_and_discloses_uncertainty` | residue row `未记录` | pass (token equality + inline marker, exit 0) |
+
+Test-side correction during T012 (disclosed): the U-LATEST fixture originally mixed stamp forms, so an ISO-dashed name beat the intended name-ascending tie; the fixture now uses two same-form same-stamp names (`20261125T140000Z-report.md` / `20261125T140000Z-93cc-report.md`). The production rule was not changed, and the red reading above was taken on the pre-correction fixture of the same node (the failure cause is the absent `classify_runs`, independent of fixture data).
+
+Supporting real-corpus smoke (read-only, same tree): `viz-skill-arena` now reads `运行报告: 已列出（共 5 份…）` with latest `2026-09-15T090000Z-report.md` at exit 0; `session-driven-self-improvement` exits 5 with the bounded auxiliary/residue lines and the `降级（degraded）` block naming `report-recognition-uncertain`; the overview row for it carries `20261008T090000Z（report-recognition-uncertain：残留 2）` at exit 0.
+
 ## Regression guards (not red slots)
 
 - T020's healthy byte-fidelity and read-only snapshot guards are regression guards: their green

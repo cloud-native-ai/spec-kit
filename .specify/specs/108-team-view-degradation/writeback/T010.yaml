@@ -1,0 +1,5 @@
+task: T010
+outcome: done
+run_id: r20261126T100550Z-108p2
+evidence: scripts/python/team-view.py assemble_single() appends `report-recognition-uncertain` to errors[] with the residue count and runs path when a readable runs/ holds residue; degraded = bool(errors) so exit 5 iff a reason is active; render_single() appends the non-group `降级（degraded）:` block naming each active reason individually; engine-degraded messages unchanged; file-level states alone add no reason. Pinned by test_residue_only_runs_state_is_not_empty_or_missing and test_production_replica_latest_is_the_parsed_maximum (exit 5 + reason code), corpus/aux tests stay exit 0
+at: 2026-11-26T10:05:50Z
