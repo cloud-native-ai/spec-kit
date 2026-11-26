@@ -1,0 +1,37 @@
+# analyze-repair4 post-commit readings — 2026-11-26T02:08:39Z
+
+## commit
+ff69edd14 docs(107-decision-governance): analyze round-4 repair — one empty-delta reading, one ruling form, B-07 receiver
+
+## numstat of the artifact commit (ff69edd14^..ff69edd14)
+4	4	.specify/features/107-decision-governance.md
+4	4	.specify/specs/107-decision-governance/checklists/decision-governance-2026-11-26.md
+2	2	.specify/specs/107-decision-governance/contracts/enforcement-boundary.contract.md
+1	1	.specify/specs/107-decision-governance/contracts/text-and-options.contract.md
+5	5	.specify/specs/107-decision-governance/plan.md
+12	5	.specify/specs/107-decision-governance/requirements.md
+8	8	.specify/specs/107-decision-governance/tasks.md
+59	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-2026-11-26.md
+3	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-decomposition.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-pre-analyze-plan.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-pre-analyze-requirements.txt
+4	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-pre-analyze-tasks.txt
+65	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-readings.txt
+12	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-validate-requirements.txt
+3	0	.specify/specs/107-decision-governance/test-evidence/analyze-repair4-validate-tasks.txt
+
+## protected record paths — zero-rewrite check (b2cd7a6cd..HEAD)
+$ git diff --numstat b2cd7a6cd..HEAD -- .specify/register.md .specify/specs/*/checkpoints/ .specify/specs/107-decision-governance/test-evidence/analyze-incremental-r4.jsonl .specify/specs/107-decision-governance/test-evidence/analyze-repair-2026-11-26.md .specify/specs/107-decision-governance/test-evidence/analyze-repair2-2026-11-26.md .specify/specs/107-decision-governance/test-evidence/analyze-repair3-2026-11-26.md
+(rows above: none means zero rewrite)
+
+## preservation reading after commit
+git diff --quiet ... rc=0
+numstat rows: 0
+
+## workspace guard check
+clean
+guard_exit=0
+
+## working tree after artifact commit
+?? .specify/specs/107-decision-governance/test-evidence/analyze-repair4-readings-postcommit.txt
+?? .specify/specs/107-decision-governance/test-evidence/workspace-analyze-repair4.json
