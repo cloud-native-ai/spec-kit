@@ -139,6 +139,13 @@ records) plus one checklist pass (H), the same-author delegation rule, the stale
 test, and the do-not-flag noise floor:
 [`./references/detection-and-severity.md`](./references/detection-and-severity.md).
 
+**Decision behavior rules (owner by pointer).** Three decision-governance behavior rules name
+`/speckit.analyze` as a review surface: B-04 (AI decision rigor), B-05 (rationale
+sufficiency) and B-07 (preservation-ruling adequacy for the three protected artifacts). Their
+statements, the full B roster and the machine/behavior boundary are owned by
+`shared/definitions/decision-definitions.md` § 强制边界 and reached by pointer, never
+restated and never claimed as machine-covered.
+
 **F — cross-clause contradictions.** Two clauses that impose mutually exclusive criteria on
 the same object MUST be reported as one `inconsistency` finding naming both clauses and the
 shared object — for example, one clause requires an artifact's whole-file hash to remain

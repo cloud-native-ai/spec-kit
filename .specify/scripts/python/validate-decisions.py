@@ -20,7 +20,22 @@ Actions:
   chain       judge chain snapshots: M-05 (the implementation receipt exists and its
               ``decision_id`` resolves) and M-07 (record → dispatch attempt → receipt all
               present with consistent ids)
-  inventory   judge the closed Decision Producer Inventory (FR-003; the leg lands with US5)
+  inventory   judge the closed Decision Producer Inventory (FR-003). The declared set is
+              parsed from the owner page's § 档案即投影 producer table (--spec names a copy;
+              the repository's own page by default). The observation set is supplied by the
+              caller through --fixture: the caller runs the documented code-face scan from
+              the repository root —
+                grep -rEl 'shared/definitions/decision-definitions\.md' \
+                  templates skills agents scripts src \
+                  --include='*.md' --include='*.py' --include='*.sh' | sort
+              — and passes the output file. A hit maps to a declared producer by that row's
+              owner-path cell; the ambient instruction surface, the two dispatch-recipe
+              surfaces and the checker's own source are known non-producer faces (they
+              reach the owner page by pointer and yield no decision items; the checker's
+              verdicts are the exempt P-12 face). Any other hit is an unregistered
+              decision-entry face and turns the guard red; a declared non-exempt producer
+              whose owner face does not exist is reported missing. The verdict is
+              ``observed == declared ± exempt``.
 
 Options:
   --action {records,payload,chain,inventory}   required; the judgement to run
@@ -34,7 +49,7 @@ Options:
   --version            one line ``<script-name> <framework-version>``, exit 0
 
 Exit codes: 0 = every judged check passed / 1 = a documented check failed /
-2 = input or argument error (including a declared action not implemented yet).
+2 = input or argument error.
 
 Read-only: no write point of any kind, no resident process, standard library only.
 """
@@ -962,6 +977,148 @@ def chain_verdicts(segments: dict[str, list[dict]]) -> list[dict]:
     return found
 
 
+#: Faces that reference the owner page but yield no decision item: the ambient instruction
+#: surface (FR-010/FR-026), the two dispatch-recipe surfaces (rules carriers) and the
+#: checker's own source (the judge; its verdicts are the exempt P-12 face). Closed set —
+#: extending it is an owner-page inventory revision (FR-003).
+NON_PRODUCER_FACES = frozenset({
+    "templates/instructions-template.md",
+    "skills/external/sdd-loop-driver/references/dispatch-recipes.md",
+    "skills/external/sdd-loop-driver/references/stage-prompts.md",
+    "scripts/python/validate-decisions.py",
+})
+
+INVENTORY_ROW_RE = re.compile(r"^\| (P-\d{2}) \|")
+BACKTICK_PATH_RE = re.compile(r"`([^`]+)`")
+
+
+def load_inventory(owner_path: Path) -> list[dict]:
+    """Declared producer rows of the owner page's § 档案即投影 inventory table."""
+    rows: list[dict] = []
+    in_section = False
+    for lineno, line in enumerate(owner_path.read_text(encoding="utf-8").splitlines(), start=1):
+        if line.startswith("## "):
+            in_section = "档案即投影" in line and "Archive as Projection" in line
+            continue
+        if not in_section:
+            continue
+        match = INVENTORY_ROW_RE.match(line)
+        if not match:
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        obligation = cells[3] if len(cells) > 3 else ""
+        owner_cell = cells[5] if len(cells) > 5 else ""
+        rows.append({
+            "id": match.group(1),
+            "line": lineno,
+            "obligation": obligation,
+            "exempt": obligation.strip().lower().startswith("exempt"),
+            "owner_paths": [path for path in BACKTICK_PATH_RE.findall(owner_cell) if "/" in path],
+        })
+    return rows
+
+
+def run_inventory(args) -> int:
+    """Observed == declared ± exempt over the closed Decision Producer Inventory (C-406)."""
+    owner_path = REPO_ROOT / "shared" / "definitions" / "decision-definitions.md"
+    if args.spec:
+        spec = Path(args.spec)
+        owner_path = spec / "decision-definitions.md" if spec.is_dir() else spec
+    if not owner_path.is_file():
+        print(f"error: owner page not found: {owner_path}", file=sys.stderr)
+        return EXIT_INPUT
+    try:
+        declared = load_inventory(owner_path)
+    except OSError as exc:
+        print(f"error: cannot read owner page {owner_path}: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    if not declared:
+        print(f"error: {display_path(owner_path)} carries no producer inventory rows",
+              file=sys.stderr)
+        return EXIT_INPUT
+    if not args.fixture:
+        print("error: --action inventory needs --fixture <observation file> "
+              "(the documented code-face scan output)", file=sys.stderr)
+        return EXIT_INPUT
+    observation_path = Path(args.fixture)
+    try:
+        observation = [
+            line.strip() for line in observation_path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+    except OSError as exc:
+        print(f"error: cannot read observation {observation_path}: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+
+    by_id = {row["id"]: row for row in declared}
+    observed: set[str] = set()
+    unregistered: list[str] = []
+    for raw in observation:
+        face = raw.strip().lstrip("./")
+        mapped = [row["id"] for row in declared if face in row["owner_paths"]]
+        if mapped:
+            observed.update(mapped)
+        elif face not in NON_PRODUCER_FACES:
+            unregistered.append(face)
+
+    missing: list[str] = []
+    for row in declared:
+        if row["exempt"] or row["id"] in observed:
+            continue
+        if any((REPO_ROOT / path).is_file() for path in row["owner_paths"]):
+            observed.add(row["id"])
+        else:
+            missing.append(row["id"])
+
+    violations: list[dict] = []
+    for index, face in enumerate(sorted(unregistered), start=1):
+        violations.append({
+            "rule": "INVENTORY",
+            "line": index,
+            "path": display_path(observation_path),
+            "message": (f"unregistered decision-entry face {face!r}; a producer outside the "
+                        "declaration that yields decision items MUST revise the inventory "
+                        "(FR-003)"),
+        })
+    for row in declared:
+        if row["id"] in missing:
+            violations.append({
+                "rule": "INVENTORY",
+                "line": row["line"],
+                "path": display_path(owner_path),
+                "message": (f"declared producer {row['id']} has no existing owner face "
+                            f"({', '.join(row['owner_paths']) or 'no path declared'})"),
+            })
+
+    exempt_ids = sorted(row["id"] for row in declared if row["exempt"])
+    status = "fail" if violations else "pass"
+    verdict = ("observed == declared ± exempt" if not violations
+               else "observed != declared ± exempt")
+    if args.json:
+        print(json.dumps({
+            "action": "inventory",
+            "status": status,
+            "verdict": verdict,
+            "declared": [{"id": row["id"], "obligation": row["obligation"],
+                          "exempt": row["exempt"]} for row in declared],
+            "exempt": exempt_ids,
+            "observed": sorted(observed),
+            "unregistered": sorted(unregistered),
+            "missing": sorted(missing),
+            "violations": violations,
+        }, ensure_ascii=False, indent=2))
+    else:
+        for verdict_row in violations:
+            print(f"{verdict_row['rule']} {verdict_row['path']}:{verdict_row['line']}: "
+                  f"{verdict_row['message']}")
+        if violations:
+            print(f"FAIL: {verdict}")
+        else:
+            print(f"PASS: {verdict} (declared {len(declared)}, exempt {len(exempt_ids)}, "
+                  f"observed {len(observed)})")
+    return EXIT_CHECK_FAILED if violations else EXIT_OK
+
+
 def print_action_report(action: str, rules: tuple[str, ...], checked: int,
                         violations: list[dict], as_json: bool) -> int:
     """Shared verdict rendering for the snapshot-shaped actions."""
@@ -1045,16 +1202,7 @@ def main(argv=None) -> int:
         return run_payload(args)
     if args.action == "chain":
         return run_chain(args)
-
-    # Interface final, judgement leg pending: the remaining declared action reports
-    # not-implemented and exits as an input error, so an unimplemented check can never be
-    # mistaken for a pass. The leg lands with US5 of feature 107.
-    if args.json:
-        print(json.dumps({"action": args.action, "status": "not-implemented",
-                          "root": str(REPO_ROOT)}, ensure_ascii=False))
-    print("error: action %r is declared but not implemented yet (read-only skeleton)"
-          % args.action, file=sys.stderr)
-    return EXIT_INPUT
+    return run_inventory(args)
 
 
 if __name__ == "__main__":

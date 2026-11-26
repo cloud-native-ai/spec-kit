@@ -259,3 +259,45 @@
 
 - 重决是**新记录**：父侧新增一条记录，旧记录以条件层 `superseded_by` 指向新编号并**保留**旧记录与旧回执，MUST NOT 删除或改写（§ 决策记录 的取代族）。
 - 取代不改变被传递决策的类别；每条记录的审计链分别成立。
+
+## 强制边界(Enforcement Boundary)
+
+本节拥有本特性的**机器可判/行为类分工**：九条机器规则与七条行为规则的封闭名单、逐规则的唯一判据动作与转红条件、以及表—守卫对等和门控中性两项义务。两类规则的反向性质是本节的要点：机器规则 MUST 能被改坏的对象**转红**；行为规则 MUST 被具名评审承接，MUST NOT 被任何文档或测试声称机器覆盖。
+
+### 机器可判规则(M rules, closed)
+
+| 规则 | 判据动作(judge) | 转红条件(red condition) | 覆盖声明 | 逆向样本(reverse sample) |
+|------|-----------------|--------------------------|----------|--------------------------|
+| M-01 记录分层文法/类取值/时点 | `--action records` | 缺基础层字段、条件层字段在触发成立时缺失、`decision_class` 值域外、`transmission_status` 值域外、时点形态错或与状态相位矛盾 | 机器覆盖 | `tests/fixtures/decision-governance/m01/` |
+| M-02 同名冲突的定位信息 | `--action records` | `same_name_conflict: true` 且 `resource_locator` 为空或具名维度少于下限 | 机器覆盖（只判在场与维度数） | `tests/fixtures/decision-governance/m02/` |
+| M-03 选项闭集 | `--action records` | 空选项集、重复标签、`other` 无 `path`、五要素缺失、`chosen_option` 非成员 | 机器覆盖 | `tests/fixtures/decision-governance/m03/` |
+| M-04 决策编号（只判新式记录） | `--action records` | 新式记录的 `D-NNN` 形态错、同载体不密集、register 不可解析（legacy 标题与 register 行不判） | 机器覆盖 | `tests/fixtures/decision-governance/m04/` |
+| M-05 实施回执 | `--action chain` | 回执缺失、`decision_id` 缺失或不可解析 | 机器覆盖 | `tests/fixtures/decision-governance/m05/` |
+| M-06 派发决策块 | `--action payload` | 决策 backed 派发缺决策块或块缺字段 | 机器覆盖 | `tests/fixtures/decision-governance/m06/` |
+| M-07 审计链 | `--action chain` | 记录、派发尝试、回执三段任一缺失或编号不一致 | 机器覆盖 | `tests/fixtures/decision-governance/m07/` |
+| M-08 已登记简称 | `--action records` | 决策主体命中 glossary 已登记 variant 且 canonical 存在 | 机器覆盖（只覆盖已登记词） | `tests/fixtures/decision-governance/m08/` |
+| M-09 evidence 指针可解析 | `--action records` | 任一 evidence 指针不可解析（指向的载体路径/锚不存在或不可读） | 机器覆盖（只判可解析，不判证据是否充分） | `tests/fixtures/decision-governance/m09/` |
+
+### 行为类规则(B rules, closed)
+
+| 规则 | 承接面(review surface) | 覆盖声明 |
+|------|------------------------|----------|
+| B-01 名称完整性 | `/speckit.review` 产物段 + 人工决策评审 | 行为类，不声称机器覆盖 |
+| B-02 定位充分性 | `/speckit.review` 产物段 + 人工决策评审 | 行为类，不声称机器覆盖 |
+| B-03 人工可读性/后果真实性 | 人工决策评审 + `/speckit.review` 产物段 | 行为类，不声称机器覆盖 |
+| B-04 AI 严谨性 | `/speckit.analyze` + `/speckit.review` | 行为类，不声称机器覆盖 |
+| B-05 理由充分性 | `/speckit.analyze` + `/speckit.review` | 行为类，不声称机器覆盖 |
+| B-06 类别正确性 | `/speckit.review` 产物段 | 行为类，不声称机器覆盖 |
+| B-07 保全裁定充分性（受保护产物改动） | `/speckit.analyze` + `/speckit.review` 产物段 | 行为类，不声称机器覆盖 |
+
+### 表—守卫对等(table–guard parity)
+
+- 每条 M 规则恰有**一个**确定性判据动作与**一个**转红条件（上表逐行）；改变判据动作或转红条件 MUST 先修订本节。
+- 测试侧的守卫花名册（`tests/contract/test_decision_governance_guards.py` 的 `GUARD_ROSTER`）与本节 M 表 MUST 行集一致；行为面名单与 B 表 MUST 行集一致——任一方向缺一行即缺陷（C-407）。
+- 每条 M 规则 MUST 配一个**逆向样本**（把被检查对象改坏后守卫转红）；无逆向样本的守卫视为缺陷（C-403）。
+- 每条 B 规则 MUST 有具名承接面；文档与测试 MUST NOT 声称任何 B 规则被机器覆盖（C-402）。
+
+### 门控中性(gate neutrality)
+
+- 本特性 MUST NOT 新增阻塞式门控：`scripts/python/scan-confirmation-gates.py` 的治理后复扫 MUST 相对**有效基线**零新增命中（基线读数与重定基线裁定记录在实现证据中，FR-025）。
+- **保全面（containment claim）**：三个受保护所有者产物 MUST 对有效基线逐字节一致，读数由 `git diff --quiet <有效基线>..HEAD -- <三路径>`（零 `--numstat` 行）给出；允许差异集恒为空。任何改动 MUST 与一条记录在案的**重定基线裁定**同批落盘（裁定形态归 requirements FR-025 与其载体）；无裁定的改动由 B-07 承接（评审，永不机器声称）。
