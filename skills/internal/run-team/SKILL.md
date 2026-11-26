@@ -69,6 +69,7 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 - 成员派发模态按 `.specify/shared/definitions/subagent-definitions.md`;外部 CLI 派发遵守其 Visibility Contract;派发携带快速失败注入子句并要求显式异常回传行(沉默不读作干净,判据 `.specify/shared/guidelines/fast-fail.md`)。
 - **Run line 刷新（每步边界一次）**: 在 §5 登记的同一条 line 上（引擎为 §5 按有序候选解析到的 `line-registry.py`），每个编排步骤边界调一次引擎 `update --last-event <step-label>`（步骤标签取当前编排步骤名），刷新该 line 的最近活动；不存在定时器、守护进程、心跳文件或第二 liveness 通道——line 的活动只由这些显式刷新写入。
 - **结算义务（每个席位，owner 按指针）**: 席位派发之前 MUST 写起点记录 —— 一条 carrier `c3-team-seat` 的 `<label>.attempt`（含 `started_at`，写入既有派发日志目录），或经 C1/C2 派发时复用同 label 的既有载体起点证据（不重复写入）；每个席位的结算值、逐值证据、反应与违例集合归 `.specify/shared/definitions/superagent-definitions.md` § Termination（按指针，本节不复制值表或证据矩阵）；报告行的 `end_state` / `evidence` 列归 `skills/internal/create-team/SKILL.md` § Report。叶子执行者模板不获得第二套结算逻辑。
+- **决策块传递（决策 backed 席位派发，owner 按指针）**: 席位派发实施一个已记录决策时，载荷 MUST 携带 `decision_block`（五个字段；缺块或缺字段即在构造处拒绝）；席位回传 MUST 含确认与 `implementation_receipt`（四成员），缺任一项即回传不完整、MUST NOT 消费或补齐；上下文使决策失效时按快速失败上送，MUST NOT 静默重决。块字段与回执形态归 `shared/definitions/decision-definitions.md` § 传递与实施，本节不复述。
 - 用户可在执行中随时中止。
 
 ### 7. Report
