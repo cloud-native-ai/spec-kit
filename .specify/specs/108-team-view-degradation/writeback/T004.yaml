@@ -1,0 +1,5 @@
+task: T004
+outcome: done
+run_id: r20261126T071500Z-108a
+evidence: notes/red-first-evidence.md — 17 slots (5 unit, 5 US1 integration, 3 US2 integration, 4 US3 contract) each with planned node ids, command field, real-output field, exit-status field and evidence file; failing-name baseline referenced via /speckit.implement § Test runs owner, not restated; T020 guards noted as post-implementation regression guards
+at: 2026-11-26T09:49:50Z

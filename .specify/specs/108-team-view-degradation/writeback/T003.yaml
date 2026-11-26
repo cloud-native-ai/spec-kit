@@ -1,0 +1,5 @@
+task: T003
+outcome: done
+run_id: r20261126T071500Z-108a
+evidence: notes/pre-change-measurements.md — six rows with command, reading and date; corpus scan reproduces 46=41 reports(28 compact+13 report-style)+3 auxiliary+2 residue and 5/7/1 for the all-non-conforming teams; git cat-file -e 54c6efa8c ok and baseline/working sha256 both 81fad3f9…; sync-mirrors --check rc 0 and regen-command-copies --check rc 0; four test-file sha256 match the tasks.md premises; both binding messages reproduced verbatim (exit 2) from scratch teams under the sanctioned temp root
+at: 2026-11-26T09:49:37Z

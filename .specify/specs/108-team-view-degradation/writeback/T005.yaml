@@ -1,0 +1,5 @@
+task: T005
+outcome: done
+run_id: r20261126T071500Z-108a
+evidence: test-evidence/implement-entry-readings.txt — implement_start_commit=005437f72beef5deeb76b1bb45560a1ebeedb217; pyproject dependency sets captured; fresh mirror verdicts rc 0/0; 10/10 surfaces OK and 3/3 new test files ABSENT; pytest 8.4.2 under /usr/local/bin/python3; single full-suite slot rc=1 with 221 failed / 10190 passed (parallel) + 1 serial passed, names in baseline-failed.txt (221), full output test-evidence/implement-baseline.log, E2 row appended to the spine test-budget fence
+at: 2026-11-26T09:51:00Z

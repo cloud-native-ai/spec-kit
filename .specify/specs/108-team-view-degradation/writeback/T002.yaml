@@ -1,0 +1,5 @@
+task: T002
+outcome: done
+run_id: r20261126T071500Z-108a
+evidence: coverage-baseline.txt frozen via python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/108-team-view-degradation --freeze (rc=0, 787 lines, non-empty); header frozen-from reads "excluding 108-team-view-degradation", base-sha 005437f72bee, files 334 (parsed 223 + named 111)
+at: 2026-11-26T09:48:55Z

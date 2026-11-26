@@ -1,0 +1,59 @@
+# Implement-entry readings — 108-team-view-degradation (T005)
+
+Taken 2026-11-26 at implement entry, before any executable surface edit. Worktree
+`.specify/.tmp/sdd-loop/worktrees/team-view-degradation`, branch `108-team-view-degradation`.
+This is the environment reading plus DoD-2's baseline capture — NOT a failing-test baseline
+(that one is the single full-suite slot recorded in the spine test-budget fence, with names in
+`baseline-failed.txt` and full output in `test-evidence/implement-baseline.log`).
+
+implement_start_commit=005437f72beef5deeb76b1bb45560a1ebeedb217
+
+## Baseline dependency requirement sets (command: sed -n '/^\[project\]/,/^\[project.scripts\]/p' pyproject.toml)
+
+[project].dependencies=typer; rich; httpx[socks]; readchar; truststore>=0.10.4; python_version >= '3.10'
+[project].optional-dependencies.dev=pytest; pytest-xdist; python_version >= '3.9'; ruff
+[dof2_unit_a_rule]=git diff <implement_start_commit>..HEAD -- pyproject.toml MUST be empty (DoD-2 dependency comparison unit 1)
+
+## Fresh mirror / copy verdicts (same day, at entry)
+
+sync_mirrors_check_rc=0 (six mirror pairs byte-identical: templates 23, skills/external 394, skills/internal 139, agents 20, scripts 133, shared 117 files; seven projected members ok)
+regen_command_copies_check_rc=0 (OK: all per-tool command copies match the source templates.)
+
+## Read/edit surfaces (test -e; all 10 expected present)
+
+OK tests/unit/test_team_view_parsers.py
+OK tests/contract/test_team_view_program_contract.py
+OK tests/contract/test_team_view_command.py
+OK tests/integration/test_team_view_program.py
+OK tests/fixtures/team_view_fixtures.py
+OK scripts/python/goal-utils.py
+OK scripts/python/script_interface_cli.py
+OK docs/reference/commands/team.md
+OK skills/internal/view-team/SKILL.md
+OK scripts/bash/run-tests.sh
+surface_count=10/10 OK
+
+## New test files (test -e; all 3 expected absent — red-first precondition)
+
+ABSENT tests/unit/test_team_view_report_recognition.py
+ABSENT tests/contract/test_team_view_degradation_contract.py
+ABSENT tests/integration/test_team_view_degradation.py
+absent_count=3/3 ABSENT
+
+## Interpreter and pytest
+
+/usr/local/bin/python3 --version -> Python 3.11.11
+/usr/local/bin/python3 -m pytest --version -> pytest 8.4.2
+PATH python3 -> /storage/project/profiles/.venv/bin/python3 (imports no pytest; SPECKIT_PYTHON override required)
+
+## Single full-suite baseline slot (E2; no second full suite)
+
+command=SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full --names-out .specify/specs/108-team-view-degradation/baseline-failed.txt
+mode=parallel workers=auto dist=load passes=2 tier=full excluded_slow=0
+main_pass=221 failed, 10190 passed, 3 skipped (69.45s)
+serial_pass=1 passed, 10414 deselected (19.56s)
+rc=1
+failed_name_count=221
+failed_names_path=.specify/specs/108-team-view-degradation/baseline-failed.txt
+full_output_path=.specify/specs/108-team-view-degradation/test-evidence/implement-baseline.log
+baseline_compare=na (first implement-start capture in this worktree)

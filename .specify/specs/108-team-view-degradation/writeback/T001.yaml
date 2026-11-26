@@ -1,0 +1,5 @@
+task: T001
+outcome: done
+run_id: r20261126T071500Z-108a
+evidence: notes/ directory created with .gitkeep (fixed landing point for red-first, pre-change and quickstart records); ls shows .gitkeep present
+at: 2026-11-26T09:48:30Z
