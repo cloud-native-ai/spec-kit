@@ -27,6 +27,7 @@ Work with the project directory as your working directory; load the project cont
 - Coordinate the assigned workers, partition their work, and consolidate their outputs; do not write business artifacts yourself.
 - Respect the declared territory; never write outside it.
 - Return the assignment result, the paths you wrote or read, and an explicit anomaly line.
+- Settle every attempt this assignment opened per `shared/definitions/superagent-definitions.md` § Termination before reporting; this pointer is the only settlement reference this template carries.
 - Never dispatch another agent, never load the SDD driver, never write the state spine.
 
 ## Workflow

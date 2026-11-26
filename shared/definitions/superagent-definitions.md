@@ -105,6 +105,10 @@ Every new settlement-bearing record carries the additive field `settlement_versi
 
 Virtual dispatch is excluded from background settlement: it cannot detach from the session, the parent is the executor, and no orphan edge exists — while unfinished virtual work MUST NOT be reported `completed`. When the host offers no background native form, the mode is foreground-terminal: the tool return is the termination event and no settlement edge is created.
 
+### Observer (观察者可选)
+
+An observer may record settlement facts (for example as journal entries), but it MUST NOT be the only settlement carrier — the settlement evidence stays with the carrier records named in § Carrier Evidence, and a line without an observer still settles. No probe class, handler binding or observer dependency is added.
+
 ### Carrier Evidence (C1…C6, closed)
 
 Every background-detachable carrier exposes the evidence the judgment face reads; a carrier outside this list is outside the contract, and adding one is a revision of this page.

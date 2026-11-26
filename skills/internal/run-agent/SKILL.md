@@ -155,6 +155,14 @@ attributed per `.specify/skills/sdd-loop-driver/references/watch-model.md` § 11
 generator, child list or registry is introduced: uniqueness is the per-run label, not a
 maintained inventory.
 
+**C4 native settlement obligation (owner by pointer)**: the settlement contract — values, per-value evidence, reactions and the closed violation kinds — is owned by `.specify/shared/definitions/superagent-definitions.md` § Termination; this block states only the native carrier's obligations and copies no value table.
+
+- **Attempt record before hand-off**: before a native background hand-off, write the attempt record into the existing dispatch log directory (`<label>.attempt`, E2 shape, carrier `c4-native`, with `attempt_id` / `parent_identity` / `started_at`, optional `wait_deadline_s`); no new storage root is created.
+- **Settlement on return**: settle the attempt when the return arrives by the five-element uplink — all five elements present → verify and settle; missing any element → `failed` (incomplete) and its conclusion MUST NOT be consumed; a host error settles `failed`.
+- **Wait deadline**: a declared wait deadline (`--wait-deadline`, or the attempt's `wait_deadline_s`) that has passed with no return and no live signal settles `silent-end`; before the deadline, or with a live signal, the attempt stays `running` and MUST NOT be settled `silent-end` early.
+- **Foreground-terminal branch**: when the host provides no background form, declare the dispatch foreground-terminal — the tool return is the termination event and no settlement edge is created.
+- **Virtual exclusion**: virtual dispatch is not background settlement (the parent is the executor, no orphan edge); its rule belongs to the settlement owner and `subagent-definitions.md` § Three Execution Modes — handed off by pointer, with no second mode table here.
+
 **Multi-child visibility（多子代可见性，仅既有载体）**: several children under one superagent
 are read from the existing carriers only — the external **artifact triplet** (liveness and
 completion per child), the `exec-quant` dispatch records (`unit_type=agent` /

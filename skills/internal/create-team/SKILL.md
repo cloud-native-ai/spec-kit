@@ -82,7 +82,9 @@ First activation: declare the summary mechanism has activated and the cadence no
 ## Nested SDD Runs
 ```
 
-`## Execution Detail` MUST 内含派发映射表 —— 每个被派发的执行体一行,列恰为 `label` | `role` | `dispatch_duty` | `workspace` | `parent`。`role` 取值恰为 `subagent` / `superagent`(`dual-role` 从不出现在该列);`dispatch_duty` 取值恰为 `granted` / `not-granted`。列与行形态由本节拥有;角色语义与值域归 `.specify/shared/definitions/superagent-definitions.md` § The Relative Role / § Role Edges(按指针)。不得为此新增顶层段 —— 映射表是 `## Execution Detail` 的必备内容。
+`## Execution Detail` MUST 内含派发映射表 —— 每个被派发的执行体一行。新报告的列恰为 `label` | `role` | `dispatch_duty` | `workspace` | `parent` | `end_state` | `evidence`(7 列);`end_state` 与 `evidence` 是加性结算列,其值域、逐值证据要求与反应归 `.specify/shared/definitions/superagent-definitions.md` § Termination(按指针;本节不复制第二张值表或证据矩阵)。5 列旧头(`label` | `role` | `dispatch_duty` | `workspace` | `parent`)仍被接受并被解析为 legacy:缺列行豁免 `settlement-unrecorded`,只标 `legacy`。7 列行空 `end_state` / `evidence` 记 `settlement-unrecorded`;`completed` 而无证据指针,或证据指针不可解析,记 `settlement-unbacked`。`role` 取值恰为 `subagent` / `superagent`(`dual-role` 从不出现在该列);`dispatch_duty` 取值恰为 `granted` / `not-granted`。列与行形态由本节拥有;角色语义与值域归 `.specify/shared/definitions/superagent-definitions.md` § The Relative Role / § Role Edges(按指针)。不得为此新增顶层段 —— 映射表是 `## Execution Detail` 的必备内容。
+
+**席位起点记录(与报告行分离)**: 席位在移交前 MUST 有起点记录 —— 一条 carrier `c3-team-seat` 的 `<label>.attempt`(含 `started_at`,写入既有派发日志目录),或经 C1/C2 派发时复用同 label 的既有载体起点证据(不重复写入);报告行是主张面,不是起点记录 —— 席位在写行之前死亡,仍由其起点记录加终止证据的缺失结算。
 
 ### Verification(必填段,本节为该口径的唯一真源)
 
@@ -91,6 +93,8 @@ First activation: declare the summary mechanism has activated and the cadence no
 1. **回归数字注明口径** — 每个测试 / 检查数字 MUST 标明是**全量**还是**过滤子集**,子集 MUST 附过滤表达式(如 `-k <expr>`);子集数字 MUST NOT 当作整体基线陈述。
 2. **仓库存在长期既存失败时** — 独立验证的最小充分形式是「**同口径** A/B 失败集求差 + 差集逐项归因」:A、B 两侧用同一条命令、同一过滤口径跑,只对**失败集差集**逐项归因,不对两侧的绝对数字作比较。worktree A/B 的差集项 MUST 先排除 **git-ignored 残留**归因 —— worktree 不复制 git-ignored 文件,运行工作区、构建产物、本地缓存一类路径在两侧天然不对称,由此产生的差异不是本次改动造成的,把它记成改动效果就是假阳。
 3. **One-Source-Of-Truth 类验收** — MUST 先从**落盘产物**提取实际出现的短语,再以这些短语为查询集反向计数;MUST NOT 以「我以为写了的短语」为查询集 —— 那样复写检查必然假阴(查询集与被查集不同源)。机械判据见 `.specify/shared/guidelines/one-source-of-truth.md` § Reference, don't copy。
+
+**结算覆盖(必填声明)**: `## Verification` MUST 声明结算覆盖 —— 每个被派发的席位按结算 owner(`.specify/shared/definitions/superagent-definitions.md` § Termination)结算,本段声明的验证机制是 `team-verification`;存在 `silent-end` / `unknown` 席位时 MUST NOT 以成功语气收束(行为类条款,由评审与变异演练举证,不冒充文本解析覆盖)。
 
 Stage 级批量判定的实读证据下限由 `references/patterns.md` § Serial Chain → Substance floor 持有,不在此复述。
 
