@@ -1,0 +1,55 @@
+# Implement baseline — full suite (E2 slot seq=1, slot=baseline)
+
+- command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full --names-out .specify/specs/107-decision-governance/baseline-failed.txt`
+- worktree: `.specify/.tmp/sdd-loop/worktrees/decision-governance`; branch `107-decision-governance`; HEAD `0d7519521`
+- at: 2026-11-26T04:25Z (start) — run wall-clock ~4 min
+- rc: 1 (derived: the runner composes its exit code from the two passes; the parallel pass failed — 221 FAILED node ids — and the serial pass passed, so the composed code is the parallel pass code, 1. The pipeline `| tail -40` masked the shell status.)
+- failed: 221 (measured — complete list in `baseline-failed.txt`, line count 221)
+- passed: not-captured (the parallel-pass pytest summary line was discarded by the `| tail -40` output filter; the budget rule forbids a second full suite; the complete failed-name list is the preserved comparison surface)
+- selection: full tier (`--full`); two passes composed (`passes=2`; 1 declared serial test re-ran serially and passed: `tests/contract/test_sdd_loop_driver_skill.py`)
+- baseline_compare: na (this is the reference run)
+
+## Captured tail (verbatim, exactly what the filtered stream retained)
+
+```text
+collected 10370 items / 10369 deselected / 1 selected
+
+tests/contract/test_sdd_loop_driver_skill.py .                           [100%]
+
+=============================== warnings summary ===============================
+tests/unit/test_check_prerequisites_host_fallback.py:27
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_check_prerequisites_host_fallback.py:27: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_moves.py:44
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_pre_analyze_gate_dod_count_skip.py:18
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_pre_analyze_gate_dod_count_skip.py:18: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_classify.py:19
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_seal_archive_classify.py:19: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_manifest_math.py:20
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_seal_archive_manifest_math.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_seal_archive_schema.py:23
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_seal_archive_schema.py:23: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============== 1 passed, 10369 deselected, 8 warnings in 19.56s ===============
+# failed-name list written: .specify/specs/107-decision-governance/baseline-failed.txt (221 entries) passes=2
+```
