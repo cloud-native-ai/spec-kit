@@ -21,3 +21,13 @@
 - expected: the commit carrying this file (recorded below after the push)
 - published heads: recorded below after the push
 - disposition: pending push → re-read
+
+### Published-state reading — 2026-11-26T04:05Z
+
+| remote | refs/heads/master | expected | verdict |
+|---|---|---|---|
+| github | 6ff80ead8a52 | 6ff80ead8a52 | converged |
+| gitlab | 6ff80ead8a52 | 6ff80ead8a52 | converged |
+| gitee | 6ff80ead8a52 | 6ff80ead8a52 | converged |
+
+- Read command: `git ls-remote <remote> refs/heads/master` after pushing the merge + closure commit; all three declared closeout remotes returned the corrected trunk. `origin` remains the read-only upstream and was not pushed.
