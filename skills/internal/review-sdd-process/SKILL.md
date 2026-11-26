@@ -45,6 +45,12 @@ template keeps entry + delegation only.
 - **Evidence-backed**: Every finding cites a specific quoted excerpt. Drop unsupported
   findings.
 - **Process scope only**: Don't judge feature business content.
+- **Decision behavior rules (owner by pointer)**: the seven decision-governance behavior
+  rules B-01, B-02, B-03, B-04, B-05, B-06 and B-07 are product-side; their `/speckit.review` carrier is the artifact
+  segment, and this process review judges the process that produced them, never their
+  content. The statements, the per-rule surfaces and the machine/behavior boundary are
+  owned by `shared/definitions/decision-definitions.md` § 强制边界 — reached by pointer,
+  never restated, never claimed as machine-covered.
 
 ## Severity Vocabulary
 

@@ -82,6 +82,13 @@ defect. What this section states is only the consequence a run has to enact:
 The dimension set is fixed and complete: a segment that judged fewer of them would answer a narrower
 question than the one it owes.
 
+**Decision behavior rules (owner by pointer).** The seven decision-governance behavior rules
+B-01…B-07 name `/speckit.review` surfaces (this artifact segment carries B-01, B-02, B-03,
+B-06 and shares B-04, B-05, B-07 with `/speckit.analyze`). Their statements, the per-rule
+surfaces and the machine/behavior boundary are owned by
+`shared/definitions/decision-definitions.md` § 强制边界 and reached by pointer, never
+restated and never claimed as machine-covered.
+
 1. **Completeness** — every member of the expected set exists, and each existing member carries the
    sections its own template requires.
 2. **Internal consistency** — no two artifacts state the same fact differently. A threshold, a count,
