@@ -1,6 +1,6 @@
 # Super Agent Definitions Reference
 
-This file is the **single owner** of the **super agent** concept — the parent-side **relative** logical role that a dispatch edge assigns to its two endpoints. It owns the role definition and its set semantics, the edge predicate and its four closed violation kinds, role depth, the super↔sub protocol, the closed `role-transition` injection, the state-sync/recovery mapping, the visualization mapping, the zero-second-mechanism boundary, and the terminology boundary. Every other surface reaches this page by pointer: `agent-definitions.md`, `subagent-definitions.md` and `framework-map.md` carry one pointer line / row each, and the dispatch and digest surfaces reference the model without restating it. The role acts on the existing three-layer Agent taxonomy owned by `agent-definitions.md` and adds no fourth layer, no entity type and no runtime.
+This file is the **single owner** of the **super agent** concept — the parent-side **relative** logical role that a dispatch edge assigns to its two endpoints. It owns the role definition and its set semantics, the edge predicate and its four closed violation kinds, role depth, the super↔sub protocol, the dispatch settlement contract (§ Termination: the closed settlement values, the per-value evidence requirement, the reactions, the version/legacy rule and the three settlement violation kinds), the closed `role-transition` injection, the state-sync/recovery mapping, the visualization mapping, the zero-second-mechanism boundary, and the terminology boundary. Every other surface reaches this page by pointer: `agent-definitions.md`, `subagent-definitions.md` and `framework-map.md` carry one pointer line / row each, and the dispatch and digest surfaces reference the model without restating it. The role acts on the existing three-layer Agent taxonomy owned by `agent-definitions.md` and adds no fourth layer, no entity type and no runtime.
 
 ## The Relative Role (相对角色)
 
@@ -29,7 +29,7 @@ The judgement face is the deterministic, read-only engine `scripts/python/role-e
 | `unbacked-role-claim` | an explicit recorded `superagent` role assertion (a carrier's declared-role field taking `superagent`) while the judgement finds no edge where that executor is the parent. A `dispatch_duty: granted` declaration is not a role claim and never triggers this kind; `dual-role` appears in no carrier |
 | `depth-inconsistent` | a recorded `depth_position` disagrees with the computed depth, or a cycle makes depth unresolvable |
 
-A fifth kind MUST NOT be emitted before this page is revised.
+A fifth kind MUST NOT be emitted before this page is revised. The settlement contract in § Termination owns a separate closed three-kind violation set — `settlement-unrecorded`, `settlement-out-of-set`, `settlement-unbacked` — carried by this same page; the edge kinds and the settlement kinds never merge, and neither gains a kind before this page is revised.
 
 ## Role Depth (角色深度)
 
@@ -55,7 +55,82 @@ When an executor enters the SDD carrying chain, the three conditions, the three 
 
 **Authorization.** What an edge may do is decided only by `sdd-route.py --action authorize` together with the recorded routing verdict and the team territory; message content never widens permission; a refusal produces the existing named refusal record; resume or retry re-validates before acting.
 
-**Termination.** Edge end (`completed` / `failed` / `cancelled`) is written into the edge's existing carrier, so the parent can judge it; silent orphaning is a defect. Cancel and terminate follow the existing confirmation gates — no new gate.
+**Termination.** Edge end is written into the edge's existing carrier, so the parent can judge it; silent orphaning is a defect. The settlement value set, the per-value evidence requirement, the reactions, the version/legacy rule and the closed settlement violation kinds are owned by § Termination (终止与结算) and are reached only by pointer.
+
+## Termination (终止与结算)
+
+**Termination.** The settlement contract of a dispatch edge lives here. The parent derives exactly one settlement value per attempt it opened, from positive evidence only. This section is the single owner of that contract — the value set, the per-value evidence requirement, the settlement-time rules, the reactions, the version/legacy rule, the virtual/native boundaries and the settlement violation kinds. Every other surface (a skill, a command template, a report contract, an engine or a test) reaches these rules by pointer; **no other surface may carry a second value table, a second evidence matrix or a carrier-private judgment copy.** The judgment face is the read-only engine `scripts/python/role-edge-check.py` `--action settle`.
+
+### Settlement Values (结算值, closed)
+
+Exactly one closed set of seven settlement values applies to every attempt; a value outside it is never coerced. The three semantic classes are `terminal` (`completed`, `failed`, `anomaly`, `cancelled`, `silent-end`), `non-terminal` (`running`) and `detection-defect` (`unknown`).
+
+| Value | Class | Positive evidence required | Readings that explicitly do not constitute it |
+|-------|-------|---------------------------|-----------------------------------------------|
+| `completed` | terminal | A success terminal record **and** an independent verification of the required deliverable/return; the independent-verification mechanism is one of the closed four — `u4` (driver product verification), `team-verification` (the team report's `## Verification`), `five-element` (a complete five-element uplink), `return-record` (the parent's verified declared-equivalent return) — with non-empty, resolvable evidence pointers | exit code 0 alone; a good-looking log tail; the parent's expectation; any mechanism outside the closed four; a success record with verification absent (that is `failed` (incomplete)) |
+| `failed` | terminal | A non-zero terminal record; a named failure return; or exit 0 without the required completion evidence **and without an explicit anomaly signal** (the incomplete kind) | missing logs, no output or silence; a stopped-growing log; a wait that ran out; and exit 0 carrying an explicit anomaly signal, which settles `anomaly` instead |
+| `anomaly` | terminal | An explicit anomaly signal together with terminal evidence — for example an exit-0 termination whose last non-empty log line starts with `ANOMALY:`, or an equivalent anomaly return; an exit-0 termination carrying an explicit anomaly signal settles `anomaly` here, and the incomplete branch of `failed` applies only when no anomaly marker is present | an intermediate anomaly line while the subject is still alive: that is `anomaly` observed, and the attempt stays `running` |
+| `cancelled` | terminal | An explicit parent-side cancellation record produced under the existing destructive-action discipline | process death; an early exit; a dropped connection |
+| `running` | non-terminal | A live check performed at settlement time: the pid alive (not a zombie, start ticks matching), a fresh heartbeat, a live log growing inside the `--live-window` window, or an open return channel | a stale reading; "it was alive last time"; a check that was not performed |
+| `silent-end` | terminal (abnormal) | A start record **and** the execution subject gone **and** all four terminal evidences (`completed` / `failed` / `anomaly` / `cancelled`) absent. For process carriers, subject-gone means the recorded pid is absent — it disappeared, or it never appeared within `--start-grace` (or the attempt's `start_grace_s`). For pid-less carriers the same value's substitution applies: the declared wait deadline passed with no return and no live signal, where the deadline comes from `--wait-deadline` (or the attempt's `wait_deadline_s`) and "no live signal" means the settlement-time live check fails on every leg, its live-log leg measured over `--live-window` | "no output was seen"; "the process is not there" without a start record and the absence check; a deadline that has not yet passed; and a live subject — a live attempt is `running`, never `silent-end` |
+| `unknown` | detection-defect | The unreadable/unparseable evidence pointer set (finding label `unreadable`), or a claimed attempt with no resolvable start record (finding label `start-record-missing`) | any inference of success, failure or still-running |
+
+### Settlement-Time Rules (结算时刻规则)
+
+- **`silent-end` is a named terminal state, not a fallback.** It MUST NOT be folded into `completed` or `failed`, and it MUST NOT be reported as still running. For a carrier without a pid, the no-pid branch above is the same value's substitution, not a second value. The declared wait deadline only triggers a settlement-time observation: evidence already present at that observation settles the attempt by that evidence, and only an observation that finds no return and no live signal settles `silent-end` — it MUST NOT be declared before the deadline. C1's post-deadline reclassification rides the watcher's existing `--deadline-grace` and adds no settlement-side parameter. A return arriving after the settlement is a late return under the attempts rule below, never a rewrite of the settled value.
+- **`unknown` is a detection-defect state, never an ending.** It is produced only in the two readable cases of its value row, each with its finding label (`unreadable` / `start-record-missing`); it names the unreadable pointers or the missing start slot, is not an ending, and carries the same "do not claim success" reaction as `silent-end`.
+- **Attempts and labels.** Each attempt has one unique label; a retry is a new dispatch attempt with a new label; the old attempt's artifacts are kept; a stale attempt's late return is never consumed as the current result.
+- **Start record or `unknown`; the return channel is not liveness evidence.** Before or at dispatch, the parent records the attempt identity, carrier, parent identity, start time, the optional `wait_deadline_s` / `start_grace_s` and (for process carriers) the pid into the existing dispatch log directory (the judgment face's `--logs-dir` root) as the additive `<label>.attempt` record. C1 reuses its existing four-piece, and a C3 seat dispatched through C1/C2 reuses the same label's carrier start evidence, so neither writes a duplicate; the additive file is permitted additive evidence, not a new storage root. An attempt with no start record cannot prove it existed and settles `unknown` with the finding label `start-record-missing` — never `completed`. The return channel (including the seven-field `return_channel`) is a child-initiated uplink; its silence is neither liveness nor completion, so the parent settles from the attempt record plus live evidence or the deadline plus the carrier's terminal records — never by waiting for a return that may never come.
+- **The parent settles before it reports.** The parent settles every attempt it opened before its own externally visible completion report; a report that leaves any attempt unsettled is incomplete and cannot claim success.
+
+### Reactions (反应: report / retry / stop)
+
+Exactly three reactions exist; silent repair is forbidden.
+
+- **report** — a `silent-end` or `unknown` attempt is surfaced as an abnormal report (what was found, why it matters, the intermediate artifacts, optional dispositions) and is not re-dispatched as an ordinary failure without a named diagnosis or a user ruling.
+- **retry** — a retry is a new attempt with a new label, and the old attempt's evidence is kept; the existing retry limits are unchanged.
+- **stop** — stopping a live attempt records `running` + live evidence + the stop reason, never `silent-end`; stopping or terminating keeps the existing destructive-action discipline and adds no gate.
+
+No silent repair: never fabricate a terminal record, never backfill a missing return field, never rewrite a `.status` line, report or evidence file, never delete evidence, and never consume a stale return. The engine has no kill, retry, delete, rewrite or push authority.
+
+### Cancellation (取消)
+
+`cancelled` comes only from a parent-side explicit cancellation record produced under the existing destructive-action discipline; process death, an early exit or a dropped connection MUST NOT be inferred as cancellation.
+
+### Contract Version and Legacy (版本与旧记录)
+
+Every new settlement-bearing record carries the additive field `settlement_version` (`1` in this page's first version); no existing line format changes. A record without the version declaration its shape requires is annotated `legacy` in settlement/audit output: it is never reported as compliant with this contract, it is never rewritten, and the annotation alone does not produce a failing exit code. Version-bearing is decided per claim shape — a claim file is version-bearing if and only if it carries `settlement_version`; a team-report row has no version slot, so the 7-column header is its version declaration and a 5-column-header row is version-less legacy by schema. A legacy record is exempt from all three settlement violations below (a 5-column row's absent cells are absent columns, not an unrecorded claim) while still deriving its value from its raw evidence; the single deterministic refusal is `unknown` (a detection defect, not a settlement judgment), which applies regardless of the version declaration. No pre-built rejection mechanism is added beyond that single refusal.
+
+### Virtual and Native Boundaries (virtual 排除与 native 前台终结)
+
+Virtual dispatch is excluded from background settlement: it cannot detach from the session, the parent is the executor, and no orphan edge exists — while unfinished virtual work MUST NOT be reported `completed`. When the host offers no background native form, the mode is foreground-terminal: the tool return is the termination event and no settlement edge is created.
+
+### Carrier Evidence (C1…C6, closed)
+
+Every background-detachable carrier exposes the evidence the judgment face reads; a carrier outside this list is outside the contract, and adding one is a revision of this page.
+
+| ID | Carrier | Evidence the judgment face reads | Evidence-shape owner |
+|----|---------|----------------------------------|----------------------|
+| C1 | driver stage dispatch (fork) | the four-piece (`pid-`, `status-`, `log-`, `heartbeat-<line>-<stage>`), the stage sidecar/spine and the U4 verdict pointer | `skills/external/sdd-loop-driver/scripts/stage-runner.sh`; `watch-model.md` |
+| C2 | external CLI subprocess | the `.live.log` / `.jsonl` / `.status` triplet plus the additive `<label>.attempt` / `<label>.end` and the optional parent-written `<label>.settlement` claim | `skills/internal/create-team/scripts/dispatch.sh` |
+| C3 | team run seats | the seat's `<label>.attempt` (carrier `c3-team-seat`) or the same label's C1/C2 start evidence, plus the run report's mapping row and `## Verification` | `skills/internal/create-team/SKILL.md` § Report |
+| C4 | native host subagent | `<label>.attempt` (carrier `c4-native`) plus the return record or the five-element uplink | `skills/internal/run-agent/SKILL.md` |
+| C5 | virtual subagent | no settlement evidence — excluded (see the virtual boundary above) | `shared/definitions/subagent-definitions.md` § Three Execution Modes |
+| C6 | direct external recipes | only through a compliant C1/C2 runner or the foreground-terminal form | `shared/workflow/external-dispatch-recipes.md` |
+
+- **C1 verdict mapping.** The watcher's judgments map onto the settlement values: `DONE` → `completed` (a candidate the driver's U4 verification completes), `FAILED` → `failed`, `ANOMALY` → `anomaly`, `INCOMPLETE` → `failed` (incomplete), `DEAD` → `silent-end`, `NO_SIGNAL` → `silent-end`, `TIMEOUT` / `RUNNING` → `running` only when a settlement-time live check holds, else `silent-end` for a `TIMEOUT` whose subject is dead and which has no terminal record.
+
+### Settlement Violations (结算违例, closed)
+
+Exactly three settlement violation kinds exist, owned by this page; the judgment face emits no other kind.
+
+| Kind | Predicate |
+|------|-----------|
+| `settlement-unrecorded` | a version-bearing claim slot exists with no value: a 7-column team-report row missing `end_state`/`evidence`, or a claim file carrying `settlement_version` with no `value` |
+| `settlement-out-of-set` | a recorded value on a version-bearing record lies outside the closed seven |
+| `settlement-unbacked` | a recorded value on a version-bearing record lacks its required positive evidence (`completed` without the closed-four verification; `running` without a settlement-time live check; `silent-end` without start record plus disappearance plus all four terminal evidences absent), or the claim disagrees with the value derived from the evidence |
+
+A fourth settlement kind MUST NOT be emitted before this page is revised. The four edge violation kinds in § Role Edges are unchanged and separate. The settlement judgment face is the read-only engine `scripts/python/role-edge-check.py`, whose `--action settle` keeps the engine's exit codes: `0` every attempt judged (a correctly derived `silent-end` included), `1` settlement violations found, `2` `unknown` findings naming the unreadable pointers or the missing start slot — `unknown` is never represented as exit `0`.
 
 ## Role-Transition Injection (身份转变注入)
 
