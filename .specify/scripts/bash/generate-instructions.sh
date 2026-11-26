@@ -167,7 +167,19 @@ main() {
     #   reason: the new `## Re-Anchoring (不忘初心 · 温故而知新)` ambient section.
     #   rule: the same rule — the smallest N*1024 with (N*1024 - 1) - 35790 >= 1024.
     #     36864 fails (73 B); 37888 leaves 2097 B and is the first that passes.
-INSTRUCTIONS_BUDGET_BYTES=38912
+    #
+    # Raise record (Feature 107 — Decision Items ambient section):
+    #   old value: 38912
+    #   new value: 40960
+    #   measured live size after injection: 40170 B (this repository, 2026-11-26)
+    #   reason: the new `## Decision Items（决策项）` ambient section (1,274 B, its own
+    #     A-13 ceiling is 1,500 B). The file had only 18 B of headroom against the old
+    #     budget, so any section would have crossed it; no existing section was trimmed.
+    #   rule: the raise rides the recorded T-001 ruling (plan § Decision Tensions) that
+    #     fixes the new value at +2,048 B; it does not re-derive the earlier N*1024
+    #     headroom form, which would have demanded 41984 for a section this size. The
+    #     run reports the measured headroom below (budget - 1 - size), advisory only.
+INSTRUCTIONS_BUDGET_BYTES=40960
 
     mkdir -p "$TARGET_DIR"
 

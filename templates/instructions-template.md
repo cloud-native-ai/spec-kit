@@ -241,6 +241,16 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.
 - **Sole sanctioned writer**: hand-maintained; the one exception is duplicate-ID collision repair by `/speckit.sanitize --lane renumber`.
 
+## Decision Items（决策项）
+
+Every decision item follows its single owner page — classes, presentation templates, option sets, record grammar and field ownership live only in `.specify/shared/definitions/decision-definitions.md`; this section is a pointer plus the minimum bar.
+
+- **Minimum bar (two production rules)**: (1) the decision subject and every option label MUST use the full name of the object, never an abbreviation alone; (2) when a same-name conflict is possible, declare `same_name_conflict: true` with a machine-parseable `resource_locator` carrying at least the business resource group + region id pair — never present a same-name object without one.
+- **`human-interactive`** (held by a person): readability first — plain language, context, per-option consequences and reversibility, the default option, full names and locator; wording per `.specify/shared/guidelines/user-facing-comprehension.md`.
+- **`ai-autonomous`** (held by an agent with no user present): rigor first — closed option set, explicit decision predicate/rule, explicit assumptions, machine-checkable evidence pointers, deterministic conclusion and reopening condition.
+
+**本节字节上限：1,500 B** —— 判据是这里声明的上限加上生成后的实测增量。
+
 ## Tech Stack & Resources
 - **Project Name**: {{PROJECT_NAME}}
 - **Root Path**: {{PROJECT_ROOT}}
