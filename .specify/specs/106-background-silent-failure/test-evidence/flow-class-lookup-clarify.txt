@@ -1,0 +1,8 @@
+unit_id: spec:106-background-silent-failure
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+EXIT=0

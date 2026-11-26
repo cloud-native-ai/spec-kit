@@ -1,0 +1,73 @@
+Final gates — spec 106, package P4 (T037)
+Executed 2026-11-26 on branch 106-background-silent-failure (head at execution: 1f0e9dee5 + T036 record)
+================================================================================
+
+GATE-1 — task file structure
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/106-background-silent-failure/tasks.md
+PASS: .specify/specs/106-background-silent-failure/tasks.md — 0 error(s), 0 warning(s)
+rc=0
+
+GATE-2 — cross-artifact agreement (tasks stage)
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/106-background-silent-failure --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=2 waived=0
+advisories (both adjudicated, expected):
+  - tasks.md:281 missing path .specify/.tmp/settlement-demo — the quickstart demo scratch,
+    created and torn down inside T033; the path is never a deliverable (teardown recorded
+    in notes/quickstart-run.md).
+  - research.md:21 missing path agents/execution/logs/ — the pre-existing relative-path
+    advisory carried from the plan stage (unchanged; the real root is
+    .specify/agents/execution/logs).
+rc=0
+
+GATE-3 — clause and FR coverage
+$ python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/106-background-silent-failure
+claimed clauses 34; clause-uncovered 785 (0 beyond the frozen baseline) — pass lane.
+fr-uncovered 37/41 (FR-036/FR-037/FR-039/FR-040 not cited by any contract clause) and
+clause-unparsable 111 are the frozen structural facts GATE-3 declares report-only; the
+FR-coverage authority is tasks.md § Requirement Coverage Map (41/41) plus the
+pre-analyze runtime-stack-row errors=0 reading above. Full output:
+test-evidence/non-goals-audit.md § 7.
+
+GATE-4 — final-path success + smoke record
+verification.md is spec-side derived; the crew input test-evidence/verification-input.md
+carries SC-001/SC-002/SC-004 = final/pass and the single smoke triple:
+  smoke_command=env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_engine.py tests/contract/test_settlement_carriers.py -q
+  smoke_exit_code=0
+  smoke_evidence_path=.specify/specs/106-background-silent-failure/test-evidence/t033-smoke.txt
+Smoke run observed: 57 passed in 6.47s; the evidence file exists and is non-empty (398 B).
+
+GATE-5 — full-suite zero new failures
+The implement-entry baseline slot is the single E2 fence row in the state spine
+(SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full …,
+rc=1, passed=10049 failed=218, names .specify/specs/106-background-silent-failure/baseline-failed.txt).
+This package consumed NO full-suite slot (all selections targeted; two-slot budget
+respected). The closure slot belongs to the review stage; no third slot was created —
+pinned by test_settlement_preservation.py::test_test_budget_keeps_one_baseline_and_at_most_one_closure_slot.
+
+GATE-6 — mirrors and command copies clean
+$ python3 scripts/python/sync-mirrors.py --check
+ok templates/ (23) · skills/external/ (394) · skills/internal/ (139) · agents/ (20) ·
+scripts/ (132) · shared/ (116) — byte-identical; rc=0; zero NEW drift members vs baseline.
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates. rc=0
+
+GATE-7 — preserved surfaces equal
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_preservation.py -q
+6 passed in 23.27s (rc 0) — watcher three sets member-for-member equal to fbab7a45c,
+--self-test 39/0, five-element/seven-field text unchanged, report byte-identical,
+two-slot ledger unchanged.
+
+GATE-8 — no open tasks
+$ grep -cE '^- \[[ >]\]' .specify/specs/106-background-silent-failure/tasks.md
+37
+$ grep -c '^- \[X\]' .specify/specs/106-background-silent-failure/tasks.md
+0
+Reading note (ownership, not a failure): the task-state table is closed by the stage
+integrator after package verification. This executor is assigned "do not mark the task
+table complete"; the count above is the state at P4 hand-off. Every P4 task (T028–T037)
+is delivered and evidenced; the integrator flips the rows and re-runs this grep (0).
+
+================================================================================
+Package P4 summary of gates: GATE-1 pass · GATE-2 pass (2 adjudicated advisories) ·
+GATE-3 report-only lanes as declared · GATE-4 input ready · GATE-5 no slot consumed ·
+GATE-6 pass · GATE-7 pass · GATE-8 pending integrator closure (37 open by design).

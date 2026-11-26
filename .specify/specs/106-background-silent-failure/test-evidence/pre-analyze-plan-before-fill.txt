@@ -1,0 +1,1 @@
+pre-analyze-check: input error: plan stage requires plan.md

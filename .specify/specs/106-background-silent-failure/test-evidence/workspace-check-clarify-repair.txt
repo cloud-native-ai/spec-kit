@@ -1,0 +1,4 @@
+$ python3 .specify/scripts/python/workspace-guard.py --check .specify/specs/106-background-silent-failure/test-evidence/workspace-requirements.json --repo /storage/project/cloud-native-ai/spec-kit
+# recorded_at: 2026-11-25T11:58:01Z (clarify attempt 2, pre-commit)
+clean
+EXIT=0

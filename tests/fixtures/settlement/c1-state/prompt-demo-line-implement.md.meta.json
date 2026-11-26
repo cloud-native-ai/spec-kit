@@ -1,0 +1,14 @@
+{
+  "line_id": "demo-line",
+  "stage": "implement",
+  "started_at": "2026-01-01T00:00:00Z",
+  "role_edge": {
+    "parent_identity": "r-fixture-c1",
+    "child_label": "demo-line-implement",
+    "role_declaration": "subagent",
+    "dispatch_duty": "not-granted",
+    "depth_position": 1,
+    "authority_ref": "none",
+    "return_channel": "structured return + evidence pointer"
+  }
+}

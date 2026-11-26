@@ -5,13 +5,21 @@
 **Description**: 把事实上的 super agent 归一为派发边上的相对逻辑角色：定义 owner、判定引擎、super↔sub 协议与身份转变注入、digest 角色视图与 harness 落点。
 **Status**: Ready for Review
 **Created**: 2026-11-10
-**Last Updated**: 2026-11-10
+**Last Updated**: 2026-11-25（clarify：绑定切片 106 background dispatch settlement；plan：切片 106 plan 集落盘，切片行 `Draft → Planned`；tasks：切片 106 任务清单落盘（37 行 / 5 故事 / 34 条款各被认领一次）；父状态保持 `Ready for Review` 不回退）
 
 ## Overview
 
 框架里 super agent 事实上早已存在（交互 session、team 协调会话、SDD 驱动者、派发者），但只以「主 session / 编排者 / supervisor / driver / 派发方」等分散措辞出现：没有归一化定义、没有 super↔sub 协议、没有「身份转变时注入什么」的清单，也没有把并发、状态同步、状态跟踪与可视化接到同一张关系模型上。本特性把 super agent 正式定义为**派发边上的相对逻辑角色**（不是实体类型；同一执行体可在不同边上同时是 subagent 与 superagent），交付「定义 + 协议 + 身份转变注入清单 + 既有载体的投影接线」，并以三个真实形态验收：桌面端 Qoder 经 SSH 驱动远端 qodercli、本地 qodercli 编排一个 team、team 成员并发扇出 10 个 subagent 并自行汇总。本运行同时作为 080–094 机制实际效果的观测（FR-038）。
 
 ## Latest Review
+
+- **2026-11-26 — `/speckit.review` slice 106 (run `r20261125T113505Z-106a`)** — Report: `.specify/specs/106-background-silent-failure/review.md`; code record: `.specify/specs/106-background-silent-failure/code-review.md`.
+  - **Process segment**: pass with 1 P0 (repaired in-run), 2 P1 and 3 P2 findings — the P0: the slice's `Planned → Implemented` flip landed while `verification.md` was absent; the review materialized it from `test-evidence/verification-input.md` (nine SC rows + smoke triple) plus five `RS-NNN_joint_acceptance=` rows, and re-ran the ARC to `accept`. The two P0 rows carry the documented `(validated: direct re-read, subagent unavailable)` fallback.
+  - **Artifact segment**: pass — coverage 10/10 after the repair (9/10 at review start; missing member `verification.md`); A2 P1 (quickstart S-1 command cannot block as written) and A3 P2 (EP-001 verdict-token enumeration under-inclusive) remain disclosed.
+  - **Implementation segment**: pass — smoke `57 passed` exit 0 (evidence `.specify/specs/106-background-silent-failure/test-evidence/review-evidence.txt`), scope carries one P2 (stale `sdd-debt-governor` render refreshed by the prescribed render step), regression re-measured green (report byte-identical, engine + owner pins 35 passed, six settlement modules 100 passed).
+  - **Code segment**: `not-evaluated` (receipt 331 changed / 49 judged / 282 legally skipped / 0 gap; skips earn no coverage credit) — 0 `blocking`, 2 `important` (each answered), 1 `suggestion`, 1 `nitpick`, 2 `praise`; merge gate `allow`.
+  - **Acceptance Reality Check**: `final_path` record copied verbatim — pass 3 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 3; claimed status `Implemented`; ARC verdict `agree`; no fixed item.
+  - **Status transition `Implemented → Ready for Review`: allowed** — the four conjunctive conditions hold; the registry row 106 and this entry carry the flip; the parent's own status is unchanged.
 
 - **2026-11-10 — `/speckit.review` (run `r20261110T055657Z-b095-review`)** — Report: `.specify/specs/095-superagent-role/review.md`; code record: `.specify/specs/095-superagent-role/code-review.md`.
   - **Process segment**: `blocked` at the P0 level — 1 P0 (the implement stage never landed its owned `Planned → Implemented` transition although the closure checker returned `accept`), 3 P1 and 8 P2 findings; the P0 was confirmed by an independent read-only validator.
@@ -58,6 +66,7 @@
 ## Related Specifications
 
 - `.specify/specs/095-superagent-role/requirements.md`（本特性的需求规格；三个真实场景为定义输入）
+- `.specify/specs/106-background-silent-failure/requirements.md`（**切片行 106**，`Draft`；2026-11-25 `/speckit.clarify` 绑定）：后台派发静默退出结算契约——修订本 Feature 拥有的 `superagent-definitions.md` § Termination（封闭结算值集合、每值正证据、`silent-end` / `unknown` 语义），并加性扩展 `role-edge-check.py` 为其唯一确定性结算判定面；父行状态保持 `Ready for Review`，不回退。
 - `.specify/studies/dsh-superagent-prototype-study/docs/overview.md`（研读归档；授权链、能力分离、WorkerSlots、注意力预算、三层恢复、提示词不可越权）
 - `.specify/shared/definitions/subagent-definitions.md`（子端 owner：三模态、并发义务、可见性契约、派发治理）
 - `.specify/shared/definitions/agent-definitions.md`（Agent 三层分类法）
@@ -95,3 +104,20 @@
 - **Blocked**: 任务已关但至少一条 `final` 路径 SC 非 pass；或闭包判定 `block`。
 - **Ready for Review**: review 证据齐、`code-review.md` 无 blocking、无未豁免的 `final` 路径非 pass。
 - **Completed**: 人工 / 治理最终验收。
+
+## Plan Notes — Slice 106（2026-11-25，plan 阶段）
+
+- **设计落点**：结算契约的唯一 owner 仍是本 Feature 拥有的 `shared/definitions/superagent-definitions.md` § Termination（修订：封闭七值集合、每值正证据、反应义务、`settlement_version`/legacy、载体证据表、结算违例三 kind）；判定面复用 `scripts/python/role-edge-check.py` 的加性 `--action settle`，不新建第二引擎（A-6 保持成立）。
+- **产物**：`.specify/specs/106-background-silent-failure/` 下 plan / research（14 B + 8 R）/ data-model（9 实体、12 不变量）/ 3 份契约（34 条款：C-01…C-12 结算、C-13…C-24 载体一致性、C-25…C-34 执行与迁移）/ quickstart（8 场景，逐例 premises + 钉住测试）/ feature-ref；门读数 pre-analyze `pass errors=0 advisories=20`、decision-tensions `0 error 0 warning`。
+- **载体证据**：C1 四件套与 watcher 判定不变（sha 与 `fbab7a45c` 相等、self-test 39/0）；C2 加性 `.attempt`/`.end` + pid + TERM/INT/HUP trap，`.status` 行格式不变；C3 报告映射表加性 `end_state` + `evidence` 列与 `## Verification` 结算覆盖；C4 父侧尝试记录 + 期限/无返回规则；C5 显式排除并保留「未完成不得报成功」；C6 只允许合规 runner 后台形态或前台终结，含混 stall 表述按结算值逐项拆清。
+- **披露的基线事实**：`scan-confirmation-gates.py` 冻结 `total == 27` 的相等判定测试在阶段基线即为红（实测 total 31），plan 以 EP-005 `falsified` + `fallback` 记录，本特性改判为「被触及文件的阻断命中数零新增」，不声称已冻结基线绿。
+- **上游标识符纠正**：requirements 的载体编号由连字符形态改为 `C1`…`C6`，与框架契约条款语法（`C-NN`）分离；语义与 FR/SC 不变，requirements 校验器重跑 0 error / 0 warning，并已 append-only 记录在 `## Clarifications`。
+- **注册裁决**：不新增 Feature、不新增 skill/command 单元、不新增 flow-class/probe 行；仅切片行 106 状态推进与本详情 plan note。
+
+## Tasks Note — Slice 106（2026-11-25，tasks 阶段）
+
+- **产物**：`.specify/specs/106-background-silent-failure/tasks.md` — 37 行依赖有序任务，按 5 个用户故事组织（US1/US2 P1 = MVP，US3/US4 P2，US5 P3），Foundational 承载 owner 章节修订；34 条款逐条被一行 `[green:]` 认领一次，认领行序与条款序号单调一致；Requirement Coverage Map 41/41。
+- **门读数**：`validate-tasks.py` PASS（0 error / 0 warning / 34 green claims）；`pre-analyze-check.py --stage tasks` decision=pass errors=0 advisories=55（全部为 missing-path：50 条指向本阶段规划的新测试/夹具文件、1 条指向 quickstart teardown 临时目录、4 条为 plan 集既有引用）；`account-clause-coverage.py` claimed clauses 34、clause-uncovered beyond-baseline 0，`fr-uncovered` 37/41（FR-036 / FR-037 / FR-039 / FR-040 不被任何契约条款引用——如实报告，不作通过判据；FR 覆盖权威判据是本文件的 Requirement Coverage Map + runtime-stack-row errors=0）。
+- **测试模式**：ON（Constitution Principle IV）；两处回归守卫按 migration/regression 例外置于实现之后（T023 保留面、T028 version/legacy），红能力由 T021 / T025 / T032 的演练读数证明。
+- **冻结基线**：`coverage-baseline.txt` 已在生成时冻结（787 行，base-sha `1f06dceaf`）。
+- **注册裁决**：切片行 106 维持 `Planned`（tasks 阶段无状态迁移权）；本 Feature 状态保持 `Ready for Review`，不回退。

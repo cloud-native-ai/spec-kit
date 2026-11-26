@@ -1,0 +1,212 @@
+{
+  "file": ".specify/specs/106-background-silent-failure/tasks.md",
+  "errors": [],
+  "warnings": [],
+  "status": "PASS",
+  "green_claims": [
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-01",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-02",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-03",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-04",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-05",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-06",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-07",
+      "task_id": "T002",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-08",
+      "task_id": "T003",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-09",
+      "task_id": "T003",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-10",
+      "task_id": "T003",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-11",
+      "task_id": "T003",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/settlement-contract.contract.md",
+      "clause_id": "C-12",
+      "task_id": "T003",
+      "phase": "## Phase 2: Foundational (Blocking Prerequisites)"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-13",
+      "task_id": "T007",
+      "phase": "## Phase 3: User Story 1 - 后台执行体无论怎么结束，父侧都能拿到一个可区分的结果 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-25",
+      "task_id": "T007",
+      "phase": "## Phase 3: User Story 1 - 后台执行体无论怎么结束，父侧都能拿到一个可区分的结果 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-26",
+      "task_id": "T007",
+      "phase": "## Phase 3: User Story 1 - 后台执行体无论怎么结束，父侧都能拿到一个可区分的结果 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-27",
+      "task_id": "T007",
+      "phase": "## Phase 3: User Story 1 - 后台执行体无论怎么结束，父侧都能拿到一个可区分的结果 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-28",
+      "task_id": "T007",
+      "phase": "## Phase 3: User Story 1 - 后台执行体无论怎么结束，父侧都能拿到一个可区分的结果 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-29",
+      "task_id": "T008",
+      "phase": "## Phase 3: User Story 1 - 后台执行体无论怎么结束，父侧都能拿到一个可区分的结果 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-14",
+      "task_id": "T010",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-15",
+      "task_id": "T011",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-16",
+      "task_id": "T012",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-17",
+      "task_id": "T013",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-18",
+      "task_id": "T014",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-19",
+      "task_id": "T015",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-20",
+      "task_id": "T015",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-21",
+      "task_id": "T016",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-22",
+      "task_id": "T017",
+      "phase": "## Phase 4: User Story 2 - 每个后台派发载体都产出足以结算的证据，且只有一套契约 (Priority: P1) 🎯 MVP"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-23",
+      "task_id": "T023",
+      "phase": "## Phase 6: User Story 4 - 静默终止能让一条检查转红，而不是只在文档里被禁止 (Priority: P2)"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-30",
+      "task_id": "T025",
+      "phase": "## Phase 6: User Story 4 - 静默终止能让一条检查转红，而不是只在文档里被禁止 (Priority: P2)"
+    },
+    {
+      "contract_file": "contracts/carrier-conformance.contract.md",
+      "clause_id": "C-24",
+      "task_id": "T026",
+      "phase": "## Phase 6: User Story 4 - 静默终止能让一条检查转红，而不是只在文档里被禁止 (Priority: P2)"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-31",
+      "task_id": "T027",
+      "phase": "## Phase 6: User Story 4 - 静默终止能让一条检查转红，而不是只在文档里被禁止 (Priority: P2)"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-32",
+      "task_id": "T027",
+      "phase": "## Phase 6: User Story 4 - 静默终止能让一条检查转红，而不是只在文档里被禁止 (Priority: P2)"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-33",
+      "task_id": "T029",
+      "phase": "## Phase 7: User Story 5 - 客户项目升级后拿到同一契约，旧记录不被假装成合规 (Priority: P3)"
+    },
+    {
+      "contract_file": "contracts/enforcement-and-migration.contract.md",
+      "clause_id": "C-34",
+      "task_id": "T032",
+      "phase": "## Phase 7: User Story 5 - 客户项目升级后拿到同一契约，旧记录不被假装成合规 (Priority: P3)"
+    }
+  ]
+}

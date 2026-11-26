@@ -1,308 +1,8 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261125T160141Z",
+  "rendered_at": "20261126T042506Z",
   "entries": {
-    ".claude/agents/dogfood-executor.md": {
-      "source": "instances/dogfood-executor.agent.md",
-      "sha256": "df2a294cbd80e89420cd11f4398e8ee0040d8551738acf0ed6ddd3b28d65eb19"
-    },
-    ".claude/agents/framework-engineer.md": {
-      "source": "instances/framework-engineer.agent.md",
-      "sha256": "faf6bbdc94324fd93a164be33bf710abf80b753e160bbcbaf1c869ec52432886"
-    },
-    ".claude/agents/reporter.md": {
-      "source": "templates/reporter.agent.md",
-      "sha256": "1658df4901ee66c59dc61a30db35c299926f90a2fe3cb3dc2493baca84a8b1da"
-    },
-    ".claude/agents/sdd-analysis-worker.md": {
-      "source": "templates/sdd-analysis-worker.agent.md",
-      "sha256": "9ecd4eba6da1c80280f216c141e337f07d1ea4208f626b961de7ec8aafd1fe6b"
-    },
-    ".claude/agents/sdd-checklist-worker.md": {
-      "source": "templates/sdd-checklist-worker.agent.md",
-      "sha256": "1e40cf330352cdf2f6fbb8e17745285d92c2f8cd5e659960cc696e60f55c25c2"
-    },
-    ".claude/agents/sdd-clarify-analyzer.md": {
-      "source": "templates/sdd-clarify-analyzer.agent.md",
-      "sha256": "22281ce104a0ce67c9521f52abbe858ea57bab89c0f02fd2ce54634d758f08dc"
-    },
-    ".claude/agents/sdd-debt-fixer.md": {
-      "source": "templates/sdd-debt-fixer.agent.md",
-      "sha256": "2b1b58e306cfd01d527a6f01491c4df53922f8180e11f897752bc3824e5bc4b5"
-    },
-    ".claude/agents/sdd-debt-governor.md": {
-      "source": "templates/sdd-debt-governor.agent.md",
-      "sha256": "ebd93954ec22ad125dbb1c05f6531baba71d06d5738ec79cab99e16c7432c9d6"
-    },
-    ".claude/agents/sdd-implement-coordinator.md": {
-      "source": "templates/sdd-implement-coordinator.agent.md",
-      "sha256": "94e2ca489ad62af5c8edf0077eb6bc6a34e48466779c03efc33ebfedda0cf29b"
-    },
-    ".claude/agents/sdd-implement-executor.md": {
-      "source": "templates/sdd-implement-executor.agent.md",
-      "sha256": "8cc2e3158407d9a0fc021f69c4d72b5297e58ae374b48571e01cbe2946c606cd"
-    },
-    ".claude/agents/sdd-observer.md": {
-      "source": "templates/sdd-observer.agent.md",
-      "sha256": "b008927cf0bca0bde033e9517aa7c16f7b63469de601d274f71c3f080fdce066"
-    },
-    ".claude/agents/sdd-observer-103-team-view.md": {
-      "source": "instances/sdd-observer-103-team-view.agent.md",
-      "sha256": "f646190e76ee27f660969287b912283e99b55e7922849a084da1895412b3e26d"
-    },
-    ".claude/agents/sdd-observer-104-agents-run.md": {
-      "source": "instances/sdd-observer-104-agents-run.agent.md",
-      "sha256": "f5c54495b2d18b58e9a3f9a5ca024905dfacfa6456aac6ccf2548984e39dd7b3"
-    },
-    ".claude/agents/sdd-plan-coordinator.md": {
-      "source": "templates/sdd-plan-coordinator.agent.md",
-      "sha256": "1b150b0b2fe06985ec807e3dbcc104cb8e3b5a318140ca7a22f6095875c68805"
-    },
-    ".claude/agents/sdd-plan-executor.md": {
-      "source": "templates/sdd-plan-executor.agent.md",
-      "sha256": "a91150b7971e8affb1ca585d372864c82864dcec67cd4ca1bb15f7ab63d55e32"
-    },
-    ".claude/agents/sdd-requirement-analyzer.md": {
-      "source": "templates/sdd-requirement-analyzer.agent.md",
-      "sha256": "67fc194f98cb34efb84ef904e983f71ee6eed362975d1319dd2cb046927ffdcf"
-    },
-    ".claude/agents/sdd-review-coordinator.md": {
-      "source": "templates/sdd-review-coordinator.agent.md",
-      "sha256": "10d393450807aab846129ee9aee6f7220feff20570cb120eca158db5c08ad978"
-    },
-    ".claude/agents/sdd-review-executor.md": {
-      "source": "templates/sdd-review-executor.agent.md",
-      "sha256": "a23decf0f3f1751968093cf18da0632403e9cd3cba23e5d8277c5c7ac4ab3d17"
-    },
-    ".claude/agents/sdd-setup-executor.md": {
-      "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "d5928e633b2f16b8350bf55c60e194087a7a71850391769e512dea6c30a097df"
-    },
-    ".claude/agents/sdd-stage-integrator.md": {
-      "source": "templates/sdd-stage-integrator.agent.md",
-      "sha256": "24b754317c277cd3b2af4ce5acaea559fcf201eec33d3c84d15163b15f471d3d"
-    },
-    ".claude/agents/sdd-stage-verifier.md": {
-      "source": "templates/sdd-stage-verifier.agent.md",
-      "sha256": "69567f5f308a905640078d2eddb781ad86dc915ad67e98894e73b5a9ae04df16"
-    },
-    ".claude/agents/sdd-task-coordinator.md": {
-      "source": "templates/sdd-task-coordinator.agent.md",
-      "sha256": "8924c626dbefb6d27e135ae700c8019d5cbe648c4b6071fc2f02beaf0634c2ca"
-    },
-    ".claude/agents/sdd-task-executor.md": {
-      "source": "templates/sdd-task-executor.agent.md",
-      "sha256": "76b12a226e5f4ffde65362c590737826b61487edf6f69b2724cf3ac9920dfe3c"
-    },
-    ".claude/agents/skill-verifier.md": {
-      "source": "templates/skill-verifier.agent.md",
-      "sha256": "3969ea56c44d0ea6023a9aedc20201c80399f59555f421ed9387b3edf6d67d9c"
-    },
-    ".claude/agents/structure-adjuster.md": {
-      "source": "templates/structure-adjuster.agent.md",
-      "sha256": "2cea357cd65248db2a06730122ed702977e044f6408b13141e550daa5e0d0164"
-    },
-    ".github/agents/dogfood-executor.agent.md": {
-      "source": "instances/dogfood-executor.agent.md",
-      "sha256": "6884fda2d026cd784f06ef6e8a864c16ec0307110a6237474fb97c61eeb7cdf1"
-    },
-    ".github/agents/framework-engineer.agent.md": {
-      "source": "instances/framework-engineer.agent.md",
-      "sha256": "77448954698b9bb1231555533f68ce2c7d2491a49a53064607963eebeb2750f6"
-    },
-    ".github/agents/reporter.agent.md": {
-      "source": "templates/reporter.agent.md",
-      "sha256": "ebefc287a51ccf514061e0d2a8ce58d092a4ef7b20bca6622ffc3980cb24b7b6"
-    },
-    ".github/agents/sdd-analysis-worker.agent.md": {
-      "source": "templates/sdd-analysis-worker.agent.md",
-      "sha256": "ef7d155ffffa5e45d70c499ed97862b9ca3c3630fc881445be47223592f06960"
-    },
-    ".github/agents/sdd-checklist-worker.agent.md": {
-      "source": "templates/sdd-checklist-worker.agent.md",
-      "sha256": "d651dec27a5f626f0d08feac67a25ce04661970185a17eea18ada530da123a79"
-    },
-    ".github/agents/sdd-clarify-analyzer.agent.md": {
-      "source": "templates/sdd-clarify-analyzer.agent.md",
-      "sha256": "07afa7e34feb919bfabcf10c31b71577187de4a67c1051123795465495a824d9"
-    },
-    ".github/agents/sdd-debt-fixer.agent.md": {
-      "source": "templates/sdd-debt-fixer.agent.md",
-      "sha256": "d02fbd4e844469d5214455deb8ea4ed52f5ec814bdfa97326b0891c0ae2e4ab7"
-    },
-    ".github/agents/sdd-debt-governor.agent.md": {
-      "source": "templates/sdd-debt-governor.agent.md",
-      "sha256": "7368a923cd9a8fde3b998cc62992b525367cfd8bc3c44d34b0861a8c18d84345"
-    },
-    ".github/agents/sdd-implement-coordinator.agent.md": {
-      "source": "templates/sdd-implement-coordinator.agent.md",
-      "sha256": "dc9452c79303eaf693e1be7c1be763d05a17038a8f71617d8eec59029c23069d"
-    },
-    ".github/agents/sdd-implement-executor.agent.md": {
-      "source": "templates/sdd-implement-executor.agent.md",
-      "sha256": "7218e47b28e61f36cca37463de15f8817abb5b970ef0a1f25d2983188baba017"
-    },
-    ".github/agents/sdd-observer.agent.md": {
-      "source": "templates/sdd-observer.agent.md",
-      "sha256": "d758f2db31a500d0c20c185b807120b1ab879c8b359450012e7917623df9d1ca"
-    },
-    ".github/agents/sdd-observer-103-team-view.agent.md": {
-      "source": "instances/sdd-observer-103-team-view.agent.md",
-      "sha256": "870ddc56f3aaf04166c4e8dd0a61cc2889627756e42022a935ab853cf7d3747e"
-    },
-    ".github/agents/sdd-observer-104-agents-run.agent.md": {
-      "source": "instances/sdd-observer-104-agents-run.agent.md",
-      "sha256": "4810484fed789710b2565e6d92ce2a34072ce0f079e1f50e48409c2afbe33c89"
-    },
-    ".github/agents/sdd-plan-coordinator.agent.md": {
-      "source": "templates/sdd-plan-coordinator.agent.md",
-      "sha256": "0aa5498af8081788d3f81579af84be4626bd1ca35a8f62a1201f23dd9b31d002"
-    },
-    ".github/agents/sdd-plan-executor.agent.md": {
-      "source": "templates/sdd-plan-executor.agent.md",
-      "sha256": "e50b5d477f2dd6365ee7103d4b0d65818c91ed32a687bdaa7ef49b66a2eb1a03"
-    },
-    ".github/agents/sdd-requirement-analyzer.agent.md": {
-      "source": "templates/sdd-requirement-analyzer.agent.md",
-      "sha256": "1325f75f162ac6af65fcc5c22f82c8aaa66bbd8a4cb52c69fcff13564935b2c8"
-    },
-    ".github/agents/sdd-review-coordinator.agent.md": {
-      "source": "templates/sdd-review-coordinator.agent.md",
-      "sha256": "eecdf52ab5a84c1f3ff53246832e36bc4ec1c15d16f654e6c265b134104863ce"
-    },
-    ".github/agents/sdd-review-executor.agent.md": {
-      "source": "templates/sdd-review-executor.agent.md",
-      "sha256": "fad61c0d820316a286275a3fe5126e4b047a276357f38f8475014bc8ef568b3b"
-    },
-    ".github/agents/sdd-setup-executor.agent.md": {
-      "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "b0a15e2d87a9bcb7517726aa3fe761b38f58719cc4800826553872219393e9d1"
-    },
-    ".github/agents/sdd-stage-integrator.agent.md": {
-      "source": "templates/sdd-stage-integrator.agent.md",
-      "sha256": "ea8f3605dbd3660b2bac4c9d7c8264d4a0547bef4b31292d7c3bb99445251f84"
-    },
-    ".github/agents/sdd-stage-verifier.agent.md": {
-      "source": "templates/sdd-stage-verifier.agent.md",
-      "sha256": "78b68bba07ddc87bbc82329d84c6625f13f17b278c342183feaa6d8acc7617ce"
-    },
-    ".github/agents/sdd-task-coordinator.agent.md": {
-      "source": "templates/sdd-task-coordinator.agent.md",
-      "sha256": "9b4e42b19aecf61ccbabe85eda67b50e7c0688aa3febfb8ae5f9890d7990d163"
-    },
-    ".github/agents/sdd-task-executor.agent.md": {
-      "source": "templates/sdd-task-executor.agent.md",
-      "sha256": "4f3314aebfd214fc57b306e94e2d5b62b6146502d62b565ff4815855b23c09e1"
-    },
-    ".github/agents/skill-verifier.agent.md": {
-      "source": "templates/skill-verifier.agent.md",
-      "sha256": "1b6d75964ecfaea28558185a2ff483e88377a4da6c44ba819c7dc7604cd57425"
-    },
-    ".github/agents/structure-adjuster.agent.md": {
-      "source": "templates/structure-adjuster.agent.md",
-      "sha256": "faf5f5cb5e075ede24920646ce340c9c368d9acb63697801d5099cc14ac9b594"
-    },
-    ".opencode/agents/dogfood-executor.md": {
-      "source": "instances/dogfood-executor.agent.md",
-      "sha256": "e8abbfb610706291d0b488e71e940784d42aded21ce042f6e580df12f71cbe92"
-    },
-    ".opencode/agents/framework-engineer.md": {
-      "source": "instances/framework-engineer.agent.md",
-      "sha256": "8013b6305a75f0b7959b15fc7c166a2fd5f3813ec2ac002b25d5d70caea41c61"
-    },
-    ".opencode/agents/reporter.md": {
-      "source": "templates/reporter.agent.md",
-      "sha256": "62dc2ed5a8e9a163ad9aceb3b636ffcfbff002fbab7a65816136093a7db992ca"
-    },
-    ".opencode/agents/sdd-analysis-worker.md": {
-      "source": "templates/sdd-analysis-worker.agent.md",
-      "sha256": "49999ed3097e93d030195ffa70f89d8d64f2c84d1a0268bfd0970cc6da1e01c6"
-    },
-    ".opencode/agents/sdd-checklist-worker.md": {
-      "source": "templates/sdd-checklist-worker.agent.md",
-      "sha256": "2c866f9b840f3147424fce9c479780025371a664a9502ddb828f5bf4d4620064"
-    },
-    ".opencode/agents/sdd-clarify-analyzer.md": {
-      "source": "templates/sdd-clarify-analyzer.agent.md",
-      "sha256": "646245cd4ddb65cc25236ee44a155a190bc76a6f3d7f2a93b1e9e7477d5d4bad"
-    },
-    ".opencode/agents/sdd-debt-fixer.md": {
-      "source": "templates/sdd-debt-fixer.agent.md",
-      "sha256": "d98420de709067516e58c3f6d30f38468307110f02f42eb24e46a198dd6f82da"
-    },
-    ".opencode/agents/sdd-debt-governor.md": {
-      "source": "templates/sdd-debt-governor.agent.md",
-      "sha256": "3fb3f60b761e88e4300b7db201f757077c09e627e83b5b5afef87a19ac80cdce"
-    },
-    ".opencode/agents/sdd-implement-coordinator.md": {
-      "source": "templates/sdd-implement-coordinator.agent.md",
-      "sha256": "32fd761933f8eec1745f42be9c643424f5d66beaff007ea6d396b4b9dffbf138"
-    },
-    ".opencode/agents/sdd-implement-executor.md": {
-      "source": "templates/sdd-implement-executor.agent.md",
-      "sha256": "8d3669d58eb1e48405da2843aafea6e74027066dc46369333fde573a759253a8"
-    },
-    ".opencode/agents/sdd-observer.md": {
-      "source": "templates/sdd-observer.agent.md",
-      "sha256": "2a7e36f5dd932d672e6800c57d3fabe00f5b52e4b7d7fc20da3bad87a896088d"
-    },
-    ".opencode/agents/sdd-observer-103-team-view.md": {
-      "source": "instances/sdd-observer-103-team-view.agent.md",
-      "sha256": "8247c9e6486da4392916e875375d0e103a1bf47885b415c1e8f03c22bc059139"
-    },
-    ".opencode/agents/sdd-observer-104-agents-run.md": {
-      "source": "instances/sdd-observer-104-agents-run.agent.md",
-      "sha256": "ced3ced615a35cc62c6dd53640f72f3900e552cf41b838a753b12c9209bfabfb"
-    },
-    ".opencode/agents/sdd-plan-coordinator.md": {
-      "source": "templates/sdd-plan-coordinator.agent.md",
-      "sha256": "13392bc5c7a45f356a67441b5976384fff64c15bd4926095d386d2a4680af569"
-    },
-    ".opencode/agents/sdd-plan-executor.md": {
-      "source": "templates/sdd-plan-executor.agent.md",
-      "sha256": "91053c37493c932d5cb8a3db2c52e7378a29887466573e8fbe24ac7283d62b52"
-    },
-    ".opencode/agents/sdd-requirement-analyzer.md": {
-      "source": "templates/sdd-requirement-analyzer.agent.md",
-      "sha256": "ebf0db3582b3e13567013f4ed2a2ec04dea605787365bd82b2f773f8e72fa2cf"
-    },
-    ".opencode/agents/sdd-review-coordinator.md": {
-      "source": "templates/sdd-review-coordinator.agent.md",
-      "sha256": "39e72f34e24ecea4a6f0b34fb1fc387e62a6e2e34f812f148e7ee06000866be6"
-    },
-    ".opencode/agents/sdd-review-executor.md": {
-      "source": "templates/sdd-review-executor.agent.md",
-      "sha256": "c371e7454b531798e0023ae0955228133fdb9a8fc0d18264024c3a9f5a0d46b2"
-    },
-    ".opencode/agents/sdd-setup-executor.md": {
-      "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "d771d0bbecad4f57552feed9673f5a370e9b16f79168359e3ec852e3c9f91ab3"
-    },
-    ".opencode/agents/sdd-stage-integrator.md": {
-      "source": "templates/sdd-stage-integrator.agent.md",
-      "sha256": "68fa97cc3f82e88119b6ea8c53c7cc79622acdd1b1cba05b86b645eef3df0cbb"
-    },
-    ".opencode/agents/sdd-stage-verifier.md": {
-      "source": "templates/sdd-stage-verifier.agent.md",
-      "sha256": "e9a3b95c5f7bedb5c135642ae0f6e235596f4cebe1c02e8b0c325286aa5921f0"
-    },
-    ".opencode/agents/sdd-task-coordinator.md": {
-      "source": "templates/sdd-task-coordinator.agent.md",
-      "sha256": "1fed0bf6fac0dce226fc364d2b74f744b3f62fae2a441154eb188f448b98da7f"
-    },
-    ".opencode/agents/sdd-task-executor.md": {
-      "source": "templates/sdd-task-executor.agent.md",
-      "sha256": "1a6045b229f0f13b6bf8fd97c8ac4c4655281ab2fe90c78fc374cf1d2680b139"
-    },
-    ".opencode/agents/skill-verifier.md": {
-      "source": "templates/skill-verifier.agent.md",
-      "sha256": "0528fded9d92051e49f9a182d0191101ceb4eb2f133f30bf42ec57b24a232134"
-    },
-    ".opencode/agents/structure-adjuster.md": {
-      "source": "templates/structure-adjuster.agent.md",
-      "sha256": "4be4fa88fd31b7819f439b33cebbe482d092152b9cdb889745facd092927080e"
-    },
     ".qoder/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
       "sha256": "9d1d57b14d4c44a68e1b38e48ae9046ca0a06d465aadce6af4d39fb8d1309c8f"
@@ -337,7 +37,7 @@
     },
     ".qoder/agents/sdd-implement-coordinator.agent.md": {
       "source": "templates/sdd-implement-coordinator.agent.md",
-      "sha256": "86fed6b5b800a16ce3f3d1816bb56dd5c153363c33df5c4948163ff8c6ff94c9"
+      "sha256": "bf73d5c145b57f90e3a80a922154175a02ca656a9721618d700f39ffc151b8d3"
     },
     ".qoder/agents/sdd-implement-executor.agent.md": {
       "source": "templates/sdd-implement-executor.agent.md",
@@ -357,7 +57,7 @@
     },
     ".qoder/agents/sdd-plan-coordinator.agent.md": {
       "source": "templates/sdd-plan-coordinator.agent.md",
-      "sha256": "f4f7f869e89b63b570624bed87288d108cf4eebf1df4d1c545beaa2fb9af549d"
+      "sha256": "a0d069836ad36de94978bc9a92fac8b90624b45ff0d1fb42c8426d95b1cbac4b"
     },
     ".qoder/agents/sdd-plan-executor.agent.md": {
       "source": "templates/sdd-plan-executor.agent.md",
@@ -369,7 +69,7 @@
     },
     ".qoder/agents/sdd-review-coordinator.agent.md": {
       "source": "templates/sdd-review-coordinator.agent.md",
-      "sha256": "119fe964b575b09440267e1478bf9a93f60e62cbe210bb24a45bb4f01e64fdfa"
+      "sha256": "7482558c411ccdcec52d59949fd953f3b4aba087203d90797bdbc6f80abaa12d"
     },
     ".qoder/agents/sdd-review-executor.agent.md": {
       "source": "templates/sdd-review-executor.agent.md",
@@ -389,7 +89,7 @@
     },
     ".qoder/agents/sdd-task-coordinator.agent.md": {
       "source": "templates/sdd-task-coordinator.agent.md",
-      "sha256": "5963b2d73fd2d821450a927229c97bce779d3ccca5548bad1b26e9908bef69fb"
+      "sha256": "31c9128d94ff77f105131214538905991330440c162b5c4a6cd05a71512a4eb7"
     },
     ".qoder/agents/sdd-task-executor.agent.md": {
       "source": "templates/sdd-task-executor.agent.md",

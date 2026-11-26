@@ -1,0 +1,27 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_gn_c2_gate_scan_total_unchanged _____________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.mark.contract
+    def test_gn_c2_gate_scan_total_unchanged():
+        """Run the real scanner and assert equality — not <=, per the clause."""
+        proc = run_engine_in_process(SCANNER, ["--root", str(ROOT), "--json"])
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == 27, (
+            f"gate total moved to {payload['total']}; the recorded budget is 27 and the integer "
+            "headroom is 0, so any new BLOCKING_RE hit in scan scope lands here"
+        )
+E       AssertionError: gate total moved to 31; the recorded budget is 27 and the integer headroom is 0, so any new BLOCKING_RE hit in scan scope lands here
+E       assert 31 == 27
+
+tests/contract/test_user_facing_comprehension_doc.py:569: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged
+1 failed in 6.96s

@@ -342,6 +342,8 @@ DOCS_DECOMPOSITION_H2 = "任务拆解与配合（070-subagent-task-teams 切片�
 
 DOCS_OBSERVER_H2 = "观察者生命周期（096-sdd-observer-agent 切片）"
 
+DOCS_SETTLEMENT_H2 = "结算判定（106-background-silent-failure 切片）"
+
 
 def test_docs_page_sections_are_additive_only():
     """The docs page gains one pointer section; predecessor sections remain.
@@ -351,7 +353,8 @@ def test_docs_page_sections_are_additive_only():
     """
     sections = _h2_sections(_read(DOCS_PAGE))
     expected = (
-        PREDECESSOR_DOCS_H2[:7] + [DOCS_DECOMPOSITION_H2]
+        PREDECESSOR_DOCS_H2[:5] + [DOCS_SETTLEMENT_H2]
+        + PREDECESSOR_DOCS_H2[5:7] + [DOCS_DECOMPOSITION_H2]
         + PREDECESSOR_DOCS_H2[7:10]
         + [DOCS_OBSERVER_H2]
         + PREDECESSOR_DOCS_H2[10:]

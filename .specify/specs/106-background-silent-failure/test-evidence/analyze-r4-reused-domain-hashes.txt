@@ -1,0 +1,4 @@
+d2f8d5056366b81b2716edcf07ede2903a909a2146a5c0c0caae7e4b9ad56e78  .specify/specs/106-background-silent-failure/requirements.md
+06260b155926088c46213c30526e9e2befd4af0e3538e9c91024ad3317bb5dd7  .specify/specs/106-background-silent-failure/checklists/requirements.md
+71d7d2ac2e325abaf00a5e6a6e21a77ad0beab0c5f42f20389364b9001ceeec8  .specify/specs/106-background-silent-failure/checklists/background-settlement-2026-11-25.md
+dbabe7e4572716a70ad2d501200082d9773b0cdf7cb99bd9f99070deb0ece383  .specify/constitution.md

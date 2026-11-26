@@ -1,0 +1,12 @@
+$ git add -- <artifact paths>
+warning: unable to access '.git/config': Permission denied
+fatal: unable to access '.git/config': Permission denied
+git_add_exit=128
+$ git diff --cached --diff-filter=D --name-only
+warning: unable to access '.git/config': Permission denied
+fatal: unable to access '.git/config': Permission denied
+audit_exit=128
+$ git commit -m docs(106): clarify ...
+warning: unable to access '.git/config': Permission denied
+fatal: unable to access '.git/config': Permission denied
+git_commit_exit=128

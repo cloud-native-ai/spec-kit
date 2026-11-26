@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "path": "/storage/project/cloud-native-ai/spec-kit/.specify/glossary.md"
+}

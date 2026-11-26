@@ -1,0 +1,8 @@
+{
+  "settlement_version": 1,
+  "attempt_id": "seat-legacy",
+  "carrier": "c3-team-seat",
+  "parent_identity": "root",
+  "started_at": "2026-01-01T00:00:00Z",
+  "contract": "shared/definitions/superagent-definitions.md § Termination"
+}

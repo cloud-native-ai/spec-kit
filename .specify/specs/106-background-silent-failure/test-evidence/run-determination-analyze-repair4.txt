@@ -1,0 +1,9 @@
+unit: skill:analyze-artifacts   run: r20261125T173750Z-106r4
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (source_unavailable)
+  artifact_correctness not_evaluated (no_baseline)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261125T173750Z-106r4 clean=false findings=4
+persisted: .specify/session/20261125T173937Z-run-determination-skill-analyze-artifacts-r20261125t173750z.md
+settled: skill:analyze-artifacts r20261125T134017Z-106r3 -> not_evaluated (no_user_input)

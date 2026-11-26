@@ -1,0 +1,8 @@
+# super↔sub protocol paragraphs extracted from fbab7a45c:shared/definitions/superagent-definitions.md
+# (baseline for the T023 five-element uplink / seven-field downlink preservation guard)
+<!-- DOWNLINK-BEGIN -->
+**Downlink.** Every governed dispatch carries seven role fields in its existing payload channel: `parent_identity`, `child_label`, `role_declaration`, `dispatch_duty`, `depth_position`, `authority_ref`, `return_channel`. The four pre-existing injections keep their owners and travel by pointer: the fast-fail clause (`shared/guidelines/fast-fail.md` § 子代理派发注入), the concurrency obligation (`subagent-definitions.md` § The Concurrency Obligation), the reporting duty (`shared/guidelines/reporting-obligations.md`), and the re-anchoring anchor digest (`shared/definitions/re-anchoring-definitions.md`). The payload MUST NOT instruct the child to load any skill, MUST NOT reference a driver skill, and MUST NOT contain loop logic — the anti-nesting owner is `subagent-definitions.md` § Dispatch-Time Governance Obligation.
+<!-- DOWNLINK-END -->
+<!-- UPLINK-BEGIN -->
+**Uplink.** Every return carries the result or deliverable path, evidence pointer(s), an explicit anomaly line (stating "no anomaly" explicitly when none), the concurrency reading triple with its fields owned by `subagent-definitions.md` § The Concurrency Obligation, and the returning executor's identity. Missing any item makes the return incomplete: the parent MUST NOT consume the conclusion and MUST NOT backfill the missing fields.
+<!-- UPLINK-END -->

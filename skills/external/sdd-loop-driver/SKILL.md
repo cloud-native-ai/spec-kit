@@ -128,6 +128,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 13. **类别感知（只换算子与槽位内容）**：阶段派发载荷 MUST 携带类别**四元组**（`flow_class=` / `source=` / `marker=` / `error=`；值域、缺键处置与派发纪律归 `references/stage-prompts.md` § 类别四元组的派发纪律），fork 承载（本地同族 `qodercli` 子进程）与远端 CLI 同规，subprocess 承载（异构 agent）同规；缺任一键即**派发构造缺陷**，U4 不放行。U4 对表达类 MUST 校验门禁证据——算子结果齐备、证据文件存在且非空、载荷与当场解析一致、`stage-status` 在行（校验程序归 `references/stage-prompts.md` § Independent Verification）；载荷 `error` 位非 `-`（即 `owner-unavailable`）时 MUST 走 `owner-unavailable` 分支——记降级观测、保持既有门禁集，MUST NOT 按表达类校验。预算槽位装什么归 `references/efficiency-model.md` §2.8（`selection_basis=docs-gate-full`），时点与槽位数不变。驱动 MUST NOT 因类别改变阶段序列、哨兵字面量、watcher 判定与退出码、卡死处置、快车道判据或 analyze / review 调用率（两者保持 100%）；任何以「本线属表达类」为由跳过或缩短阶段的请求被拒。类别只改变两件事：用哪套算子证明同一不变量、预算槽位里装什么。
 
 14. **方向审计（Direction audit）**：每个检查点 MUST 包含五问方向审计（owner：`references/checkpoint-protocol.md` § Direction audit）；驱动 MUST 按 T0/T1/T2 分层重载方向契约与 Hard Requirements（T0 每检查点、T1 每阶段边界/轮次上限/压缩后、T2 仅在派发形态不清或处置卡死时），审计判定只有 `on-track` / `correction-applied` / `decision-needed` 三值，结论是陈述、MUST NOT 以征求用户「继续」收尾（HR1）。
+15. **结算指针（派发职责，owner 按指针）**: 本驱动派发的每个阶段尝试按 `.specify/shared/definitions/superagent-definitions.md` § Termination 结算（C1 四件套 + stage sidecar/spine；判定面 `scripts/python/role-edge-check.py --action settle`）；本节只给指针，不复制值表、证据矩阵或载体私有判定副本。
 ## Discipline Defaults
 
 阶段提示词骨架第二段把默认纪律写进每次派发（全文见 references/stage-prompts.md）：直接执行不要确认、访谈式问题自行裁决并记录假设、只提交本特性产物、既有脏文件不提交不还原、不要 push（除非明确授权）。

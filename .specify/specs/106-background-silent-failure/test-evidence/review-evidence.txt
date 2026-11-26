@@ -1,0 +1,64 @@
+# Review-run evidence — spec 106 (review stage)
+
+## Smoke (recorded verification.md command, re-run at review)
+```
+bringing up nodes...
+bringing up nodes...
+
+.........................................................                [100%]
+57 passed in 6.47s
+```
+rc=0
+
+## Quickstart S-1 — real dispatch.sh + real SIGKILL + settle (re-run at review)
+```
+attempt record: {"attempt_id": "review-kill", "carrier": "c2-subprocess", "contract": "superagent-definitions.md \u00a7 Termination", "parent_identity": "root", "pid": 1136959, "pid_start_ticks": 2460001766, "settlement_version": 1, "started_at": "2026-11-26T03:29:16Z"}
+wrapper pid gone after SIGKILL: 1136959
+.end present after SIGKILL: False
+.status present after SIGKILL: False
+leftover CLI pid: 1136971 gone: True
+--- settle rc=0 ---
+attempt review-kill carrier=c2-subprocess verdict=silent-end class=terminal consistent=true legacy=false evidence=/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-qs1b/logs/review-kill.attempt,/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-qs1b/logs/review-kill.end,/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-qs1b/logs/review-kill.status
+summary attempts=1 violations=0 unknown=0
+```
+
+## Preserved surfaces (S-2/S-6/S-7 run-now parts)
+```
+== S-2/S-6 watcher self-test ==
+SELF-TEST: 39 passed, 0 failed
+== sha256 live vs baseline ==
+955ddf7820a80cb3afad5af25877f2f8d7093e4fb08c46ec59dfe948ec3f2479  skills/external/sdd-loop-driver/scripts/watch-target.sh
+955ddf7820a80cb3afad5af25877f2f8d7093e4fb08c46ec59dfe948ec3f2479  .specify/specs/106-background-silent-failure/test-evidence/watch-target-fbab7a45c.sh
+== gate scan total ==
+{
+  "total": 30,
+  "gates": [
+Exception ignored in: <_io.TextIOWrapper name='<stdout>' mode='w' encoding='utf-8'>
+BrokenPipeError: [Errno 32] Broken pipe
+== sync-mirrors --check ==
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (116 files, byte-identical)
+rc=0
+== regen-command-copies --check ==
+OK: all per-tool command copies match the source templates.
+rc=0
+```
+
+## S-3 real-roots settle (review re-run)
+```
+summary attempts=117 violations=0 unknown=0
+      1 verdict=anomaly
+    113 verdict=failed
+      1 verdict=running
+      2 verdict=silent-end
+```
+rc=0
+
+## Targeted suites at review head
+```
+six settlement modules: 100 passed in 23.49s (rc 0)
+test_role_edge_engine.py + test_superagent_definitions.py: 35 passed in 6.36s (rc 0)
+SC-001 selection: 16 passed in 6.30s (rc 0)
+SC-002 selection: 5 passed in 6.28s (rc 0)
+```

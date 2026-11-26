@@ -27,6 +27,8 @@ Load skills by their runtime path (internal skills are path-referenced by the wo
 
 Ambiguous or unsupported intent → reports the three capabilities (create / refine / run) and requests the missing intent without executing any mode; for teams direct to `/speckit.team`.
 
+**Settlement pointer**: every dispatched execution settles per `.specify/shared/definitions/superagent-definitions.md` § Termination — the run-agent skill carries the carrier obligations, and this template carries no settlement table of its own.
+
 The authoring baseline (frontmatter vocabulary, valid file locations, validation rules, Role × Stage × Type conceptual model) is owned by these skills and `.specify/shared/definitions/agent-definitions.md` — it is not restated in this template.
 
 ## Handoffs

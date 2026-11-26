@@ -70,7 +70,7 @@ ssh -o RemoteCommand=none <alias> "su - <run-user> -c 'bash /home/<run-user>/run
 tail -N ~/tmp/<project>/<line>-<stage>.log        # poll until the sentinel line appears
 ```
 
-On seeing `<STAGE>-DONE`, write the next stage's prompt file and continue the loop — this polling step **is** the loop's engine (see the pattern doc). On seeing the sentinel missing past the stage timeout, treat it as a stall, not a silence (pattern doc's stall handling).
+On seeing `<STAGE>-DONE`, write the next stage's prompt file and continue the loop — this polling step **is** the loop's engine (see the pattern doc). A missing sentinel is never read as a generic stall or silence — it takes the per-value disposition owned by `.specify/shared/definitions/superagent-definitions.md` § Termination: no sentinel and the subject gone (or no termination record) → `silent-end`; evidence unreadable → `unknown`; no sentinel but the subject still alive → `running`. A background recipe is permitted in exactly two forms: (a) a compliant runner or wrapper that produces termination evidence (`.status` / `.end`, or one of the driver's four-piece records), or (b) an explicitly foreground-terminal form where the return *is* the termination.
 
 **Observation surface — honest limits**: `qodercli -p` (print mode) buffers output until process exit, so this recipe observes the run at **stage granularity only** — the log stays quiet until the stage ends. The External Dispatch Visibility Contract in [`subagent-definitions.md`](../definitions/subagent-definitions.md) requires stream-level observability (`--output-format stream-json` + compacted live log) whenever mid-run progress, stall detection, or debugging surface is needed. Rule of thumb: sentinel-granular polling suffices for short, bounded stages where stage-boundary detection is the only need; switch the runner to stream-json output (or reuse `skills/internal/create-team/scripts/dispatch.sh`) for long stages, hard stall thresholds, or anything a human may need to debug mid-flight.
 
@@ -111,8 +111,10 @@ DISPATCH_LOG_DIR="<run-dir>/validators" \
 - **Write check** — after the wave, `git status --porcelain` in `<repo>` MUST be unchanged; any change
   means a validator wrote and the wave is invalid (fast fail).
 - **Result contract** — each `<label>.status` records `exit=0`, and each validator's final message
-  carries the verdict plus both evidence-boundary fields; a missing field marks that validator
-  incomplete and it must be re-asked.
+  carries the verdict plus both evidence-boundary fields. Each validator attempt is settled
+  individually per the settlement owner (`.specify/shared/definitions/superagent-definitions.md`
+  § Termination); a missing status/verdict settles that validator `failed` (incomplete) and it is
+  re-asked under the existing rule — it MUST NOT disappear from the wave result.
 - **Not a session** — `create_chat_session` / `fork_chat_session` (or any host session-creation API) MUST NOT be used for this wave; see [`subagent-definitions.md`](../definitions/subagent-definitions.md) § Mode Selection.
 
 ## Boundary

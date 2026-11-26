@@ -1,0 +1,52 @@
+[
+  {
+    "validator": "r3-r3-w2a-01",
+    "verdict": {
+      "finding_id": "R3-W2A-01",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "All four cited lines verify verbatim: data-model.md:72 (legacy claim = exit unaffected, exempt only from settlement-unrecorded), :95 (settlement-out-of-set predicated on any recorded value), :96 (settlement-unbacked predicated on any recorded value), :133 (INV08: legacy claims never cause a failing exit code). Neither :95 nor :96 gates on settlement_version, and the legacy carve-outs at :72/:94/:133 exempt only settlement-unrecorded; E5 defines legacy solely by absent settlement_version, so a versionless claim carrying a recorded value falls under both predicates. C-26 (contracts/enforcement-and-migration.contract.md:14) makes exit 1 the result of any settlement violation and quickstart.md:80 confirms violations exit 1, so such a legacy claim gets exit 1 from E7+C-26 and exit 0 from INV08/:72/C-33 with no clause selecting one.",
+      "evidence_not_supported": "No concrete record shape is demonstrated: a legacy 5-column team-report row has no end_state/evidence columns, .settlement is described as a new artifact written at settlement_version 1, and no cited or adjacent artifact shows a versionless claim actually carrying a value; no fixture, engine run, or observed exit code is produced. The finding therefore establishes a normative-text ambiguity about predicate scope, not an observed double-exit in implementation; the narrower C-10 wording (the annotation alone does not fail the exit) also hints the intended carve-out is annotation-only, though INV08/C-33/E5 overstate it in a way the text never reconciles."
+    }
+  },
+  {
+    "validator": "r3-r3-w2a-02",
+    "verdict": {
+      "finding_id": "R3-W2A-02",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "E4 enum (:56) names only u4/driver, team-verification/report ## Verification, five-element/run-agent and return-record; none maps to C2/dispatch.sh. :60 and INV02 (:127) require E4 with non-empty resolvable evidence for completed and send a success terminal record with no E4 to failed (incomplete). E8 C2 (:105) lists the engine read set as .live.log/.jsonl/.status + .attempt/.end/optional .settlement with no E4/verification pointer slot, and its writer column headed 'Attempt record written by' names only dispatch.sh for the attempt record. E5 (:68) names the attempt-file (<label>.settlement) claim surface without declaring a producer, while E7 settlement-unrecorded (:94) presupposes a claim file can exist, so that claim surface has no declared writer.",
+      "evidence_not_supported": "The surface row is at :68, not the cited :69 (line 69 is the attempt_id/label row); the rest of the cited content exists as described. The absolute 'can never' is not literally proven for every C2 attempt: the E4 enum text is carrier-agnostic, so a C2 seat nested under a C3 team report could conceivably fall under team-verification; however the data model defines no such mapping or read slot for C2, so the completed path is undefined in effect. E8's writer column could be read as covering the whole row including the optional .settlement, but its header scopes it to the attempt record and .settlement is an E5 claim, so no claim-file producer is actually declared."
+    }
+  },
+  {
+    "validator": "r3-r3-w2b-01",
+    "verdict": {
+      "finding_id": "R3-W2B-01",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "C-33 at enforcement-and-migration.contract.md:42 states unconditionally that records without settlement_version MUST NOT cause a failing exit code; C-26 at line 14 defines exit 1 = settlement violations found, and C-27 at line 18 makes settlement-out-of-set and settlement-unbacked settlement violation kinds; C-10 at settlement-contract.contract.md:48 carries the narrower owner-page wording that the annotation alone does not produce a failing exit code. The alone qualifier is indeed absent from C-33, and C-33's only legacy exit carve-out is the specific 5-column settlement-unrecorded exemption, so a legacy record exhibiting a genuine violation has two conflicting MUST outcomes (exit 1 by C-26 vs no failing exit by C-33); all cited line numbers match.",
+      "evidence_not_supported": "No cited text states that legacy records are exempt from content-violation judgment, nor that violations on legacy records still exit 1; the strongest supported reading is an unresolved contract-level conflict rather than a demonstrated implementation defect. C-10 retains the intended qualifier but does not repair C-33's unqualified wording, and no cited test or engine artifact pins either outcome."
+    }
+  },
+  {
+    "validator": "r3-r3-w2b-02",
+    "verdict": {
+      "finding_id": "R3-W2B-02",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "Verified at the cited lines: C-34 (enforcement-and-migration.contract.md:46) declares a closed eight-item behavior-class set and names neither FR-010 nor FR-024. settlement-contract.contract.md:30-32 heads C-06 'artifact-class content / behavior-class discharge' and cites only FR-010; :38-40 heads C-08 identically and cites FR-023, FR-024, FR-025, FR-026. requirements.md:178 (FR-010) carries the return-channel rule (silence MUST NOT be read as liveness or completion) and :198 (FR-024) carries the retry duty including 'named diagnosis or user ruling'; both are runtime/judgment duties with no machine-assertable artifact. requirements.md:221 (FR-041) requires unassertable obligations to be marked behavior-class with review/mutation evidence, and .specify/glossary.md:139 defines behavior-class by runtime actions and forbids claiming such clauses guard-covered. The set is the operative enumeration in DoD-7 (tasks.md:23) and T032 ('the eight items', tasks.md:271), so the omission leaves C-06/C-08 behavior-class-labeled duties outside the 'closed' enforcement-honesty enumeration; the closed-set claim and the suite's own labels cannot both be complete.",
+      "evidence_not_supported": "No cited artifact defines the heading tag as set membership: the same 'artifact-class content / behavior-class discharge' heading appears on ten clauses (C-02, C-06, C-07, C-08, C-13, C-15, C-17, C-20, C-30, C-33) while the set draws from only some, and C-16 (tagged artifact-class) already contains a set-listed behavior-class duty (the success-voice half of FR-017), so headings are not a clean membership signal. The FR-024 leg is overstated as a whole-FR omission: C-08 renders the diagnosis/user-ruling constraint inside the FR-023 sentence, FR-023 is in the set, and FR-024's machine-assertable retry mechanics (new label, preserved evidence) are exercised by T020/T021; FR-010's record, missing-start and unknown parts are likewise machine-assertable (C-26, T009), leaving only the return-channel reading genuinely unenumerated. No downstream artifact was observed making an explicit contract-coverage claim over the specific omitted runtime duties, and the eventual owner (shared/definitions/superagent-definitions.md Section Termination) was not read, so an owner-level reconciliation is not excluded."
+    }
+  },
+  {
+    "validator": "r3-r3-w2b-03",
+    "verdict": {
+      "finding_id": "R3-W2B-03",
+      "verdict": "reject",
+      "proposed_severity": null,
+      "evidence_supported": "C-02 at settlement-contract.contract.md:16 does co-locate the two four-item groups: it names the 'closed four-value set' of independent-verification mechanisms (u4 / team-verification / five-element / return-record) and later uses 'all four terminal evidences absent' without enumerating the four inline, while the same clause carries the completed / failed / anomaly / cancelled evidence rows.",
+      "evidence_not_supported": "The ambiguity claim fails: C-01 (same file, line 12) defines the terminal class as exactly {completed, failed, anomaly, cancelled, silent-end}, so 'all four terminal evidences' deterministically denotes the four terminal values other than silent-end itself; C-02 labels the other group 'mechanism' and separates it from 'completion evidence', so it is not a 'terminal evidence' referent, and the mechanism reading would make silent-end overlap the failed/anomaly/cancelled rows, contradicting the same clause. The set is also explicitly enumerated upstream: FR-006 (requirements.md:174), A-7 (requirements.md:52), the contract's declared design input Settlement Evidence Matrix (requirements.md:250), and data-model INV04 (data-model.md:129, '(completed/failed/anomaly/cancelled)'). No two valid silent-end predicates are derivable."
+    }
+  }
+]

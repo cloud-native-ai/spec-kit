@@ -1,0 +1,122 @@
+[
+  {
+    "id": "w1-01",
+    "verdict": {
+      "finding_id": "W1-01",
+      "verdict": "downgrade",
+      "proposed_severity": "MEDIUM",
+      "evidence_supported": "requirements.md:178 (FR-010) mandates [[STR-002]] for attempts lacking a start record; requirements.md:294/251 map STR-002 to `unknown`. requirements.md:156 labels the same no-start-record attempt 'legacy/`unknown`', while requirements.md:214 (FR-034) ties the `legacy` mark exclusively to a missing settlement_version [[STR-004]], and requirements.md:307 confirms `legacy` is only an audit/settlement-output mark. The `legacy` term thus carries two coexisting criteria, one of which (missing start record) FR-034 does not define.",
+      "evidence_not_supported": "The claim of 'two different values': `legacy` is outside FR-001's closed verdict set (requirements.md:169) and `unknown` appears in both locations, so the settlement value itself is not contradicted — only the `legacy` labeling criterion is. The Edge Cases phrase also admits a disjunctive reading ('legacy or unknown', the legacy branch covering version-less attempts) that would dissolve the conflict; the finding does not exclude it, and no downstream artifact beyond the cited file was examined to establish an implementer-facing consequence."
+    }
+  },
+  {
+    "id": "w1-02",
+    "verdict": {
+      "finding_id": "W1-02",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "requirements.md:171 (FR-003) makes 'exit 0 but missing required completion evidence (incomplete)' positive evidence for failed; requirements.md:172 (FR-004) makes 'last non-empty line starts with ANOMALY:' plus terminal evidence positive evidence for anomaly, and a terminated exit-0 attempt with an ANOMALY final line satisfies both branches on the same observation; requirements.md:148 routes 'exit 0, no sentinel / no completion declaration' to failed(incomplete), which also covers exit 0 with an ANOMALY final line; requirements.md:246 lists both as separate positive-evidence rows in the Settlement Evidence Matrix on overlapping observations with no precedence column or note; adjacent FR-001 (requirements.md:169) requires exactly one settlement value per attempt, making the collision material rather than harmless permissive wording.",
+      "evidence_not_supported": "The blanket negative 'no clause states which value takes precedence' was verified only within the cited Settlement Contract (FR-001–FR-018), the Edge Cases and the Settlement Evidence Matrix; the remainder of requirements.md and any downstream artifacts were not read, so precedence rules outside that scope were not observed. The artifacts show an under-determined overlap (both FRs are permissive 'MUST only hold when' conditions) plus a failed-prescribing edge case, not two explicitly prescriptive clauses naming different values."
+    }
+  },
+  {
+    "id": "w1-03",
+    "verdict": {
+      "finding_id": "W1-03",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "requirements.md:52 (A-7) states that silent-end requires 尝试已开始 + 执行主体已消失 + 四类终态证据均缺席 to hold simultaneously, with no carrier qualification and no deadline branch, and says 「三件同时成立」. requirements.md:174 (FR-006) defines silent-end for carriers with no pid as 声明等待期限已过、无返回且无活信号, a separate operative test that does not require establishing that the executing body disappeared. requirements.md:60 (A-15) states that the spec definition governs this feature until the glossary entry is confirmed, after which the glossary entry takes over semantic reference. glossary.md:208 (status=proposed, 提案来源: spec 106) defines silent-end via 起点记录 + 执行主体已消失 + 四类终态证据全部缺席 and contains no no-pid/deadline branch, so it is narrower than the spec it cites as its source. Corroboration within the same artifact: requirements.md:250's settlement-evidence matrix already carries the branch 或无 pid 载体的等待期限已过且无返回无活信号, and requirements.md:189 (FR-018) applies the deadline test to C4 native, confirming that the requirements layer does require the branch A-7 and the glossary entry omit.",
+      "evidence_not_supported": "The claim that the glossary entry 'would exclude' the no-pid path after takeover is inferred from A-15's takeover clause; the entry is status=proposed and no confirmation decision or confirmation outcome was observable. The cited semantic owner shared/definitions/superagent-definitions.md § Termination was not read because it is outside the cited locations, so whether that owner already carries the branch is unobserved. The claim does not mention requirements.md:250 or FR-018, which show the requirements artifact as a whole does carry the no-pid branch, so the divergence is confined to A-7's summary and the current glossary proposal rather than to the entire spec. The parenthetical 未覆盖无 pid 的期限分支 in the evidence notes is the finder's annotation, not glossary text; the omission from the glossary is substantiated, but that wording is not present in the artifact. No plan or implementation artifact was observed, so downstream impact is not demonstrated, and whether glossary-utils detect-conflict would flag this semantic narrowing at plan wrap-up was not observed; HIGH rests on the owner-projection argument, not on an observed defect."
+    }
+  },
+  {
+    "id": "w1-04",
+    "verdict": {
+      "finding_id": "W1-04",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "requirements.md:173 (FR-005) conditions `running` on 活日志在声明阈值内增长 without naming who declares the threshold or where it lives; requirements.md:174 (FR-006) defines the pid-less-carrier silent-end as 声明等待期限已过、无返回且无活信号, again with no declarer, value or record field; requirements.md:189 (FR-018) settles C4 on 超过声明的等待期限 with the same gap. A whole-file grep of requirements.md for 阈值|期限|宽限|声明 finds no numeric value, declaration point or owner anywhere in the document (line 250's evidence matrix and line 237's C4 row only restate 等待期限/期限), and FR-010 (line 178) enumerates the dispatch-time record fields (尝试身份、载体、父身份、开始时间、pid) with no deadline/threshold field even though it names 期限 as a settlement input. With no binding value and no home for it, the same material event can settle silent-end under one compliant implementation and running/late completed under another, and the FR-028/FR-029 deterministic surface has nothing authoritative to read.",
+      "evidence_not_supported": "The inference that two implementers 'can choose different numbers with both readings compliant' is derived from the observed absence of any value, owner or field, not from a demonstrated contradiction; absence was verified only inside requirements.md — a declaration in plan.md or an existing framework owner (line 153 cites 既有 deadline grace, implying a pre-existing deadline concept) was not examined, so 'no declarer anywhere' exceeds the observed boundary. The claim also folds FR-005 into the silent-end boundary, whereas FR-005 is one of several alternative live-evidence forms and pid-bearing carriers (FR-014/FR-016) settle via pid disappearance/termination records without the deadline; the deadline is decisive mainly for pid-less carriers (FR-006) and C4 (FR-018)."
+    }
+  },
+  {
+    "id": "w1-05",
+    "verdict": {
+      "finding_id": "W1-05",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "requirements.md:170 (FR-002) makes `completed` require 终端成功记录 AND 独立核验, introducing the verification mechanisms with 例如 (驱动 U4 的产物校验、团队 `## Verification`、五要素上行齐备) — explicitly non-exhaustive; the same open form recurs in the artifact at :245 (Settlement Evidence Matrix `completed` row: 五要素齐备 / U4 / 团队 Verification) and :77 (US1 scenario: 独立核验的指针), so no closure of the mechanism set is stated. FR-029 at :206 requires a red-able guard covering 无完成证据却声称 `completed`; SC-002 at :269 asserts the identical predicate with Path: final. FR-041 at :221 declares closed only 载体清单与结算值集合, leaving the completion-evidence mechanism set outside any closure declaration, and no FR requires the named evidence owner to enumerate or close it, so the guard predicate has no decidable evidence set in the requirements text.",
+      "evidence_not_supported": "'no closure owner' is stronger than observed: A-3 (:48) and FR-029 (:206) name the revised superagent-definitions § Termination as single owner of 集合与证据要求, and FR-013 (:184) forbids a second evidence matrix — the missing piece is a closure/decidability mandate, not an owner; the owner page itself was not cited or read, so whether it closes the set is unobserved. Also unestablished: that plan/implementation cannot close it — FR-029 defers C2/C4/C6 evidence-input integration to the plan, and carrier FRs (FR-016 :187 '退出 0 但无完成声明 → failed'; FR-018 :189 五要素缺任一 → failed incomplete) constrain completion evidence for some carriers."
+    }
+  },
+  {
+    "id": "w1-06",
+    "verdict": {
+      "finding_id": "W1-06",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "requirements.md:178 FR-010 requires recording attempt identity/carrier/parent/start time/pid into an unnamed 既有父侧载体, with missing start record forcing [[STR-002]]; requirements.md:189 FR-018 requires C4 native to leave an attempt record at dispatch with no named destination; requirements.md:218 FR-038 and requirements.md:51 A-6 forbid new storage/registry and define settlement as read-only classification of existing carriers; requirements.md:32 states C4 attempt records exist only in parent-side memory with no persistent started-but-unreturned fact. Adjacent context corroborates: the C4 inventory row (line 237) records '无持久尝试记录' and lists '父侧尝试记录' as the required change; line 156 requires rebuilding attempts after parent death from an '既有持久载体' that is also unnamed; a full-file scan finds no named store for these records.",
+      "evidence_not_supported": "FR-010 does not itself use the word 'persistent' nor explicitly require cross-session survival; that requirement is implied by missing-start→[[STR-002]] at settlement and asserted at uncited Edge Cases line 156. The document shows a load-bearing under-specification/contradiction rather than a formal impossibility: FR-033 permits additive new fields/files, so whether a new C4 attempt-record file constitutes forbidden 'storage' under A-6/FR-038 is itself undefined — that ambiguity is the defect. No plan/tasks or other artifacts were examined (out of scope), so it is unverified whether a downstream artifact names a carrier."
+    }
+  },
+  {
+    "id": "w1-07",
+    "verdict": {
+      "finding_id": "W1-07",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "FR-039（requirements.md:219）与 SC-009（requirements.md:276）均要求冻结 total 与相等判定保持绿色，但未点名基线参照物（无具体值、提交或文件），A-12（requirements.md:57）同义；plan.md:185 的 EP-005 将该前提标为 falsified，实测 total 31、相等测试失败 31 != 27，plan.md:187 明言本特性从不声称其为绿，plan.md:216 复述同一事实；checklists/background-settlement-2026-11-25.md:70（CHK036）明写 live 31 ≠ 冻结 27，:93 将其列为待 analyze/review 裁定的观察；checklists/requirements.md:18 仍勾选 [x] containment claims 点名基线参照物与可推导允许差异集；glossary.md:120 记录基线 93 ⇒ cap 23.25 ⇒ 最大整数 23，且 test_proactive_trigger_section.py 对 050 baseline-gates.json 的 frozen total=23 做相等判定（该文件第 14-23 行确为 23），而 test_clause_coverage.py:87、test_wrap_up_wording_gate_safe.py:75-77、test_user_facing_comprehension_doc.py:569 钉 27，证明仓内 '冻结基线值' 存在多个互不一致的钉值。",
+      "evidence_not_supported": "受只读约束未重跑扫描器，live 31 无法独立复测，仅取自 plan.md EP-005 与 checklist 的转述；'未给出 allowed-delta set' 对 SC-009 的 '新增阻断模式命中数为 0' 而言略宽——该句确为零增量声明，缺参照物的是 total/相等判定部分；glossary.md:120 的 23 与 plan 的 27 是不同钉点/冻结日期（050 baseline-gates.json 2026-09-08 与 067 T025 更新）下的值，二者可先后描述同一扫描器，故应读作 '不存在单一冻结基线参照物'，而非两个数字本身不可能同源；未核对 requirements 清单第 18 行勾选时间是否早于 EP-005 的发现时点。"
+    }
+  },
+  {
+    "id": "w2-01",
+    "verdict": {
+      "finding_id": "W2-01",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "settlement-contract.contract.md:32 (C-06) requires § Termination to state that an attempt with no start record cannot prove it existed and settles as `unknown`, never `completed`; :24 (C-04) says `unknown` is produced only when evidence is unreadable/unparseable and names the unreadable pointers; :16 (C-02) defines `unknown` as the unreadable/unparseable pointer set; data-model.md:127 (INV05) says `unknown` is produced only from unreadable/unparseable evidence, names the unreadable pointers, and the engine exits 2, never 0; data-model.md:81/95 distinguish E6 `kind: lack` (absence) from `kind: unreadable` and call unreadable evidence the single deterministic exit-2 refusal, with `unknown` not a violation kind; enforcement-and-migration.contract.md:14 (C-26) maps exit 2 to unreadable/unparseable evidence with `unknown` findings and forbids `unknown` as exit 0, and :42 (C-33) calls `unknown`/exit-2 the single deterministic refusal for unreadable evidence; the settlement contract contains only C-01–C-12 and the enforcement contract only C-25–C-34, and no clause reconciles a missing (never-written, hence readable-absent) start record with the only-unreadable-evidence definition, so the cited artifacts do force that absence into the detection-defect/exit-2 path.",
+      "evidence_not_supported": "FR-007/FR-010 source text in requirements.md and the owner page superagent-definitions.md § Termination were not cited and I did not read them, so an owner-level resolution (e.g. redefining 'unreadable' to include an unresolvable start-record pointer) cannot be ruled out; 'always tied to exit 2' is an inference from C-04/INV05's 'only' plus C-26's mapping, since no cited line literally states every `unknown` verdict yields exit 2; no downstream task or test was cited, so whether an implementation reading is already fixed is unobserved; the 'missing pointer = unreadable pointer' reading is a stretch but is not textually excluded by the cited lines."
+    }
+  },
+  {
+    "id": "w2-02",
+    "verdict": {
+      "finding_id": "W2-02",
+      "verdict": "downgrade",
+      "proposed_severity": "LOW",
+      "evidence_supported": "carrier-conformance.contract.md:10 (C-13) does contain an unqualified mapping list including `DONE → completed`, immediately followed by the qualifier `DONE remains a candidate that the driver's U4 verification completes; a versioned claim MUST name its U4 evidence pointer`; data-model.md:124 (INV02) requires E3 success and E4 with non-empty resolvable evidence for `completed`, with exit 0 alone not being completion; data-model.md:142-144 shows exit 0 plus sentinel/declaration reaching `completed` only with E4 verified and `failed (incomplete)` with E4 absent; data-model.md:48-58 (E4) states no E4 means a success terminal record settles `failed (incomplete)`, never `completed`.",
+      "evidence_not_supported": "The claim that one C1 attempt is given two mutually exclusive outcomes, and its HIGH severity, are overstated: C-13's own next sentence, E4, INV02 and the state-transition table converge on one final verdict (`failed (incomplete)`) for DONE without E4, so the artifact as a whole leaves only an unqualified arrow-notation tension rather than two licensed outcomes; no task row, pinning test or implementation consequence of the mapping was cited or observed (tasks.md and tests were not inspected)."
+    }
+  },
+  {
+    "id": "w2-03",
+    "verdict": {
+      "finding_id": "W2-03",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "data-model.md:91 (E7) defines settlement-unrecorded as a claim-bearing team-report row missing end_state/evidence; data-model.md:66 places a ## Execution Detail row on E5's team-report-row surface, so a 5-column legacy row matches; carrier-conformance.contract.md:22 (C-16) both requires the legacy 5-column header to parse as legacy and declares a row with empty end_state/evidence settlement-unrecorded, with no legacy carve-out; data-model.md:130 (INV08) and enforcement-and-migration.contract.md:42 (C-33) state records without settlement_version are annotated and MUST NOT cause a failing exit code; quickstart.md:80 pairs settlement-unrecorded (exit 1) with a 5-column legacy report parsing and annotated legacy; enforcement-and-migration.contract.md:12-14 (C-26) maps settlement violations to exit 1 and judged attempts to exit 0, making the two prescribed exit codes incompatible for the same row; quickstart.md:94 (same-document S-4 context) pins a legacy fixture to exit 0.",
+      "evidence_not_supported": "No cited location states an explicit precedence or carve-out for legacy team-report rows (neither that legacy rows are exempt from settlement-unrecorded nor that legacy reports must exit 1); the contradiction is assembled from separate clauses. A charitable reading of C-16 (empty means blank 7-column cells, not absent columns) could reconcile the texts, but that scoping is nowhere written, and E7 plus quickstart say missing. I did not inspect spec.md FR-034/FR-017, role-edge-check.py, or the pinning tests, so actual intended or implemented exit behavior for a legacy team report is unobserved; HIGH is the finding's own severity, not an artifact claim."
+    }
+  },
+  {
+    "id": "w2-04",
+    "verdict": {
+      "finding_id": "W2-04",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "settlement-contract.contract.md:20 (C-03) defines pid-less silent-end as 'the declared wait deadline passed with no return and no live signal' without naming a declaration site; carrier-conformance.contract.md:26 (C-17) likewise uses 'declared wait deadline' for C4; carrier-conformance.contract.md:18 (C-15) uses 'start grace' with no value or source; data-model.md:126 (INV04) and data-model.md:46 both make derivation depend on a deadline with no defined input; data-model.md:19-31 (E2) lists settlement_version/attempt_id/carrier/parent_identity/started_at/pid/pid_start_ticks/contract and no deadline or grace field, and E3 (35-44) and E5 (66-71) add none; enforcement-and-migration.contract.md:22 (C-28) closes the settle input set to existing carriers, additive records and the three existing roots, with no deadline/grace option; a targeted search of the cited contracts/data-model plus plan.md and requirements.md found no default, field, CLI option or input source for either value (plan.md:15 only repeats 'declared deadline'; requirements.md:153 cites only the C1 watcher's existing deadline grace). Because silent-end versus running for pid-less carriers is decided by this undeclared boundary and the engine contract requires deterministic per-attempt derivation (INV10, C-29), the gap is material and unimplementable without inventing a value.",
+      "evidence_not_supported": "The finding attaches C-15's start grace to the pid-less carrier boundary, but C-15 governs C2, which records a pid; the start-grace gap is real yet belongs to C2's 'pid never appeared' branch rather than to pid-less carriers, whose split depends only on the wait deadline. I did not examine pointer-reached downstream texts not among the cited locations (e.g. shared/definitions/superagent-definitions.md § Termination, skills/internal/run-agent/SKILL.md), so I cannot exclude that one of them declares a deadline source or default; a non-cited baseline shows watch-target.sh already carries --start-grace and deadline parameters for C1, so the gap is specific to carriers without that watcher, and no citation establishes whether the feature intends to reuse those defaults. Magnitude of practical impact (which of C3/C4 fail at runtime) was not measurable from the cited artifacts."
+    }
+  },
+  {
+    "id": "w3-01",
+    "verdict": {
+      "finding_id": "W3-01",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "tasks.md:66 classifies plan.md, data-model.md, contracts/, quickstart.md, research.md, feature-ref.md as 'plan-owned 面（仅小修）', and tasks.md:360 permits implementation-driven small edits declared under PLAN-EDIT disclosure, halting only for substantive changes; handoff.md:42 states these same paths MUST stay forbidden to every seat carrying the expansion (C-62) with no PLAN-EDIT exception in the contract (lines 28-43); team.md:62-81 is a team-level territory.forbidden list naming the same six paths, and no seat-level entry (reporter reporting-territory, lines 123-125) removes them; handoff.md:26 and team.md:168-175 make the crew the executor of T001-T037, so the actor executing the tasks is the same actor set the forbidden lists bind, yielding mutually exclusive write permissions over one object set.",
+      "evidence_not_supported": "tasks.md never names the crew, a seat, or the handoff/team contract as the PLAN-EDIT actor and states no precedence, so 'mutually exclusive for the same actor' relies on inferring '实现' = the crew; handoff.md:14 says design authority stays on the spec side (C-64), leaving open a spec-side-only reading; the PLAN-EDIT discipline's own text was not cited and was not read, so whether it routes small edits to the spec side is unobserved."
+    }
+  }
+]

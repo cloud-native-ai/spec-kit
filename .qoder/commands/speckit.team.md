@@ -42,6 +42,8 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 7. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
 8. **modify / run / view targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it; view additionally lists the available slugs (bounded, omissions counted) through its skill.
 
+**Settlement pointer**: every team run settles each dispatched seat per `.specify/shared/definitions/superagent-definitions.md` § Termination; the run report's `end_state` / `evidence` columns are owned by the create-team report contract (`.specify/skills/internal/create-team/SKILL.md` § Report). This template carries no settlement table of its own.
+
 ### Default Behavior (No Arguments)
 
 When `$ARGUMENTS` is empty, the command MUST execute the following sequence instead of routing to a mode:

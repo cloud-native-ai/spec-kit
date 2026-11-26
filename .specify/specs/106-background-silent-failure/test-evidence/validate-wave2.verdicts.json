@@ -1,0 +1,62 @@
+[
+  {
+    "validator": "r2-r2-w1-01",
+    "verdict": {
+      "finding_id": "R2-W1-01",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "requirements.md:174 (FR-006) and :52 (A-7) define no-pid silent-end as the declared wait deadline (--wait-deadline / wait_deadline_s, owner C-25) passed with no return and no live signal; :189 (FR-018) repeats the same deadline trigger for C4; :250 repeats the deadline criterion and lists 「未到期限」 as a disqualifier. :153 (Edge Case 「期限之后的晚完成」) instead says terminal/sentinel evidence inside the existing deadline grace triggers re-judgment, and silent-end may be judged only when the grace is exhausted, with disappearance not to be declared early. The cited lines never relate the settlement wait deadline to that grace; C-25 (contracts/enforcement-and-migration.contract.md:10) defines --wait-deadline (default 1800 s) with no grace parameter. So at t between wait-deadline and wait-deadline+grace the FR-006/FR-018 conditions are satisfied while :153 forbids declaring silent-end — two conflicting decision points for one attempt.",
+      "evidence_not_supported": "FR-016:187 is pid/start-grace based (no termination record + recorded pid gone, or never seen within --start-grace → silent-end), not wait-deadline based, so its inclusion in the claimed 「decidable at the declared wait deadline」 group is imprecise; its clash with :153 is only conditional (pid loss after the deadline). The grace is not wholly 「unnamed」 in the repo: it exists as --deadline-grace (default 120 s, owner watch-target.sh / watch-model per 065), though requirements.md:153 cites no option name, owner or value domain, and the cited artifact never scopes :153 to the watcher/C1. Whether the two clocks can be reconciled by defining --wait-deadline to include grace is not stated anywhere cited, so the defect is an unresolved, conflicting decision point rather than a documented mechanism."
+    }
+  },
+  {
+    "validator": "r2-r2-w1-02",
+    "verdict": {
+      "finding_id": "R2-W1-02",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "requirements.md:273 的 SC-006 以无条件形式写「源/模板/已安装副本一致」，同一句无「本特性触及面」「零新增」「基线」等限定；同节 SC-009（requirements.md:276）却显式采用基线相对形式「不高于基线（零新增）」「如实上报、不声称绿」，证明文档具备相对判据写法而 SC-006 未采用。requirements.md:285 的 SC-006 Source 对同一项度量写「sync-mirrors.py --check 与安装流程的既有读数（如实报告绝对漂移，断言本特性触及面零新增）」，即断言对象是「触及面零新增」，绝对漂移仅如实报告——SC 正文的绝对「一致」与其度量来源的相对「零新增」确为两套判据。glossary.md:138 的相对判据条目明载「绝对判据在本仓不可通过」及实测例「sync-mirrors.py --check 全树 EXIT=2、--only shared 恰 2 条既有 DIFF」，即全树镜像在改动前已红，绝对形在基线为假。requirements.md:133 叙述段亦以同形绝对断言「框架源、模板与本仓运行副本一致」，可作佐证。finding 的核心不一致结论成立。",
+      "evidence_not_supported": "未重跑 sync-mirrors.py，亦未核对其比较的树集合是否恰等于 SC-006 的「源/模板/已安装副本」三元组（超出引用范围）；glossary.md:138 的实测例未标 as-of 日期，故「基线为假」取自其「既有 DIFF」措辞与 SC-006 Source 的「如实报告绝对漂移」表述，而非对 feature 106 基线的实时测量；实现后全树是否恰好转绿不可从引用位置观测，但 SC-006 Source 并未把绝对相等列为断言，判据错配结论不依赖此点。"
+    }
+  },
+  {
+    "validator": "r2-r2-w3-01",
+    "verdict": {
+      "finding_id": "R2-W3-01",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "tasks.md:283 (T035) is the only row producing .specify/specs/106-background-silent-failure/verification.md; tasks.md:24 (DoD-8) and tasks.md:33 (GATE-4) require that file's content, so it cannot be dropped; handoff.md:26 hands T001-T037 wholesale to the crew with no Polish-row carve-out, and team.md:168 gives the coordinator all 37 task rows; handoff.md:42 forbids requirements.md, tasks.md, verification.md and handoff.md to every seat that carries the expansion (C-62); team.md:65 lists verification.md in territory.forbidden and team.md:175 declares the design face including verification.md read-only to the crew; tasks.md:66 enumerates the spec-side plan-owned paths and omits verification.md, stating the territory contract prevails on conflict; tasks.md:360 reaffirms crew MUST NOT write the design/plan-owned face and routes defects to the spec side without granting a verification.md write; tasks.md:64 lists verification.md among the feature's evidence drop locations. Result: the receiving crew has no seat permitted to write T035's artifact while the gates require it.",
+      "evidence_not_supported": "The absolute claim of no legal executor is proven only within the handoff/crew scope: the cited artifacts do not rule out the spec side as writer (handoff.md:14 keeps design authority on the spec side; team.md:175 calls verification.md part of the design face), but no cited location explicitly assigns T035 or verification.md writing to the driver or analyze-repair, and tasks.md:66 leaves that unrecorded. Whether any enforcement check would catch a crew write, and any uncited artifact (anchor, implement skill) that might resolve the conflict, were not observed."
+    }
+  },
+  {
+    "validator": "r2-w2a-01",
+    "verdict": {
+      "finding_id": "w2a-01",
+      "verdict": "confirm",
+      "proposed_severity": "HIGH",
+      "evidence_supported": "data-model.md:18 defines E2 as one `<label>.attempt` JSON file per attempt in the carrier evidence directory, with start-side fields `started_at` (line 26) and `carrier` incl. c3-team-seat (line 24); data-model.md:106 gives C3 only `## Execution Detail` mapping row + `## Verification` and names the report row (E5 surface) as its attempt record, assigning no .attempt file or start timestamp; data-model.md:62-73 defines the team-report row as a settlement claim (surface/value/evidence/claimed_at), i.e. end-side, not a start record; data-model.md:129 INV04 requires an E2 start record for silent-end, and the pid-less wait-deadline exception covers only the subject-gone leg; data-model.md:96 makes start-less silent-end settlement-unbacked; data-model.md:150-154 repeats the start-record precondition in the state transition; plan.md:15 adds only end_state/evidence columns plus a `## Verification` coverage declaration for C3 (corroborated by plan.md:129,142 — report contract and C3-reports fixture, no start artifact); plan.md:16 requires every carrier's silent-death fixture, which C3 cannot satisfy through the cited model.",
+      "evidence_not_supported": "The artifacts do not state when the `## Execution Detail` row is authored or establish that a row cannot pre-exist at dispatch; even if one pre-exists, E5's fields carry no started_at/carrier, so the strict E2 start-record predicate remains unmet within the cited design. The scenario 'a team seat that dies before writing its row' is entailed by the model rather than narrated in the cited text; if no row exists the engine may not enumerate the attempt at all (no claim), which the cited model does not address. E2 line 33 exempts carriers with pre-existing equivalent start facts (C1 four-piece, exec-quant records), so 'solely' is not literally universal, though no start-equivalent is listed for C3. I did not inspect requirements.md, the team-report skill/template, or engine code, so an out-of-model workaround cannot be ruled out, but nothing in the cited artifacts supplies one."
+    }
+  },
+  {
+    "validator": "r2-w2b-01",
+    "verdict": {
+      "finding_id": "w2b-01",
+      "verdict": "confirm",
+      "proposed_severity": null,
+      "evidence_supported": "enforcement-and-migration.contract.md:10 declares --live-window (default 120 s), --wait-deadline (default 1800 s), --start-grace (default 30 s) with precedence attempt-field > option > default; C-28 (:22) restates them as settlement boundary inputs without adding semantics. settlement-contract.contract.md:16 defines running as 'a live check performed at settlement time' and pid-less silent-end as deadline passed with 'no return and no live signal', citing only --wait-deadline/wait_deadline_s; 'live-window' appears nowhere in this file (grep-verified). :20 (C-03) repeats the pid-less branch with deadline only. :32 (C-06) requires recording optional wait_deadline_s / start_grace_s but binds no rule to start_grace, and :24 (C-04) makes start-record-missing -> unknown unconditional on any grace window; :30-:32 further state the return channel is not liveness evidence, leaving 'live signal' with no defined source or freshness. The contracts are the declared implementation source (Consumers lines in both files), so two of the three declared boundary parameters have no consumed evidence rule and a primary settlement value rests on an undefined predicate.",
+      "evidence_not_supported": "I did not inspect artifacts outside the two cited contracts (owner page shared/definitions/superagent-definitions.md § Termination, requirements.md § Settlement Evidence Matrix, data-model, or implementation/tests), so I cannot assert these semantics are absent framework-wide; the claim's literal scope ('neither contract') holds but the consequential statement that the boundary is undecidable overall is inferred from contract text alone. The characterization 'undecidable' is an inference from absent rules, not a directly stated artifact fact. No finding on the declarations' values/defaults themselves — those are supported."
+    }
+  },
+  {
+    "validator": "r2-w2c-03",
+    "verdict": {
+      "finding_id": "w2c-03",
+      "verdict": "reject",
+      "proposed_severity": null,
+      "evidence_supported": "contracts/carrier-conformance.contract.md:18 uses the term `completion declaration` without defining it in the contract itself (the contract's pointer list at line 6 names no data-model entry), and research.md:28 does describe `<label>.settlement` as a claim a parent may add after independent verification, with the engine deriving a verdict even without one, so that file is optional.",
+      "evidence_not_supported": "The finding's load-bearing assertions do not hold against the same feature's Phase-1 artifacts: (1) data-model.md:50-60 defines E4 `Completion Declaration / Independent Verification` as the required parent-side verification that upgrades a success terminal record to `completed` (mechanism enum includes `return-record` as a declared equivalent; evidence pointers required), and line 60 states that no E4 means a success terminal record settles as `failed (incomplete)`, never `completed` — so `<label>.settlement` is not the only candidate and the declaration itself is mandatory; (2) data-model.md:62-73 defines `.settlement` as E5 `Settlement Claim`, a distinct optional surface (data-model.md:105), and data-model.md:82-85,96 has the engine audit claims against the derived verdict, never substitute them, so the claim's presence or absence cannot flip completed vs failed; (3) accordingly C-15 rule 1 (success terminal + verified return -> completed) and rule 3 (exit 0 without a completion declaration -> failed (incomplete)) are complementary once the declaration resolves to E4, and an exit-0 attempt with a verified return is deterministically `completed`. The only residual is clause-local terminology/cross-reference looseness (C-15 does not cite data-model E4 by pointer), which is not the HIGH reader-dependent settlement defect claimed and does not justify a repair that would make the optional E5 claim mandatory."
+    }
+  }
+]

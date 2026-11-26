@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "action": "report",
+  "inputs": {
+    "state_dir": "tests/fixtures/superagent-role/empty/state",
+    "teams_dir": "tests/fixtures/superagent-role/empty/teams",
+    "logs_dir": "tests/fixtures/superagent-role/empty/logs",
+    "registry_dir": "tests/fixtures/superagent-role/empty/registry",
+    "registry": "present",
+    "dispatch_store": "tests/fixtures/superagent-role/empty/exec-quant/records",
+    "dispatch_store_present": false,
+    "spines": 0,
+    "registry_entries": 0,
+    "triplets": 0,
+    "carrier_rows": {
+      "team-report": 0,
+      "driver-spine": 0,
+      "run-agent-label": 0
+    },
+    "registry_unreadable": 0,
+    "unconfirmed_dispatch_records": 0
+  },
+  "roots": [],
+  "executors": [],
+  "edges": [],
+  "violations": [],
+  "conflicts": [],
+  "summary": {
+    "edges": 0,
+    "executors": 0,
+    "violations": 0,
+    "conflicts": 0
+  }
+}

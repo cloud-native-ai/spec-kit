@@ -58,6 +58,15 @@ independent Agent Execution and relays a return that satisfies the five-element 
 reports `agent not found` with a bounded suggestion list and a create suggestion — neither
 path dispatches an agent.
 
+**Settlement after the return.** A dispatched run does not end at the return channel: the
+parent settles every attempt it opened before reporting, from the attempt record and the
+existing evidence roots — a subject that disappeared without terminal evidence settles as
+a silent end, never as success or as "still running". The closed settlement values, their
+per-value evidence and the violation kinds are owned by
+`shared/definitions/superagent-definitions.md` § Termination; the reaction duties
+(parent settles before reporting, retry is a new label) live in
+`skills/internal/run-agent/SKILL.md`.
+
 ## Authoring Modes
 
 When creating an agent, `create-agent` supports several **modes** (`kind`). If the request does not clearly map to one, `/speckit.agents` **confirms which mode you want before generating** — it never guesses the mode silently:
