@@ -21,7 +21,7 @@ skill:code-review run=r20261125T022857Z-06dd token=not_evaluated elapsed=not_eva
   "feature": "105-runtime-store-layout",
   "feature_id": "024",
   "determined_at": "2026-11-25T07:41:57Z",
-  "settled_at": null,
+  "settled_at": "2026-11-26T06:29:05Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -84,7 +84,7 @@ skill:code-review run=r20261125T022857Z-06dd token=not_evaluated elapsed=not_eva
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -161,8 +161,8 @@ skill:code-review run=r20261125T022857Z-06dd token=not_evaluated elapsed=not_eva
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -192,7 +192,7 @@ skill:code-review run=r20261125T022857Z-06dd token=not_evaluated elapsed=not_eva
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

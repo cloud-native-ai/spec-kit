@@ -21,7 +21,7 @@ skill:review-sdd-process run=r20261126T033520Z-106review token=not_evaluated ela
   "feature": "106-background-silent-failure",
   "feature_id": "106",
   "determined_at": "2026-11-26T03:35:27Z",
-  "settled_at": null,
+  "settled_at": "2026-11-26T06:28:50Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -84,7 +84,7 @@ skill:review-sdd-process run=r20261126T033520Z-106review token=not_evaluated ela
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -161,8 +161,8 @@ skill:review-sdd-process run=r20261126T033520Z-106review token=not_evaluated ela
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -192,7 +192,7 @@ skill:review-sdd-process run=r20261126T033520Z-106review token=not_evaluated ela
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
