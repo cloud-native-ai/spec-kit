@@ -28,7 +28,12 @@
 | S-17 | `tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id` (chain fixtures) | T032 | filled (red captured 2026-11-26; green at T038) |
 | S-18 | `tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old` (chain fixtures) | T032 | filled (red captured 2026-11-26; green at T038) |
 | S-19 | `tests/contract/test_decision_governance_guards.py::test_reconstruct_from_register_and_carriers` (four-carrier fixtures) | T024 | filled (red -> green at T029/T031) |
-| S-20 | `tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample` (C-403) | T039 | pending |
+| S-20 | `tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample` (C-403) | T039 | filled (red captured 2026-11-26; green at T045) |
+| S-21 | `tests/contract/test_decision_governance_guards.py::test_inventory_closure` (C-406) | T039 | filled (red captured 2026-11-26; green at T045) |
+| S-22 | `tests/contract/test_decision_governance_guards.py::test_table_guard_parity` (C-407) | T039 | filled (red captured 2026-11-26; green at T045) |
+| S-23 | `tests/contract/test_decision_governance_contracts.py::test_behavior_surfaces_named` (C-402) | T039 | filled (red captured 2026-11-26; green at T045) |
+| S-24 | `tests/contract/test_decision_governance_contracts.py::test_gate_neutrality` (C-405) | T039 | filled (red captured 2026-11-26; green at T045) |
+| S-25 | `tests/contract/test_decision_governance_contracts.py::test_review_surfaces_named` (C-109) | T039 | filled (red captured 2026-11-26; green at T045) |
 
 ## Slots
 
@@ -441,8 +446,92 @@ FAILED tests/contract/test_decision_governance_guards.py::test_reconstruct_from_
 - green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
 - exit status (green): `0`. The four-record reconstruction output (ids, carriers, classes, base fields, triggered family) is recorded in `notes/us3-green.txt` § SC-005.
 
-### S-20 — `test_every_guard_has_reverse_sample` (T039; C-403)
+### S-20 — `test_every_guard_has_reverse_sample` (T039 red → T045 green; C-403)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample -q`
-- red output: pending (author lands with T039)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US5 red run before T040; raw log `test-evidence/us5-red-first.txt`):
+
+```text
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the owner page declares no reverse-sample table yet), never an import error.
+- fixtures: the nine roster samples — `m01/red-missing-actor.md`, `m02/red-empty-locator.md`, `m03/red-empty-set.md`, `m04/red-form.md`, `m05/red-no-id.md`, `m06/red-no-block.md`, `m07/red-missing-dispatch.md`, `m08/red-variant.md`, `m09/red-broken.md`.
+- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+
+### S-21 — `test_inventory_closure` (T039 red → T045 green; C-406)
+
+- command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_inventory_closure -q`
+- red output (verbatim, captured 2026-11-26 in the combined US5 red run before T042; raw log `test-evidence/us5-red-first.txt`):
+
+```text
+E       AssertionError: the inventory action exited 2, expected 0:  error: action 'inventory' is declared but not implemented yet (read-only skeleton)
+E       assert 2 == 0
+FAILED tests/contract/test_decision_governance_guards.py::test_inventory_closure
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the `inventory` leg does not exist yet), never an import error.
+- observation: the test runs the documented code-face scan (grep for the owner-page path over `templates/ skills/ agents/ scripts/ src/`, recorded in the checker docstring) and feeds the output to the action; mutations add an unregistered face and remove a declared producer's owner face.
+- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+
+### S-22 — `test_table_guard_parity` (T039 red → T045 green; C-407)
+
+- command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_table_guard_parity -q`
+- red output (verbatim, captured 2026-11-26 in the combined US5 red run before T040; raw log `test-evidence/us5-red-first.txt`):
+
+```text
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_guards.py::test_table_guard_parity
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the owner page carries no M/B tables yet), never an import error.
+- comparison unit: the owner page's M/B table row sets against the test-side `GUARD_ROSTER` / `B_RULES`, plus each M row's single judge action against the roster's action.
+- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+
+### S-23 — `test_behavior_surfaces_named` (T039 red → T045 green; C-402)
+
+- command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py::test_behavior_surfaces_named -q`
+- red output (verbatim, captured 2026-11-26 in the combined US5 red run before T040; raw log `test-evidence/us5-red-first.txt`):
+
+```text
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_contracts.py::test_behavior_surfaces_named
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the B table does not exist yet), never an import error.
+- comparison unit: each B row's surface cell and its explicit no-machine-coverage statement; the M table's complementary machine-coverage claim; the guards module quotes no behavior rule id.
+- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+
+### S-24 — `test_gate_neutrality` (T039 red → T045 green; C-405)
+
+- command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py::test_gate_neutrality -q`
+- red output (verbatim, captured 2026-11-26 in the combined US5 red run before T043; raw log `test-evidence/us5-red-first.txt`):
+
+```text
+E       AssertionError: missing file: …/.specify/specs/107-decision-governance/test-evidence/gate-neutrality.txt
+E       assert False
+FAILED tests/contract/test_decision_governance_contracts.py::test_gate_neutrality
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the re-baselined gate record does not exist yet), never an import error.
+- comparison unit: the live scan summary against the recorded effective baseline (re-baselined 31 → 30 on the merged tree), the touched-face hit membership, the FR-025 three-path containment against `fbab7a45c`, and the EP-002 payload field counts.
+- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.
+
+### S-25 — `test_review_surfaces_named` (T039 red → T045 green; C-109)
+
+- command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py::test_review_surfaces_named -q`
+- red output (verbatim, captured 2026-11-26 in the combined US5 red run before T040; raw log `test-evidence/us5-red-first.txt`):
+
+```text
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_contracts.py::test_review_surfaces_named
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the B rows and the producer-side review-surface pointers do not exist yet), never an import error.
+- comparison unit: B-03/B-04/B-06 surfaces in the owner tables and § Decision Classes, plus the analyze/review skill pointer blocks.
+- command (green): same single-test command; output and exit status recorded at T045 in `notes/us5-green.txt`.

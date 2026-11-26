@@ -376,3 +376,227 @@ def test_read_only_disposition_carrier() -> None:
         "MUST NOT 通过修改被分析的工件来归档",
     ):
         assert token in flat, f"§ Archive as Projection lacks {token!r}"
+
+
+# --------------------------------------------------------------------------- #
+# US5 — enforcement honesty: B surfaces, gate neutrality, review surfaces (T039)
+# --------------------------------------------------------------------------- #
+
+import json
+import subprocess
+import sys
+
+ENFORCEMENT_SECTION_TOKENS = ("强制边界", "Enforcement Boundary")
+SUPERAGENT = ROOT / "shared" / "definitions" / "superagent-definitions.md"
+SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
+GATE_RECORD = (
+    ROOT / ".specify" / "specs" / "107-decision-governance" / "test-evidence"
+    / "gate-neutrality.txt"
+)
+
+#: The FR-025 preservation owners (three files, byte-for-byte containment claim) and the
+#: effective baseline the claim is read against (default `fbab7a45c`, replaceable only by a
+#: recorded re-baseline ruling).
+FR025_PATHS = (
+    "shared/declarations/facts/driver-completion-sentinels.yaml",
+    "skills/external/sdd-loop-driver/references/watch-model.md",
+    "skills/external/sdd-loop-driver/references/efficiency-model.md",
+)
+FR025_BASELINE = "fbab7a45c"
+
+#: The seven role fields, the four pre-existing injections and the five uplink items
+#: (EP-002 payload shape; ownership stays with superagent-definitions.md).
+ROLE_FIELDS = (
+    "parent_identity", "child_label", "role_declaration", "dispatch_duty",
+    "depth_position", "authority_ref", "return_channel",
+)
+INJECTION_REFS = (
+    "shared/guidelines/fast-fail.md",
+    "subagent-definitions.md` § The Concurrency Obligation",
+    "shared/guidelines/reporting-obligations.md",
+    "shared/definitions/re-anchoring-definitions.md",
+)
+#: The feature-touched code faces the gate scan covers (paths relative to the repo root).
+FEATURE_TOUCHED_FACES = frozenset({
+    "shared/definitions/decision-definitions.md",
+    "shared/definitions/superagent-definitions.md",
+    "shared/guidelines/confirmation-gates.md",
+    "shared/guidelines/decision-tension.md",
+    "shared/guidelines/fast-fail.md",
+    "shared/definitions/goal-definitions.md",
+    "shared/definitions/anchor-definitions.md",
+    "shared/definitions/agent-definitions.md",
+    "templates/instructions-template.md",
+    "skills/internal/run-agent/SKILL.md",
+    "skills/internal/run-team/SKILL.md",
+    "skills/internal/analyze-artifacts/SKILL.md",
+    "skills/internal/review-feature-quality/SKILL.md",
+    "skills/internal/review-sdd-process/SKILL.md",
+    "skills/external/sdd-loop-driver/references/checkpoint-protocol.md",
+    "skills/external/sdd-loop-driver/references/dispatch-recipes.md",
+    "skills/external/sdd-loop-driver/references/stage-prompts.md",
+})
+
+
+def behavior_rows() -> dict[str, tuple[str, str]]:
+    """(surface cell, coverage cell) per B row of the owner page's § Enforcement Boundary."""
+    section = h2_section(read(OWNER), *ENFORCEMENT_SECTION_TOKENS)
+    rows: dict[str, tuple[str, str]] = {}
+    for line in section.splitlines():
+        match = re.match(r"^\| (B-\d{2})[^|]*\|([^|]*)\|([^|]*)\|", line)
+        if match:
+            rows[match.group(1)] = (match.group(2).strip(), match.group(3).strip())
+    return rows
+
+
+def test_behavior_surfaces_named() -> None:
+    """C-402: every behavior rule names its review surface and disclaims machine coverage."""
+    rows = behavior_rows()
+    assert set(rows) == {f"B-{n:02d}" for n in range(1, 8)}, sorted(rows)
+    for rule, (surface, coverage) in rows.items():
+        assert surface, f"{rule} names no review surface"
+        assert "/speckit.review" in surface or "/speckit.analyze" in surface or (
+            "人工决策评审" in surface
+        ), (rule, surface)
+        assert "不声称机器覆盖" in coverage, (
+            f"{rule} does not carry the explicit no-machine-coverage statement: {coverage!r}"
+        )
+    for rule in ("B-04", "B-05", "B-07"):
+        assert "/speckit.analyze" in rows[rule][0], (rule, rows[rule][0])
+    for rule in ("B-01", "B-02", "B-03", "B-06"):
+        assert "/speckit.review" in rows[rule][0], (rule, rows[rule][0])
+
+    # The machine table keeps the complementary claim: machine-covered, one judge each.
+    section = h2_section(read(OWNER), *ENFORCEMENT_SECTION_TOKENS)
+    for line in section.splitlines():
+        match = re.match(r"^\| (M-\d{2})[^|]*\|([^|]*)\|([^|]*)\|([^|]*)\|", line)
+        if match:
+            assert "机器覆盖" in match.group(4), (match.group(1), match.group(4))
+
+    # No test asserts a machine verdict for a behavior rule.
+    guards = read(ROOT / "tests" / "contract" / "test_decision_governance_guards.py")
+    assert not re.search(r'"B-\d{2}"', guards), (
+        "the guards module quotes a behavior rule id; behavior rules are never machine-judged"
+    )
+
+
+def run_scanner_summary() -> dict[str, int]:
+    completed = subprocess.run(
+        [sys.executable, str(SCANNER), "--summary"],
+        capture_output=True,
+        text=True,
+        cwd=str(ROOT),
+    )
+    assert completed.returncode == 0, completed.stderr
+    readings: dict[str, int] = {}
+    patterns = {
+        "blocking": r"blocking confirmation gates:\s*(\d+)",
+        "destructive": r"destructive:\s*(\d+)",
+        "governance_kept": r"governance_kept:\s*(\d+)",
+        "reversible": r"reversible:\s*(\d+)",
+        "violations": r"violations[^:]*:\s*(\d+)",
+    }
+    for key, pattern in patterns.items():
+        match = re.search(pattern, completed.stdout)
+        assert match, f"the scan summary carries no {key!r} reading: {completed.stdout!r}"
+        readings[key] = int(match.group(1))
+    return readings
+
+
+def test_gate_neutrality() -> None:
+    """C-405: zero new gate hits against the re-baselined reading; FR-025 stays byte-identical."""
+    record = read(GATE_RECORD)
+    effective = {
+        key: int(re.search(rf"^{key}: (\d+)$", record, re.M).group(1))
+        for key in (
+            "effective_baseline_blocking",
+            "effective_baseline_destructive",
+            "effective_baseline_governance_kept",
+            "effective_baseline_reversible",
+            "effective_baseline_violations",
+        )
+    }
+    assert effective["effective_baseline_blocking"] == 30, (
+        "the recorded effective baseline is not the merged-tree re-baselined 30"
+    )
+
+    current = run_scanner_summary()
+    assert current["violations"] == effective["effective_baseline_violations"] == 0, (
+        current
+    )
+    for key in ("blocking", "destructive", "governance_kept", "reversible"):
+        assert current[key] == effective[f"effective_baseline_{key}"], (key, current, effective)
+
+    # Zero NEW hits on the feature-touched faces: only the two pre-existing
+    # dispatch-recipes members appear, nothing else touched by this feature does.
+    scan = subprocess.run(
+        [sys.executable, str(SCANNER), "--json"],
+        capture_output=True,
+        text=True,
+        cwd=str(ROOT),
+    )
+    assert scan.returncode == 0, scan.stderr
+    gates = json.loads(scan.stdout)["gates"]
+    hits = [gate for gate in gates if gate["file"] in FEATURE_TOUCHED_FACES]
+    assert len(hits) == 2, [(gate["file"], gate["line"]) for gate in hits]
+    assert all(gate["file"].endswith("dispatch-recipes.md") for gate in hits), hits
+
+    # FR-025 preservation: the three owner artifacts are byte-identical to the effective
+    # baseline (default fbab7a45c; no recorded re-baseline ruling replaces it).
+    quiet = subprocess.run(
+        ["git", "diff", "--quiet", f"{FR025_BASELINE}..HEAD", "--", *FR025_PATHS],
+        cwd=str(ROOT),
+    )
+    assert quiet.returncode == 0, (
+        "the FR-025 preservation owners drifted from the effective baseline"
+    )
+    numstat = subprocess.run(
+        ["git", "diff", "--numstat", f"{FR025_BASELINE}..HEAD", "--", *FR025_PATHS],
+        capture_output=True,
+        text=True,
+        cwd=str(ROOT),
+    )
+    assert numstat.stdout.strip() == "", numstat.stdout
+
+    # EP-002: the payload field counts (seven role fields + four injections + five-item
+    # uplink) are unchanged.
+    superagent = read(SUPERAGENT)
+    for field in ROLE_FIELDS:
+        assert f"`{field}`" in superagent, f"the role field `{field}` vanished"
+    for ref in INJECTION_REFS:
+        assert ref in superagent, f"the injection pointer {ref!r} vanished"
+    uplink = norm(h2_section(superagent, "The super↔sub Protocol"))
+    for item in ("evidence pointer", "anomaly line", "concurrency reading triple",
+                 "returning executor's identity", "deliverable path"):
+        assert item in uplink, f"the uplink paragraph lost {item!r}"
+
+
+def test_review_surfaces_named() -> None:
+    """C-109: the class/presentation mismatch is named on review surfaces, never machine-claimed."""
+    rows = behavior_rows()
+    for rule in ("B-03", "B-04", "B-06"):
+        assert rows.get(rule), f"§ Enforcement Boundary names no {rule} row"
+    assert "/speckit.review" in rows["B-03"][0], rows["B-03"]
+    assert "/speckit.analyze" in rows["B-04"][0], rows["B-04"]
+    assert "/speckit.review" in rows["B-06"][0], rows["B-06"]
+
+    classes = norm(h2_section(read(OWNER), "决策类别", "Decision Classes"))
+    assert "B-03" in classes and "B-04" in classes and "B-06" in classes, (
+        "§ Decision Classes does not name the three review surfaces of a mismatch"
+    )
+    assert "MUST NOT 被机器声称覆盖" in classes, (
+        "§ Decision Classes does not disclaim machine coverage"
+    )
+
+    owners = {
+        "skills/internal/analyze-artifacts/SKILL.md": ("B-04", "B-05", "B-07"),
+        "skills/internal/review-feature-quality/SKILL.md": tuple(f"B-{n:02d}" for n in range(1, 8)),
+        "skills/internal/review-sdd-process/SKILL.md": tuple(f"B-{n:02d}" for n in range(1, 8)),
+    }
+    for rel, ids in owners.items():
+        body = read(ROOT / rel)
+        assert "shared/definitions/decision-definitions.md" in body, (
+            f"{rel} does not reach the owner page by pointer"
+        )
+        for rule in ids:
+            assert rule in body, f"{rel} does not name the {rule} review surface"

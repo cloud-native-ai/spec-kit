@@ -1,0 +1,190 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample tests/contract/test_decision_governance_guards.py::test_inventory_closure tests/contract/test_decision_governance_guards.py::test_table_guard_parity tests/contract/test_decision_governance_contracts.py::test_behavior_surfaces_named tests/contract/test_decision_governance_contracts.py::test_gate_neutrality tests/contract/test_decision_governance_contracts.py::test_review_surfaces_named -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_____________________________ test_gate_neutrality _____________________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_gate_neutrality() -> None:
+        """C-405: zero new gate hits against the re-baselined reading; FR-025 stays byte-identical."""
+>       record = read(GATE_RECORD)
+                 ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_contracts.py:508: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/.specify/specs/107-decision-governance/test-evidence/gate-neutrality.txt')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/.specify/specs/107-decision-governance/test-evidence/gate-neutrality.txt
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/.specify/specs/107-decision-governance/test-evidence/gate-neutrality.txt').is_file
+
+tests/contract/test_decision_governance_contracts.py:86: AssertionError
+__________________________ test_review_surfaces_named __________________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_review_surfaces_named() -> None:
+        """C-109: the class/presentation mismatch is named on review surfaces, never machine-claimed."""
+>       rows = behavior_rows()
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_contracts.py:576: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_governance_contracts.py:443: in behavior_rows
+    section = h2_section(read(OWNER), *ENFORCEMENT_SECTION_TOKENS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# 决策项定义(Decision Definitions)\n\n**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、决策记录字...录**：父侧新增一条记录，旧记录以条件层 `superseded_by` 指向新编号并**保留**旧记录与旧回执，MUST NOT 删除或改写（§ 决策记录 的取代族）。\n- 取代不改变被传递决策的类别；每条记录的审计链分别成立。\n'
+tokens = ('强制边界', 'Enforcement Boundary')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 260
+
+    def h2_section(text: str, *tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+
+tests/contract/test_decision_governance_contracts.py:107: AssertionError
+_____________________ test_every_guard_has_reverse_sample ______________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_every_guard_has_reverse_sample() -> None:
+        """C-403: every machine rule carries a reverse sample that turns its guard red."""
+        assert set(GUARD_ROSTER) == set(M_RULES), (
+            f"the guard roster covers {sorted(GUARD_ROSTER)}, not the nine machine rules"
+        )
+        # The owner page's M table declares each rule's reverse sample; the declared
+        # directory must be the one the executable roster actually drives.
+>       section = owner_section("强制边界", "Enforcement Boundary")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_guards.py:730: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tokens = ('强制边界', 'Enforcement Boundary')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 260
+
+    def owner_section(*tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = OWNER.read_text(encoding="utf-8").splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+
+tests/contract/test_decision_governance_guards.py:376: AssertionError
+_________________________ test_behavior_surfaces_named _________________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_behavior_surfaces_named() -> None:
+        """C-402: every behavior rule names its review surface and disclaims machine coverage."""
+>       rows = behavior_rows()
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_contracts.py:454: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_governance_contracts.py:443: in behavior_rows
+    section = h2_section(read(OWNER), *ENFORCEMENT_SECTION_TOKENS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# 决策项定义(Decision Definitions)\n\n**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、决策记录字...录**：父侧新增一条记录，旧记录以条件层 `superseded_by` 指向新编号并**保留**旧记录与旧回执，MUST NOT 删除或改写（§ 决策记录 的取代族）。\n- 取代不改变被传递决策的类别；每条记录的审计链分别成立。\n'
+tokens = ('强制边界', 'Enforcement Boundary')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 260
+
+    def h2_section(text: str, *tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+
+tests/contract/test_decision_governance_contracts.py:107: AssertionError
+___________________________ test_table_guard_parity ____________________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_table_guard_parity() -> None:
+        """C-407: the owner page's M/B tables and the test-side rosters are row-identical."""
+>       section = owner_section("强制边界", "Enforcement Boundary")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_guards.py:856: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tokens = ('强制边界', 'Enforcement Boundary')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 260
+
+    def owner_section(*tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = OWNER.read_text(encoding="utf-8").splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('强制边界', 'Enforcement Boundary')
+E       assert None is not None
+
+tests/contract/test_decision_governance_guards.py:376: AssertionError
+____________________________ test_inventory_closure ____________________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19188/popen-gw1/test_inventory_closure0')
+
+    def test_inventory_closure(tmp_path: Path) -> None:
+        """C-406: observed == declared ± exempt; an unregistered entry face turns it red."""
+        owner = ROOT / "shared" / "definitions" / "decision-definitions.md"
+        hits = documented_scan(ROOT)
+        assert hits, "the documented scan observed no code face reaching the owner page"
+    
+        tmp = tmp_path
+        observation = Path(tmp) / "observation.txt"
+        observation.write_text("\n".join(hits) + "\n", encoding="utf-8")
+    
+        run = run_action("inventory", "--spec", str(owner), "--fixture", str(observation))
+>       assert run.returncode == 0, (
+            f"the inventory action exited {run.returncode}, expected 0: "
+            f"{run.stdout} {run.stderr}"
+        )
+E       AssertionError: the inventory action exited 2, expected 0:  error: action 'inventory' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...returncode=2, stdout='', stderr="error: action 'inventory' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:791: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_governance_contracts.py::test_gate_neutrality
+FAILED tests/contract/test_decision_governance_contracts.py::test_review_surfaces_named
+FAILED tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample
+FAILED tests/contract/test_decision_governance_contracts.py::test_behavior_surfaces_named
+FAILED tests/contract/test_decision_governance_guards.py::test_table_guard_parity
+FAILED tests/contract/test_decision_governance_guards.py::test_inventory_closure
+6 failed in 6.27s

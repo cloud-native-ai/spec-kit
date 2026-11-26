@@ -686,3 +686,193 @@ def test_supersession_preserves_old() -> None:
     section = transmission_section()
     for token in ("`superseded_by`", "保留", "重决"):
         assert token in section, f"§ Transmission lacks the supersession duty ({token!r})"
+
+
+# --------------------------------------------------------------------------- #
+# US5 — enforcement honesty: reverse samples, inventory closure, parity (T039)
+# --------------------------------------------------------------------------- #
+
+#: One representative reverse sample per machine rule (C-401/C-403). The roster is the
+#: test-side half of the C-407 parity check: its id set MUST equal the owner page's M table.
+#: Each entry: (action, fixture path, extra args, a needle the verdict message must carry).
+GUARD_ROSTER = {
+    "M-01": ("records", M01 / "red-missing-actor.md", (), "missing base-layer field"),
+    "M-02": ("records", FIXTURES / "m02" / "red-empty-locator.md", (), "resource_locator"),
+    "M-03": ("records", FIXTURES / "m03" / "red-empty-set.md", (), "empty option set"),
+    "M-04": ("records", FIXTURES / "m04" / "red-form.md",
+             ("--register", str(FIXTURES / "m04" / "register.md")), "D-NNN"),
+    "M-05": ("chain", M05 / "red-no-id.md", (), "decision_id"),
+    "M-06": ("payload", M06 / "red-no-block.md", (), "decision_block"),
+    "M-07": ("chain", M07 / "red-missing-dispatch.md", (), "dispatch"),
+    "M-08": ("records", FIXTURES / "m08" / "red-variant.md",
+             ("--glossary", str(FIXTURES / "m08" / "glossary.md")), "variant"),
+    "M-09": ("records", FIXTURES / "m09" / "red-broken.md", (), "does not resolve"),
+}
+
+#: The owner page's § Enforcement Boundary M/B table row sets (closed rosters).
+M_RULES = tuple(f"M-{n:02d}" for n in range(1, 10))
+B_RULES = tuple(f"B-{n:02d}" for n in range(1, 8))
+
+
+def run_roster_sample(rule: str) -> subprocess.CompletedProcess:
+    action, fixture, extra, _needle = GUARD_ROSTER[rule]
+    flag = "--carrier" if action == "records" else "--fixture"
+    return run_action(action, flag, str(fixture), *extra)
+
+
+def test_every_guard_has_reverse_sample() -> None:
+    """C-403: every machine rule carries a reverse sample that turns its guard red."""
+    assert set(GUARD_ROSTER) == set(M_RULES), (
+        f"the guard roster covers {sorted(GUARD_ROSTER)}, not the nine machine rules"
+    )
+    # The owner page's M table declares each rule's reverse sample; the declared
+    # directory must be the one the executable roster actually drives.
+    section = owner_section("强制边界", "Enforcement Boundary")
+    for rule in M_RULES:
+        row = re.search(rf"^\| {rule} \|(.*)$", section, re.M)
+        assert row, f"the owner page M table carries no {rule} row"
+        fixture_dir = GUARD_ROSTER[rule][1].parent.relative_to(ROOT).as_posix()
+        assert fixture_dir in row.group(1), (
+            f"the {rule} row does not declare the reverse-sample directory {fixture_dir}"
+        )
+    before = dir_snapshot(FIXTURES)
+    for rule in M_RULES:
+        action, fixture, extra, needle = GUARD_ROSTER[rule]
+        assert fixture.is_file(), f"missing reverse sample for {rule}: {fixture}"
+        run = run_roster_sample(rule)
+        assert run.returncode == 1, (
+            f"{rule} reverse sample exited {run.returncode}, expected 1: "
+            f"{run.stdout} {run.stderr}"
+        )
+        assert rule in run.stdout, (
+            f"{rule} reverse sample carries no {rule} verdict: {run.stdout!r}"
+        )
+        flag = "--carrier" if action == "records" else "--fixture"
+        payload = json.loads(
+            run_action(action, flag, str(fixture), *extra, "--json").stdout
+        )
+        verdict = next(v for v in payload["violations"] if v["rule"] == rule)
+        assert verdict["message"], (rule, verdict)
+        assert needle in verdict["message"], (rule, needle, verdict["message"])
+    assert dir_snapshot(FIXTURES) == before, "a roster run mutated the fixture tree"
+
+
+def documented_scan(root: Path) -> list[str]:
+    """The documented code-face scan: faces reaching the owner page by pointer.
+
+    The command is recorded in the checker's docstring (``--action inventory``): a
+    recursive grep for the owner-page path over the FR-003 code faces, sorted.
+    """
+    completed = subprocess.run(
+        [
+            "grep", "-rEl", r"shared/definitions/decision-definitions\.md",
+            "templates", "skills", "agents", "scripts", "src",
+            "--include=*.md", "--include=*.py", "--include=*.sh",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(root),
+    )
+    assert completed.returncode in (0, 1), completed.stderr
+    return sorted(line.strip() for line in completed.stdout.splitlines() if line.strip())
+
+
+def test_inventory_closure(tmp_path: Path) -> None:
+    """C-406: observed == declared ± exempt; an unregistered entry face turns it red."""
+    owner = ROOT / "shared" / "definitions" / "decision-definitions.md"
+    hits = documented_scan(ROOT)
+    assert hits, "the documented scan observed no code face reaching the owner page"
+
+    tmp = tmp_path
+    observation = Path(tmp) / "observation.txt"
+    observation.write_text("\n".join(hits) + "\n", encoding="utf-8")
+
+    run = run_action("inventory", "--spec", str(owner), "--fixture", str(observation))
+    assert run.returncode == 0, (
+        f"the inventory action exited {run.returncode}, expected 0: "
+        f"{run.stdout} {run.stderr}"
+    )
+    payload = json.loads(
+        run_action("inventory", "--spec", str(owner), "--fixture", str(observation),
+                   "--json").stdout
+    )
+    assert payload["status"] == "pass", payload
+    assert payload["verdict"] == "observed == declared ± exempt", payload
+    declared = {row["id"] for row in payload["declared"]}
+    assert declared == {f"P-{n:02d}" for n in range(1, 13)}, declared
+    exemptions = set(payload["exempt"])
+    assert exemptions == {"P-11", "P-12"}, exemptions
+    assert set(payload["observed"]) == declared - exemptions, payload["observed"]
+    assert payload["unregistered"] == [], payload["unregistered"]
+
+    # Mutation 1: an extra observed face outside the declared producers is red.
+    doctored = Path(tmp) / "observation-unregistered.txt"
+    doctored.write_text(
+        "\n".join(hits + ["skills/internal/some-new-producer/SKILL.md"]) + "\n",
+        encoding="utf-8",
+    )
+    red = run_action("inventory", "--spec", str(owner), "--fixture", str(doctored))
+    assert red.returncode == 1, (
+        f"an unregistered entry face exited {red.returncode}, expected 1: {red.stdout}"
+    )
+    red_payload = json.loads(
+        run_action("inventory", "--spec", str(owner), "--fixture", str(doctored),
+                   "--json").stdout
+    )
+    assert red_payload["unregistered"] == ["skills/internal/some-new-producer/SKILL.md"], (
+        red_payload["unregistered"]
+    )
+
+    # Mutation 2: a declared non-exempt producer whose owner face disappears is red.
+    page = owner.read_text(encoding="utf-8")
+    mutated = page.replace(
+        "| P-10 | probe / feedback 处置 | `.specify/feedback/` 条目 + probe 注册面 | "
+        "record-when-decision（阈值提示不是决策；接受/延后/拒绝处置是决策） | 通常 "
+        "`ai-autonomous` | `shared/definitions/probe-definitions.md`、"
+        "`shared/workflow/feedback-step.md` |",
+        "| P-10 | probe / feedback 处置 | `.specify/feedback/` 条目 + probe 注册面 | "
+        "record-when-decision（阈值提示不是决策；接受/延后/拒绝处置是决策） | 通常 "
+        "`ai-autonomous` | `shared/definitions/probe-definitions-absent.md`、"
+        "`shared/workflow/feedback-step-absent.md` |",
+    )
+    assert mutated != page, "the P-10 row form changed; the fixture mutation did not apply"
+    page_copy = Path(tmp) / "owner-copy.md"
+    page_copy.write_text(mutated, encoding="utf-8")
+    missing = run_action("inventory", "--spec", str(page_copy), "--fixture",
+                         str(observation))
+    assert missing.returncode == 1, (
+        f"a vanished producer face exited {missing.returncode}, expected 1: "
+        f"{missing.stdout}"
+    )
+    missing_payload = json.loads(
+        run_action("inventory", "--spec", str(page_copy), "--fixture", str(observation),
+                   "--json").stdout
+    )
+    assert "P-10" in missing_payload["missing"], missing_payload["missing"]
+
+
+def test_table_guard_parity() -> None:
+    """C-407: the owner page's M/B tables and the test-side rosters are row-identical."""
+    section = owner_section("强制边界", "Enforcement Boundary")
+    m_rows = re.findall(r"^\| (M-\d{2}) \|", section, re.M)
+    b_rows = re.findall(r"^\| (B-\d{2})[\s|]", section, re.M)
+    assert tuple(sorted(m_rows)) == M_RULES, (
+        f"the owner page M table carries {sorted(m_rows)}, the roster {M_RULES}"
+    )
+    assert tuple(sorted(b_rows)) == B_RULES, (
+        f"the owner page B table carries {sorted(b_rows)}, the roster {B_RULES}"
+    )
+    assert set(GUARD_ROSTER) == set(m_rows), (
+        "the guard roster and the owner page M table differ"
+    )
+    # Each M row names exactly one deterministic judge action, matching the roster's action.
+    for rule in M_RULES:
+        row = re.search(rf"^\| {rule} \|(.*)$", section, re.M)
+        assert row, f"missing M row {rule}"
+        cells = [cell.strip() for cell in row.group(1).split("|")]
+        judge_cell = cells[0]
+        assert judge_cell.count("`--action") == 1, (rule, judge_cell)
+        action = GUARD_ROSTER[rule][0]
+        assert f"`--action {action}`" in judge_cell, (
+            f"{rule} row names {judge_cell!r}, the roster uses --action {action}"
+        )
