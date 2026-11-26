@@ -1,0 +1,36 @@
+# Shape-change guard reading — 108-team-view-degradation (T028, FR-023)
+
+Taken 2026-11-26 on worktree team-view-degradation (branch 108-team-view-degradation).
+
+## Baseline-relative diff of the naming owner and schema owner
+
+```bash
+git diff --stat 54c6efa8c..HEAD -- skills/internal/create-team/SKILL.md skills/internal/create-team/references/create-mode.md
+git diff --name-only 54c6efa8c..HEAD -- skills/internal/create-team/SKILL.md skills/internal/create-team/references/create-mode.md
+```
+
+- `--stat` output: **empty** (rc 0, no lines)
+- `--name-only` output: **empty** (rc 0, no lines)
+
+The report-naming owner (`skills/internal/create-team/SKILL.md` § Report contract) and the
+team-schema owner (`references/create-mode.md`) are byte-identical to the baseline commit —
+no shape change, no migration, no deterministic-refusal duty triggered (C-108).
+
+## Behavioural counter-check (pinned nodes, single entry)
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/integration/test_team_view_degradation.py \
+  tests/contract/test_team_view_degradation_contract.py -q \
+  -k "corpus_style or report_naming_owner"
+```
+
+- Real output: `2 passed in 6.52s`, rc 0.
+- `test_corpus_style_reports_are_recognized`: the 13 real-corpus report-style names
+  (5 × `YYYY-MM-DDThh-mm-ssZ-report.md`, 7 × `YYYY-MM-DDThhmmssZ-report.md`,
+  1 × `YYYYMMDDThhmmZ-report.md`) are recognized **13/13**, state is neither `为空` nor
+  `缺失`, exit 0.
+- `test_report_naming_owner_and_schema_unchanged_since_baseline`: both owner files equal
+  their `git show 54c6efa8c:` blobs byte-for-byte, and a compact
+  `<YYYYMMDD>T<hhmmss>Z-report.md` name still classifies as a run report — every name that
+  conformed before remains a run report (C-108 closure).

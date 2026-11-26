@@ -1,0 +1,44 @@
+# Targeted set reading — 108-team-view-degradation (T027, SC-008)
+
+Taken 2026-11-26 on worktree team-view-degradation (branch 108-team-view-degradation).
+
+## Command (exactly quickstart.md § Run the targeted set)
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_team_view_report_recognition.py \
+  tests/contract/test_team_view_degradation_contract.py \
+  tests/integration/test_team_view_degradation.py \
+  tests/unit/test_team_view_parsers.py \
+  tests/contract/test_team_view_program_contract.py \
+  tests/contract/test_team_view_command.py \
+  tests/integration/test_team_view_program.py -q --names-out .specify/specs/108-team-view-degradation/test-evidence/targeted-current-failed.txt
+```
+
+## Real output (trimmed to the recap lines; full capture in the scratch run log)
+
+```
+........................................................................ [ 48%]
+........................................................................ [ 96%]
+.....                                                                    [100%]
+149 passed in 7.01s
+# failed-name list written: .specify/specs/108-team-view-degradation/test-evidence/targeted-current-failed.txt (0 entries) passes=1
+```
+
+- rc = 0
+- counts: **149 passed, 0 failed, 0 skipped** (72 new/US2+US1 unit nodes included: 6 unit
+  recognition + 18 contract + 19 integration + the 106 inherited nodes)
+- failing-name list: `test-evidence/targeted-current-failed.txt` — **0 entries** (0 bytes)
+
+## Zero-new-failure comparison (owner: `/speckit.implement` § Test runs)
+
+- Baseline capture (implement entry, single full-suite slot): `baseline-failed.txt` —
+  **221 pre-existing failed names** (unrelated suites; recorded in
+  `test-evidence/implement-entry-readings.txt`).
+- Comparison command: `comm -13 .specify/specs/108-team-view-degradation/baseline-failed.txt .specify/specs/108-team-view-degradation/test-evidence/targeted-current-failed.txt`
+- Reading: **0 lines** — new failure names = **0**.
+
+SC-008: the new tests cover every FR-named shape (non-standard naming, auxiliary artifacts,
+residue, uncertainty, missing binding, inline goal, missing `agent` column, missing
+artifacts, unreadable report, healthy fidelity) — pinned across the three new files; the
+inherited four files remain green (106 passed) inside the same run.
