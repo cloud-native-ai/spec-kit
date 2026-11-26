@@ -1,0 +1,16 @@
+checklist: .specify/specs/108-team-view-degradation/checklists/requirements-quality-2026-11-26.md
+item count: 40
+numbering contiguous CHK001..CHK040: True
+unique: True
+items with >=1 trace anchor: 40 / 40
+items missing anchor: none
+items citing >=1 FR/SC/clause: 40 / 40
+items missing FR/SC/clause: none
+FR covered: 25 / 25; missing: none
+SC covered: 8 / 8; missing: none
+clauses covered: 35 / 35; missing: none
+items starting with Verify/Test/Confirm/Check: none
+primary dimension histogram: {'Completeness': 15, 'Measurability': 7, 'Consistency': 4, 'Gap': 4, 'Clarity': 3, 'Dependency': 2, 'Ambiguity': 1, 'Conflict': 1, 'Coverage': 1, 'NFR': 1, 'Traceability': 1}
+per-item primary dimension: CHK001:Completeness, CHK002:Completeness, CHK003:Gap, CHK004:Measurability, CHK005:Gap, CHK006:Completeness, CHK007:Coverage, CHK008:Consistency, CHK009:Completeness, CHK010:Completeness, CHK011:Completeness, CHK012:Ambiguity, CHK013:Clarity, CHK014:Consistency, CHK015:Completeness, CHK016:Completeness, CHK017:Completeness, CHK018:Consistency, CHK019:Completeness, CHK020:Gap, CHK021:Completeness, CHK022:Dependency, CHK023:Clarity, CHK024:Measurability, CHK025:Clarity, CHK026:Gap, CHK027:Completeness, CHK028:Measurability, CHK029:Consistency, CHK030:Conflict, CHK031:Completeness, CHK032:Completeness, CHK033:Measurability, CHK034:Completeness, CHK035:NFR, CHK036:Dependency, CHK037:Measurability, CHK038:Measurability, CHK039:Measurability, CHK040:Traceability
+has Notes section: True
+checklists dir files: ['requirements-quality-2026-11-26.md', 'requirements.md']

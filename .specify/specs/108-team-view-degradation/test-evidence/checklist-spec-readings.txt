@@ -1,0 +1,25 @@
+== requirements.md ==
+lines: 238
+FR rows: 25
+SC rows: 8
+STR rows: 3
+A rows: 17
+User stories: 3
+Edge-case bullets: 12
+RS rows: 5
+Clarification sessions: 2
+
+== contracts ==
+presentation.contract.md clauses: 9
+report-recognition.contract.md clauses: 8
+team-view-program.contract.md clauses: 9
+view-labels.contract.md clauses: 9
+contract files: 4 total clauses: 35
+
+== plan / data-model / quickstart / tasks ==
+plan EP rows: 9
+data-model entities C1-C10: 10
+data-model invariants: 10
+quickstart scenarios S-N: 8
+task rows: 29
+checklist files present: ['requirements.md']
