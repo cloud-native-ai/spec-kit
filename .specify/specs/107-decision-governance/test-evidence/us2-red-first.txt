@@ -1,0 +1,78 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples tests/unit/test_validate_decisions.py::test_ai_replay_deterministic -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________________________ test_ai_replay_deterministic _________________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_ai_replay_deterministic() -> None:
+        """C-107: the recorded inputs + predicate re-derive the chosen option; mismatches show."""
+        green = M03 / "ai-replay-green.md"
+        mismatch = M03 / "ai-replay-mismatch.md"
+        for path in (green, mismatch, M03 / "red-chosen-not-member.md"):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        text = green.read_text(encoding="utf-8")
+        first = replay_choice(text)
+        second = replay_choice(text)
+        assert first == second == "plan-a", (
+            f"replay is not deterministic on the same record text: {first!r} then {second!r}"
+        )
+        recorded = CHOSEN_RE.search(text).group(1).strip()
+        assert first == recorded, (
+            f"replay re-derived {first!r} but the record chose {recorded!r}"
+        )
+    
+        mismatch_text = mismatch.read_text(encoding="utf-8")
+        recorded_bad = CHOSEN_RE.search(mismatch_text).group(1).strip()
+        assert replay_choice(mismatch_text) != recorded_bad, (
+            "a doctored record replays to its recorded choice; the mismatch would be undetectable"
+        )
+    
+        # The chosen option is a named member of the closed set (M-03 membership leg).
+        not_member = run_records("--carrier", str(M03 / "red-chosen-not-member.md"))
+>       assert not_member.returncode == 1, (
+            f"a chosen option outside the set exited {not_member.returncode}, expected 1: "
+            f"{not_member.stdout} {not_member.stderr}"
+        )
+E       AssertionError: a chosen option outside the set exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-08)
+E          
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...overnance/m03/red-chosen-not-member.md'], returncode=0, stdout='PASS: 0 violation(s) (rules: M-02, M-08)\n', stderr='').returncode
+
+tests/unit/test_validate_decisions.py:240: AssertionError
+_____________________ test_m03_option_set_reverse_samples ______________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m03_option_set_reverse_samples() -> None:
+        """C-106 / M-03: each degenerate option-set form turns red; a completed set is green."""
+        red_samples = {
+            "red-empty-set.md": "empty option set",
+            "red-duplicate-label.md": "duplicate option label",
+            "red-other-without-path.md": "other",
+            "red-missing-reversibility.md": "missing option element",
+            "red-missing-evidence.md": "missing option element",
+            "red-single-without-forced.md": "forced",
+            "red-count-mismatch.md": "declared count",
+        }
+        before = snapshot()
+        for name, needle in red_samples.items():
+            path = M03 / name
+            assert path.is_file(), f"missing fixture: {path}"
+            red = run_records("--carrier", str(path))
+>           assert red.returncode == 1, (
+                f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+            )
+E           AssertionError: red-empty-set.md exited 0, expected 1: PASS: 0 violation(s) (rules: M-02, M-08)
+E              
+E           assert 0 == 1
+E            +  where 0 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...cision-governance/m03/red-empty-set.md'], returncode=0, stdout='PASS: 0 violation(s) (rules: M-02, M-08)\n', stderr='').returncode
+
+tests/unit/test_validate_decisions.py:191: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_validate_decisions.py::test_ai_replay_deterministic - ...
+FAILED tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples
+2 failed in 6.23s

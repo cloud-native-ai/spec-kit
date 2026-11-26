@@ -21,6 +21,7 @@ undeclared-option refusal are observed exactly as a shell caller observes them.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -127,4 +128,123 @@ def test_cli_surface() -> None:
     assert before == after, (
         "a run changed the repository tree: "
         f"created={sorted(set(after) - set(before))[:3]} removed={sorted(set(before) - set(after))[:3]}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# US2 — option-set closure and AI replay (T018)
+# --------------------------------------------------------------------------- #
+
+M03 = ROOT / "tests" / "fixtures" / "decision-governance" / "m03"
+
+CHOSEN_RE = re.compile(r"(?m)^- \*\*chosen_option\*\*:\s*(.*)$")
+LABEL_RE = re.compile(r"(?m)^\s{2,}-\s+label:\s*(.+)$")
+PREDICATE_RE = re.compile(r"(?m)^\s{2,}predicate:\s*(min|max)\(([A-Za-z0-9_]+)\)\s*$")
+INPUTS_RE = re.compile(r"(?m)^\s{2,}inputs:\s*(.+)$")
+
+
+def run_records(*args: str) -> subprocess.CompletedProcess:
+    return run_engine("--action", "records", *args)
+
+
+def replay_choice(record_text: str) -> str:
+    """Re-derive the chosen option from the record's own predicate and recorded inputs.
+
+    The replay fixture records, as ``rationale`` continuation lines, one closed predicate
+    form — ``min(<dimension>)`` / ``max(<dimension>)`` — plus a per-option input line. The
+    first declared option wins ties, so the replay is deterministic for one record text.
+    """
+    labels = [label.strip() for label in LABEL_RE.findall(record_text)]
+    predicate = PREDICATE_RE.search(record_text)
+    inputs = INPUTS_RE.search(record_text)
+    assert predicate and inputs, "the fixture does not record a decision predicate and its inputs"
+    direction, _dimension = predicate.group(1), predicate.group(2)
+    values: dict[str, float] = {}
+    for part in inputs.group(1).split(";"):
+        key, _, raw = part.partition("=")
+        if key.strip():
+            values[key.strip()] = float(raw)
+    ordered = [label for label in labels if label in values]
+    assert ordered and len(ordered) == len(labels), (
+        f"recorded inputs cover {sorted(values)}, not every option label {labels}"
+    )
+    pick = min if direction == "min" else max
+    return pick(ordered, key=lambda label: values[label])
+
+
+def test_m03_option_set_reverse_samples() -> None:
+    """C-106 / M-03: each degenerate option-set form turns red; a completed set is green."""
+    red_samples = {
+        "red-empty-set.md": "empty option set",
+        "red-duplicate-label.md": "duplicate option label",
+        "red-other-without-path.md": "other",
+        "red-missing-reversibility.md": "missing option element",
+        "red-missing-evidence.md": "missing option element",
+        "red-single-without-forced.md": "forced",
+        "red-count-mismatch.md": "declared count",
+    }
+    before = snapshot()
+    for name, needle in red_samples.items():
+        path = M03 / name
+        assert path.is_file(), f"missing fixture: {path}"
+        red = run_records("--carrier", str(path))
+        assert red.returncode == 1, (
+            f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+        assert "M-03" in red.stdout, f"{name} carries no M-03 verdict: {red.stdout!r}"
+        payload = json.loads(run_records("--carrier", str(path), "--json").stdout)
+        verdict = next(v for v in payload["violations"] if v["rule"] == "M-03")
+        assert verdict["path"].endswith(name), verdict
+        assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+        assert needle in verdict["message"], (
+            f"{name}: message {verdict['message']!r} lacks {needle!r}"
+        )
+
+    for name in ("green-complete.md", "green-single-forced.md"):
+        ok = run_records("--carrier", str(M03 / name))
+        assert ok.returncode == 0, (
+            f"{name} exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+        )
+        assert not re.search(r"(?m)^M-03 ", ok.stdout), (
+            f"{name} still carries an M-03 verdict: {ok.stdout!r}"
+        )
+    assert snapshot() == before, "a run mutated the repository tree"
+
+
+def test_ai_replay_deterministic() -> None:
+    """C-107: the recorded inputs + predicate re-derive the chosen option; mismatches show."""
+    green = M03 / "ai-replay-green.md"
+    mismatch = M03 / "ai-replay-mismatch.md"
+    for path in (green, mismatch, M03 / "red-chosen-not-member.md"):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    text = green.read_text(encoding="utf-8")
+    first = replay_choice(text)
+    second = replay_choice(text)
+    assert first == second == "plan-a", (
+        f"replay is not deterministic on the same record text: {first!r} then {second!r}"
+    )
+    recorded = CHOSEN_RE.search(text).group(1).strip()
+    assert first == recorded, (
+        f"replay re-derived {first!r} but the record chose {recorded!r}"
+    )
+
+    mismatch_text = mismatch.read_text(encoding="utf-8")
+    recorded_bad = CHOSEN_RE.search(mismatch_text).group(1).strip()
+    assert replay_choice(mismatch_text) != recorded_bad, (
+        "a doctored record replays to its recorded choice; the mismatch would be undetectable"
+    )
+
+    # The chosen option is a named member of the closed set (M-03 membership leg).
+    not_member = run_records("--carrier", str(M03 / "red-chosen-not-member.md"))
+    assert not_member.returncode == 1, (
+        f"a chosen option outside the set exited {not_member.returncode}, expected 1: "
+        f"{not_member.stdout} {not_member.stderr}"
+    )
+    assert "M-03" in not_member.stdout, (
+        f"the membership verdict does not carry M-03: {not_member.stdout!r}"
+    )
+    ok = run_records("--carrier", str(green))
+    assert ok.returncode == 0, (
+        f"the replayable record exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
     )
