@@ -76,3 +76,32 @@ Prerequisites).
   file `shared/definitions/superagent-definitions.md` carries **0** hits
   (base 1) — zero NEW hits, per-file count not above base (EP-005 fallback).
 
+## T009 — carrier surfaces red-first (US2)
+
+- Command:
+  `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_settlement_carriers.py -q`
+- Exit code: **1**
+- Real output: `12 failed, 9 passed in 66.18s`
+- Failing node set (the red-first target set):
+  - `test_c2_sigkill_silent_death_settles_silent_end` — `kill-seat.attempt was never
+    written (C-14: before the CLI launches)`
+  - `test_c2_signal_traps_write_termination_records[15/1/2]` — same missing `.attempt`
+  - `test_c2_live_attempt_is_running_not_silent_end` — same missing `.attempt`
+  - `test_c2_exit_zero_without_declaration_is_failed_incomplete` — same missing `.attempt`
+  - `test_c16_report_contract_declares_the_settlement_columns`,
+    `test_c21_observer_remains_optional`,
+    `test_c4_run_agent_native_settlement_obligations`,
+    `test_c5_virtual_exclusion_is_written_in_three_execution_modes`,
+    `test_c6_recipes_carry_per_value_dispositions`,
+    `test_c22_dispatch_entries_reference_the_same_owner` — each fails on its own named
+    missing owner sentence (never on an import/collection error)
+- Passing at red time (9): the engine legs (C3 five/seven-column rows, seat silent
+  death, `start-record-missing`, C2 unreadable → `unknown` exit 2), the `.status` line
+  shape / baseline-reader leg (the current writer already emits the byte-compatible
+  line), and the "no second value table on dispatch surfaces" scan (vacuous until the
+  new texts land).
+- Process mechanics disclosed: every C2 leg drives the shipped `dispatch.sh` with a
+  deterministic fake CLI (a python script that writes its pid then exits or blocks on
+  stdin) and a passthrough stream filter; synchronization is fact-based polling, zero
+  fixed `sleep`.
+
