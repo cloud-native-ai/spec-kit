@@ -67,3 +67,11 @@ Not touched: `templates/commands/team.md` (no per-tool command copy changes), `s
 - The three new test files carry the FR/SC coverage above; the existing four team-view test files form the regression surface and are expected to pass unmodified.
 - Re-measure list: `research.md` § Re-measure list (corpus counts, baseline git object, mirror baselines, `SPECKIT_PYTHON`, the 103 test surface, engine messages).
 - Wrap-up duties for the implement stage: targeted set through the runner with `--names-out`, name-level new-failure diff against the implement-entry baseline, no full suite.
+
+## Overlap Adjudication (driver record, plan U4, 2026-11-26)
+
+- Trigger: post-plan `overlap-check.py` → `decision=overlap`, `checked_specs=90`, `overlaps=72`; clarify-time run was vacuous (no declaration artifact).
+- Reading: relations are historical path declarations (top: `templates/commands/team.md`, `scripts/python/team-view.py`, `scripts/python/goal-utils.py`, `skills/internal/create-team/SKILL.md`, `skills/internal/view-team/SKILL.md`, docs). No concurrent writer: the only active line is 108; 101 is a stale registry entry.
+- Ruling: **108 is the sole current writer** for the view-recognition/degradation changes; 103-team-view and 027 Team Management keep their delivered behavior and dated records; additions are pointer-only or in-place edits within the existing owner; no scope removed.
+- Residual: `overlap=72, historical/non-concurrent`; the engine cannot clear without falsifying delivery surfaces; tasks MUST NOT start if a new concurrent writer activates.
+- Evidence: `.specify/state/u4-team-view-degradation-plan.txt`.
