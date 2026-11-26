@@ -54,7 +54,7 @@ classification: external
 **例外——共享渲染后端（环境特定）**：六引擎共用的渲染服务（`xuanji-render.aliyun-inc.com:9696-9701`）
 是**跨引擎共享基础设施**，不属于任何单一引擎层，因此其**可用性 preflight 与自部署回退**由前门统一持有
 （见 Step 2.5 + [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)）。
-前门仍**不渲染**——它只在分派前确认后端可达、不可达时按既定流程提示/中断/可选自部署；各引擎的渲染请求语法仍归引擎层自有。
+前门仍**不渲染**——它只在分派前确认后端可达、不可达时按既定流程提示/中断/可选自部署；各引擎的渲染请求语法仍归引擎层自有，请求经 `scripts/render-client.py` 发出（服务 URL 与 route 由调用方提供，客户端不做编码/布局/端点推断；契约见 quality-gate.md）。
 
 ## Engine Layers（六个内置引擎层）
 
@@ -76,48 +76,49 @@ classification: external
 
 1. 吃透上下文（文档/代码/目标图）：先产出**带出处的上下文摘要**（组件、关系、分区、核心流程），LDM 只从摘要与用户意图构建，**不臆造元素**
 2. 构建 LDM（schema 与覆盖检查定义见 [./references/semantic-model.md](./references/semantic-model.md)）：
-   `diagram_class / elements / relations / zones / layout_intent / style_intent / weight_plan / artifact_intent / fidelity_intent / interactivity_intent / editability_intent`；
+   `diagram_class / elements / relations / zones / layout_intent / style_intent / weight_plan / artifact_intent / fidelity_intent / layout_policy / interactivity_intent / editability_intent`；
    含多层结构的图**必须填 `weight_plan`**（语义视觉强弱：大模块边界 > 小模块边界 > 数据流；前门决定「什么该更显眼」，引擎决定「怎么画粗」）；
    `interactivity_intent` 按**交互语义规约**落为 level + forms（形式分类、档位与默认值见 [./references/semantic-model.md](./references/semantic-model.md) § 交互语义与验收），要求交互时 `artifact_intent` 同步取 `interactive-html`
-3. 产出**几何层**（语义决策，语法层实现）：canvas 尺寸、每图元 `box{x,y,w,h}`、分区盒与布局语义（equal-height/stack/grid/free）、关系锚点与间隙；复刻类从源图测量（像素或比例），新建类先规划网格再落坐标（schema 见 semantic-model.md Geometry）
-4. 复刻类请求（给了现有图/文档要求重画）：`fidelity_intent=reproduction`——保留源结构与版面语义（含源图实测的每角色线宽，覆盖默认档位），不得"顺手优化"布局
+3. 几何归属按 `layout_policy` 分流（owner：[semantic-model.md](./references/semantic-model.md) § 几何归属）：
+   - `preserve`（缺省）：产出**几何层**（语义决策，语法层实现）——canvas 尺寸、每图元 `box{x,y,w,h}`、分区盒与布局语义（equal-height/stack/grid/free）、关系锚点与间隙；复刻类从源图测量（像素或比例），新建类先规划网格再落坐标
+   - `optimize`（仅用户明示授权）：**不预先固定 box**——前门只交语义、布局意图与约束（分区成员、方向/宽高比、weight_plan、关键路径、阅读顺序、不得穿越/合并的硬约束）；几何由所选引擎按其原生图类生成，冻结后回读（几何回填 SDS 再导出）。风格探索不得被前门的 box 或样式冻结挡住
+4. 复刻类请求保持 `fidelity_intent=reproduction`——保留源结构与实测线宽/字号（覆盖引擎默认档）；`layout_policy` 与它独立（缺省 `preserve`，授权与冻结验收见 [semantic-model.md](./references/semantic-model.md) § 布局授权）。不得改用 `fresh` 绕开语义保真，`optimize` 也不得改变复刻语义
 
 ### Step 2: 路由
 
-1. **独占登记优先**（有些图只有一家能画）：[./references/routing-matrix.md](./references/routing-matrix.md) §1 命中即定引擎，不再比较
-2. 否则按 §2 图类矩阵取默认引擎，再按 §3 tie-break（artifact_intent）切换
-3. 仍歧义 → 一轮 `AskUserQuestion`（≤4 问）附推荐项；不得静默猜
-4. **Preflight**：选定引擎的入口文档存在（`references/types/<engine>/<engine>.md`）；缺失即响亮失败并列出可用引擎，不得即兴自渲染
+1. **比较/探索模式先行**：用户要求「多引擎比较 / 各引擎各画一版 / 探索风格」→ 按 [routing-matrix.md](./references/routing-matrix.md) §5 进比较模式：同一 LDM 分派多引擎各自原生出图，独占登记不排斥比较，各引擎只受自身能力与质量门约束；不统一风格、不排名异口径数字。冷启动交接用 `python3 "${SKILL_HOME}/scripts/handoff.py"`（语义冻结、几何剥离，见 quality-gate.md § 可执行检查）
+2. **单引擎**：独占登记优先（有些图只有一家能画）——§1 命中即定引擎，不再比较
+3. 否则按 §2 图类矩阵取默认引擎，再按 §3 tie-break（artifact_intent）切换
+4. 仍歧义 → 一轮 `AskUserQuestion`（≤4 问）附推荐项；不得静默猜
+5. **Preflight**：选定引擎（比较模式下为每个引擎）的入口文档存在（`references/types/<engine>/<engine>.md`）；缺失即响亮失败并列出可用引擎，不得即兴自渲染
 
 ### Step 2.5: 共享渲染后端 preflight 与自部署回退（环境特定）
 
-> **⚠️ 环境特定信息**：六个引擎共用一个自部署的多引擎渲染服务，消费方契约名为 `xuanji-render.aliyun-inc.com`
-> （一引擎一专用端口 **9696-9701**：plantuml 9696 / mermaid 9697 / excalidraw 9698 / drawio 9699 /
-> echarts 9700 / d3 9701，**无网关 / 无聚合 / 无代理**）。**并非所有执行环境都能访问 `xuanji-render.aliyun-inc.com`**——
-> 它依赖该执行环境的内网 DNS / `/etc/hosts` 映射与 docker 主机。完整契约 + 自部署步骤见附件
-> [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)。**委派引擎渲染（Step 3）前先过此 preflight**
-> （**纯 HTML 交互交付不经此后端**——解耦语义 owner 是 [./references/delivery-contract.md](./references/delivery-contract.md) § D7.2，本节不复述）：
+> **⚠️ 环境特定**：六引擎共用一个自部署多引擎渲染服务，消费方契约名 `xuanji-render.aliyun-inc.com`
+> （一引擎一专用端口 **9696-9701**，无网关/聚合/代理；plantuml 9696 / mermaid 9697 / excalidraw 9698 /
+> drawio 9699 / echarts 9700 / d3 9701）。**并非所有执行环境都能访问**——它依赖执行环境的内网 DNS /
+> `/etc/hosts` 映射与 docker 主机。完整契约、部署形态分析与逐步自部署流程的 owner：
+> [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)，本节不复述。
 
-1. **探测可用性**：`curl -sf --max-time 5 http://xuanji-render.aliyun-inc.com:9697/healthz`（任一 Node 引擎端口的 `/healthz` 即代表后端可用）。
-   **可用** → 一切按既定流程执行，进入 Step 3 委派，**不做任何部署动作**。
-2. **不可用**（DNS 不解析 / 超时 / 非 200）→ **提示用户并中断**本次渲染委派；**不得**静默降级、**不得**即兴用本地工具（mermaid-cli / plantuml.jar 等）自渲染绕过。提示须说明：该地址是环境特定、当前不可达、本次无法走既定渲染后端。
-3. 该提示的**末尾**必须附一个选项：**「要不要考虑自部署?」**
-4. 用户选择自部署 → 按 [self-deploy-render-service.md](./references/self-deploy-render-service.md) **先分析当时的运行环境**（docker / podman / k8s / 裸机进程能力 + registry/镜像工厂可达性），据此**选择部署形态**：**docker 容器化为最优默认**，但**不假定 docker 一定可用**——按环境给出可选备选（podman rootless / Kubernetes / 裸机 systemd 进程）连同推荐项**交用户拍板**；选定后给出**具体要执行的步骤**，并在执行前**再次向用户确认是否执行自部署操作**，确认后才动手。
-5. 自部署完成后 → 把 `xuanji-render.aliyun-inc.com → 自部署服务 IP` 的映射写入**执行环境**的 `/etc/hosts`；此后再次执行绘图时**直接从第 1 步 preflight 命中可用后端开始，不再重复部署步骤**。
+1. 委派引擎渲染前探测（单条命令，不经复合 shell）：`python3 "${SKILL_HOME}/scripts/render-client.py" --service-url http://xuanji-render.aliyun-inc.com:9697 --preflight-route /healthz --preflight-only --timeout 5`（任一 Node 引擎端口 `/healthz` 即代表后端可用；退出 0 可用、3 不可用）；比较模式对每个引擎分别 preflight；**纯 HTML 交互交付不经此后端**（解耦 owner：交付契约 § D7.2）。
+2. **可用** → 进入 Step 3，不做任何部署动作。**不可用**（DNS 不解析/超时/非 200）→ 提示「该地址环境特定、当前不可达」并中断渲染委派；**不得**静默降级或即兴本地自渲染绕过；提示末尾附「要不要考虑自部署?」。
+3. 用户选择自部署 → 按 owner 文件先分析运行环境形态（docker/podman/k8s/裸机）连同推荐项交用户拍板，执行前再次确认；完成后把域名映射写入执行环境 `/etc/hosts`，此后从第 1 步 preflight 直接命中。
 
 ### Step 3: 分派到引擎层
 
-- 读选定引擎的入口文档 `references/types/<engine>/<engine>.md`，按其自身流程渲染；传入 **SDS 文件路径**（SDS = Semantic Drawing Spec，即 LDM + Geometry 的落盘形态，schema 见 [./references/semantic-model.md](./references/semantic-model.md)）+ 目标/输出要求 + **交付契约**（[./references/delivery-contract.md](./references/delivery-contract.md)：HTML 包装、源文件与图片保留、面向用户的文字规则、交互式网页交付 § D7（interactivity_intent ≠ none 时适用））；尽量 file-path-only handoff。**`weight_plan` 随 SDS 一并传递**，由引擎层按其「强弱实现」小节落地（各引擎线宽/边框语法归引擎层自有）；**`interactivity_intent` 同随 SDS 传递**，由引擎层按其「交互实现」小节落地（当前 d3js / echarts 设有该节；`level: none` 时无交互义务）
-- 引擎层的 `scripts/` 按其文档给定的调用形式执行：`${SKILL_HOME}` 指本技能根目录，故引擎脚本路径形如 `${SKILL_HOME}/references/types/<engine>/scripts/<script>`
-- 前门层不渲染、不手改引擎产物、不改引擎脚本（score = f(target) 纪律在引擎层各自生效）
-- **只加载选定引擎那一层**：不得为了「参考」而把其它引擎层的文档读进上下文
+- 读选定引擎的入口文档 `references/types/<engine>/<engine>.md`，按其自身流程渲染；传入 **SDS 文件路径**（schema → [semantic-model.md](./references/semantic-model.md)）+ 目标/输出要求 + **交付契约**（[delivery-contract.md](./references/delivery-contract.md)）+ **质量门**（[quality-gate.md](./references/quality-gate.md)），尽量 file-path-only handoff。**`weight_plan` 与 `interactivity_intent` 随 SDS 传递**，由引擎「强弱实现 / 交互实现」小节落地（`level: none` 零交互义务）
+- `layout_policy=optimize` 的 SDS **不带元素 box**：交「语义 + 布局意图 + 约束」，引擎**生成并冻结自身原生几何**后回填 SDS（注明引擎与版本）再导出回读；`preserve` 按既有零偏离兑现
+- 引擎脚本路径形如 `${SKILL_HOME}/references/types/<engine>/scripts/<script>`；交付三元组 = **原生源** + **真实导出图** + **结果 manifest**（schema 与判据 owner：quality-gate.md；交付前跑 `python3 "${SKILL_HOME}/scripts/check-manifest.py" --manifest <交付目录>/manifest.json`，退出 0 才算 manifest 合格）
+- 比较模式按引擎单元各自执行，每个单元只读自己那一层；前门不渲染、不手改引擎产物、不改引擎脚本（**只加载选定引擎那一层**，不把其它引擎层文档读进上下文）
 
 ### Step 4: 验收与回报
 
-1. 对照 LDM 做覆盖检查：元素与标签、关系集合（含方向）、分组边界、产物形态、**强弱层级（weight_plan 在产物中可辨：边框按档递减、流线最细、关键路径仅色相抬升）**、**交互（interactivity_intent.level ≠ none 时逐声明 form 复现一次「输入 → 可见变化」，判据见 semantic-model.md § 交互语义与验收；level = none 零交互义务）**
-2. **对照交付契约做验收**（[./references/delivery-contract.md](./references/delivery-contract.md) 的 D6 自检表，逐项核对）：D1/D2 交付形态在盘、D3–D5 面向用户的文字规则成立（图内文字与 HTML 正文同规）。**条文与示例只在契约里，本节不复写**；任一项不过 = 不覆盖
-3. 不覆盖 → 带 delta 说明重渲染一次（上限 1 次）；仍不覆盖 → 如实回报产物与缺口
-4. 回报：产物路径（HTML + 源文件 + 图片）、**选定引擎层** + 路由理由（命中独占/矩阵行/tie-break）、LDM 摘要
+1. **四轴分开验收，任一轴的 pass 不得代替另一轴**（最小检查集、硬失败与 manifest 的 owner：[quality-gate.md](./references/quality-gate.md)）：
+   **语义**——元素/关系（含方向）/分组/标签/强弱层级/交互逐 form 与 LDM 对照；**视觉**——原生源回读完整元素/父级/方向/标签 + 真实导出成功 + 实际文字与端点检查，**标签错归关系、箭头指入错误框是硬失败**，不可消除的交叉/共线单列且不得删边/加中转实体/事后改 PNG；**交互/编辑**——声明的 form 或可继续编辑须有实际输入证据，只读代码或截图记「未实操验证」；**工程复现**——源、导出图与 manifest 同盘，命令与运行时条件可复述
+2. **对照交付契约做验收**（[delivery-contract.md](./references/delivery-contract.md) 的 D6 自检表逐项）：D1/D2 交付形态在盘、D3–D5 面向用户的文字规则成立（条文只在契约里，本节不复写）；任一项不过 = 不覆盖
+3. **视觉 partial 不得默认交付满意**：带 delta 说明返修一次（上限 1 次）；仍 partial → 如实回报 partial + 未解决项清单，不得用语义 pass 或导出成功代称视觉通过
+4. 回报：产物路径（HTML + 源文件 + 图片 + manifest）、**选定引擎层** + 路由理由、LDM 摘要、**运行时条件**（调用方提供者；未提供写「未提供」，不猜、不读凭据）；**manifest 未过 `check-manifest.py` 不得声称交付完成**
+5. **执行记录与验收分轴**：执行身份、权限事件（含 scope 评估）、必需步骤、业务结果分别记录；有 denial 的运行保留 `blocked_by_permission`（即使 exit 0、产物在盘），`unsupported/partial` 不是语义 pass、也不是图损坏；运行记录用 `scripts/check-run-record.py` 校验，引擎回读入口用 `scripts/check-readback-contract.py` 验证（契约 owner：quality-gate.md）。
 
 > **Fast Fail 实例指针**:本文件中"即停 / 即中止 / 不得静默降级"一类规则是快速失败纪律的既有**实例**;其判据与两份清单的唯一真源是 `.specify/shared/guidelines/fast-fail.md`(本文件引用它,MUST NOT 复述它)。
 
@@ -129,9 +130,9 @@ classification: external
 
 | 层 | 承载面 | 这一层做什么 |
 |----|--------|-------------|
-| **L1** | `skills/external/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM 与几何层，产出**整体逻辑图表设计**（Step 1） |
-| **L2** | `skills/external/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴（Step 2）、LDM/SDS schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则） |
-| **L3** | 分派决策本身 | 选定后读入对应引擎层入口文档，传 SDS 路径 + `weight_plan` + 交付契约（Step 3） |
+| **L1** | `skills/external/draw-diagram/SKILL.md`（本文件） | 分析语义逻辑，构建 LDM；几何层按 `layout_policy` 由前门（preserve）或引擎（optimize）产出，形成**整体逻辑图表设计**（Step 1） |
+| **L2** | `skills/external/draw-diagram/references/*.md` | 选型与判据分析：路由矩阵 / 独占登记 / tie-break / 能力轴 / 比较模式（Step 2）、LDM/SDS schema 与覆盖检查、**交付契约**（交付形态 + 面向用户的文字规则）、**质量门**（四轴验收与 manifest） |
+| **L3** | 分派决策本身 | 选定后读入对应引擎层入口文档，传 SDS 路径 + `weight_plan` + 交付契约 + 质量门（Step 3） |
 | **L4** | `references/types/<engine>/<engine>.md` | 针对**自身图表类型**做引擎侧逻辑设计：「SDS 实现与强弱落地」小节把语义档位落实为本引擎的绝对线宽/字号，并声明几何兑现义务 |
 | **L5** | `references/types/<engine>/references/*.md` | 各层面完善并输出最终图表：语法/格式、渲染与导出、引擎指南与坑位 |
 
@@ -157,6 +158,7 @@ classification: external
 | 独占登记 / 图类矩阵 / tie-break | [./references/routing-matrix.md](./references/routing-matrix.md) |
 | LDM schema 与覆盖检查 | [./references/semantic-model.md](./references/semantic-model.md) |
 | **交付形态**（HTML 包装、源文件与渲染图保留）**与面向用户的文字规则** | [./references/delivery-contract.md](./references/delivery-contract.md) |
+| **质量门**（四轴验收、硬失败、原生源回读、结果 manifest、partial 返修）**+ 运行记录五轴 / 原生回读契约 / 渲染传输入口** | [./references/quality-gate.md](./references/quality-gate.md)（`scripts/check-run-record.py` / `check-readback-contract.py` / `render-client.py`） |
 | 共享渲染后端可用性 preflight / 自部署（**环境特定**：xuanji-render.aliyun-inc.com:9696-9701） | [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md) |
 | 语义视觉强弱（weight_plan 档位与验收） | [./references/semantic-model.md](./references/semantic-model.md) `weight_plan`；引擎落地见各引擎层「强弱实现」小节 |
 | 可交互图表（交互形式分类/档位/验收判据；交互交付形态） | [./references/semantic-model.md](./references/semantic-model.md) § 交互语义与验收；交付侧 [./references/delivery-contract.md](./references/delivery-contract.md) § D7；引擎落地见 d3js / echarts「交互实现」小节 |
@@ -185,15 +187,15 @@ classification: external
 
 ## Evaluation Form(绘制评价单)
 
-**定位与边界。** 本节是交付结果后的 Evaluation Form(绘制评价单)，专门承载用户对本次**已交付的渲染结果**的评价；它不是 `## Feedback`，也不替代或改变该节的 agent 自省。`## Feedback` 保持其既有的「不向用户征询」规则，本节只处理用户主动给出的绘制评价。合并前六个引擎技能各有一份本节，现统一为此一份，**引擎维度改由条目内的引擎名承载**（见下）。
+**定位与边界。** 本节是交付结果后的 Evaluation Form(绘制评价单)，专门承载用户对本次**已交付的渲染结果**的评价；它不是 `## Feedback`，也不替代或改变该节的 agent 自省。`## Feedback` 保持其既有的「不向用户征询」规则，本节只处理用户主动给出的绘制评价；**引擎维度由条目内的引擎名承载**（见下）。
 
-**运行模式门。** 若 `${SKILL_WORKDIR}/.specify/` 不存在（standalone 模式）：本节保留交付时的一次性非阻塞征询与「无评价即满意」规则，但**跳过全部反馈引擎读写**——不执行下方 probe 记录与 `--action list` 查询，用户评价仅保留在当次运行报告中，不创建反馈条目；Spec Kit 项目模式（`${SKILL_WORKDIR}/.specify/` 存在）按本节原文执行。
+**运行模式门。** 若 `${SKILL_WORKDIR}/.specify/` 不存在（standalone 模式）：本节保留交付时的一次性非阻塞征询与「无评价 = 未评价」规则，但**跳过全部反馈引擎读写**——不执行下方 probe 记录与 `--action list` 查询，用户评价仅保留在当次运行报告中；Spec Kit 项目模式按本节原文执行。
 
 **触发与一次性征询。** 仅在 Step 4 已验收并回报实际交付的产物路径、选定引擎层、路由理由和 LDM 摘要之后，随该次交付附上一句非阻塞征询：`已交付渲染结果（引擎:<engine>）；如愿意，请评价这张结果是否准确、清晰且适合用途，或说明希望调整之处。` 不得在路由、渲染开始或中间结果时征询；不得等待回复、重复询问或因沉默降低交付结果。
 
-**无评价。** 用户没有给出评价即视为本次绘制满意；不创建评价条目、不调用反馈引擎，也不在后续回合追问。
+**无评价 = 未评价。** 用户没有给出评价时，本次绘制的「用户评价」维度记为**未评价**——不得推导为满意、不创建评价条目、不调用反馈引擎，也不在后续回合追问；客观质量以 Step 4 的四轴结果为准。
 
-**有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，**在 review 首行记明 `engine: <engine>`**（这是原六份分引擎评价单合并后唯一保留引擎维度的位置，缺失即无法把结论回用到对应引擎层），并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
+**有评价。** 用户一旦主动给出评价，保留其原意，将 review 内容标为 `## Evaluation Form`，**在 review 首行记明 `engine: <engine>`**（这是评价结论回用到对应引擎层的定位依据，缺失即无法回用），并从评价中提取至少一条评价要点；随后以本节的 probe 记录（不是以 `wrap-up` probe 记录）：
 
 ```bash
 python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action record \

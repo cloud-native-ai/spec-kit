@@ -28,17 +28,48 @@ weight_plan:     # 语义视觉强弱（注意力层级）：大模块边界 > �
   key_paths: [relation-id]   # 关键路径在 T3 内用色相抬升；粗细封顶 = T2，不得反压结构
 artifact_intent: static-embed | interactive-html | editable-whiteboard | repo-text | pixel-reproduction
 fidelity_intent: reproduction | fresh        # 复刻既有图 vs 新建
+layout_policy: preserve | optimize        # 缺省 preserve；几何写入者随它分流，见 § 几何归属
 interactivity_intent:    # 交互语义规约（不是备注字段）——形式分类/档位/默认值/验收判据 owner：本文件 § 交互语义与验收
   level: none | basic | rich
   forms: [hover | click | filter | expand-collapse | zoom-pan | brush | linked-highlight | dashboard]   # 可多选；level=none 时为空
 editability_intent:   none | whiteboard-edit | text-edit
 ```
 
+## 布局授权
+
+`layout_policy: preserve | optimize` 与 `fidelity_intent` 独立；缺省 `preserve` 保留源几何、相对位置与走线。仅用户明确允许优化时设 `optimize`，并在本次 SDS 交接记录中保留授权依据；元素、关系方向/标签、分区归属及源图实测权重仍须保真，不删边、不合并不同关系、不虚构网关。优化后的最终几何必须冻结并回读，源与导出同源；结构通过不代表字体或视觉通过。
+
+## 几何归属（who writes the box）
+
+| layout_policy | 前门交给引擎的 | 几何由谁生成 | 验收 |
+|---|---|---|---|
+| `preserve` | 语义 + 完整几何（canvas / box / zone box / anchor / gap） | 前门：复刻测量源图，新建先规划网格 | 引擎零偏离兑现；不可兑现项按 Deviation Declaration 声明 |
+| `optimize` | 语义 + 布局意图与约束（分区成员、方向/宽高比、weight_plan、key_paths、阅读顺序、不得穿越/合并的硬约束）；**不含元素 box** | 引擎按其原生图类生成；冻结后回填 SDS（注明引擎与版本） | 回填几何回读零偏差 + quality-gate.md 四轴 |
+
+- `optimize` 里前门**不预先固定 box，也不以 box 冻结挡住风格探索**；但空间语义仍是前门决策，引擎只决定「怎么画」。
+- 回填的几何就是本次 SDS 的冻结几何，源与导出必须同源于它；改动几何须新起一轮并保留旧版，不在导出时移动。
+- `preserve` 下引擎的布局/路由 pass 不得移动 box（drawio 的 ELK/libavoid 见该引擎条目的执行面约束）。
+- 两种模式都不得删边、合并关系或增加中转业务实体；复刻类缺省 `preserve`，`optimize` 也不得把 `reproduction` 偷换成 `fresh`。
+
+### 固定几何架构 JSON（drawio 编译子集）
+
+这是完整 SDS 的显式投影，不是自动将通用 LDM 猜成引擎输入。调用方保留完整语义模型，以此固定 JSON 交给 drawio 编译器；未知字段拒绝而非静默丢弃：
+
+```text
+title, canvas:{w,h}, fidelity_intent:"reproduction", layout_policy:"preserve"|"optimize",
+zones:[{id,label,parent?,box:{x,y,w,h},fill?,fontSize?}],
+elements:[{id,label,zone,box:{x,y,w,h},fontSize?,bold?}],
+relations:[{id,from,to,label?,color?,source_side?,target_side?,via?:[{x,y}],label_position?:{x,offset:{x,y}}}],
+uncertain?:[...], style?:{...}
+```
+
+所有 box/via 为画布绝对坐标；`parent` 只引用 zone，元素 `zone` 必填；省略 zone.parent 表示默认层。边可连接元素或 zone，ID 全局唯一且不占用结构 ID `0`/`1`。side 为 `left|right|top|bottom`。`uncertain` 仅随报告携带，不推断成边。style 的支持项、端口和 preserve 走线条件归 [drawio 工具入口](types/drawio/drawio.md#本地编译与回读校验)。
+
 ## 构建纪律
 
 1. **带出处摘要先行**：富上下文（文档/代码/目标图）先产出摘要（组件、关系、分区、核心流程，逐条标出处），LDM 只从摘要 + 用户意图构建
 2. **不臆造**：摘要没有的元素/关系不得进入 LDM；目标图看不清的结构标 `uncertain` 并在委派时声明
-3. **复刻不改版**：`fidelity_intent=reproduction` 时 zones 的 layout 与 elements 的相对位置语义照抄源图（如 equal-height 分区、stagger 列），不得"优化"
+3. **语义保真与布局权限分离**：`fidelity_intent=reproduction` 不因版面优化改变；独立 `layout_policy` 的授权、缺省与验收以本文件「布局授权」为准
 4. **产物意图显式**：用户没说的 artifact_intent 按 tie-break 默认并在回报中声明假设
 5. **强弱计划必做**：含多层结构的图（zones 非空或元素 >15）必须填 `weight_plan`——委派前把每个 zone/子容器/叶元素/边族分配到 T1–T4；**前门只决定「什么该更显眼」，引擎技能决定「怎么画粗」**（各引擎「强弱实现」小节）；全图单一线宽/单一边框粗细判不合格
 
@@ -92,13 +123,13 @@ editability_intent:   none | whiteboard-edit | text-edit
 |------|---------|
 | 元素 | 数量与标签集合一致（`uncertain` 项已声明） |
 | 关系 | 边集合一致且方向一致（hub-spoke 的扇出数一致） |
-| 分组 | zone 成员与边界语义一致（equal-height 等 layout 语义保留） |
+| 分组 | zone 成员与层级一致；`preserve` 保留边界与相对位置语义，`optimize` 对照已授权并冻结的几何验收 |
 | 产物形态 | 与 artifact_intent 匹配（可编辑/交互/文本/静态） |
 | 强弱 | `weight_plan` 层级在产物中可辨：边框粗细/深浅按 T1>T2>T3 递减、流线最细最浅；关键路径仅色相抬升且粗细 ≤ T2；全图单一线宽判不合格 |
 | 风格 | 与 style_intent 匹配（monochrome 复刻不得引入彩色主题） |
 | 交互 | `level ≠ none` 时逐声明 form 可复现一次「输入 → 可见变化」（判据见 § 交互语义与验收）；`level = none` 零交互义务 |
 
-## Geometry（几何层 —— 语义层产出，语法层实现）
+## Geometry（几何层 —— 空间语义归语义层，精确坐标的写入者按 § 几何归属 分流）
 
 ```yaml
 canvas: { w: <px>, h: <px> }          # SDS 声明的画布尺寸
@@ -111,9 +142,9 @@ relations:
 ```
 
 纪律：
-1. 几何是**语义决策**（谁和谁同区、谁居中、分区等高、列错位），不是引擎语法——由 draw-diagram 产出
-2. 复刻类请求：几何从源图测量得来（像素测量或比例估算），照抄源版面语义
-3. 新建类请求：先规划网格（列宽/行高/间距/枢纽居中/上下游排布），再落坐标；文本宽度按 CJK≈fontSize×字数、ASCII≈fontSize×0.6×字数 预留
+1. 分清两层：**空间语义**（谁和谁同区、谁居中、分区等高、列错位、方向/宽高比、阅读顺序）始终是语义决策，由 draw-diagram 决定；**精确坐标**（每图元 box、via、anchor）的写入者随 `layout_policy` 变化——`preserve` 由前门测量/规划后写 SDS，`optimize` 由引擎生成并冻结回填（§ 几何归属）
+2. 复刻类先测量源几何；默认照抄，只有 `layout_policy=optimize` 才按授权改由引擎规划。检查元素/分区重叠、包含、标题占位、正交与穿框；交叉/共线量化报告，不以估算文本宽度声称视觉验收通过
+3. 新建类请求（`preserve` 下）：先规划网格（列宽/行高/间距/枢纽居中/上下游排布），再落坐标；文本宽度按 CJK≈fontSize×字数、ASCII≈fontSize×0.6×字数 预留
 
 ## Visual Weights / weight_plan（视觉权重语义 —— "应该画多显眼"，不是"怎么画"）
 

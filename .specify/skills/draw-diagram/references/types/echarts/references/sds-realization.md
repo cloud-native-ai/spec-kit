@@ -45,6 +45,21 @@ series: [
 - 所有边 `lineStyle.opacity: 1`（半透明是已修复缺陷，不得回归）；
 - 简单直线边可留在 graph `links`（`edgeSymbol: ['none','arrow']`），精确落点/正交路由走 `lines` series。
 
+### 箭头旋转的符号约定（ECharts 5.6.0 实测）
+
+自定义三角 path 的上顶点在局部 `(0,-1)`；scatter 的 `symbolRotate` 经 SVG 导出的矩阵实测为 **SVG 旋转 `theta = -symbolRotate`**。要让箭头沿末段方向 `u` 指出去：
+
+```
+symbolRotate = atan2(-ux, -uy)   # 度；归一到 (-180, 180]
+```
+
+按「顺时针」直觉写 `atan2(dy,dx)+90` 会让水平边箭头反向（180°）——该错误在渲染 SVG 中可判、在声明端点上看不出来。机械核对与修复入口：`scripts/normalize-edge-series.py --check|--write`；渲染实测入口：`scripts/native-readback.py --svg`（从 SVG arrow path 的矩阵反算 apex 与方向，不复制声明值）。
+
+### 末段内缩与边标签锚点
+
+- **线端内缩 < 末段长度**：箭头线端内缩（tip 前 10px）大于最后一段时，存储的末段会反向（路线数据与箭头自相矛盾，读回无法用末段作方向参照）。`normalize-edge-series.py` 把线端修回末段上；末段短到无法在不移动箭头的前提下修复时，显式报 `unsupported` 而不是静默改写。
+- **标签锚点必须贴附自身折线**：边标签锚点落在它描述的那条折线上（公差 3px），且到任何**其他**关系折线的距离不得更近——否则标签会被读成在标注另一条关系（quality-gate 的「标签错归」硬失败）。归一化脚本按最近点吸附并在报告中记录吸附前后的本线/他线距离。
+
 ## 5. 固定坐标复刻管线（测量 → config JSON → render.mjs）
 
 1. **目标像素测量**（语义层职责）：复刻类 SDS 由 draw-diagram 从源图测量产出 canvas、每图元盒位、每角色实测线宽；语法层只消费测量值。仅当无 SDS 直接调用复刻需求时，本层才自行测量（量像素，不目测）。
@@ -60,6 +75,9 @@ series: [
 ## 7. 渲染质量清单（cycle3 固化，交付前逐项过）
 
 - [ ] 每条有向边有可见箭头，落点在目标盒边中点、方向沿线（不进盒底、不落盒角）
+- [ ] 箭头 `symbolRotate` 按 §4 的实测符号约定设置；`normalize-edge-series.py --check` 无 drift（或对不可修复项显式报告 unsupported）
+- [ ] 边标签锚点贴附自身折线（≤3px）且不与其它关系折线竞争；`native-readback.py` 的 labels 检查无「错归」
+- [ ] 渲染 SVG 回读（`native-readback.py --svg`）中箭头 apex 落点/方向实测通过，不以声明端点代替渲染落点
 - [ ] 导出图（render.png）**无任何 UI chrome**：toolbox saveAsImage 按钮隐藏或导出期关闭
 - [ ] 无死白：导出视口 = 内容包围盒；4 角锚点在位
 - [ ] bounds-fit 恒等（echarts 5.6.x）：`series.zoom: 1.25` 补偿在位（角锚点单独不达成恒等）；symbol 外接盒 ×1.15 偏离已按 §1 量化声明

@@ -20,6 +20,34 @@ Create interactive data visualizations using D3.js (Data-Driven Documents), outp
 3. **几何**：d3js 是**绝对坐标引擎** → **MUST 精确兑现 SDS 的每个 box，预期零偏离**（不启力导向重排、不用 margin 约定平移已声明坐标）；运行时不可避免项（字体度量致文本溢出）先在 box 内近似，再量化声明。
 4. 像素测量管线、viewBox 对齐、固定坐标 data-join、锚点计算、校验三关（`validateCoords` + `validateAgainstSDS` + 复刻型的渲染读回 ↔ 源图差量）、偏离策略：[references/sds-realization.md](references/sds-realization.md)。
 
+**已知限制与返修判据（引擎事实；某次运行的具体量化值归该次 manifest 与验收记录，不写进本文件当通用门槛）**：
+
+- **路径与密度**：端口标记与透明命中路径是呈现辅助，不计业务边；密集跨区线束会贴近/交叉——不得声称零交叉，需原尺寸查看或关联高亮；交叉按本次自测口径写入 manifest 的 `crossings` 与 `unresolved`。
+- **交互证据**：hover 关联高亮、点击固定选中、滚轮缩放/拖动平移、边标签开关、SVG/PNG 导出按钮均以真实浏览器操作为证据；未实操的交互记 `not_performed`，不以代码存在代替。
+- **导出与回读**：几何逐 box 回读零偏差、组件文字溢出 0 是几何层结论；它不等于视觉完美，残余交叉/拥挤项仍须单列。
+
+四轴验收与 manifest 判据见 [quality-gate.md](../../quality-gate.md)。
+
+## 可执行入口（本引擎脚本）
+
+d3js 的生成与回读由本引擎子树内的两个脚本承担；业务排序/配色是**调用方数据**，不是脚本常量：
+
+| 脚本 | 用途 |
+|------|------|
+| `scripts/build-native.py` | SDS → 原生 HTML：确定性布局、正交路由（走廊车道 + 障碍回退）、冲突感知标签、vendor-first D3、逐字节内联 `delivery.css`；同时写 `<stem>.sds.json`（冻结几何）与 `<stem>.layout-report.json`（交叉/共线/标签碰撞/长线/门户间距）。`--layout-plan` 承接列/带排布、每区元素顺序与列数、子区排布、分区填充；未给 plan 时按分区级关系 DAG 的最长路径分列。 |
+| `scripts/native-readback.py` | 共享回读接口：`--source <native> --semantics <json> [--svg <svg>] --output <new.json>`；退出码 `0` 通过 / `1` 硬差异 / `3` partial 或 unsupported / `2` 用法或 I/O（含拒绝覆盖）。 |
+
+生成与回读契约（本引擎的稳定接口）：
+
+1. **数据脚本**：SDS MUST 位于真实 `<script>` 内、是一个可严格解析的 JSON 对象字面量（或 `type="application/json"` 块）。文档示例、HTML 转义副本（`&quot;`）、注释掉的代码与非字面量赋值（如 `JSON.parse`）一律记为 rejected；出现两个**不同**的合法数据对象时输出 `ambiguous` 并按未支持处理，**MUST NOT** 按出现顺序挑一个。
+2. **身份**：SVG 优先读 `data-node-id` / `data-zone-id` / `data-edge-id`；兼容旧产物时使用 `id="node-<id>"` / `zone-<id>` / `edge-<id>` 的**完整余量**映射——任意子串巧合不构成同一身份。
+3. **图例**：图例行声明 `data-legend-kind="style"|"interaction"`；其它 kind 或未声明的图例文字按额外语义上报（图例 MUST NOT 给红/绿/深色连线杜撰业务含义）。旧式未声明图例记 `partial`，不记 pass。
+4. **离线**：默认本地 vendor（`vendor/d3.v7.min.js` 与 HTML 同目录）；离线性以「全部网络请求被阻断的 `file://` 运行」为证据，静态检查不算。固定版本 URL 只作已声明的备用模式。
+5. **生成质量**：跨区走廊先分车道；走廊穿过组件卡片时先对齐门户/端点，仍不行改用带障碍的 A*；相邻锚点 stub 共线时做 4px 级错位；标签在「卡片 / 分区标题 / 图例 / 其它标签 / 其它边」约束下选位。交叉、共线、标签碰撞与长线统计写入 layout report；不得声称零交叉。
+6. **回读边界**：SVG 路径解析支持绝对 `M/L/H/V/Q`，其它命令显式记 unsupported；交叉/共线只在原生正交路线上计算（每方法口径，不跨引擎排名）。
+
+引擎局部正反例：`references/types/d3js/scripts/tests/`（经 `bash scripts/bash/run-tests.sh <paths> -q` 执行）。
+
 ## 交互实现（interactivity_intent → D3 交互）
 
 语义层在 SDS 中声明**要什么交互**（`interactivity_intent.level` + `forms`；形式分类、档位、默认值与逐 form 验收判据 owner：[semantic-model.md](../../semantic-model.md) § 交互语义与验收，此处不复写）。本节只拥有**怎么实现**：form → D3 配方、产物形态、实现义务。MUST NOT 增删或改判声明的 forms；`level: none` 时零交互义务（不顺手加交互，与 Core Principle 4 一致）。
@@ -208,6 +236,7 @@ For multi-chart dashboards:
 ## Output Requirements
 
 - **Delivery contract (read first; rules owned by the front door)**: [../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) — D1/D2 delivery form, D3–D5 user-facing text rules (**in-chart labels and the HTML prose obey the same rules**), D6 pre-delivery self-check. **The rule text and its examples live only in the contract; they are not restated here.** The items below are this engine's **mechanics**; the contract wins on conflict.
+- **最短可运行链路**：写 HTML/JS（或由 `scripts/build-native.py` 生成）→ 浏览器实际打开后回读 DOM/SVG（与 `references/sds-realization.md` 校验三关对应）→ 用页面导出按钮或浏览器导出 SVG/PNG → `scripts/native-readback.py` 复核 → 公共 `scripts/check-manifest.py`。共享渲染服务的 d3 端口只提供 served-HTML，**没有图像端点**，不猜 `GET /png`；端口与请求 shape 的 owner 是 [self-deploy-render-service.md](../../self-deploy-render-service.md)，此处不复述。
 - Output as a **single `.html` file** by default (self-contained; D3.js v7 via the render-service asset). Split mode is allowed when maintainability or offline reproducibility requires it: local `data.js`/`data.json` and/or a vendored local D3.js (`vendor/d3.v7.min.js`), all referenced by relative paths
 - D3.js version: v7.9.0 (via `http://xuanji-render.aliyun-inc.com:9701/d3.v7.min.js`, or the same bundle vendored as `vendor/d3.v7.min.js`)
 - SVG-based rendering (not Canvas, unless specifically requested for performance)

@@ -15,7 +15,7 @@
 | 选 PlantUML 图类型与元素关键字（`rectangle`/`component`/`package`/`entity`…）承载 SDS 元素 | 增删/重命名/合并 SDS 元素与关系 |
 | 用 skinparam / `<style>` / 宏把档位落成绝对线宽、深浅、虚实 | 改写 zone 成员、`layout`（equal-height/stack/grid/free）语义 |
 | 用脚手架（隐藏边、占位节点、方向关键字）**逼近**几何 | "优化"复刻版面（`fidelity_intent=reproduction` 时照抄源图语义） |
-| 补 SDS 未声明的引擎必需项（渲染参数、字体、图例）并在回报中声明 | 自行调整权重层级顺序或把关键路径加粗越过结构档 |
+| 补 SDS 未声明的引擎必需项（渲染参数、字体、**经授权的图例**）并在回报中声明 | 自行调整权重层级顺序或把关键路径加粗越过结构档；为输入未定义含义的颜色杜撰图例语义（无授权不生成 legend，见 [guide/style.md §十](guide/style.md)） |
 
 SDS 缺项 → 按本技能默认流程补，并在最终回报里逐项声明"补了什么、按什么默认"。
 

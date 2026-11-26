@@ -129,6 +129,7 @@ endlegend
 ```
 
 - 边标签保持裸编号，语义查 legend——画布清爽，细节不丢。
+- **legend 内容先授权、后撰写**：只把输入（SDS/语义 JSON）已声明的含义收进 legend；输入只给颜色值/编号而未声明含义时，保留画布上的颜色与编号，但**不生成含义对照表**，更不得替颜色发明业务语义。无授权的 legend 不是"细节仓"，是杜撰（判据与自检见 [style.md §十](style.md) 与 [`native-readback.py`](../../scripts/native-readback.py)）。
 
 > **反模式：不要把元素内文本外置为 per-element `note` + 连线牵引。** 直觉上「外置文本 → 盒子变小 → 更好对齐」，但在**嵌套 cluster 大图**上是净负收益：PlantUML 会**忽略 `note left/right/top/bottom of` 的方位提示**、把 note 甩到页面边缘，连线随之**横穿整幅画布**；外置 N 个元素 = **新增 N 条连线**，重新制造交叉。**盒子瘦身的正确落点是 legend（本节）或去重（见 principles §3），不是浮动 note。**
 

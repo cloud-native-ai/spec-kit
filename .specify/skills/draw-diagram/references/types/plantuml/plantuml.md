@@ -28,6 +28,14 @@
 
 **几何**：PlantUML 走 graphviz **自动布局，没有绝对坐标通道**，只能逼近 SDS 几何——`skinparam rectangle<<zone>> { MinimumWidth N }` 逼近 zone 宽/拉平多 zone 等宽、`-[hidden]down-` 锁秩、`-[hidden]right-` 拉同排（不改秩）、`<<ph>>` 透明占位节点撑高、方向关键字 + `nodesep`/`ranksep` 控宽高比。**SDS 中无法兑现的项（精确 x/y、等高/等宽分区、列错位 stagger、relation anchor/gap）必须量化声明**（偏离维度 + 实测幅度 + 引擎原因）；未声明的偏离按 semantic-fidelity 扣分，已声明的计入引擎实现质量。
 
+**已知限制与返修判据（引擎事实；某次运行的具体量化值归该次 manifest 与验收记录，不写进本文件当通用门槛）**：
+
+- **隐藏布局约束独立维护**：`-[hidden]-` 约束只做秩/排控制，不进入业务关系集合；业务边声明顺序是稳定 ID 的回读依据，编辑时保持顺序，否则 ID 校验立即报不一致。
+- **端点容差**：数据库圆柱、包页签、部署节点斜角等形状使箭头端点与目标包围框存在几何偏移；容差是**每次运行声明的参数**——按本次实际 SVG 回读实测并写入 manifest，不是跨图的通用正确性标准，也不是像素级端点证明。
+- **交叉与长线**：自动布局在扇出/汇聚处仍有交叉与长线；不得声称零交叉或等比例全屏可读，建议 SVG 放大；返修 = 调整隐藏秩脚手架/方向/分组后重渲。跨域长边优先加**方向关键字**（如 `-[#334155]down->`/`-left->`）引导路由——它只改走线不改语义；量化入口 [measure-svg-layout.py](scripts/measure-svg-layout.py) 与共享接口回读 [native-readback.py](scripts/native-readback.py)（同时给出交叉/穿框/长边/端点/标签几何与限制）。
+
+四轴验收与 manifest 判据见 [quality-gate.md](../../quality-gate.md)。
+
 → 落地配方、实测数据、量测自检（measure 量具）与偏离声明模板：[references/sds-realization.md](references/sds-realization.md)
 
 ## 工作流
@@ -77,13 +85,13 @@
 
 ### Step 7: 应用样式 + 大图专项（对齐·着色·线条）
 
-应用统一 skinparam/色彩模式，确保视觉一致；**并按强弱计划落地权重档**：边框粗细/深浅按档递减（大区 > 子模块 > 叶元素），流线默认细浅、关键路径色相抬升且粗细 ≤ 子模块档。**大图（节点多/尺寸大）套用大图技术栈**：×N 语义折叠、弱化管线突出语义色、正交路由 + 隐藏边控宽高比消交叉、连线治理、隐藏脚手架的能与不能、legend 作单一细节仓；只用 SVG 交付大图。
+应用统一 skinparam/色彩模式，确保视觉一致；**并按强弱计划落地权重档**：边框粗细/深浅按档递减（大区 > 子模块 > 叶元素），流线默认细浅、关键路径色相抬升且粗细 ≤ 子模块档。**大图（节点多/尺寸大）套用大图技术栈**：×N 语义折叠、弱化管线突出语义色、正交路由 + 隐藏边控宽高比消交叉、连线治理、隐藏脚手架的能与不能、legend 作单一细节仓。**legend 内容必须有输入依据**：只写调用方输入显式声明的编码含义（如 SDS/语义 JSON 的 `legend` 授权项）或引擎自身、与业务无关的画法说明；**输入只给颜色值而没给含义时，保留颜色族但不生成颜色含义图例**（不得为红/绿/灰杜撰业务语义）；无授权的 legend 一律不生成。见 [style.md §十](references/guide/style.md)。大图仍以 **SVG 为无损主交付**（PNG 同时产出）。
 
 → [style.md](references/guide/style.md)、[large-diagram-playbook.md](references/guide/large-diagram-playbook.md)；受委派时档位落地与几何逼近配方见 [sds-realization.md](references/sds-realization.md)
 
 ### Step 8: 渲染、匹配与微调
 
-用渲染脚本渲染 SVG/PNG（**默认远端渲染**——脚本默认 `PLANTUML_BACKEND=server`；禁止自行下载/配置本地渲染工具；远端不可用时脚本会提示，必须先询问用户是否接受本地渲染，获确认后以 `PLANTUML_BACKEND=local` 重试）；读取生成图片与用户要求比对，发现差异微调代码重渲；**强弱自检：大区边框须明显粗且深于子模块边框、子模块边框粗且深于流线（SVG 中 `stroke-width` 至少三档可辨），全图单一线宽即判不合格**；图集则逐图检查自足性、交叉引用与跨图一致（配色/字号/编号/页脚）；最终组装为 HTML 文档输出。
+用渲染脚本渲染 SVG/PNG（**默认远端渲染**——脚本默认 `PLANTUML_BACKEND=server`；禁止自行下载/配置本地渲染工具；远端不可用时脚本会提示，必须先询问用户是否接受本地渲染，获确认后以 `PLANTUML_BACKEND=local` 重试）；读取生成图片与用户要求比对，发现差异微调代码重渲；**强弱自检：大区边框须明显粗且深于子模块边框、子模块边框粗且深于流线（SVG 中 `stroke-width` 至少三档可辨），全图单一线宽即判不合格**；图集则逐图检查自足性、交叉引用与跨图一致（配色/字号/编号/页脚）；最终组装为 HTML 文档输出。**交付前用 [native-readback.py](scripts/native-readback.py) 对实际 `.puml` 与 SVG 做一次独立回读**（校验元素/分组/方向/标签/颜色族/图例授权与几何；退出 0 才代表该轴干净，3=partial/unsupported 不是通过）；运行时条件若需写入 manifest，用 [runtime-evidence.py](scripts/runtime-evidence.py) 消费调用方提供的 launch/stream 证据，缺失即 `unavailable/not_evaluated`。
 
 → [12-rendering-and-output.md](references/howto/12-rendering-and-output.md)
 
@@ -108,8 +116,9 @@
 ## 输出要求
 
 - **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
+- **最短可运行链路**：写 `.puml` → PlantUML 编码后 `GET /plantuml/svg/{enc}` 与 `/plantuml/png/{enc}`（或 `render-plantuml.sh`）→ 读回 SVG 的 `data-qualified-name`/ent 映射核对父级、方向与标签；按业务边声明顺序还原稳定 ID。端口与请求 shape 的 owner 是 [self-deploy-render-service.md](../../self-deploy-render-service.md)，此处不复述。
 - 输出为单个 HTML 文档，包含渲染的图表（渲染图为主体；原始 PlantUML 文本不嵌入正文，仅放入可折叠的「复现性附录」`<details>` 块，默认收起）
-- 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `PLANTUML_BACKEND=server`；本地渲染必须先在用户确认后以 `PLANTUML_BACKEND=local` 显式启用）
+- 图表通过 [render-plantuml.sh](scripts/render-plantuml.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `PLANTUML_BACKEND=server`；本地渲染必须先在用户确认后以 `PLANTUML_BACKEND=local` 显式启用）。执行环境禁止直接执行 bash（固定 Bash 白名单）时，可用同目录薄客户端 [render-native.py](scripts/render-native.py)：`--server` 由调用方显式提供、无公共回退、先 preflight 后渲染（服务不可用即停）；协议 shape 的 owner 仍是 [self-deploy-render-service.md](../../self-deploy-render-service.md)。
 - **HTML 附复现性附录**：本图渲染命令（render-plantuml.sh 调用 + CJK 补跑脚本，一律 `${SKILL_HOME}` 相对路径、禁止写死绝对路径）、依赖说明（后端/CJK/本地工具链，含离线 fallback）与可折叠的 puml 源码——**附录源码必须与磁盘实际渲染的 `.puml` 逐字节一致**（含渲染脚本注入的样式块，直接从磁盘复制），保证"这张图怎么重新生成"可复现（详见 [12-rendering-and-output.md §4.4](references/howto/12-rendering-and-output.md)）
 - **默认优先选用 PNG 格式**引用/嵌入图片（最美观，且在 Preview / Markdown 预览中可直接查看）；仅当图表过宽/过大触及 PNG 4096px 上限或需任意无损缩放时改用 SVG
 - **嵌入 Markdown 文档时（最佳实践）**：默认看 PNG、细节不够可开 SVG 无损放大，**SVG/PNG 必须同时产出**。⚠️ Markdown 图片 `![]()` 与内联 HTML `<a>` 走**不同的路径解析管线**（有的渲染器会代理/改写 Markdown 图片 URL 却透传 HTML `href`），混用会导致两条路径不一致——故 **PNG 与 SVG 引用须用同一机制**：首选**全内联 HTML**（`<a href=x.svg target=_blank rel=noopener><img src=x.png></a>`，点图即开 SVG 新标签），渲染器会剥 HTML 时回退**全纯 Markdown**（同标签打开）。→ 见 [12-rendering-and-output.md §4.3](references/howto/12-rendering-and-output.md)

@@ -39,6 +39,16 @@ ECharts provides built-in interactivity (tooltip, legend toggle, zoom, data high
 
 映射理据、固定坐标复刻管线（目标像素测量 → config JSON → render.mjs 确定性导出）、bounds-fit 角锚点与边线 lines-series-压节点技巧、渲染质量清单：[references/sds-realization.md](references/sds-realization.md)。
 
+**已知限制与返修判据（引擎事实；某次运行的具体量化值归该次 manifest 与验收记录，不写进本文件当通用门槛）**：
+
+- **节点缩放**：显式 `left/top/width/height` 的固定布局必须配 `zoom: 1` 与 `nodeScaleRatio: 0`，否则默认容器缩放会整体放大四角锚点坐标并裁切组件；坐标恒等按实际回读验收。
+- **箭头落点与方向**：原生 graph 的矩形符号不保证精确端口——箭头尖端可能落在目标外接框内或与目标框留有间隙；scatter 箭头的 `symbolRotate` 是渲染期符号约定（owner：[references/sds-realization.md](references/sds-realization.md) §4），不能由声明端点推断方向。落点/方向必须从原生坐标与渲染 SVG 实测（`scripts/native-readback.py --svg`）；容差与计数由该次验收声明并写入 manifest（`crossings`/`unresolved`），不是跨图通用标准。返修 = 调整端点/走线/旋转/布局后重渲，禁止事后改 PNG。
+- **边标签绑定**：标签锚点必须贴附其自身折线，且到任何其他关系折线的距离不得更近——错归 = 硬失败。用 `scripts/normalize-edge-series.py` 归一化锚点、`native-readback.py` 的 labels 检查复核。
+- **SVG 扁平化身份**：导出 SVG 无稳定语义 ID 与分组树，逐边 `to`/parent 不能只靠 SVG 独立重建；须以原生 option + 坐标恒等 + SVG 几何数量/颜色族/顺序交叉核对，身份回溯未完成时 manifest 的 `readback.parents/directions` 记 `partial`。共享同一箭头的多条关系在渲染路径上只能整组核对，报告记 identity note。
+- **可读性**：中部跨区曲线与旋转标签在密集图仍拥挤，hover/图例过滤只改善探索，不改善静态总览；不得以交互 pass 代称静态视觉 pass。
+
+四轴验收与 manifest 判据见 [quality-gate.md](../../quality-gate.md)。
+
 ## 交互实现（interactivity_intent → ECharts 交互）
 
 语义层在 SDS 中声明**要什么交互**（`interactivity_intent.level` + `forms`；形式分类、档位、默认值与逐 form 验收判据 owner：[semantic-model.md](../../semantic-model.md) § 交互语义与验收，此处不复写）。本节只拥有**怎么实现**。MUST NOT 增删或改判声明的 forms。
@@ -218,9 +228,10 @@ For dark theme:
 
 1. Save the HTML file to the user's specified path (or suggest a reasonable default like `./output/chart.html`)
 2. **Structural verification (program-first, no browser needed)**: run `node scripts/verify-deliverable.mjs <file>.html` — it checks (a) any referenced `vendor/echarts.min.js` actually exists and is non-empty, (b) the ECharts loader does not use `document.write`, (c) `*.config.js`/`*.config.json` pairs are in sync, (d) fixed-layout graph coordinates have no out-of-bounds nodes or overlaps (canvas size from config `meta.canvasWidth/Height`). Fix all reported problems before delivery
-3. **Local open verification (渲染证明)**: open the HTML in a browser and confirm the chart actually renders (canvas is not blank, no console errors). For offline-critical deliverables, re-open with network disabled (or `file://` with no CDN access) to prove the vendored copy renders. If a headless browser is available, capture a screenshot, e.g. `chromium --headless --screenshot=out.png --window-size=<w>,<h> <file>.html` — the window height (content height **plus** a margin) and the clipping judgement are owned by the delivery contract's D6「渲染证据几何」row ([../draw-diagram/references/delivery-contract.md](../../delivery-contract.md)); the margin value is not restated here, and a non-blank PNG alone is **not** render evidence
-4. **Static snapshot export**: for offline-critical or review-facing deliverables, export a static PNG/SVG of each chart (toolbox "保存为图片", or `chart.getDataURL({ type: 'png', pixelRatio: 2 })`, or the headless screenshot) and deliver it **alongside the HTML** as render evidence — reviewers without a browser or network can verify the actual visual result offline
-5. Provide a brief explanation of:
+3. **Native + rendered readback (语义与几何)**: run `python3 -B scripts/native-readback.py --source <file>.config.json --semantics <semantics.json> --svg <rendered.svg> --output <new-report.json>`. Exit codes: 0 = no hard discrepancy, 1 = hard discrepancy, 2 = usage/I/O, 3 = partial evidence. The report lists the actual native records, the semantic diff, measured arrow landing/direction (rendered SVG geometry, not declared endpoints), crossings, edge-through-node hits and label binding. Without an SVG export the arrow geometry is declared-rotation-only and is marked as such — that is not a rendered pass.
+4. **Local open verification (渲染证明)**: open the HTML in a browser and confirm the chart actually renders (canvas is not blank, no console errors). For offline-critical deliverables, re-open with network disabled (or `file://` with no CDN access) to prove the vendored copy renders. If a headless browser is available, capture a screenshot, e.g. `chromium --headless --screenshot=out.png --window-size=<w>,<h> <file>.html` — the window height (content height **plus** a margin) and the clipping judgement are owned by the delivery contract's D6「渲染证据几何」row ([../draw-diagram/references/delivery-contract.md](../../delivery-contract.md)); the margin value is not restated here, and a non-blank PNG alone is **not** render evidence
+5. **Static snapshot export**: for offline-critical or review-facing deliverables, export a static PNG/SVG of each chart (toolbox "保存为图片", or `chart.getDataURL({ type: 'png', pixelRatio: 2 })`, or the headless screenshot) and deliver it **alongside the HTML** as render evidence — reviewers without a browser or network can verify the actual visual result offline
+6. Provide a brief explanation of:
    - What the visualization shows
    - How to interact with it (tooltip, legend toggle, zoom, toolbox)
    - How to modify the data (where in the code to update values)
@@ -229,6 +240,7 @@ For dark theme:
 ## Output Requirements
 
 - **Delivery contract (read first; rules owned by the front door)**: [../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) — D1/D2 delivery form, D3–D5 user-facing text rules (**in-chart labels and the HTML prose obey the same rules**), D6 pre-delivery self-check. **The rule text and its examples live only in the contract; they are not restated here.** The items below are this engine's **mechanics**; the contract wins on conflict.
+- **最短可运行链路**：写 `option/config.json`（`sync-config.mjs` 保 js/json 一致）→ `normalize-edge-series.py --check|--write` 归一化箭头旋转/线端/标签锚点 → `POST` 到共享渲染服务的 echarts 端口换取自包含 HTML → 浏览器实际渲染后用 `getOption`/导出 SVG 回读 → `node scripts/verify-deliverable.mjs` + `check-layout.mjs` 做结构检查 → `python3 -B scripts/native-readback.py --source <config> --semantics <semantics> --svg <rendered.svg> --output <new-report>` 做原生 + 渲染回读。服务无图像端点，PNG 由浏览器导出；端口与请求 shape 的 owner 是 [self-deploy-render-service.md](../../self-deploy-render-service.md)，此处不复述。
 - Output as a **single `.html` file** (self-contained, no external dependencies except the pinned ECharts script; offline-critical output ships a REAL local `vendor/echarts.min.js`, never an empty stub)
 - **Offline-critical / review-facing deliverables**: `vendor/echarts.min.js` present and non-empty (verified by `scripts/vendor-echarts.sh` / `scripts/verify-deliverable.mjs`) AND a static PNG/SVG snapshot of each chart delivered alongside the HTML as render evidence
 - ECharts version: **pinned 5.x** (e.g. `https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js`), never a floating `@5` tag
@@ -267,6 +279,8 @@ For dark theme:
 | [sync-config.mjs](scripts/sync-config.mjs) | Generate the `*.config.js` wrapper from the canonical `*.config.json` (or reverse); `--check` mode fails when the pair drifted — no more hand-syncing two copies |
 | [check-layout.mjs](scripts/check-layout.mjs) | Coordinate hygiene for fixed-layout graph configs: out-of-bounds nodes/zones and pairwise node overlaps (canvas size from `meta.canvasWidth/Height`) |
 | [verify-deliverable.mjs](scripts/verify-deliverable.mjs) | Pre-delivery structural checks per HTML: vendor file presence, no `document.write` loader, config js/json sync, layout checks (program-first; the visual check is Step 5) |
+| [normalize-edge-series.py](scripts/normalize-edge-series.py) | Deterministic edge-decoration normalization for the fixed-layout recipe: arrow `symbolRotate` per the measured renderer convention, reversed final micro-segments, label anchors; `--check` / `--write`; refuses overwrite; help/version |
+| [native-readback.py](scripts/native-readback.py) | Shared native readback (`--source/--semantics/[--svg]/--output`): actual records with category-index → zoneId, parents, container endpoints and endpoint identity forms; semantic diff; arrow landing/direction from native coordinates and the rendered SVG; crossings, edge-through-node, label binding; exit codes 0 pass / 1 hard / 2 usage or I/O / 3 partial evidence |
 
 ## Quality Checklist
 
