@@ -1,0 +1,11 @@
+{
+  "settlement_version": 1,
+  "attempt_id": "versioned-run",
+  "surface": "attempt-file",
+  "value": "completed",
+  "evidence": [
+    "versioned-run.return.txt"
+  ],
+  "claimed_at": "2026-01-01T00:01:00Z",
+  "mechanism": "return-record"
+}

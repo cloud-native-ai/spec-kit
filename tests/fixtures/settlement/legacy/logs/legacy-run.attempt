@@ -1,0 +1,9 @@
+{
+  "settlement_version": 1,
+  "attempt_id": "legacy-run",
+  "carrier": "c2-subprocess",
+  "parent_identity": "root",
+  "started_at": "2026-01-01T00:00:00Z",
+  "pid": 99999999,
+  "contract": "shared/definitions/superagent-definitions.md § Termination"
+}
