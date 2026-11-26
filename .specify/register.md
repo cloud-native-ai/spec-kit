@@ -251,3 +251,14 @@
 | T-003 (098) | 098 plan 承重决策：进程内直调按「清单 + 二值边界类」逐点转换，携带 cwd/env 的 fixture 层调用保留子进程（反题=全部保持子进程；重开条件=任一转换点出现无法用断言集等价解释的行为差异 ≥1，或 fixture 层必须进程内化才能达到 SC-009） | `.specify/specs/098-suite-speed-optimizations/plan.md` § Decision Tensions T-003 | active（重开条件见记录） |
 | D-098-01 | 用户裁定（2026-11-10）：宪法 Principle VII 的 Pre-Status-Flip Gate 状态载体由 `verification.log` 更正为 `verification.md`（框架实现链实际读取的文件；仓库忽略 `*.log`），遂以 PATCH 1.19.0 → 1.19.1 随 098 delta 落地；该修订无 098 需求/任务行，由本登记行承接归属 | `.specify/constitution.md` 顶部 Sync Impact Report（1.19.1 段）+ commit `af73f65f1` | ratified（user ruling 2026-11-10；review F7 补登记） |
 | D-102-01 | 用户裁定（2026-11-16）：instructions 预算 `INSTRUCTIONS_BUDGET_BYTES` 38400→38912（+512 B），以容纳 102 必需的常驻指针 bullet（`.specify/instructions.md` 38,578 B）；反题=缩短 C-07 bullet 至 ≤98 B 并重审 plan；判别证据=instructions 实测 38578 B、`generate-instructions.sh:107`、两份预算守卫 34 passed；预期的反度量=下游项目 instructions 超预算事件数；重开条件=任一项目因新预算掩盖真实膨胀 >512 B，或框架再增常驻小节 | `scripts/bash/generate-instructions.sh:107` + `.specify/state/102-line-registry-registration.md` § U5 | decided-ratified |
+| REC-106-01 | 实现阶段 Feature Integration 翻转前必须以成功的 `closure-acceptance-check.py`（或至少解析派生的 `verification.md`）为条件；spec 侧派生步骤进入 implement 提示词的哨兵条件而不只是任务行 | `.specify/specs/106-background-silent-failure/review.md` §5.1（源 F1/A1） | open |
+| REC-106-02 | 任务行的 `[green:]` 条款集成为写作用域围栏：一行不得实现后续行拥有的条款；被迫共同交付须拆行或记录红窗损失 | `.specify/specs/106-background-silent-failure/review.md` §5.2（源 F2） | open |
+| REC-106-03 | 最终门禁行须可由其所属席位执行（任务表闭包归 integrator 步骤；GATE 读取闭包后状态） | `.specify/specs/106-background-silent-failure/review.md` §5.2（源 F6） | open |
+| REC-106-04 | `workspace-guard.py` 拒绝输出必填字段全空/几乎全空的快照；`--check` 把全空 baseline 当输入错误 | `.specify/specs/106-background-silent-failure/review.md` §5.3（源 F4） | open |
+| REC-106-05 | analyze 增量复用缺少域内容哈希产物时 fail closed（该域 `not-evaluated` 并收缩复用集） | `.specify/specs/106-background-silent-failure/review.md` §5.3（源 F3） | open |
+| REC-106-06 | `render-agents` 对本分支未改源文件的刷新予以披露或拒绝；渲染清单 `source` 字段必须可解析（`templates/sdd-debt-governor.agent.md` 不存在） | `.specify/specs/106-background-silent-failure/review.md` §5.3（源 I1） | open |
+| REC-106-07 | U4 记录步骤粘贴 validator 的 `fr`/`sc` 摘要（或引输出路径不印数字），不再手抄计数 | `.specify/specs/106-background-silent-failure/review.md` §5.4（源 F5） | open |
+| REC-106-08 | `dispatch.sh` 的 TERM/INT/HUP trap 在写 `.end`/`.status` 后向管线进程组发信号（或显式记录孤儿），避免终止记录被读作「工作已结束」 | `.specify/specs/106-background-silent-failure/review.md` §5.4（源 code important） | open |
+| REC-106-09 | `--live-window` 的活日志增长腿实现之，或从引擎与 owner `running` 行移除；声明即须生效 | `.specify/specs/106-background-silent-failure/review.md` §5.4（源 I2） | open |
+| REC-106-10 | quickstart 可执行示例必须被其钉住运行逐字验证；需要变通的场景记为失败示例并在同一变更中修复（spec 侧） | `.specify/specs/106-background-silent-failure/review.md` §5.5（源 A2） | open |
+| REC-106-11 | EP-001（及 quickstart S-2）的判定 token 枚举更正为 watcher 块携带的 9 值集合，或声明集合以抽取器为准并引用守卫 | `.specify/specs/106-background-silent-failure/review.md` §5.5（源 A3） | open |

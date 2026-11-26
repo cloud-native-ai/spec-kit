@@ -13,6 +13,14 @@
 
 ## Latest Review
 
+- **2026-11-26 — `/speckit.review` slice 106 (run `r20261125T113505Z-106a`)** — Report: `.specify/specs/106-background-silent-failure/review.md`; code record: `.specify/specs/106-background-silent-failure/code-review.md`.
+  - **Process segment**: pass with 1 P0 (repaired in-run), 2 P1 and 3 P2 findings — the P0: the slice's `Planned → Implemented` flip landed while `verification.md` was absent; the review materialized it from `test-evidence/verification-input.md` (nine SC rows + smoke triple) plus five `RS-NNN_joint_acceptance=` rows, and re-ran the ARC to `accept`. The two P0 rows carry the documented `(validated: direct re-read, subagent unavailable)` fallback.
+  - **Artifact segment**: pass — coverage 10/10 after the repair (9/10 at review start; missing member `verification.md`); A2 P1 (quickstart S-1 command cannot block as written) and A3 P2 (EP-001 verdict-token enumeration under-inclusive) remain disclosed.
+  - **Implementation segment**: pass — smoke `57 passed` exit 0 (evidence `.specify/specs/106-background-silent-failure/test-evidence/review-evidence.txt`), scope carries one P2 (stale `sdd-debt-governor` render refreshed by the prescribed render step), regression re-measured green (report byte-identical, engine + owner pins 35 passed, six settlement modules 100 passed).
+  - **Code segment**: `not-evaluated` (receipt 331 changed / 49 judged / 282 legally skipped / 0 gap; skips earn no coverage credit) — 0 `blocking`, 2 `important` (each answered), 1 `suggestion`, 1 `nitpick`, 2 `praise`; merge gate `allow`.
+  - **Acceptance Reality Check**: `final_path` record copied verbatim — pass 3 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 3; claimed status `Implemented`; ARC verdict `agree`; no fixed item.
+  - **Status transition `Implemented → Ready for Review`: allowed** — the four conjunctive conditions hold; the registry row 106 and this entry carry the flip; the parent's own status is unchanged.
+
 - **2026-11-10 — `/speckit.review` (run `r20261110T055657Z-b095-review`)** — Report: `.specify/specs/095-superagent-role/review.md`; code record: `.specify/specs/095-superagent-role/code-review.md`.
   - **Process segment**: `blocked` at the P0 level — 1 P0 (the implement stage never landed its owned `Planned → Implemented` transition although the closure checker returned `accept`), 3 P1 and 8 P2 findings; the P0 was confirmed by an independent read-only validator.
   - **Artifact segment**: `blocked` — coverage 11/11, no missing member; P1 findings: the digest contract C-1 "no carrier root may be read twice" clause is unimplemented and unguarded, the bound feature detail carries no `**Status**` field or `## Latest Review` section, and `verification.md` vs `tasks.md` disagree on the implement-stage status obligation.
