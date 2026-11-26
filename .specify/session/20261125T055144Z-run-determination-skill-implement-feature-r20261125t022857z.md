@@ -21,7 +21,7 @@ skill:implement-feature run=r20261125T022857Z-06dd token=not_evaluated elapsed=n
   "feature": "105-runtime-store-layout",
   "feature_id": "024",
   "determined_at": "2026-11-25T05:51:44Z",
-  "settled_at": null,
+  "settled_at": "2026-11-26T03:22:40Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -88,7 +88,7 @@ skill:implement-feature run=r20261125T022857Z-06dd token=not_evaluated elapsed=n
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -165,8 +165,8 @@ skill:implement-feature run=r20261125T022857Z-06dd token=not_evaluated elapsed=n
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -191,7 +191,7 @@ skill:implement-feature run=r20261125T022857Z-06dd token=not_evaluated elapsed=n
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }
