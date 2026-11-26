@@ -1,0 +1,279 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_guards.py::test_m06_block_completeness tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused tests/contract/test_decision_governance_guards.py::test_acknowledgement_present tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_______________________ test_m05_receipt_reverse_samples _______________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m05_receipt_reverse_samples() -> None:
+        """C-304 / M-05: receipt presence and decision_id resolvability; a missing item reds."""
+        green = CHAIN / "green-complete.md"
+        assert green.is_file(), f"missing fixture: {green}"
+    
+>       section = transmission_section()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_guards.py:511: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_governance_guards.py:390: in transmission_section
+    return flat(owner_section("传递与实施", "Transmission and Implementation"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tokens = ('传递与实施', 'Transmission and Implementation')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 223
+
+    def owner_section(*tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = OWNER.read_text(encoding="utf-8").splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+
+tests/contract/test_decision_governance_guards.py:376: AssertionError
+_________________________ test_m06_block_completeness __________________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m06_block_completeness() -> None:
+        """C-301 / M-06: the decision block carries all five fields; each omission turns red."""
+        complete = PAYLOAD / "complete.md"
+        assert complete.is_file(), f"missing fixture: {complete}"
+    
+>       section = transmission_section()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_guards.py:398: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_governance_guards.py:390: in transmission_section
+    return flat(owner_section("传递与实施", "Transmission and Implementation"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tokens = ('传递与实施', 'Transmission and Implementation')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 223
+
+    def owner_section(*tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = OWNER.read_text(encoding="utf-8").splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+
+tests/contract/test_decision_governance_guards.py:376: AssertionError
+_________________________ test_acknowledgement_present _________________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_acknowledgement_present() -> None:
+        """C-303: the return carries an acknowledgement echoing the id; the producers owe the duty."""
+        snapshot = PAYLOAD / "returns" / "return-acknowledged.md"
+        assert snapshot.is_file(), f"missing fixture: {snapshot}"
+        text = snapshot.read_text(encoding="utf-8")
+        assert "- **decision_id**: D-001" in text, "the return does not echo the decision_id"
+        assert "acknowledgement" in text and "accepted for implementation" in text, (
+            "the return carries no acknowledgement stating acceptance for implementation"
+        )
+        for member in RECEIPT_FIELDS:
+            assert f"**{member}**" in text, f"the receipt does not carry `{member}`"
+    
+>       section = transmission_section()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_guards.py:482: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_governance_guards.py:390: in transmission_section
+    return flat(owner_section("传递与实施", "Transmission and Implementation"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tokens = ('传递与实施', 'Transmission and Implementation')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 223
+
+    def owner_section(*tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = OWNER.read_text(encoding="utf-8").splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+
+tests/contract/test_decision_governance_guards.py:376: AssertionError
+___________________ test_m06_dispatch_without_block_refused ____________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m06_dispatch_without_block_refused() -> None:
+        """C-302 / M-06: a decision-backed dispatch without a block is refused; non-decision is legal."""
+        no_block = M06 / "red-no-block.md"
+        non_decision = PAYLOAD / "non-decision.md"
+        for path in (no_block, non_decision):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        red = run_payload("--fixture", str(no_block))
+>       assert red.returncode == 1, (
+            f"a decision-backed dispatch without a block exited {red.returncode}, expected 1: "
+            f"{red.stdout} {red.stderr}"
+        )
+E       AssertionError: a decision-backed dispatch without a block exited 2, expected 1:  error: action 'payload' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor..., returncode=2, stdout='', stderr="error: action 'payload' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:445: AssertionError
+________________________ test_m07_chain_three_segments _________________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_m07_chain_three_segments() -> None:
+        """C-306 / M-07: record → dispatch attempt → receipt; any missing segment turns red."""
+        green = CHAIN / "green-complete.md"
+        ok = run_chain("--fixture", str(green))
+>       assert ok.returncode == 0, (
+            f"the complete chain exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+        )
+E       AssertionError: the complete chain exited 2, expected 0:  error: action 'chain' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...'], returncode=2, stdout='', stderr="error: action 'chain' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:585: AssertionError
+____________________________ test_multi_hop_same_id ____________________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_multi_hop_same_id() -> None:
+        """C-307: every hop carries the block and every receipt keeps the same decision_id."""
+        green = CHAIN / "multi-hop-green.md"
+        red = CHAIN / "red-multi-hop-id.md"
+        for path in (green, red):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        text = green.read_text(encoding="utf-8")
+        assert text.count("## Dispatch Attempt") == 2, "the multi-hop fixture is not two hops"
+        assert text.count("## Receipt") == 2, "the multi-hop fixture carries two receipts"
+        assert text.count("- **decision_id**: D-001") == 5, (
+            "not every hop segment references the recorded decision id "
+            "(record + two dispatch attempts + two receipts)"
+        )
+    
+        ok = run_chain("--fixture", str(green))
+>       assert ok.returncode == 0, (
+            f"the multi-hop chain exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+        )
+E       AssertionError: the multi-hop chain exited 2, expected 0:  error: action 'chain' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...'], returncode=2, stdout='', stderr="error: action 'chain' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:634: AssertionError
+______________________ test_silent_redecision_is_anomaly _______________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_silent_redecision_is_anomaly() -> None:
+        """C-305: a child's silent re-decision breaks the chain (explicit anomaly, never silence)."""
+        silent = CHAIN / "red-silent-redecision.md"
+        escalated = PAYLOAD / "returns" / "return-escalated.md"
+        for path in (silent, escalated):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        red = run_chain("--fixture", str(silent))
+>       assert red.returncode == 1, (
+            f"a silent re-decision exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+E       AssertionError: a silent re-decision exited 2, expected 1:  error: action 'chain' is declared but not implemented yet (read-only skeleton)
+E         
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/wor...'], returncode=2, stdout='', stderr="error: action 'chain' is declared but not implemented yet (read-only skeleton)\n").returncode
+
+tests/contract/test_decision_governance_guards.py:560: AssertionError
+_______________________ test_supersession_preserves_old ________________________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_supersession_preserves_old() -> None:
+        """C-308: a re-decision adds a record and preserves the old record and its receipt state."""
+        carrier = CHAIN / "carriers" / "redecision.md"
+        lossy = CHAIN / "carriers" / "redecision-lossy.md"
+        register = CHAIN / "carriers" / "register.md"
+        for path in (carrier, lossy, register):
+            assert path.is_file(), f"missing fixture: {path}"
+    
+        before = carrier.read_bytes()
+        run, payload = run_records_json("--carrier", str(carrier), "--register", str(register))
+        assert run.returncode == 0, (
+            f"the re-decision carrier exited {run.returncode}, expected 0: {run.stdout} {run.stderr}"
+        )
+        assert payload["status"] == "pass", payload["violations"]
+        ids = [record["id"] for record in payload["records"]]
+        assert ids == ["D-001", "D-002"], ids
+        old = next(record for record in payload["records"] if record["id"] == "D-001")
+        assert old["fields"]["superseded_by"].startswith("D-002"), old
+        assert old["fields"]["transmission_status"] == "diverged", old
+        assert old["fields"]["implemented_at"], old
+        assert carrier.read_bytes() == before, "the run rewrote the carrier"
+    
+        red = run_records("--carrier", str(lossy), "--register", str(register))
+        assert red.returncode == 1, (
+            f"a rewritten old record exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+        assert "M-01" in red.stdout, f"the verdict does not carry M-01: {red.stdout!r}"
+        lossy_payload = json.loads(
+            run_records("--carrier", str(lossy), "--register", str(register), "--json").stdout
+        )
+        messages = " ".join(
+            v["message"] for v in lossy_payload["violations"] if v["rule"] == "M-01"
+        )
+        assert "implemented_at missing" in messages, messages
+    
+>       section = transmission_section()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_governance_guards.py:686: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_governance_guards.py:390: in transmission_section
+    return flat(owner_section("传递与实施", "Transmission and Implementation"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tokens = ('传递与实施', 'Transmission and Implementation')
+lines = ['# 决策项定义(Decision Definitions)', '', '**本文档是「决策项(Decision Item)」治理规则的唯一所有者(owner)。** 它拥有本特性的封闭词汇表、两类决策的强调与呈现模板、选项集契约、...文档不新建第二套登记、队列、存储或调度器；决策档案是既有载体的投影，`.specify/register.md` 保持持久编号的唯一索引。', '', '## 所有权声明(Ownership Declaration)', '', ...]
+start = None, index = 223
+
+    def owner_section(*tokens: str) -> str:
+        """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+        lines = OWNER.read_text(encoding="utf-8").splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith("## ") and all(token in line for token in tokens):
+                start = index
+                break
+>       assert start is not None, f"missing H2 section carrying {tokens!r}"
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+
+tests/contract/test_decision_governance_guards.py:376: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples
+FAILED tests/contract/test_decision_governance_guards.py::test_m06_block_completeness
+FAILED tests/contract/test_decision_governance_guards.py::test_acknowledgement_present
+FAILED tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused
+FAILED tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments
+FAILED tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id
+FAILED tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly
+FAILED tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old
+8 failed in 6.50s

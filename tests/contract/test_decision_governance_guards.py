@@ -324,3 +324,365 @@ def test_reconstruct_from_register_and_carriers() -> None:
         requirements
     )
     assert not any(v["rule"] == "M-04" for v in payload["violations"]), payload["violations"]
+
+
+# --------------------------------------------------------------------------- #
+# US4 — transmission: block completeness, acknowledgement, receipt, chain (T032)
+# --------------------------------------------------------------------------- #
+
+PAYLOAD = FIXTURES / "payload"
+CHAIN = FIXTURES / "chain"
+M05 = FIXTURES / "m05"
+M06 = FIXTURES / "m06"
+M07 = FIXTURES / "m07"
+
+#: The five decision-block fields (C-301), as the dispatch payload carries them.
+BLOCK_FIELDS = (
+    "decision_id", "decision_class", "chosen_option",
+    "implementation_constraints", "archive_pointer",
+)
+#: The four implementation-receipt members (C-304).
+RECEIPT_FIELDS = ("decision_id", "implementation_summary", "evidence", "divergence")
+
+
+def run_action(action: str, *args: str) -> subprocess.CompletedProcess:
+    env = dict(os.environ)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return subprocess.run(
+        [sys.executable, str(ENGINE), "--action", action, *args],
+        capture_output=True,
+        text=True,
+        env=env,
+        cwd=str(ROOT),
+    )
+
+
+def run_payload(*args: str) -> subprocess.CompletedProcess:
+    return run_action("payload", *args)
+
+
+def run_chain(*args: str) -> subprocess.CompletedProcess:
+    return run_action("chain", *args)
+
+
+def owner_section(*tokens: str) -> str:
+    """Body of the first H2 heading carrying every token, up to the next H2 or EOF."""
+    lines = OWNER.read_text(encoding="utf-8").splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.startswith("## ") and all(token in line for token in tokens):
+            start = index
+            break
+    assert start is not None, f"missing H2 section carrying {tokens!r}"
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return "\n".join(lines[start + 1:end])
+
+
+def flat(text: str) -> str:
+    return " ".join(text.split())
+
+
+def transmission_section() -> str:
+    return flat(owner_section("传递与实施", "Transmission and Implementation"))
+
+
+def test_m06_block_completeness() -> None:
+    """C-301 / M-06: the decision block carries all five fields; each omission turns red."""
+    complete = PAYLOAD / "complete.md"
+    assert complete.is_file(), f"missing fixture: {complete}"
+
+    section = transmission_section()
+    for field in BLOCK_FIELDS:
+        assert f"`{field}`" in section, (
+            f"§ Transmission and Implementation does not name the block field `{field}`"
+        )
+
+    before = dir_snapshot(M06)
+    ok = run_payload("--fixture", str(complete))
+    assert ok.returncode == 0, (
+        f"the complete block exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-06 ", ok.stdout), (
+        f"a complete block still carries an M-06 verdict: {ok.stdout!r}"
+    )
+
+    red_samples = {
+        "red-missing-id.md": "decision_id",
+        "red-missing-class.md": "decision_class",
+        "red-missing-chosen.md": "chosen_option",
+        "red-missing-constraints.md": "implementation_constraints",
+        "red-missing-archive.md": "archive_pointer",
+    }
+    for name, field in red_samples.items():
+        path = M06 / name
+        assert path.is_file(), f"missing fixture: {path}"
+        red = run_payload("--fixture", str(path))
+        assert red.returncode == 1, (
+            f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+        assert "M-06" in red.stdout, f"{name} carries no M-06 verdict: {red.stdout!r}"
+        payload = json.loads(run_payload("--fixture", str(path), "--json").stdout)
+        verdict = next(v for v in payload["violations"] if v["rule"] == "M-06")
+        assert verdict["path"].endswith(name), verdict
+        assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+        assert field in verdict["message"], (name, verdict["message"])
+
+    assert dir_snapshot(M06) == before, "a run mutated the m06 fixture tree"
+
+
+def test_m06_dispatch_without_block_refused() -> None:
+    """C-302 / M-06: a decision-backed dispatch without a block is refused; non-decision is legal."""
+    no_block = M06 / "red-no-block.md"
+    non_decision = PAYLOAD / "non-decision.md"
+    for path in (no_block, non_decision):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    red = run_payload("--fixture", str(no_block))
+    assert red.returncode == 1, (
+        f"a decision-backed dispatch without a block exited {red.returncode}, expected 1: "
+        f"{red.stdout} {red.stderr}"
+    )
+    assert "M-06" in red.stdout, f"the verdict does not carry M-06: {red.stdout!r}"
+    payload = json.loads(run_payload("--fixture", str(no_block), "--json").stdout)
+    verdict = next(v for v in payload["violations"] if v["rule"] == "M-06")
+    assert verdict["path"].endswith("red-no-block.md"), verdict
+    assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+    assert "decision_block" in verdict["message"], verdict
+
+    # BC-02 bridge: a non-decision dispatch without a block stays legal.
+    ok = run_payload("--fixture", str(non_decision))
+    assert ok.returncode == 0, (
+        f"a non-decision dispatch exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-06 ", ok.stdout), ok.stdout
+
+    # The whole m06 directory reds (the directory form the quickstart records).
+    directory = run_payload("--fixture", str(M06))
+    assert directory.returncode == 1, (
+        f"the m06 directory exited {directory.returncode}, expected 1: {directory.stdout}"
+    )
+
+
+def test_acknowledgement_present() -> None:
+    """C-303: the return carries an acknowledgement echoing the id; the producers owe the duty."""
+    snapshot = PAYLOAD / "returns" / "return-acknowledged.md"
+    assert snapshot.is_file(), f"missing fixture: {snapshot}"
+    text = snapshot.read_text(encoding="utf-8")
+    assert "- **decision_id**: D-001" in text, "the return does not echo the decision_id"
+    assert "acknowledgement" in text and "accepted for implementation" in text, (
+        "the return carries no acknowledgement stating acceptance for implementation"
+    )
+    for member in RECEIPT_FIELDS:
+        assert f"**{member}**" in text, f"the receipt does not carry `{member}`"
+
+    section = transmission_section()
+    for token in (
+        "acknowledgement",
+        "回显 `decision_id`",
+        "接受",
+        "回传",
+        "`acknowledged_at`",
+        "`transmission_status`",
+    ):
+        assert token in section, f"§ Transmission and Implementation lacks {token!r}"
+    assert "superagent-definitions.md" in section, (
+        "§ Transmission does not reach the existing return channel by pointer"
+    )
+
+    for rel in ("skills/internal/run-agent/SKILL.md", "skills/internal/run-team/SKILL.md"):
+        body = flat((ROOT / rel).read_text(encoding="utf-8"))
+        assert "decision-definitions.md" in body, (
+            f"{rel} does not reach the owner page by pointer"
+        )
+        assert "implementation_receipt" in body, (
+            f"{rel} does not carry the implementation-receipt duty"
+        )
+
+
+def test_m05_receipt_reverse_samples() -> None:
+    """C-304 / M-05: receipt presence and decision_id resolvability; a missing item reds."""
+    green = CHAIN / "green-complete.md"
+    assert green.is_file(), f"missing fixture: {green}"
+
+    section = transmission_section()
+    for member in RECEIPT_FIELDS:
+        assert f"`{member}`" in section, (
+            f"§ Transmission does not name the receipt member `{member}`"
+        )
+    for token in ("不完整", "MUST NOT 消费", "补齐"):
+        assert token in section, f"§ Transmission lacks the incomplete-return rule ({token!r})"
+
+    before = dir_snapshot(M05)
+    ok = run_chain("--fixture", str(green))
+    assert ok.returncode == 0, (
+        f"the complete chain exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-05 ", ok.stdout), ok.stdout
+    for member in RECEIPT_FIELDS:
+        assert f"**{member}**" in green.read_text(encoding="utf-8"), (
+            f"the green chain receipt does not carry `{member}`"
+        )
+
+    red_samples = {
+        "red-no-receipt.md": "receipt",
+        "red-no-id.md": "decision_id",
+        "red-unresolvable.md": "resolve",
+    }
+    for name, needle in red_samples.items():
+        path = M05 / name
+        assert path.is_file(), f"missing fixture: {path}"
+        red = run_chain("--fixture", str(path))
+        assert red.returncode == 1, (
+            f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+        assert "M-05" in red.stdout, f"{name} carries no M-05 verdict: {red.stdout!r}"
+        payload = json.loads(run_chain("--fixture", str(path), "--json").stdout)
+        verdict = next(v for v in payload["violations"] if v["rule"] == "M-05")
+        assert verdict["path"].endswith(name), verdict
+        assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+        assert needle in verdict["message"], (name, verdict["message"])
+
+    assert dir_snapshot(M05) == before, "a run mutated the m05 fixture tree"
+
+
+def test_silent_redecision_is_anomaly() -> None:
+    """C-305: a child's silent re-decision breaks the chain (explicit anomaly, never silence)."""
+    silent = CHAIN / "red-silent-redecision.md"
+    escalated = PAYLOAD / "returns" / "return-escalated.md"
+    for path in (silent, escalated):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    red = run_chain("--fixture", str(silent))
+    assert red.returncode == 1, (
+        f"a silent re-decision exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+    )
+    assert "M-07" in red.stdout, f"the verdict does not carry M-07: {red.stdout!r}"
+    payload = json.loads(run_chain("--fixture", str(silent), "--json").stdout)
+    verdicts = [v for v in payload["violations"] if v["rule"] == "M-07"]
+    assert verdicts, payload["violations"]
+    assert any("D-002" in v["message"] for v in verdicts), verdicts
+
+    # The correct alternative is the explicit escalation: no receipt, an anomaly line.
+    escalation = escalated.read_text(encoding="utf-8")
+    assert "ANOMALY:" in escalation, "the escalation snapshot carries no explicit anomaly line"
+    assert "implementation_receipt" not in escalation, (
+        "an escalated return must not fabricate a receipt"
+    )
+
+    section = transmission_section()
+    for token in ("MUST NOT 静默重决", "fast-fail", "不完整"):
+        assert token in section, f"§ Transmission lacks the no-silent-re-decision duty ({token!r})"
+
+
+def test_m07_chain_three_segments() -> None:
+    """C-306 / M-07: record → dispatch attempt → receipt; any missing segment turns red."""
+    green = CHAIN / "green-complete.md"
+    ok = run_chain("--fixture", str(green))
+    assert ok.returncode == 0, (
+        f"the complete chain exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-07 ", ok.stdout), ok.stdout
+
+    section = transmission_section()
+    for token in ("决策记录", "派发尝试", "实施回执", "显式异常"):
+        assert token in section, f"§ Transmission does not name the chain element {token!r}"
+
+    red_samples = {
+        "red-missing-record.md": "record",
+        "red-missing-dispatch.md": "dispatch",
+        "red-missing-receipt.md": "receipt",
+        "red-inconsistent-id.md": "D-003",
+    }
+    before = dir_snapshot(M07)
+    for name, needle in red_samples.items():
+        path = M07 / name
+        assert path.is_file(), f"missing fixture: {path}"
+        red = run_chain("--fixture", str(path))
+        assert red.returncode == 1, (
+            f"{name} exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+        )
+        assert "M-07" in red.stdout, f"{name} carries no M-07 verdict: {red.stdout!r}"
+        payload = json.loads(run_chain("--fixture", str(path), "--json").stdout)
+        verdict = next(v for v in payload["violations"] if v["rule"] == "M-07")
+        assert verdict["path"].endswith(name), verdict
+        assert isinstance(verdict["line"], int) and verdict["line"] > 0, verdict
+        assert needle in verdict["message"], (name, verdict["message"])
+
+    assert dir_snapshot(M07) == before, "a run mutated the m07 fixture tree"
+
+
+def test_multi_hop_same_id() -> None:
+    """C-307: every hop carries the block and every receipt keeps the same decision_id."""
+    green = CHAIN / "multi-hop-green.md"
+    red = CHAIN / "red-multi-hop-id.md"
+    for path in (green, red):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    text = green.read_text(encoding="utf-8")
+    assert text.count("## Dispatch Attempt") == 2, "the multi-hop fixture is not two hops"
+    assert text.count("## Receipt") == 2, "the multi-hop fixture carries two receipts"
+    assert text.count("- **decision_id**: D-001") == 5, (
+        "not every hop segment references the recorded decision id "
+        "(record + two dispatch attempts + two receipts)"
+    )
+
+    ok = run_chain("--fixture", str(green))
+    assert ok.returncode == 0, (
+        f"the multi-hop chain exited {ok.returncode}, expected 0: {ok.stdout} {ok.stderr}"
+    )
+    assert not re.search(r"(?m)^M-07 ", ok.stdout), ok.stdout
+
+    broken = run_chain("--fixture", str(red))
+    assert broken.returncode == 1, (
+        f"a diverging hop id exited {broken.returncode}, expected 1: "
+        f"{broken.stdout} {broken.stderr}"
+    )
+    assert "M-07" in broken.stdout, f"the verdict does not carry M-07: {broken.stdout!r}"
+
+    section = transmission_section()
+    for token in ("多跳", "每一跳", "同一 `decision_id`"):
+        assert token in section, f"§ Transmission does not name the multi-hop rule ({token!r})"
+
+
+def test_supersession_preserves_old() -> None:
+    """C-308: a re-decision adds a record and preserves the old record and its receipt state."""
+    carrier = CHAIN / "carriers" / "redecision.md"
+    lossy = CHAIN / "carriers" / "redecision-lossy.md"
+    register = CHAIN / "carriers" / "register.md"
+    for path in (carrier, lossy, register):
+        assert path.is_file(), f"missing fixture: {path}"
+
+    before = carrier.read_bytes()
+    run, payload = run_records_json("--carrier", str(carrier), "--register", str(register))
+    assert run.returncode == 0, (
+        f"the re-decision carrier exited {run.returncode}, expected 0: {run.stdout} {run.stderr}"
+    )
+    assert payload["status"] == "pass", payload["violations"]
+    ids = [record["id"] for record in payload["records"]]
+    assert ids == ["D-001", "D-002"], ids
+    old = next(record for record in payload["records"] if record["id"] == "D-001")
+    assert old["fields"]["superseded_by"].startswith("D-002"), old
+    assert old["fields"]["transmission_status"] == "diverged", old
+    assert old["fields"]["implemented_at"], old
+    assert carrier.read_bytes() == before, "the run rewrote the carrier"
+
+    red = run_records("--carrier", str(lossy), "--register", str(register))
+    assert red.returncode == 1, (
+        f"a rewritten old record exited {red.returncode}, expected 1: {red.stdout} {red.stderr}"
+    )
+    assert "M-01" in red.stdout, f"the verdict does not carry M-01: {red.stdout!r}"
+    lossy_payload = json.loads(
+        run_records("--carrier", str(lossy), "--register", str(register), "--json").stdout
+    )
+    messages = " ".join(
+        v["message"] for v in lossy_payload["violations"] if v["rule"] == "M-01"
+    )
+    assert "implemented_at missing" in messages, messages
+
+    section = transmission_section()
+    for token in ("`superseded_by`", "保留", "重决"):
+        assert token in section, f"§ Transmission lacks the supersession duty ({token!r})"

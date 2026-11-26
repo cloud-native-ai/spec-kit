@@ -13,20 +13,20 @@
 | S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | filled (red -> green at T013/T017) |
 | S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | filled (red -> green at T020/T022) |
 | S-04 | `tests/unit/test_validate_decisions.py::test_m04_id_density_register` | T023 | filled (red -> green at T029/T031) |
-| S-05 | `tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples` | T032 | pending |
-| S-06 | `tests/contract/test_decision_governance_guards.py::test_m06_block_completeness` | T032 | pending |
-| S-07 | `tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused` | T032 | pending |
-| S-08 | `tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments` | T032 | pending |
+| S-05 | `tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples` | T032 | filled (red captured 2026-11-26; green at T038) |
+| S-06 | `tests/contract/test_decision_governance_guards.py::test_m06_block_completeness` | T032 | filled (red captured 2026-11-26; green at T038) |
+| S-07 | `tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused` | T032 | filled (red captured 2026-11-26; green at T038) |
+| S-08 | `tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments` | T032 | filled (red captured 2026-11-26; green at T038) |
 | S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | filled (red -> green at T013/T017) |
 | S-10 | `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (M-09 / C-204) | T024 | filled (red -> green at T029/T031) |
 | S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | filled (red -> green at T011/T012/T014/T017) |
 | S-12 | `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic` (C-107 replay) | T018 | filled (red -> green at T020/T022) |
 | S-13 | `tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy` (C-205) | T024 | filled (red -> green at T029/T031) |
 | S-14 | `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` (C-206) | T024 | filled (red -> green at T029/T031) |
-| S-15 | `tests/contract/test_decision_governance_guards.py::test_acknowledgement_present` (payload/return snapshots) | T032 | pending |
-| S-16 | `tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly` (payload/return snapshots) | T032 | pending |
-| S-17 | `tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id` (chain fixtures) | T032 | pending |
-| S-18 | `tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old` (chain fixtures) | T032 | pending |
+| S-15 | `tests/contract/test_decision_governance_guards.py::test_acknowledgement_present` (payload/return snapshots) | T032 | filled (red captured 2026-11-26; green at T038) |
+| S-16 | `tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly` (payload/return snapshots) | T032 | filled (red captured 2026-11-26; green at T038) |
+| S-17 | `tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id` (chain fixtures) | T032 | filled (red captured 2026-11-26; green at T038) |
+| S-18 | `tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old` (chain fixtures) | T032 | filled (red captured 2026-11-26; green at T038) |
 | S-19 | `tests/contract/test_decision_governance_guards.py::test_reconstruct_from_register_and_carriers` (four-carrier fixtures) | T024 | filled (red -> green at T029/T031) |
 | S-20 | `tests/contract/test_decision_governance_guards.py::test_every_guard_has_reverse_sample` (C-403) | T039 | pending |
 
@@ -151,29 +151,65 @@ FAILED tests/unit/test_validate_decisions.py::test_m04_id_density_register
 - green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
 - exit status (green): `0`. The M-04 engine verdicts (form / non-dense / unregistered, exit 1 each; green dense set exit 0) are recorded in `notes/us3-green.txt` § SC-005.
 
-### S-05 — `test_m05_receipt_reverse_samples` (T032)
+### S-05 — `test_m05_receipt_reverse_samples` (T032 red → T038 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/m05/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T033/T036; raw log `test-evidence/us4-red-first.txt`):
 
-### S-06 — `test_m06_block_completeness` (T032)
+```text
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the owner page section and the not-yet-implemented `chain` leg), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m05/` — `red-no-receipt.md` (record + dispatch, no receipt), `red-no-id.md` (receipt without `decision_id`), `red-unresolvable.md` (no record segment resolves the receipt id); green chain `chain/green-complete.md`.
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+
+### S-06 — `test_m06_block_completeness` (T032 red → T038 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_m06_block_completeness -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/m06/`, `payload/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T033/T036; raw log `test-evidence/us4-red-first.txt`):
 
-### S-07 — `test_m06_dispatch_without_block_refused` (T032)
+```text
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_guards.py::test_m06_block_completeness
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the owner page section and the not-yet-implemented `payload` leg), never an import error.
+- fixtures: `tests/fixtures/decision-governance/payload/complete.md` (five-field block) and `m06/red-missing-{id,class,chosen,constraints,archive}.md` (one omission each).
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+
+### S-07 — `test_m06_dispatch_without_block_refused` (T032 red → T038 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/m06/`, `payload/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T036; raw log `test-evidence/us4-red-first.txt`):
 
-### S-08 — `test_m07_chain_three_segments` (T032)
+```text
+E       AssertionError: a decision-backed dispatch without a block exited 2, expected 1:  error: action 'payload' is declared but not implemented yet (read-only skeleton)
+E       assert 2 == 1
+FAILED tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the `payload` leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/m06/red-no-block.md` (decision-backed, no block) and `payload/non-decision.md` (BC-02 bridge: legal without a block).
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+
+### S-08 — `test_m07_chain_three_segments` (T032 red → T038 green)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/m07/`, `chain/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T036; raw log `test-evidence/us4-red-first.txt`):
+
+```text
+E       AssertionError: the complete chain exited 2, expected 0:  error: action 'chain' is declared but not implemented yet (read-only skeleton)
+E       assert 2 == 0
+FAILED tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the `chain` leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/chain/green-complete.md` and `m07/red-missing-{record,dispatch,receipt}.md` plus `m07/red-inconsistent-id.md`.
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
 
 ### S-09 — `test_m08_registered_variant_red` (T010 red → T017 green)
 
@@ -310,29 +346,65 @@ FAILED tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_
 - green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us3-green-slots.txt`): `....................... [100%]` / `23 passed in 7.96s`
 - exit status (green): `0`. The legacy report (three headings + three register rows, never judged) and the incomplete new-form block's M-01 red are recorded in `notes/us3-green.txt` § SC-005.
 
-### S-15 — `test_acknowledgement_present` (T032; payload/return snapshots)
+### S-15 — `test_acknowledgement_present` (T032 red → T038 green; payload/return snapshots)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_acknowledgement_present -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/payload/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T033/T035; raw log `test-evidence/us4-red-first.txt`):
 
-### S-16 — `test_silent_redecision_is_anomaly` (T032; payload/return snapshots)
+```text
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_guards.py::test_acknowledgement_present
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the owner page section and the producer duties), never an import error.
+- fixtures: `tests/fixtures/decision-governance/payload/returns/return-acknowledged.md` (acknowledgement echoing `D-001` + the four-member receipt).
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+
+### S-16 — `test_silent_redecision_is_anomaly` (T032 red → T038 green; payload/return snapshots)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly -q`
-- red output: pending (author lands with T032)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T033/T036; raw log `test-evidence/us4-red-first.txt`):
 
-### S-17 — `test_multi_hop_same_id` (T032; chain fixtures)
+```text
+E       AssertionError: a silent re-decision exited 2, expected 1:  error: action 'chain' is declared but not implemented yet (read-only skeleton)
+E       assert 2 == 1
+FAILED tests/contract/test_decision_governance_guards.py::test_silent_redecision_is_anomaly
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the `chain` leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/chain/red-silent-redecision.md` (receipt claims completion under `D-002`) and `payload/returns/return-escalated.md` (the correct explicit-anomaly form: no receipt, `ANOMALY:` line).
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+
+### S-17 — `test_multi_hop_same_id` (T032 red → T038 green; chain fixtures)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/chain/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T036; raw log `test-evidence/us4-red-first.txt`):
 
-### S-18 — `test_supersession_preserves_old` (T032; chain fixtures)
+```text
+E       AssertionError: the multi-hop chain exited 2, expected 0:  error: action 'chain' is declared but not implemented yet (read-only skeleton)
+E       assert 2 == 0
+FAILED tests/contract/test_decision_governance_guards.py::test_multi_hop_same_id
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the `chain` leg does not exist yet), never an import error.
+- fixtures: `tests/fixtures/decision-governance/chain/multi-hop-green.md` (two hops, five `D-001` references) and `chain/red-multi-hop-id.md` (hop 2 switches to `D-002`).
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
+
+### S-18 — `test_supersession_preserves_old` (T032 red → T038 green; chain fixtures)
 
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old -q`
-- red output: pending (author lands with T032; fixtures `tests/fixtures/decision-governance/chain/`)
-- exit status: pending
+- red output (verbatim, captured 2026-11-26 in the combined US4 red run before T033; raw log `test-evidence/us4-red-first.txt`):
+
+```text
+E       AssertionError: missing H2 section carrying ('传递与实施', 'Transmission and Implementation')
+E       assert None is not None
+FAILED tests/contract/test_decision_governance_guards.py::test_supersession_preserves_old
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion (the owner page section), never an import error.
+- fixtures: `tests/fixtures/decision-governance/chain/carriers/redecision.md` (old `D-001` with `superseded_by: D-002` + receipt state, new `D-002`), `carriers/redecision-lossy.md` (the old record rewritten and its `implemented_at` lost), `carriers/register.md`.
+- command (green): same single-test command; output and exit status recorded at T038 in `notes/us4-green.txt`.
 
 ### S-19 — `test_reconstruct_from_register_and_carriers` (T024 red → T029/T031 green; four-carrier fixtures)
 
