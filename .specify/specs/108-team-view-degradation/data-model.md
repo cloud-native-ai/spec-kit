@@ -79,8 +79,9 @@ The record never carries a reason that is not in the set; file-level states (`�
 | Field | Type | Rule |
 |-------|------|------|
 | `declared` | bool | True iff the frontmatter carries a `goal` key (any value form) |
-| `state` | literal `goal 需归一为 anchor_slug` \| null | `null` when not declared |
-| `repair` | list of pointers | `["/speckit.team modify", "goal-utils.py migrate"]` |
+| `form` | `slug` \| `inline` \| `absent` | Derived: `slug` = the value passes the shared identity grammar (`shared/definitions/goal-definitions.md` § Identity grammar); `inline` = declared with any other value; `absent` = key not declared |
+| `state` | literal `goal 需归一为 anchor_slug` \| null | The literal exactly when `form = inline`, or when `declared` and C7's binding state is `不可读`; `null` otherwise (goal absent, or slug-form with a readable binding — healthy, FR-022) |
+| `repair` | list of pointers | `["/speckit.team modify", "goal-utils.py migrate"]`; carried only alongside a non-null `state` |
 | `identity_unchanged` | bool | Always true; identity resolution is `anchor_slug` > `goal_slug` > inferred (FR-014) and the suggestion never alters it |
 
 ### C9 — Roster Comparability Record

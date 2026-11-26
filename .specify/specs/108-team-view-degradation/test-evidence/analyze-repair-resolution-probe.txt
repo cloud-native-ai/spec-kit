@@ -1,0 +1,38 @@
+== W1-01 ==
+PASS FR-022 goal condition = absent OR slug-form
+PASS FR-013 named state scoped to (a) non-slug / (b) binding unreadable
+PASS FR-013 slug+readable must add no line
+PASS A-10 is a pointer to FR-022
+PASS US3 healthy scenario is a pointer
+PASS SC-004 is a pointer
+PASS Clarify goal answer aligned (slug+readable adds no line)
+PASS C-107 goal condition = absent OR identity grammar
+PASS C-302 fires on (a) non-slug or (b) unreadable binding
+PASS C-302 slug+readable adds no state line
+PASS view-labels row scoped to degraded cases
+PASS data-model C8 form + disjunctive state rule
+PASS research R-8 aligned
+PASS tasks T015 aligned
+PASS quickstart S-1 exercises both goal variants
+PASS no live "no inline goal" phrasing
+== W2-01 ==
+PASS FR-022 condition: zero auxiliary artifacts
+PASS FR-022 condition: ledger present/readable/>=1 line
+PASS FR-022 condition: all three spine files present
+PASS FR-022 empty delta scoped to predicate inputs
+PASS FR-022 forbids non-predicate fixtures masquerading as healthy
+PASS C-107 six conditions complete
+PASS C-107 empty delta scoped exclusively
+PASS C-107 rejects unhealthy fixtures as evidence
+PASS C-205 auxiliary line emission boundary
+PASS research M4 amendment excludes old fixture
+PASS quickstart S-1 uses completed-predicate fixture
+PASS tasks T020 uses completed predicate + both goal variants
+PASS plan EP-003 completed
+== invariants ==
+PASS FR count = 25
+PASS SC count = 8
+PASS STR count = 3
+PASS clause counts 9/8/9/9 = 35
+PASS reason set + exit set untouched in C-104
+RESULT: ALL PASS

@@ -34,18 +34,20 @@ Premises for S-0: the worktree is a git checkout containing commit `54c6efa8c`; 
 
 ## S-1 — Healthy fixture stays byte-identical (route b)
 
-Scenario: a fixture satisfying the FR-022 healthy predicate — complete three-key binding, two compact-named readable reports, `agent` column present, no `goal` key, no residue.
+Scenario: a fixture satisfying the full FR-022 healthy predicate (the single owner of the condition set) — complete three-key binding, two compact-named readable reports, zero auxiliary artifacts, zero residue, `agent` column present, `goal` absent or slug-form (both variants are exercised: `goal` absent and `goal: <slug>`), `items.jsonl` present with at least one line, and all three continuous-spine files present.
 
 ```bash
 # pseudocode of the pinning test's own steps (subprocess use is internal to the test):
-# 1. build the fixture with tests/fixtures/team_view_fixtures.py
+# 1. build the fixture with tests/fixtures/team_view_fixtures.py — reports=<two compact
+#    names>, items_lines=<one valid ledger line>, spine=("constraints.md", "STATE.md",
+#    "run-log.jsonl"); build the goal-absent and the goal:<slug> variants
 # 2. materialize git show 54c6efa8c:scripts/python/team-view.py beside copies of
 #    scripts/python/script_interface_cli.py and scripts/python/goal-utils.py
-# 3. run baseline and amended programs with --repo-root <fixture>
-# expected: identical stdout bytes, identical exit code (0)
+# 3. run baseline and amended programs on the single-team view (`<slug> --repo-root <fixture>`)
+# expected: identical stdout bytes, identical exit code (0), for both goal variants
 ```
 
-Pinned by `tests/integration/test_team_view_degradation.py::test_healthy_fixture_is_byte_identical_to_the_baseline_program`. Premises: the fixture builder's `default_frontmatter()` renders the canonical binding block the engine accepts; `script_interface_cli.py` and `goal-utils.py` are importable/executable siblings of the materialized baseline; commit `54c6efa8c` is present. This scenario's expected value was pre-measured at plan time with the *unamended* program (diff lines = 0, research M4); after implementation the same comparison must still read 0.
+Pinned by `tests/integration/test_team_view_degradation.py::test_healthy_fixture_is_byte_identical_to_the_baseline_program`. Premises: the fixture builder's `default_frontmatter()` renders the canonical binding block the engine accepts; `items_lines=` and `spine=` write the ledger and the three continuous-spine files; `script_interface_cli.py` and `goal-utils.py` are importable/executable siblings of the materialized baseline; commit `54c6efa8c` is present. The plan-time reading (research M4) was taken with the *unamended* program on the smaller builder-default fixture, which does not satisfy the completed predicate (no ledger, no spine) — the amended-vs-baseline reading MUST be re-taken on the completed-predicate fixture.
 
 ## S-2 — Production replica: latest is the parsed maximum (route b)
 

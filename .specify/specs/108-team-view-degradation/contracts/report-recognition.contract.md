@@ -21,7 +21,7 @@ The latest timestamp is normalized to UTC `YYYYMMDDThhmmssZ` (second precision).
 
 **C-205** Bounded residue presentation.
 
-Residue is presented as one line carrying the total count, at most three example names and the omitted count; the program MUST NOT transcribe the directory without bound. Auxiliary artifacts use the same bounded form in their own line. (FR-004)
+Residue is presented as one line carrying the total count, at most three example names and the omitted count; the program MUST NOT transcribe the directory without bound. Auxiliary artifacts use the same bounded form in their own line, emitted only when at least one auxiliary artifact exists — zero auxiliary artifacts add no line and no zero-count placeholder (the FR-022 empty-delta claim depends on this boundary). (FR-004, FR-022)
 
 **C-206** Uncertainty predicate.
 

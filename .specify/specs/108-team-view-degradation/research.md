@@ -39,6 +39,7 @@ Scratch fixture (`no binding` block, inline `goal`, matrix without `agent`, empt
 - Current program: exit 0, zero writes (`snapshot()` before == after, 3 files).
 - Baseline program materialized with `git show 54c6efa8c:scripts/python/team-view.py` beside copies of `script_interface_cli.py` and `goal-utils.py`: exit 0, **stdout diff lines = 0** against the current program.
 - `git cat-file -e 54c6efa8c` succeeds in this checkout; the baseline blob's sha256 equals the current `scripts/python/team-view.py` (`81fad3f9…`), i.e. the referent is exact.
+- **Amendment 2026-11-26 (analyze-repair)**: this builder-default fixture carries no `items.jsonl` and no continuous-spine files, so it does **not** satisfy the completed FR-022 healthy predicate (C-107) and is no longer a valid S-1 fixture — under C-304/C-305 the amended program must change its ledger and spine lines. The M4 reading stands only as the baseline-vs-current equality (identical blobs); the amended-vs-baseline reading is re-taken by S-1 on the completed-predicate fixture (ledger + three spine files + optionally a slug-form `goal`).
 
 ## M5 — Owner readings (cited, never copied)
 
@@ -102,7 +103,7 @@ Top-level envelope keys stay the measured ten (EP-007). Reasons ride the existin
 
 ### R-8 — Binding and goal states present, never infer
 
-Binding readability is engine-only; an unreadable binding keeps the engine's verbatim reason and adds two repair pointers (`/speckit.team modify`, `goal-utils.py bind`; owner: `anchor-definitions.md` § The Binding Record). Any declared `goal` key renders a named normalization state (`goal 需归一为 anchor_slug`) with repair pointers (`/speckit.team modify`; derive via `goal-utils.py migrate`); identity resolution stays `anchor_slug` > `goal_slug` > inferred and is never changed by the suggestion.
+Binding readability is engine-only; an unreadable binding keeps the engine's verbatim reason and adds two repair pointers (`/speckit.team modify`, `goal-utils.py bind`; owner: `anchor-definitions.md` § The Binding Record). A declared `goal` renders the named normalization state (`goal 需归一为 anchor_slug`) with repair pointers (`/speckit.team modify`; derive via `goal-utils.py migrate`) exactly when its value is not a slug OR the binding is unreadable; a slug-form value under a readable binding is healthy and adds no line (FR-022 / C-302). Identity resolution stays `anchor_slug` > `goal_slug` > inferred and is never changed by the suggestion.
 
 ### R-9 — Matrix anomaly and roster not-comparable
 

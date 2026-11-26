@@ -46,8 +46,8 @@
 | **A-7** | **降级不推断**：binding 三键、goal→slug、最新报告、名册差异一律不推断、不填补、不猜测；每处呈现要么是读得的事实，要么是命名状态加原因。 | 与 103 FR-015 / A-8 的状态诚实一致；修复由人经受制裁路径执行。 |
 | **A-8** | **脊柱产物的 pattern 适用性**：`constraints.md` / `STATE.md` / `run-log.jsonl` 是 continuous 团队的持续运营脊柱（owner：`references/operating-loops.md`）；非 continuous 团队缺失时 MUST 按「按声明 pattern 不适用的产物」呈现，而不是无差别「缺失」；pattern 未声明时按 owner 的缺省语义呈现并披露缺省来源。 | 生产团队是 `iteration`，把 continuous-only 产物缺失渲染成缺陷会误导修复方向。 |
 | **A-9** | **降级原因封闭集最小扩展**：降级原因恰为 `engine-degraded`（既有：引擎读动作未能产出必需事实）与新增 `report-recognition-uncertain`（最新判定不确定）；两者都映射退出码 `5`；退出码闭集仍为 `0/2/3/4/5`；「缺失 / 为空」是诚实状态，单独出现 MUST NOT 触发降级退出码。 | 封闭集越小越可测；生产证据的降级根因（binding 不可读）本就走 `engine-degraded`。 |
-| **A-10** | **健康输出保持是可判定声明**：以基线提交 `54c6efa8c` 的同一程序在**同一健康 fixture**（完整 binding、全部报告名为紧凑 `-report.md`、无残留、矩阵含 `agent` 列、无内联 goal、报告可读）上的输出为基线 referent；变更后程序在该 fixture 上的 stdout MUST 逐字节一致、退出码相同（机器 diff）。 | 封闭声明须有基线 referent 与可推导允许增量（owner：`shared/guidelines/closed-set-claims.md`）；健康谓词使允许增量为空，判定不依赖人工清单。 |
-| **A-11** | **既有团队不需要迁移，但非规范命名的团队输出会被纠正**：本特性只读、不改任何团队定义；符合健康谓词的团队输出逐字节不变；本仓三个「报告全不可识别」的团队以及任何带非标准名/残留/缺 binding 的团队，输出会变为**纠正后的诚实读数**——这是本特性枚举的预期增量，不是回归。 | 诚实呈现必然改变「原本失真」的输出；将其定义为具名增量，避免「其余不变」的不可判定聚合。 |
+| **A-10** | **健康输出保持是可判定声明**：健康谓词、基线提交 `54c6efa8c` 的 referent、空允许增量与机器采集方式由 **FR-022 单一拥有**；本条只记录裁决理由，不复述谓词（引用而非复述，宪法 XIV）。 | 封闭声明须有基线 referent 与可推导允许增量（owner：`shared/guidelines/closed-set-claims.md`）；谓词由 FR-022 唯一持有，其他位置只引用，避免同一事实多副本漂移。 |
+| **A-11** | **既有团队不需要迁移，但非规范命名的团队输出会被纠正**：本特性只读、不改任何团队定义；符合 FR-022 健康谓词的团队输出逐字节不变；本仓三个「报告全不可识别」的团队以及任何不满足该谓词的输入（非标准名 / 残留 / 辅助产物 / 缺 binding / 内联 goal / 缺台账 / 按 pattern 判定的脊柱形态），输出会变为对应 FR 的**具名诚实呈现**——这是本特性枚举的预期增量，不是回归。 | 诚实呈现必然改变「原本失真」的输出；将其定义为具名增量，避免「其余不变」的不可判定聚合。 |
 | **A-12** | **证据形态**：生产证据是用户提供的客户端输出关键事实（项目不在本仓）；本仓实测语料与 fixture 复现同一组失真；验收断言在 fixture 上进行，不依赖客户端项目或活档案的易变状态。 | 需求只能绑定可复现的观察；活档案计数只作本阶段的实测基线记录。 |
 | **A-13** | **两顶帽子**：源面为 `scripts/python/team-view.py`、`skills/internal/view-team/**`、`docs/reference/commands/team.md`、本特性新增契约与 `tests/**`；`.specify/**` 镜像由 `scripts/python/sync-mirrors.py` 再生成，不手改。 | framework source 与 client runtime 的编辑不可互换；手改镜像会漂移。 |
 | **A-14** | **不新增 glossary 词条**：本特性不引入新实体，只细化 view 既有呈现语义；词汇登记遵循 103 A-11 先例。 | 词汇表只登记项目域术语。 |
@@ -101,7 +101,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 健康 fixture（完整 binding、全部报告紧凑命名、无残留、矩阵含 `agent` 列、无内联 goal），**When** 分别运行基线程序与变更后程序，**Then** 两次 stdout MUST 逐字节相同、退出码相同。
+1. **Given** 满足 FR-022 健康谓词的 fixture（谓词定义以该条为唯一所有者），**When** 分别运行基线程序与变更后程序，**Then** 两次 stdout MUST 逐字节相同、退出码相同。
 2. **Given** 任一降级形态（binding 不可读 / anchor 不可读 / 最新判定不确定），**When** 执行一次 view，**Then** 退出码 MUST 为 `5`，且输出的降级说明点名原因；原因集合外的取值与退出码集合外的取值出现数 MUST 为 0。
 3. **Given** 产物缺失或为空（`items.jsonl`、`runs/`、脊柱），**When** 执行一次 view 且无其它降级原因，**Then** 退出码 MUST 为 `0`，状态标签 MUST 是四态词汇表中的成员。
 4. **Given** 变更后的读取程序，**When** 扫描其源码与调用面，**Then** 报告识别/最新选择入口 MUST 唯一，MUST NOT 存在第二读取器或第二个识别规则；概览模式 MUST 复用同一入口。
@@ -137,7 +137,7 @@
 - **FR-010**: 「缺失 / 为空 / 不可读 / 未记录」四态区分 MUST 维持（103 FR-015 的既有纪律），并 MUST 适用于本特性新增的产物面（残留、辅助产物、不可读报告、pattern 不适用）。
 - **FR-011**: 绑定事实 MUST 仅在引擎读动作成功且三键（`owner` / `owner_id` / `origin`）齐备时呈现为已声明；缺 `binding` 块或键不齐 MUST 呈现引擎给出的精确原因（点名缺失键或无块事实）为 `不可读`；MUST NOT 以缺省值填补、MUST NOT 从其它字段推断。
 - **FR-012**: 绑定不可读时 MUST 给出受制裁修复路径：`/speckit.team modify`（定义修复入口）与引擎写面 `goal-utils.py bind` 的指针，修复记录语义的 owner 是 `.specify/shared/definitions/anchor-definitions.md` § The Binding Record；view MUST NOT 自动执行修复。
-- **FR-013**: frontmatter 声明 `goal` 键时（无论其值为内联长文本还是 slug 形态——`goal` 不是身份解析的声明键，身份次序只读 `anchor_slug` > `goal_slug` > 推断）MUST 呈现为命名状态（如「goal 需归一为 `anchor_slug`」）并给出修复路径（`/speckit.team modify` 将 `goal` 归一为 `anchor_slug`；需要派生锚点定义时经 `goal-utils.py migrate`）；取值形态 MUST NOT 改变该呈现或身份类型，MUST NOT 把任何 `goal` 值猜成身份 slug、MUST NOT 因 `anchor_slug` 已声明而静默略过该键。
+- **FR-013**: frontmatter 声明 `goal` 键时，命名状态只出现在降级情形，由两个可判定条件之一定义：(a) 值**不是 slug 形态**（内联长文本等，未通过共享身份文法，文法 owner：`.specify/shared/definitions/goal-definitions.md` § Identity grammar）；或 (b) 绑定不可读（FR-011 的 `不可读` 成立——归一与绑定修复同走 `/speckit.team modify`）。满足 (a) 或 (b) ⇒ MUST 呈现命名状态（`goal 需归一为 anchor_slug`）并给出修复路径（`/speckit.team modify` 将 `goal` 归一为 `anchor_slug`；需要派生锚点定义时经 `goal-utils.py migrate`）；值**是 slug 形态**且绑定可读 ⇒ 该声明不构成缺陷、MUST NOT 新增状态行（该键仍按既有「其它声明键」行可见），并满足 FR-022 健康谓词的 goal 条件。两种形态下 `goal` 都不是身份解析的声明键：身份次序只读 `anchor_slug` > `goal_slug` > 推断（FR-014），MUST NOT 把任何 `goal` 值猜成身份 slug，MUST NOT 因 `anchor_slug` 已声明而静默略过该键；绑定不可读自身的命名状态（FR-011/FR-012）与本条的 goal 状态并存呈现、互不替代。
 - **FR-014**: `anchor_slug` 已声明时锚点身份 MUST 维持既有解析次序下的 `declared`（`anchor_slug` > `goal_slug` > 推断 slug）；归一建议 MUST NOT 改变本次呈现的身份类型，MUST NOT 触发任何迁移动作。
 - **FR-015**: 正文 `## Static Structure` 矩阵缺 `agent` 列时 MUST 在矩阵组内呈现 `形态异常` 状态并点名缺失列；已解析的矩阵行 MUST 仍被完整呈现，MUST NOT 因缺列而隐藏矩阵或整段留空。
 - **FR-016**: 两侧名册不可比对时 `roster_delta` MUST 呈现为 [[STR-002]] 并附原因；MUST NOT 使用「未记录」标签冒充；frontmatter 成员 MUST 全量呈现；`seats` / `stage_seats` 未声明 MUST 显式标注（含 owner 指针）；MUST NOT 出现静默空段。
@@ -146,7 +146,7 @@
 - **FR-019**: 「不推断」规则 MUST 被钉住：绑定值、goal→slug、最新报告、名册差异 MUST 全都不允许推断或填充；输出的每一处呈现 MUST 是读得的事实或命名状态（含原因），MUST NOT 是猜测值。
 - **FR-020**: 退出码与降级说明 MUST 在三处一致：`docs/reference/commands/team.md` 的 view 小节、`skills/internal/view-team/SKILL.md` 的错误导航闭集表、`scripts/python/team-view.py` 的声明（`--help` / 模块文档）；一致性 MUST 由测试断言（允许以「指向单一 owner 的指针」形态一致）。
 - **FR-021**: 全部固定规则提取 MUST 继续只由单一读取引擎 `scripts/python/team-view.py` 完成；MUST NOT 新增第二读取器、第二存储、缓存、快照、索引或 registry；`goal-utils.py` MUST 零修改（只消费其只读动作）。
-- **FR-022**: 健康输出保持 MUST 是可判定的封闭声明：健康谓词 = 完整三键 binding + 全部报告名为紧凑 `<8d>T<6d>Z-report.md` + 无残留 + 矩阵含 `agent` 列 + 无内联 `goal` + 所有报告可读；在满足该谓词的 fixture 上，**基线提交 `54c6efa8c` 的程序**与变更后程序的 stdout MUST 逐字节一致、退出码 MUST 相同（采集方式：同一 fixture 上两次运行的机器 diff）。具名允许增量（A-11）只适用于不满足健康谓词的输入，MUST NOT 以「其余不变」等未定义聚合承载验收。
+- **FR-022**: 健康输出保持 MUST 是可判定的封闭声明，谓词只在本条定义（唯一所有者）。**健康谓词**（下列条件必须同时成立）：(1) 引擎绑定读成功且三键 `owner` / `owner_id` / `origin` 完整；(2) `runs/` 中全部文件均为运行报告——无辅助产物、无 [[STR-001]] 残留——报告名为紧凑 `<YYYYMMDD>T<hhmmss>Z-report.md` 且全部可读；(3) 正文 `## Static Structure` 矩阵含 `agent` 列（名册可比较）；(4) `goal` 键未声明，或其值通过共享身份文法（slug 形态；文法 owner：`.specify/shared/definitions/goal-definitions.md` § Identity grammar）——slug 形态的 `goal` 不构成缺陷、不新增状态行（FR-013）；(5) `items.jsonl` 存在、可读且至少一行（台账维持既有 `已聚合` 呈现）；(6) 三件持续运营脊柱文件（`constraints.md` / `STATE.md` / `run-log.jsonl`）全部在位（脊柱适用性判定不触发）。在满足该谓词的 fixture 上，**基线提交 `54c6efa8c` 的程序**与变更后程序的 stdout MUST 逐字节一致、退出码 MUST 相同（采集方式：同一 fixture 上两次运行的机器 diff）；允许增量集合对该谓词输入 MUST 为空，A-11 的具名纠正增量只适用于不满足谓词的输入，MUST NOT 以「其余不变」等未定义聚合承载验收，也 MUST NOT 以缺少谓词任一条件的 fixture 冒充健康输入。
 - **FR-023**: 本特性 MUST NOT 改变运行报告命名的 owner（`skills/internal/create-team/SKILL.md` § Report contract）或 `team.md` schema；容错 MUST 落在读取侧；若实现提出任何形态变更，MUST 附带迁移或确定性拒绝（封闭声明），否则 MUST NOT 合并。
 - **FR-024**: 渲染标签词汇表 MUST 保持单一活所有者：本特性新增/改用的标签（残留行的计数形态、[[STR-002]]、[[STR-003]]、pattern 不适用标注、goal 命名状态）MUST 并入 view 的活契约面作为唯一 owner；`.specify/specs/103-team-view/data-model.md` § Rendering Line Types 保留为日期化记录，实现 MUST NOT 让它继续充当新标签的活 owner。
 - **FR-025**: 六组信息与既有字段 MUST 全部保留；新增状态行 MUST 增补而非删除、重排或合并既有行；`view-team` 技能 MUST 维持「程序 stdout 逐字重发 + 正文外降级说明」的重发规则，降级说明 MUST NOT 替代、删减或改写六组正文。
@@ -181,7 +181,7 @@
 - **SC-001**: 在生产复现 fixture（旧 `20261124T074500Z-report.md` + 更新的 `20261125T121924Z-93cc-stage.md` + `2026-11-25T140000Z-report.md` + 同时间戳 `-seat-result.md` + 两个无时间戳文件）上，一次 view 的「最近报告」等于解析时间戳最大者；旧报告冒充最新次数 = 0；5 个报告/辅助样本的分类命中率 = 5/5；[[STR-001]] 残留行同时给出总数与有界示例（示例数 ≤ 上限，且报告省略数） **Path**: final
 - **SC-002**: 三个实测团队的命名复刻 fixture（全部报告为非标准可解析命名）在变更后：运行报告状态 ≠ `为空` 且 ≠ `缺失`；「最近报告」等于解析最新文件名；退出码 = 0；这些团队的报告样式文件识别覆盖率 = 13/13 **Path**: final
 - **SC-003**: 在生产形态降级 fixture（无 binding 块、内联 goal、无 `agent` 列、`items.jsonl` 缺失、`iteration` pattern 下三件脊柱缺失、最新报告不可读）上，一次 view 退出码 = 5，且六个具名状态全部出现：绑定 `不可读`（含精确原因）、goal 命名状态 + 修复路径、矩阵 `形态异常`（点名缺列）、`roster_delta` = [[STR-002]]、台账 `缺失`（含后果）、脊柱「按 pattern 不适用」；frontmatter 成员覆盖 = 输入成员数（9/9 形态）；`/speckit.team modify` 指针出现 ≥ 1 次；编造零值/占位值出现数 = 0 **Path**: final
-- **SC-004**: 健康 fixture 上，基线提交 `54c6efa8c` 的程序与变更后程序的 stdout 逐字节相同（机器 diff 行数 = 0）、退出码相同；允许增量集合对满足健康谓词的输入为空 **Path**: final
+- **SC-004**: 满足 FR-022 健康谓词（该条为谓词唯一所有者）的 fixture 上，基线提交 `54c6efa8c` 的程序与变更后程序的 stdout 逐字节相同（机器 diff 行数 = 0）、退出码相同；允许增量集合对该谓词输入为空 **Path**: final
 - **SC-005**: 降级原因→退出码映射逐项命中（`engine-degraded` → 5、[[STR-003]] → 5，2/2）；退出码集合外取值出现数 = 0；仅「缺失/为空」的 fixture 退出码 = 0（1/1）；`-h` / `--version` 退出 0 且零写盘（2/2） **Path**: supporting
 - **SC-006**: 同一 fixture 上，概览「最近运行」列的值与单团队「最近报告」的解析时间戳一致率 = 100%；源码扫描中报告识别/最新选择入口数 = 1，第二匹配入口出现数 = 0 **Path**: supporting
 - **SC-007**: 在健康、降级、概览三个场景各执行一次 view，前后 fixture 工作树内容哈希一致（新增/修改/删除文件数 = 0） **Path**: supporting
@@ -233,6 +233,6 @@ Format: - Q: <question> → A: <answer>
 - Q: 报告名识别接受哪些时间戳语形、何谓残留？ → A: 封闭语形集 = 日期段 `YYYYMMDD` 或 `YYYY-MM-DD` × 时间段 `hhmmss` / `hhmm` / `hh:mm:ss` / `hh-mm-ss`，紧随 `T` 与 `Z`，且构成合法 UTC 时刻；运行报告形态的剩余段 = `(?:-[0-9a-f]{4})?-(?:report|stage)`。无此前导时间戳的**任何**常规文件（含仅日期前缀 `2026-10-07-progress-snapshot.md`、非法时刻、非 `.md` 文件）一律为 [[STR-001]] 残留；全部判定只看文件名、不做模糊猜测（A-17）；具体 regex 由 plan 契约钉住（骨架见 FR-001 / FR-003）。`as_of.latest_report_timestamp` 与概览列用同一规范化值（UTC、`YYYYMMDDThhmmssZ`）；同时间戳并列取文件名字典序升序第一份（既有稳定次序）。
 - Q: 残留如何进入降级（不确定性判据）？ → A: `runs/` 存在且残留 ≥ 1 即判「最新不可证明」，以 [[STR-003]] 进入降级、退出码 `5`——不存在「证明残留更旧」的受制裁路径（mtime / 内容推断被拒：非确定且超出只读引擎契约）；`runs/` 缺失或为空、或仅带时间戳的辅助产物时不产生不确定性。A-5 中「progress snapshot」示例因此限定为带可解析时间戳者；无时间戳的 snapshot 命名走残留（与实测语料 46 文件 = 28 合规 + 16 带戳非合规 + 2 无戳 的计数一致）。
 - Q: 降级原因到退出码如何映射、边界在哪？ → A: 封闭原因集 `{engine-degraded, [[STR-003]]}` 逐项映射 `5`（2/2），原因可并存且 MUST 逐个点名；文件级命名状态（`缺失` / `为空` / `不可读` / `未记录`）本身不产生原因、不单独改变退出码；最新报告不可读只是 FR-009 命名状态；概览不发起引擎读动作、不产生原因，维持既有 `0/2` 退出域并以行内标注披露不确定性；退出码闭集不变 `0/2/3/4/5`（不新增）。
-- Q: binding / goal 归一是只呈现指引还是执行修复？ → A: **只呈现指引、view 零写**：`/speckit.team modify` 是定义修复入口，`goal-utils.py bind` / `migrate` 只作为引擎写面被点名、不被 view 调用（RS-004 零修改）；`goal` 键的任何取值（含 slug 形态）都呈现为命名状态，身份类型维持既有次序结果（`anchor_slug` > `goal_slug` > 推断）；SC-007 以工作树哈希差钉住零写盘。
+- Q: binding / goal 归一是只呈现指引还是执行修复？ → A: **只呈现指引、view 零写**：`/speckit.team modify` 是定义修复入口，`goal-utils.py bind` / `migrate` 只作为引擎写面被点名、不被 view 调用（RS-004 零修改）；`goal` 键的命名状态只出现在降级情形（FR-013）：非 slug（内联）取值或绑定不可读时呈现为命名状态并给修复路径，slug 形态取值在绑定可读时属于 FR-022 健康谓词允许的声明、不新增状态行；身份类型维持既有次序结果（`anchor_slug` > `goal_slug` > 推断）；SC-007 以工作树哈希差钉住零写盘。
 - Q: 矩阵缺 `agent` 列的呈现与名册差异措辞？ → A: 正文矩阵组携带 `形态异常` 并点名缺列 `agent`，已解析矩阵行仍完整呈现（不隐藏、不留空）；`roster_delta` 呈现为 [[STR-002]] 并附原因（MUST NOT 用「未记录」冒充）；frontmatter 成员全量列出；`seats` / `stage_seats` 未声明时显式标注并附 owner 指针；不出现静默空段。
-- Q: 健康保真、单一引擎与迁移 / 拒绝的边界？ → A: 健康谓词 fixture（三键 binding、全部紧凑 `-report.md`、无残留、矩阵含 `agent` 列、无 `goal` 声明、报告可读）上，基线 `54c6efa8c` 程序与变更后程序 stdout 逐字节一致、退出码相同；报告识别 / 最新选择入口唯一且概览列复用同一入口；唯一读取交付面 `scripts/python/team-view.py`，`goal-utils.py` 零修改；不改命名 owner（create-team § Report contract）与 `team.md` schema → 既有团队零迁移；若实现提出任何形态变更 MUST 附带迁移或确定性拒绝，否则 MUST NOT 合并（FR-023）。
+- Q: 健康保真、单一引擎与迁移 / 拒绝的边界？ → A: 在满足 **FR-022 健康谓词**（谓词定义以该条为唯一所有者，含 goal 的「未声明或 slug 形态」条件，以及无辅助产物 / 台账在位 / 三件脊柱在位条件）的 fixture 上，基线 `54c6efa8c` 程序与变更后程序 stdout 逐字节一致、退出码相同；报告识别 / 最新选择入口唯一且概览列复用同一入口；唯一读取交付面 `scripts/python/team-view.py`，`goal-utils.py` 零修改；不改命名 owner（create-team § Report contract）与 `team.md` schema → 既有团队零迁移；若实现提出任何形态变更 MUST 附带迁移或确定性拒绝，否则 MUST NOT 合并（FR-023）。

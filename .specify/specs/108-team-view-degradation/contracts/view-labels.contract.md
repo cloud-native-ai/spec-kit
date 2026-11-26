@@ -29,7 +29,7 @@ Every state or declaration label the default rendering emits MUST be a member of
 | `不可比对（not comparable）` | `roster_delta` state when the two rosters cannot be compared, always with a reason |
 | `按声明 pattern 不适用` | a missing continuous-spine file under a declared non-`continuous` pattern |
 | `适用性不可判定` | spine applicability when the pattern is undeclared (owner declares no default) |
-| `goal 需归一为 anchor_slug` | the named state for a declared `goal` key (repair pointers accompany it) |
+| `goal 需归一为 anchor_slug` | the named state for a declared `goal` key in the identity group's degraded cases (non-slug value, or unreadable binding); repair pointers accompany it. A slug-form `goal` under a readable binding adds no line (C-302) |
 | `降级（degraded）` | the trailing non-group block heading listing active reasons (reason ids themselves are owned by the program contract) |
 
 (FR-004, FR-008, FR-013, FR-016, FR-024)
