@@ -1,0 +1,50 @@
+== sync-mirrors --write ==
+Regenerated command copies for 4 tools.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (394 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (133 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (117 files, byte-identical)
+WRITE_RC=0
+
+== sync-mirrors --check ==
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (394 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (133 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (117 files, byte-identical)
+CHECK_RC=0
+
+== cmp pairs ==
+template pair: identical rc=0
+scripts/bash/generate-instructions.sh .specify/scripts/bash/generate-instructions.sh differ: byte 13, line 2
+owner page pair: identical rc=0
+checker pair: identical rc=0
+
+== regen-command-copies --check ==
+OK: all per-tool command copies match the source templates.
+REGEN_RC=0
+
+== generator pair (strict pair + projected block) ==
+$ diff scripts/bash/generate-instructions.sh .specify/scripts/bash/generate-instructions.sh | grep -c '^[0-9]'
+1
+$ python3 - (line-level reading)
+src lines: 462 mirror lines: 525 delta: 63
+mirror minus inserted lines 2..64 == source: True
+-> the only delta is the projected bash-version-guard block inserted after line 1;
+   sync-mirrors reports projected[bash-version-guard] ... generate-instructions.sh: ok
