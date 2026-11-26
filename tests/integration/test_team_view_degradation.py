@@ -15,13 +15,14 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
-from fixtures.team_view_fixtures import build_team, default_frontmatter, report_text
+from fixtures.team_view_fixtures import build_team, default_frontmatter, report_text, snapshot
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROGRAM = REPO_ROOT / "scripts" / "python" / "team-view.py"
@@ -638,3 +639,116 @@ def test_undeclared_pattern_and_zero_line_ledger_states(tmp_path):
     ):
         assert any(line.startswith(prefix) for line in output.splitlines()), (
             "existing line missing after the additive change: %r" % prefix)
+
+
+# --------------------------------------------------------------------------- #
+# US3 — golden preservation and read-only guards (T020)
+# Regression guards: their green is meaningful only after the engine amendment,
+# so they are authored and run after implementation (tasks.md migration/regression
+# exception). C-107 / C-101; FR-022, FR-025.
+# --------------------------------------------------------------------------- #
+BASELINE_COMMIT = "54c6efa8c"
+BASELINE_PROGRAM_PATH = "scripts/python/team-view.py"
+HEALTHY_ITEMS = [{"item_id": "item-1", "state": "completed", "ts": "2026-01-01T00:00:00Z"}]
+
+
+def snapshot_diff(before, after):
+    return {
+        "added": sorted(set(after) - set(before)),
+        "removed": sorted(set(before) - set(after)),
+        "modified": sorted(
+            path for path in set(before) & set(after) if before[path] != after[path]),
+    }
+
+
+def materialize_baseline_program(dest):
+    """The 54c6efa8c program with read-only sibling bases beside it."""
+    exists = subprocess.run(
+        ["git", "cat-file", "-e", BASELINE_COMMIT],
+        cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=120)
+    assert exists.returncode == 0, (
+        "baseline commit object missing: %s" % BASELINE_COMMIT)
+    shown = subprocess.run(
+        ["git", "show", "%s:%s" % (BASELINE_COMMIT, BASELINE_PROGRAM_PATH)],
+        cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=120)
+    assert shown.returncode == 0, shown.stderr
+    dest.mkdir(parents=True, exist_ok=True)
+    baseline_program = dest / "team-view.py"
+    baseline_program.write_text(shown.stdout, encoding="utf-8")
+    for name in ("script_interface_cli.py", "goal-utils.py"):
+        shutil.copyfile(REPO_ROOT / "scripts" / "python" / name, dest / name)
+    for name in ("team-view.py", "script_interface_cli.py", "goal-utils.py"):
+        (dest / name).chmod(0o444)
+    return baseline_program
+
+
+def run_materialized(program_path, *args):
+    return subprocess.run(
+        [sys.executable, str(program_path), *args],
+        capture_output=True, text=True, timeout=120)
+
+
+def healthy_team(root, slug, goal=_ABSENT):
+    """A fixture satisfying every FR-022 predicate condition (C-107's owner)."""
+    frontmatter = default_frontmatter(slug)
+    if goal is not _ABSENT:
+        frontmatter["goal"] = goal
+    return build_team(
+        root,
+        slug,
+        frontmatter=frontmatter,
+        reports=[
+            ("20260101T000000Z-report.md", report_text(result_summary="First healthy run.")),
+            ("20260102T000000Z-report.md", report_text(result_summary="Second healthy run.")),
+        ],
+        items_lines=[dict(HEALTHY_ITEMS[0])],
+        spine=("constraints.md", "STATE.md", "run-log.jsonl"),
+    )
+
+
+def test_healthy_fixture_is_byte_identical_to_the_baseline_program(tmp_path):
+    baseline = materialize_baseline_program(tmp_path / "baseline-program")
+    healthy_team(tmp_path, "healthy-plain")
+    healthy_team(tmp_path, "healthy-slug-goal", goal="healthy-anchor-slug")
+    for slug in ("healthy-plain", "healthy-slug-goal"):
+        current = view(tmp_path, slug)
+        reference = run_materialized(baseline, slug, "--repo-root", str(tmp_path))
+        assert current.returncode == 0, current.stderr + current.stdout
+        assert reference.returncode == 0, reference.stderr + reference.stdout
+        assert "运行报告: 已列出（共 2 份" in current.stdout, (
+            "fidelity fixture is not the healthy shape: %s" % slug)
+        assert current.returncode == reference.returncode
+        assert current.stdout == reference.stdout, (
+            "healthy stdout differs from the baseline program for %s: %d differing lines"
+            % (slug, sum(
+                1 for left, right in zip(current.stdout.splitlines(),
+                                         reference.stdout.splitlines())
+                if left != right) + abs(len(current.stdout.splitlines())
+                                        - len(reference.stdout.splitlines()))))
+
+
+def test_view_degradation_leaves_tree_byte_identical(tmp_path):
+    healthy_team(tmp_path, "healthy-team")
+    build_team(
+        tmp_path,
+        "residue-team",
+        reports=[
+            ("20261007T120000Z-report.md", report_text()),
+            ("2026-10-07-progress-snapshot.md", "Snapshot without a time stamp.\n"),
+        ],
+    )
+    degraded_team(tmp_path, slug="degraded-team")
+    scenarios = (
+        ("healthy", ("healthy-team",), 0),
+        ("degraded", ("degraded-team",), 5),
+        ("overview", (), 0),
+    )
+    for name, args, expected_rc in scenarios:
+        before = snapshot(tmp_path)
+        result = view(tmp_path, *args)
+        after = snapshot(tmp_path)
+        delta = snapshot_diff(before, after)
+        assert result.returncode == expected_rc, (name, result.stderr + result.stdout)
+        assert result.stdout.strip(), "empty output for scenario %s" % name
+        assert delta == {"added": [], "removed": [], "modified": []}, (
+            "scenario %s wrote to the fixture tree: %r" % (name, delta))

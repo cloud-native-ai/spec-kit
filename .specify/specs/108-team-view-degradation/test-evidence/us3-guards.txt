@@ -1,0 +1,8 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_team_view_degradation.py -q -k healthy_fixture_is_byte_identical or leaves_tree_byte_identical
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 6.81s
+rc=0
