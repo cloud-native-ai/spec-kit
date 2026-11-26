@@ -4,7 +4,7 @@
 
 - **decision_class**: human-interactive
 - **context**: 同名资源组在多个 region 存在，单维度定位不足以区分。
-- **options**:
+- **options**: 2
   - label: 扩容到 8 节点
     consequences: 峰值容量提升，成本上升
     reversibility: reversible

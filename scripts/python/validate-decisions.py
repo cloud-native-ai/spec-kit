@@ -52,8 +52,12 @@ DECLARED_OPTIONS = (
     "--action", "--spec", "--carrier", "--fixture", "--register", "--glossary", "--json",
 )
 
-#: ``### D-NNN — <title>``; the title after the em dash carries the decision subject.
-RECORD_HEADING_RE = re.compile(r"^### (D-\d{3})(?:\s+—\s+(.*))?$")
+#: ``### D-NNN — <title>``; the title after the em dash carries the decision subject. The id
+#: token is captured for any ``D-…`` heading so the legacy discriminator can tell the minimal
+#: qualifying form (``^D-\d{3}`` plus at least one field line) from everything below it.
+RECORD_HEADING_RE = re.compile(r"^###\s+(D-\S+)(?:\s+—\s+(.*))?$")
+#: The declared id form (C-203): three digits, whole token.
+ID_FORM_RE = re.compile(r"^D-\d{3}$")
 #: One top-level field line ``- **<field>**: <value>`` (the C-201 serialization grammar).
 FIELD_RE = re.compile(r"^- \*\*([A-Za-z_][A-Za-z0-9_]*)\*\*:\s*(.*)$")
 ANY_HEADING_RE = re.compile(r"^#{1,3}\s")
@@ -63,10 +67,14 @@ DIMENSION_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?)\s*$")
 #: The same-name locator floor (C-103): business resource group + region id, as a pair.
 LOCATOR_FLOOR = ("business_resource_group", "region_id")
 
-#: The rules this file's ``records`` action judges today (US1 legs). The remaining legs
-#: (M-01, M-03, M-04, M-09) land with their user stories — an unimplemented leg is never
-#: printed as a pass, because only listed rules produce verdicts at all.
-RECORDS_RULES = ("M-02", "M-08")
+#: The five option elements (C-106); ``path`` and ``forced`` are value-shape members of
+#: ``options``, not additional elements.
+OPTION_ELEMENTS = ("consequences", "reversibility", "default", "evidence")
+
+#: The rules this file's ``records`` action judges today. The remaining legs land with their
+#: user stories — an unimplemented leg is never printed as a pass, because only listed rules
+#: produce verdicts at all.
+RECORDS_RULES = ("M-02", "M-03", "M-08")
 
 
 def repo_root(start=None) -> Path:
@@ -138,10 +146,11 @@ def display_path(path: Path) -> str:
 
 
 def parse_records(text: str) -> list[dict]:
-    """Split a carrier into ``### D-NNN`` record blocks (fenced code never counts).
+    """Split a carrier into ``### D-…`` record blocks (fenced code never counts).
 
-    A block is *new-form* when it carries at least one top-level C-201 field line; a
-    three-digit heading below that threshold is legacy and is never judged (I-13).
+    A block is *new-form* when its heading token matches the minimal qualifying form
+    (``^D-\\d{3}``) and the block carries at least one top-level C-201 field line; anything
+    below that threshold is legacy and is never judged (C-206).
     """
     records: list[dict] = []
     current: dict | None = None
@@ -161,12 +170,14 @@ def parse_records(text: str) -> list[dict]:
                     "line": lineno,
                     "fields": {},
                     "field_lines": {},
+                    "lines": [],
                 }
                 records.append(current)
             elif ANY_HEADING_RE.match(line):
                 current = None
             continue
         if current is not None:
+            current["lines"].append((lineno, line))
             field = FIELD_RE.match(line)
             if field:
                 name, value = field.group(1), field.group(2).strip()
@@ -176,7 +187,11 @@ def parse_records(text: str) -> list[dict]:
 
 
 def new_form_records(records: list[dict]) -> list[dict]:
-    return [record for record in records if record["fields"]]
+    """Records at or above the minimal qualifying form; incomplete blocks stay judged."""
+    return [
+        record for record in records
+        if re.match(r"^D-\d{3}", record["id"]) and record["fields"]
+    ]
 
 
 def parse_dimensions(value: str) -> dict[str, str]:
@@ -261,6 +276,121 @@ def check_m08(record: dict, glossary_rows: list[tuple[str, list[str]]]) -> list[
     return []
 
 
+def parse_options(record: dict) -> tuple[int | None, list[dict], str]:
+    """(declared count, option entries, forced reason) of the record's ``options`` block.
+
+    Option entries are indented ``- label: <value>`` sub-lines; the four remaining elements
+    and the ``other`` path are further indented lines attributed to the current entry. A
+    ``forced: <reason>`` line anywhere in the block (or inside the field value) is the
+    single-viable-option declaration (C-106).
+    """
+    value = record["fields"].get("options", "")
+    declared = None
+    count_match = re.match(r"\s*(\d+)", value)
+    if count_match:
+        declared = int(count_match.group(1))
+    forced = ""
+    inline = re.search(r"forced\s*:\s*(.+)$", value)
+    if inline:
+        forced = inline.group(1).strip()
+
+    entries: list[dict] = []
+    start = record["field_lines"].get("options")
+    if start is None:
+        return declared, entries, forced
+    for lineno, line in record["lines"]:
+        if lineno <= start:
+            continue
+        if FIELD_RE.match(line):
+            break
+        entry = re.match(r"^\s{2,}-\s+label\s*:\s*(.*)$", line)
+        if entry:
+            entries.append({
+                "label": entry.group(1).strip(),
+                "line": lineno,
+                "elements": {},
+                "path": "",
+            })
+            continue
+        element = re.match(
+            r"^\s{2,}(consequences|reversibility|default|evidence)\s*:\s*(.*)$", line
+        )
+        if element:
+            if entries:
+                entries[-1]["elements"][element.group(1)] = element.group(2).strip()
+            continue
+        path_line = re.match(r"^\s{2,}path\s*:\s*(.*)$", line)
+        if path_line:
+            if entries:
+                entries[-1]["path"] = path_line.group(1).strip()
+            continue
+        forced_line = re.match(r"^\s{2,}forced\s*:\s*(.*)$", line)
+        if forced_line and forced_line.group(1).strip():
+            forced = forced_line.group(1).strip()
+    return declared, entries, forced
+
+
+def check_m03(record: dict) -> list[dict]:
+    """M-03: the option set is closed, enumerable and comparable (C-106, C-107 member)."""
+    if "options" not in record["fields"]:
+        return []  # a missing options field is M-01's missing base-layer field
+    options_line = record["field_lines"].get("options", record["line"])
+    declared, entries, forced = parse_options(record)
+    found: list[dict] = []
+
+    def verdict(line: int, message: str) -> None:
+        found.append({"rule": "M-03", "line": line, "message": message})
+
+    if declared is None:
+        verdict(options_line,
+                "the option count is not declared; a closed enumerable set MUST open its "
+                "options field with the declared count (e.g. '- **options**: 2')")
+    if declared == 0 or not entries:
+        verdict(options_line,
+                "empty option set; a decision item MUST carry at least one option "
+                "(zero viable options is not a decision item)")
+        return found
+    if declared is not None and declared != len(entries):
+        verdict(options_line,
+                f"declared count {declared} does not match the {len(entries)} option "
+                "entry(ies); the set is not closed as declared")
+
+    seen: dict[str, int] = {}
+    for entry in entries:
+        label = entry["label"]
+        if not label:
+            verdict(entry["line"], "option entry carries no label")
+        else:
+            key = label.casefold()
+            if key in seen:
+                verdict(entry["line"],
+                        f"duplicate option label {label!r}; labels MUST be unique")
+            else:
+                seen[key] = entry["line"]
+        missing = [name for name in OPTION_ELEMENTS
+                   if not entry["elements"].get(name, "").strip()]
+        if missing:
+            verdict(entry["line"],
+                    f"option {label!r} is missing option element(s): {', '.join(missing)}")
+        if label.strip().casefold() == "other" and not entry["path"]:
+            verdict(entry["line"],
+                    "an option named 'other' is legal only with a path declaring who/when/"
+                    "how options may be added and the record written back")
+
+    if len(entries) == 1 and not forced:
+        verdict(options_line,
+                "a single viable option MUST declare 'forced' with a reason; it MUST NOT "
+                "masquerade as a multi-option decision")
+
+    chosen = record["fields"].get("chosen_option", "").strip()
+    if chosen:
+        labels = {entry["label"].strip() for entry in entries}
+        if chosen not in labels:
+            verdict(record["field_lines"].get("chosen_option", record["line"]),
+                    f"chosen_option {chosen!r} is not a named member of the option set")
+    return found
+
+
 def collect_carriers(carriers: list[str], fixture: str | None, spec: str | None) -> list[Path]:
     """Every carrier file the run judges: explicit files, a fixture path, a spec directory."""
     paths: list[Path] = []
@@ -278,7 +408,7 @@ def collect_carriers(carriers: list[str], fixture: str | None, spec: str | None)
 
 
 def run_records(args) -> int:
-    """Judge the landed ``records`` legs (M-02, M-08); the run mutates nothing."""
+    """Judge the landed ``records`` legs; the run mutates nothing."""
     carriers = collect_carriers(args.carrier, args.fixture, args.spec)
     if not carriers:
         print("error: --action records needs --carrier, --fixture or --spec input",
@@ -303,7 +433,7 @@ def run_records(args) -> int:
             print(f"error: cannot read carrier {carrier}: {exc}", file=sys.stderr)
             return EXIT_INPUT
         for record in new_form_records(parse_records(text)):
-            found = check_m02(record) + check_m08(record, glossary_rows)
+            found = check_m02(record) + check_m03(record) + check_m08(record, glossary_rows)
             for verdict in found:
                 verdict["path"] = display_path(carrier)
                 violations.append(verdict)

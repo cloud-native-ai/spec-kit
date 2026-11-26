@@ -4,7 +4,7 @@
 
 - **decision_class**: human-interactive
 - **context**: 同名资源组在多个 region 存在，需按定位信息区分后再审批扩容。
-- **options**:
+- **options**: 2
   - label: 扩容到 8 节点
     consequences: 峰值容量提升，成本上升
     reversibility: reversible

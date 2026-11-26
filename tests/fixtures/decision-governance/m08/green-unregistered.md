@@ -4,7 +4,7 @@
 
 - **decision_class**: ai-autonomous
 - **context**: 评估是否把本仓迁移到新的目录布局。
-- **options**:
+- **options**: 2
   - label: 迁移到新布局
     consequences: 结构统一，迁移期成本上升
     reversibility: reversible
