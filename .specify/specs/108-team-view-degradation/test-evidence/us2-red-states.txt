@@ -1,0 +1,95 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_team_view_degradation.py -q -k unreadable_latest or four_state or undeclared_pattern
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_undeclared_pattern_and_zero_line_ledger_states ______________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19608/popen-gw2/test_undeclared_pattern_and_ze0')
+
+    def test_undeclared_pattern_and_zero_line_ledger_states(tmp_path):
+        frontmatter = degraded_frontmatter("undeclared-degraded")
+        frontmatter.pop("pattern")
+        team_dir = build_team(
+            tmp_path,
+            "undeclared-degraded",
+            frontmatter=frontmatter,
+            body=DEGRADED_MATRIX_BODY,
+        )
+        (team_dir / "items.jsonl").write_text("", encoding="utf-8")
+        result = view(tmp_path, "undeclared-degraded")
+        assert result.returncode == 5, result.stderr + result.stdout
+        output = result.stdout
+>       assert "适用性不可判定" in output
+E       AssertionError: assert '适用性不可判定' in 'Team View: Degraded Fixture Team（undeclared-degraded）\nmode: single · as-of: 2026-11-26T10:16:34Z（文件时间；非实时探测）\n\n## 1...ries no binding block; a definition without a complete binding record is uninterpretable (owner / owner_id / origin)\n'
+
+tests/integration/test_team_view_degradation.py:601: AssertionError
+____________ test_unreadable_latest_report_is_named_not_unrecorded _____________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19608/popen-gw0/test_unreadable_latest_report_0')
+
+    def test_unreadable_latest_report_is_named_not_unrecorded(tmp_path):
+        team_dir = build_team(
+            tmp_path,
+            "unreadable-latest",
+            reports=[("20260101T000000Z-report.md", report_text())],
+        )
+        report = team_dir / "runs" / "20260101T000000Z-report.md"
+        report.chmod(0)
+        assert not os.access(report, os.R_OK), (
+            "test premise: mode 000 must be unreadable for this account")
+        result = view(tmp_path, "unreadable-latest")
+        assert result.returncode == 0, result.stderr + result.stdout
+        output = result.stdout
+        latest_line = line_starting(output, "- 最近报告（latest_report）:")
+        assert latest_line is not None
+        assert "20260101T000000Z-report.md" in latest_line
+>       assert "不可读" in latest_line
+E       AssertionError: assert '不可读' in '- 最近报告（latest_report）: 20260101T000000Z-report.md'
+
+tests/integration/test_team_view_degradation.py:533: AssertionError
+__________________ test_four_state_discipline_on_new_surfaces __________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19608/popen-gw1/test_four_state_discipline_on_0')
+
+    def test_four_state_discipline_on_new_surfaces(tmp_path):
+        build_team(tmp_path, "state-missing")
+        missing = view(tmp_path, "state-missing")
+        assert missing.returncode == 0, missing.stderr + missing.stdout
+        assert "运行报告: 缺失（" in missing.stdout
+        assert "台账: 缺失（" in missing.stdout
+    
+        empty_dir = build_team(tmp_path, "state-empty")
+        (empty_dir / "runs").mkdir()
+        (empty_dir / "items.jsonl").write_text("", encoding="utf-8")
+        empty = view(tmp_path, "state-empty")
+        assert empty.returncode == 0, empty.stderr + empty.stdout
+        assert "运行报告: 为空（" in empty.stdout
+        assert "台账: 为空（" in empty.stdout
+    
+        unreadable_dir = build_team(
+            tmp_path,
+            "state-unreadable",
+            reports=[("20260101T000000Z-report.md", report_text())],
+        )
+        report = unreadable_dir / "runs" / "20260101T000000Z-report.md"
+        report.chmod(0)
+        assert not os.access(report, os.R_OK), (
+            "test premise: mode 000 must be unreadable for this account")
+        unreadable = view(tmp_path, "state-unreadable")
+        assert unreadable.returncode == 0, unreadable.stderr + unreadable.stdout
+        latest_line = line_starting(unreadable.stdout, "- 最近报告（latest_report）:")
+>       assert latest_line is not None and "不可读" in latest_line
+E       AssertionError: assert ('- 最近报告（latest_report）: 20260101T000000Z-report.md' is not None and '不可读' in '- 最近报告（latest_report）: 20260101T000000Z-report.md')
+
+tests/integration/test_team_view_degradation.py:570: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_team_view_degradation.py::test_undeclared_pattern_and_zero_line_ledger_states
+FAILED tests/integration/test_team_view_degradation.py::test_unreadable_latest_report_is_named_not_unrecorded
+FAILED tests/integration/test_team_view_degradation.py::test_four_state_discipline_on_new_surfaces
+3 failed in 6.64s

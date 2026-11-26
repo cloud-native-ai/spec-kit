@@ -115,27 +115,30 @@ A slot is complete only with all three; prefilled fields below are the skeleton.
 ### Slot I-DEGRADED-DEFINITION (T013)
 
 - **Planned node ids**: production-shape degraded fixture (no `binding` block, partial-keys variant, inline `goal` with `anchor_slug`, matrix without `agent` column, missing `items.jsonl`, `pattern: iteration` with three missing spine files, nine frontmatter members)
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -k <degraded nodes>`
-- **Real output**: _(filled by T013)_
-- **Exit status**: _(filled by T013)_
+- **Node ids (authored)**: `test_degraded_definition_names_every_state`, `test_binding_unreadable_carries_engine_reason_and_repair_pointers`, `test_partial_binding_keys_name_the_missing_keys`, `test_inline_goal_is_a_named_state_with_repair_pointers`, `test_slug_form_goal_under_readable_binding_adds_no_state_line`, `test_matrix_without_agent_column_is_malformed_and_roster_not_comparable`, `test_missing_ledger_carries_its_consequences`, `test_spine_applicability_follows_declared_pattern`
+- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -q -k "degraded_definition or binding_unreadable or partial_binding or inline_goal or slug_form_goal or matrix_without or missing_ledger or spine_applicability"` (2026-11-26; subject classes absent at red time)
+- **Real output**: `7 failed, 1 passed in 6.33s`; discriminating lines — `AssertionError: assert 'goal 需归一为 anchor_slug' in …` (goal named state absent), `assert None is not None` on `- 绑定修复（binding repair）:` (repair pointer line absent), `assert '正文矩阵: 形态异常（缺列: agent）' in …` (matrix state absent), `assert '按声明 pattern 不适用' in '- constraints.md 缺失（…）'` (spine annotation absent), `assert '后果：无台账聚合计数、无非终态信号' in '- 台账: 缺失（…）'` (ledger consequences absent). The one pass is `test_slug_form_goal_under_readable_binding_adds_no_state_line`, which pins the unchanged healthy half of C-302 (slug-form `goal` under a readable binding adds no line) — a guard, not a red slot.
+- **Exit status**: 1
 - **Evidence file**: `test-evidence/us2-red-degraded.txt`
 - **Subject matcher**: binding `不可读` + verbatim engine reason + `/speckit.team modify` & `goal-utils.py bind` pointers; `goal 需归一为 anchor_slug`; matrix `形态异常（缺列: agent）`; `roster_delta` 不可比对; ledger `缺失` with consequences; spine `按声明 pattern 不适用` + `operating-loops.md` § 8 pointer; 9/9 members; exit 5; ≥ 1 modify pointer; zero fabricated values.
 
 ### Slot I-UNREADABLE-LATEST (T014)
 
 - **Planned node ids**: unreadable latest report (mode 000)
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -k <unreadable-latest node>`
-- **Real output**: _(filled by T014)_
-- **Exit status**: _(filled by T014)_
+- **Node ids (authored)**: `test_unreadable_latest_report_is_named_not_unrecorded` (also `test_four_state_discipline_on_new_surfaces` carries the 不可读 member)
+- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -q -k "unreadable_latest or four_state or undeclared_pattern"` (2026-11-26; red before T015–T017)
+- **Real output**: `AssertionError: assert '不可读' in '- 最近报告（latest_report）: 20260101T000000Z-report.md'` — the amended lines are absent and the group still renders as if the report were readable; summary `3 failed in 6.64s`
+- **Exit status**: 1
 - **Evidence file**: `test-evidence/us2-red-states.txt`
 - **Subject matcher**: `不可读` with path and `不可读` field lines, not silent `未记录`; exit code unchanged by a file-level state alone.
 
 ### Slot I-LEDGER-SPINE-STATES (T014)
 
 - **Planned node ids**: undeclared pattern → `适用性不可判定`; zero-line `items.jsonl` stays `为空`; six group headings present and in order with additive lines
-- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_team_view_degradation.py -k <ledger/spine nodes>`
-- **Real output**: _(filled by T014)_
-- **Exit status**: _(filled by T014)_
+- **Node ids (authored)**: `test_undeclared_pattern_and_zero_line_ledger_states`, `test_four_state_discipline_on_new_surfaces`
+- **Command**: same single-entry command as the slot above (2026-11-26; red before T015–T017)
+- **Real output**: `AssertionError: assert '适用性不可判定' in 'Team View: Degraded Fixture Team（undeclared-degraded）…'` — the undeclared-pattern spine state is absent; the four-state test fails on the `不可读` member; summary `3 failed in 6.64s`
+- **Exit status**: 1
 - **Evidence file**: `test-evidence/us2-red-states.txt`
 - **Subject matcher**: FR-007…FR-010, FR-025.
 

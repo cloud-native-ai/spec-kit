@@ -1,0 +1,5 @@
+task: T014
+outcome: done
+run_id: r20261126T101650Z-108p3
+evidence: tests/integration/test_team_view_degradation.py US2 state segment — unreadable-latest (mode 000), four-state discipline and undeclared-pattern nodes authored; single-entry red capture `test-evidence/us2-red-states.txt` (3 failed in 6.64s); red-first slots I-UNREADABLE-LATEST and I-LEDGER-SPINE-STATES filled in notes/red-first-evidence.md
+at: 2026-11-26T10:16:50Z

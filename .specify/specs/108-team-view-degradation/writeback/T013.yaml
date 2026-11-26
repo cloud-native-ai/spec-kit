@@ -1,0 +1,5 @@
+task: T013
+outcome: done
+run_id: r20261126T101650Z-108p3
+evidence: tests/integration/test_team_view_degradation.py US2 segment — 8 US2 degraded-definition nodes authored; single-entry red capture `test-evidence/us2-red-degraded.txt` (7 failed, 1 passed; the pass pins the unchanged C-302 healthy half); red-first slot I-DEGRADED-DEFINITION filled in notes/red-first-evidence.md
+at: 2026-11-26T10:16:50Z

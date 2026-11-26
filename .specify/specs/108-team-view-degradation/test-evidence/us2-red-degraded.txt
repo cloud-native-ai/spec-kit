@@ -1,0 +1,137 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_team_view_degradation.py -q -k degraded_definition or binding_unreadable or partial_binding or inline_goal or slug_form_goal or matrix_without or missing_ledger or spine_applicability
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.FFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_______________ test_partial_binding_keys_name_the_missing_keys ________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw2/test_partial_binding_keys_name0')
+
+    def test_partial_binding_keys_name_the_missing_keys(tmp_path):
+        degraded_team(tmp_path, binding={"owner": "human"})
+        result = view(tmp_path, "degraded-team")
+        assert result.returncode == 5, result.stderr + result.stdout
+        binding_line = line_starting(result.stdout, "- 绑定（binding）:")
+        assert binding_line is not None
+        assert "binding-missing:" in binding_line
+        assert "missing the binding key(s) owner_id, origin" in binding_line
+        assert "carries no binding block" not in binding_line
+        repair_line = line_starting(result.stdout, "- 绑定修复（binding repair）:")
+>       assert repair_line is not None
+E       assert None is not None
+
+tests/integration/test_team_view_degradation.py:393: AssertionError
+______________ test_spine_applicability_follows_declared_pattern _______________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw7/test_spine_applicability_follo0')
+
+    def test_spine_applicability_follows_declared_pattern(tmp_path):
+        degraded_team(tmp_path, slug="iteration-team")
+        iteration = view(tmp_path, "iteration-team")
+        assert iteration.returncode == 5, iteration.stderr + iteration.stdout
+        for name in ("constraints.md", "STATE.md", "run-log.jsonl"):
+            line = line_starting(iteration.stdout, "- %s 缺失" % name)
+            assert line is not None, "missing spine line for %s" % name
+>           assert "按声明 pattern 不适用" in line
+E           AssertionError: assert '按声明 pattern 不适用' in '- constraints.md 缺失（/tmp/pytest-of-agent/pytest-19607/popen-gw7/test_spine_applicability_follo0/.specify/teams/iteration-team/constraints.md）'
+
+tests/integration/test_team_view_degradation.py:481: AssertionError
+_________________ test_missing_ledger_carries_its_consequences _________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw6/test_missing_ledger_carries_it0')
+
+    def test_missing_ledger_carries_its_consequences(tmp_path):
+        team_dir = degraded_team(tmp_path)
+        result = view(tmp_path, "degraded-team")
+        assert result.returncode == 5, result.stderr + result.stdout
+        output = result.stdout
+        ledger_line = line_starting(output, "- 台账: 缺失")
+        assert ledger_line is not None
+        assert str(team_dir / "items.jsonl") in ledger_line
+>       assert "后果：无台账聚合计数、无非终态信号" in ledger_line
+E       AssertionError: assert '后果：无台账聚合计数、无非终态信号' in '- 台账: 缺失（/tmp/pytest-of-agent/pytest-19607/popen-gw6/test_missing_ledger_carries_it0/.specify/teams/degraded-team/items.jsonl）'
+
+tests/integration/test_team_view_degradation.py:461: AssertionError
+______ test_binding_unreadable_carries_engine_reason_and_repair_pointers _______
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw1/test_binding_unreadable_carrie0')
+
+    def test_binding_unreadable_carries_engine_reason_and_repair_pointers(tmp_path):
+        degraded_team(tmp_path)
+        result = view(tmp_path, "degraded-team")
+        assert result.returncode == 5, result.stderr + result.stdout
+        binding_line = line_starting(result.stdout, "- 绑定（binding）:")
+        assert binding_line is not None
+        assert "不可读" in binding_line
+        assert "binding-missing:" in binding_line
+        assert "carries no binding block" in binding_line
+        repair_line = line_starting(result.stdout, "- 绑定修复（binding repair）:")
+>       assert repair_line is not None
+E       assert None is not None
+
+tests/integration/test_team_view_degradation.py:377: AssertionError
+___ test_matrix_without_agent_column_is_malformed_and_roster_not_comparable ____
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw5/test_matrix_without_agent_colu0')
+
+    def test_matrix_without_agent_column_is_malformed_and_roster_not_comparable(tmp_path):
+        degraded_team(tmp_path)
+        result = view(tmp_path, "degraded-team")
+        assert result.returncode == 5, result.stderr + result.stdout
+        output = result.stdout
+>       assert "正文矩阵: 形态异常（缺列: agent）" in output
+E       AssertionError: assert '正文矩阵: 形态异常（缺列: agent）' in 'Team View: Degraded Fixture Team（degraded-team）\nmode: single · as-of: 2026-11-26T10:16:22Z（文件时间；非实时探测）\n\n## 1. 身份与绑...ries no binding block; a definition without a complete binding record is uninterpretable (owner / owner_id / origin)\n'
+
+tests/integration/test_team_view_degradation.py:426: AssertionError
+__________________ test_degraded_definition_names_every_state __________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw0/test_degraded_definition_names0')
+
+    def test_degraded_definition_names_every_state(tmp_path):
+        team_dir = degraded_team(
+            tmp_path, reports=[("20260105T000000Z-report.md", report_text())])
+        unreadable_report(
+            team_dir, "20260105T000000Z-report.md",
+            report_text(result_summary="Unreadable newest run."))
+        result = view(tmp_path, "degraded-team")
+        assert result.returncode == 5, result.stderr + result.stdout
+        output = result.stdout
+        # identity — binding unreadable with the engine's verbatim reason
+        assert "绑定（binding）: 不可读（binding-missing:" in output
+        assert "carries no binding block" in output
+        # identity — goal named state and an unchanged declared identity
+>       assert "goal 需归一为 anchor_slug" in output
+E       AssertionError: assert 'goal 需归一为 anchor_slug' in 'Team View: Degraded Fixture Team（degraded-team）\nmode: single · as-of: 2026-11-26T10:16:22Z（文件时间；非实时探测）\n\n## 1. 身份与绑...ries no binding block; a definition without a complete binding record is uninterpretable (owner / owner_id / origin)\n'
+
+tests/integration/test_team_view_degradation.py:331: AssertionError
+____________ test_inline_goal_is_a_named_state_with_repair_pointers ____________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-19607/popen-gw3/test_inline_goal_is_a_named_st0')
+
+    def test_inline_goal_is_a_named_state_with_repair_pointers(tmp_path):
+        degraded_team(tmp_path)
+        result = view(tmp_path, "degraded-team")
+        assert result.returncode == 5, result.stderr + result.stdout
+        goal_line = line_starting(result.stdout, "- goal 归一（goal）:")
+>       assert goal_line is not None
+E       assert None is not None
+
+tests/integration/test_team_view_degradation.py:403: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_team_view_degradation.py::test_partial_binding_keys_name_the_missing_keys
+FAILED tests/integration/test_team_view_degradation.py::test_spine_applicability_follows_declared_pattern
+FAILED tests/integration/test_team_view_degradation.py::test_missing_ledger_carries_its_consequences
+FAILED tests/integration/test_team_view_degradation.py::test_binding_unreadable_carries_engine_reason_and_repair_pointers
+FAILED tests/integration/test_team_view_degradation.py::test_matrix_without_agent_column_is_malformed_and_roster_not_comparable
+FAILED tests/integration/test_team_view_degradation.py::test_degraded_definition_names_every_state
+FAILED tests/integration/test_team_view_degradation.py::test_inline_goal_is_a_named_state_with_repair_pointers
+7 failed, 1 passed in 6.33s
