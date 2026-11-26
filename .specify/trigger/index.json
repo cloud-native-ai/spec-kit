@@ -1,7 +1,7 @@
 {
   "store": ".specify/memory/trigger/",
   "schemaVersion": 1,
-  "updated": "2026-11-26T06:40:29Z",
+  "updated": "2026-11-26T13:16:36Z",
   "config": {
     "enabled": true,
     "threshold": 5,
