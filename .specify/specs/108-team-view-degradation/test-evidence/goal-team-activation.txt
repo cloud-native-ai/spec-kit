@@ -1,0 +1,7 @@
+# Goal/Team activation — 108-team-view-degradation
+- handoff decision: `goal-utils handoff-decision` → handoff (29 tasks > 10)
+- Anchor: .specify/anchoring/108-team-view-degradation/anchor.md (3 criteria)
+- Team: .specify/teams/108-team-view-degradation/team.md (serial, 5 seats incl. one reporter)
+- Handoff: .specify/specs/108-team-view-degradation/handoff.md (handoff/v1, active, T001–T029, SC-001…SC-008)
+- handoff-ref: run with an absolute handoff path after a cwd-relative resolution failure (corrected in passing)
+- validate-roster: conforming; run-checks: ok/blocked=false; render: 25/25
