@@ -1,0 +1,113 @@
+# US3 green reading — 108-team-view-degradation (T025)
+
+Taken 2026-11-26 on worktree team-view-degradation (branch 108-team-view-degradation) after
+T019–T024 landed (contract file, guards, three-surface declarations, mirror regeneration).
+
+## Command (single entry, US3 files)
+
+`SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py tests/integration/test_team_view_degradation.py -q`
+
+## Real output
+
+```
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_team_view_degradation_contract.py tests/integration/test_team_view_degradation.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.....................................                                    [100%]
+37 passed in 6.85s
+rc=0
+```
+
+37 nodes = 18 contract nodes (`test_team_view_degradation_contract.py`) + 19 integration
+nodes (`test_team_view_degradation.py`: 17 US1/US2 nodes + the 2 T020 guards). The single
+red node at T019 authoring time (`test_three_surfaces_cite_the_owner`) is green after
+T021–T023; the whole-file red capture is `test-evidence/us3-red-contract.txt`
+(`1 failed, 17 passed`).
+
+## SC-004 — healthy fidelity (machine diff)
+
+Node: `tests/integration/test_team_view_degradation.py::test_healthy_fixture_is_byte_identical_to_the_baseline_program`
+(guard capture `test-evidence/us3-guards.txt`, re-run inside the 37).
+
+- Fixture: both goal variants (`goal` absent and `goal: healthy-anchor-slug`) satisfying
+  every FR-022 condition — three-key binding, two compact `<YYYYMMDD>T<hhmmss>Z-report.md`
+  names, zero auxiliary / zero residue, `agent` column, `items.jsonl` with one valid line,
+  all three continuous-spine files present.
+- Baseline program materialized read-only from `git show 54c6efa8c:scripts/python/team-view.py`
+  beside read-only `script_interface_cli.py` and `goal-utils.py`; `git cat-file -e 54c6efa8c`
+  asserted first.
+- Reading: baseline stdout == amended stdout in both variants — **stdout diff lines = 0**;
+  exit codes equal (0 = 0). Allowed-delta set for predicate inputs = ∅.
+
+## SC-005 — closed reason set, 2/2 exit mapping, zero-write script interface
+
+Readings from the green run and the read-only source measurement (same tree):
+
+- `test_reason_set_is_closed`: emitted `"code"` literals == `['engine-degraded', 'report-recognition-uncertain']`
+  (set equality; a reason outside the set fails the test); the file-level states
+  `缺失 / 为空 / 不可读 / 未记录` are disjoint from the codes; `APPROVED_EXIT_CODES == (0, 2, 3, 4, 5)`.
+- `test_exit_mapping_two_of_two`: `no-binding` → exit 5 with exactly `engine-degraded`;
+  residue fixture → exit 5 with exactly `report-recognition-uncertain` (2/2); missing
+  history and empty `runs/` → exit 0 with no errors (only `缺失`/`为空` never degrade);
+  observed exit codes ⊆ the closed set (0 outside values = 0).
+- `test_script_interface_stays_closed`: `-h` / `--help` / `--version` each exit 0 with a
+  zero-delta fixture snapshot (3/3); `--target` refused with exit 2; declared options and
+  the four help labels present.
+
+## SC-006 — overview reuse and single recognition entry
+
+- `test_overview_matches_single_view_and_discloses_uncertainty` (US1 segment, inside the
+  37): overview `最近运行` cells equal the single-team `as_of.latest_report_timestamp`
+  values (2/2 = 100%); the residue row carries `（report-recognition-uncertain：残留 1）`;
+  overview exit 0.
+- `test_single_recognition_entry_source_scan`: exactly one `def classify_runs(`, exactly
+  one compiled timestamp grammar (`STAMP_RE`, `REPORT_NAME_RE` absent), and the only call
+  sites are `build_persistence` + `build_overview_row` — second matching / latest-selection
+  entry count = 0.
+
+## SC-007 — read-only tree
+
+Node: `test_view_degradation_leaves_tree_byte_identical` (guard capture
+`test-evidence/us3-guards.txt`, re-run inside the 37). Healthy / degraded / overview
+scenarios: before/after `{relative_path: sha256}` snapshots equal — additions = 0,
+modifications = 0, deletions = 0.
+
+## Label closure both directions (C-401)
+
+`test_label_closure_both_directions` + the four subset tests: the owner tables parse to
+**20 members** (C-402 ×4, C-403 ×2, C-404 ×7, C-405 ×7); the program carries **17 label
+constants** (16 `STATE_*` + `NESTED_NONE`), all members of the owner tables; every owner
+member has a registered emitting site (constant referenced by the renderer, or the
+composed `未声明 → active` / literal `辅助产物（auxiliary）` / `降级（degraded）` sites);
+no catch-all label (`其他` / `未知`) and no empty reason exists in the program.
+
+## Mirror and copy convergence (T024, same day)
+
+- `python3 scripts/python/sync-mirrors.py --write` → synced 1 file (`scripts/` mirror pair);
+  `--check` rc 0 with zero DIFF members (capture `test-evidence/sync-mirrors-after.txt`) —
+  no NEW drift against `test-evidence/sync-mirrors-baseline.txt`.
+- `cmp scripts/python/team-view.py .specify/scripts/python/team-view.py` → byte-identical;
+  `cmp skills/internal/view-team/SKILL.md .specify/skills/internal/view-team/SKILL.md` →
+  byte-identical.
+- `python3 scripts/python/regen-command-copies.py --check` → rc 0
+  (`OK: all per-tool command copies match the source templates.`).
+
+## Red → green for the US3 slots
+
+| Slot | Node(s) | Red (T019) | Green (T025) |
+|------|---------|------------|--------------|
+| C-CLOSED-SETS | `test_reason_set_is_closed`, `test_exit_mapping_two_of_two`, `test_envelope_keys_unchanged_with_nested_additions` | pass at authoring (pin of T008–T017 behavior; guard reading) | pass |
+| C-SINGLE-ENTRY | `test_single_recognition_entry_source_scan`, `test_script_interface_stays_closed`, `test_only_the_three_declared_engine_reads` | pass at authoring | pass |
+| C-LABEL-CLOSURE | `test_label_closure_both_directions` and the four subset tests | pass at authoring | pass |
+| C-THREE-SURFACE-CONSISTENCY | `test_three_surfaces_cite_the_owner` | **failed** — `docs View Mode does not name reason report-recognition-uncertain` | pass (docs / skill / `--help` / docstring all name both ids and cite the owner) |
+| C-THREE-SURFACE-CONSISTENCY (guards) | `test_report_naming_owner_and_schema_unchanged_since_baseline`, `test_goal_utils_is_untouched_since_baseline`, `test_import_roots_are_stdlib_local_or_pytest` | pass at authoring | pass |
+
+## Regression readings (same run)
+
+- The four inherited team-view files (`test_team_view_parsers.py`,
+  `test_team_view_program_contract.py`, `test_team_view_command.py`,
+  `test_team_view_program.py`) → **106 passed** against the amended program, the amended
+  docs page and the amended skill (the 103 surface pins survive: envelope keys, CLI
+  surface, exit set, read-only source scan, docs View Mode tokens).

@@ -213,8 +213,25 @@ Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh t
 | I-UNREADABLE-LATEST | `test_unreadable_latest_report_is_named_not_unrecorded` | latest group rendered as readable | pass (不可读 + path + field lines, exit 0) |
 | I-LEDGER-SPINE-STATES | `test_four_state_discipline_on_new_surfaces`, `test_undeclared_pattern_and_zero_line_ledger_states` | `不可读` member and `适用性不可判定` absent | pass |
 
+## Green reading (T025, 2026-11-26)
+
+Command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_team_view_degradation_contract.py tests/integration/test_team_view_degradation.py -q` → exit 0, `37 passed in 6.85s` (full capture `notes/us3-green.txt`; the two T020 guards are inside this run).
+
+| Slot | Node | Red (T019) | Green (T025) |
+|------|------|------------|--------------|
+| C-CLOSED-SETS | `test_reason_set_is_closed`, `test_exit_mapping_two_of_two`, `test_envelope_keys_unchanged_with_nested_additions` | pass at authoring (pin of T008–T017) | pass |
+| C-SINGLE-ENTRY | `test_single_recognition_entry_source_scan`, `test_script_interface_stays_closed`, `test_only_the_three_declared_engine_reads` | pass at authoring | pass |
+| C-LABEL-CLOSURE | `test_label_closure_both_directions` and the four subset tests | pass at authoring | pass |
+| C-THREE-SURFACE-CONSISTENCY | `test_three_surfaces_cite_the_owner` | failed — docs View Mode did not name `report-recognition-uncertain` | pass (docs / skill / `--help` / docstring each name both reason ids and cite the owner) |
+| C-THREE-SURFACE-CONSISTENCY (guards) | `test_report_naming_owner_and_schema_unchanged_since_baseline`, `test_goal_utils_is_untouched_since_baseline`, `test_import_roots_are_stdlib_local_or_pytest` | pass at authoring | pass |
+
 ## Regression guards (not red slots)
 
 - T020's healthy byte-fidelity and read-only snapshot guards are regression guards: their green
   is meaningful only after the engine amendment, so they are authored/run after implementation
-  per the tasks.md migration/regression exception. Readings land in `test-evidence/us3-guards.txt`.
+  per the tasks.md migration/regression exception.
+- Green reading (2026-11-26, `test-evidence/us3-guards.txt`; re-run inside the T025 37-node
+  run): `test_healthy_fixture_is_byte_identical_to_the_baseline_program` — baseline
+  `54c6efa8c` vs amended stdout diff lines = 0 and equal exit codes in both goal variants;
+  `test_view_degradation_leaves_tree_byte_identical` — healthy / degraded / overview
+  scenarios each show 0 added, 0 modified, 0 deleted fixture files.

@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""team-view.py — deterministic read-only reader behind `/speckit.team view` (103-team-view).
+"""team-view.py — deterministic read-only reader behind `/speckit.team view` (108 amendment).
 
 Owner of the fixed-rule extraction for the view mode: team definition facts, archive
-enumeration, report listing, ledger aggregation and the latest-report summary. Binding and
-anchor facts are composed from the goal-utils reads (`binding`, `list`, `targets --list`);
-this program re-implements none of their semantics and writes nothing.
+enumeration, run-report recognition (closed timestamp grammar, three-way classification,
+latest by parsed timestamp) and the latest-report summary. Binding and anchor facts are
+composed from the goal-utils reads (`binding`, `list`, `targets --list`); this program
+re-implements none of their semantics and writes nothing.
 
-Contract: `.specify/specs/103-team-view/contracts/team-view-program.contract.md`
-(C-24 read-only, C-25 engine composition, C-26 closed CLI surface, C-27 script interface,
-C-28 closed exit codes, C-29 output modes).
+Contract: `.specify/specs/108-team-view-degradation/contracts/team-view-program.contract.md`
+(C-101 read-only program, C-102 one recognition entry, C-103 closed CLI surface, C-104
+closed exit codes and degradation reasons, C-105 envelope shape, C-106 script interface,
+C-107 healthy fidelity, C-108 no shape change, C-109 three-surface consistency). The 103
+program contract is superseded on four points and remains a dated record.
 
 Usage:
   team-view.py [options] [<team-slug>]
@@ -19,7 +22,8 @@ Exit codes:
      no-slug --spec-dir)
   3  team not found (single mode)
   4  definition corrupt (single mode: team.md missing, unreadable or unparseable)
-  5  rendered, but a required fact group is unreadable because an engine read failed
+  5  rendered, but a required fact group is unreadable or the latest run is undeterminable;
+     degradation reasons (closed set): engine-degraded | report-recognition-uncertain
 
 Python >= 3.8, standard library only; the only sibling import is ``script_interface_cli``.
 """
@@ -27,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -131,6 +136,11 @@ STATE_CORRUPT = "定义损坏"
 STATE_UNDECLARED = "未声明"
 STATE_LISTED = "已列出"
 STATE_FOLDED = "已聚合"
+STATE_UNRECOGNIZED = "未识别（unrecognized）"
+STATE_NOT_COMPARABLE = "不可比对（not comparable）"
+STATE_GOAL_NORMALIZE = "goal 需归一为 anchor_slug"
+STATE_SPINE_BY_PATTERN = "按声明 pattern 不适用"
+STATE_SPINE_UNDETERMINABLE = "适用性不可判定"
 DEFAULT_POINTER = "（默认值见 create-mode.md § Schema notes）"
 NESTED_NONE = "本次无嵌套 SDD 调用"
 TRUNCATION_MARKER = "…（截断）"
@@ -139,8 +149,29 @@ EXCERPT_LINE_CAP = 10
 EXCERPT_CHAR_CAP = 800
 REPORT_SHOWN_CAP = 20
 SLUG_LIST_CAP = 20
+RESIDUE_EXAMPLE_CAP = 3
 
-REPORT_NAME_RE = re.compile(r"^(\d{8}T\d{6}Z)-report\.md$")
+# One compiled timestamp grammar: the five accepted leading forms of C-201,
+# longest-first inside the alternation. Calendar validity is checked by strptime.
+STAMP_RE = re.compile(
+    r"^(?:"
+    r"(?P<iso_colon>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)"
+    r"|(?P<iso_dashed>\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z)"
+    r"|(?P<iso_compact>\d{4}-\d{2}-\d{2}T\d{6}Z)"
+    r"|(?P<compact_seconds>\d{8}T\d{6}Z)"
+    r"|(?P<compact_minutes>\d{8}T\d{4}Z)"
+    r")"
+)
+STAMP_FORMATS = (
+    ("iso_colon", "%Y-%m-%dT%H:%M:%SZ"),
+    ("iso_dashed", "%Y-%m-%dT%H-%M-%SZ"),
+    ("iso_compact", "%Y-%m-%dT%H%M%SZ"),
+    ("compact_seconds", "%Y%m%dT%H%M%SZ"),
+    ("compact_minutes", "%Y%m%dT%H%MZ"),
+)
+REPORT_SUFFIX_RE = re.compile(r"^(?:-[0-9a-f]{4})?-(?:report|stage)\.md$")
+# Identity grammar owner: `.specify/shared/definitions/goal-definitions.md` § Identity grammar.
+SLUG_FORM_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.\-]*$")
 REQUIRED_MATRIX_COLUMNS = ("role", "stage", "type")
 SPINE_FILES = ("constraints.md", "STATE.md", "run-log.jsonl")
 LEDGER_STATES = ("completed", "in-progress", "delayed", "not-started", "unknown")
@@ -522,6 +553,17 @@ def matrix_columns(rows: list) -> list:
     return order
 
 
+def matrix_header(body: str) -> list:
+    """The lowercased header cells of the ``## Static Structure`` table, or ``[]``."""
+    section = _section_lines(body, "Static Structure")
+    if section is None:
+        return []
+    table = [line for line in section if line.strip().startswith("|")]
+    if not table:
+        return []
+    return [cell.strip().lower() for cell in _cells(table[0])]
+
+
 # --------------------------------------------------------------------------- #
 # Report segments and bounded excerpt (E6, C-33)
 # --------------------------------------------------------------------------- #
@@ -824,6 +866,27 @@ def build_definition(front, problems: dict, slug: str) -> dict:
     }
 
 
+def build_goal_declaration(front, problems: dict, binding_unreadable: bool) -> dict:
+    """The declared ``goal`` key's presentation record (C-302 / C8): never an identity."""
+    declared = "goal" in front or "goal" in problems
+    value = front.get("goal")
+    if not declared:
+        form = "absent"
+    elif (problems.get("goal") is None and isinstance(value, str)
+          and SLUG_FORM_RE.match(value)):
+        form = "slug"
+    else:
+        form = "inline"
+    state = STATE_GOAL_NORMALIZE if declared and (
+        form == "inline" or binding_unreadable) else None
+    return {
+        "declared": declared,
+        "form": form,
+        "state": state,
+        "identity_unchanged": True,
+    }
+
+
 def _roster_names(values) -> list:
     names = []
     for item in values:
@@ -836,6 +899,15 @@ def _roster_names(values) -> list:
 
 def build_static(front, body: str) -> dict:
     rows, matrix_state = parse_static_matrix(body)
+    matrix_note = None
+    if matrix_state is None:
+        agent_columns = matrix_header(body).count("agent")
+        if agent_columns == 0:
+            matrix_state = STATE_MALFORMED
+            matrix_note = "缺列: agent"
+        elif agent_columns > 1:
+            matrix_state = STATE_MALFORMED
+            matrix_note = "重复列: agent"
     members_raw = front.get("members")
     if members_raw is None:
         members = {"state": STATE_UNDECLARED, "rows": []}
@@ -845,16 +917,17 @@ def build_static(front, body: str) -> dict:
         members = {"state": STATE_MALFORMED, "rows": []}
     matrix_names = _roster_names(rows)
     member_names = _roster_names(members["rows"])
-    matrix_has_agent = any("agent" in row for row in rows)
-    comparable = matrix_state is None and matrix_has_agent and members["state"] is None
+    comparable = matrix_state is None and members["state"] is None
     reason = None
-    if not matrix_has_agent:
-        reason = "正文矩阵无 agent 列，两侧名册不可比对"
+    if matrix_state is not None:
+        detail = "（%s）" % matrix_note if matrix_note else ""
+        reason = "正文矩阵%s%s，两侧名册不可比对" % (matrix_state, detail)
     elif members["state"] is not None:
         reason = "frontmatter 名册%s，两侧名册不可比对" % members["state"]
     return {
         "matrix_rows": rows,
         "matrix_state": matrix_state,
+        "matrix_note": matrix_note,
         "members": members,
         "seats": _declared_block_map(front.get("seats")),
         "stage_seats": _declared_block_map(front.get("stage_seats")),
@@ -903,42 +976,137 @@ def build_dynamic(front) -> dict:
     }
 
 
-def build_persistence(team_dir: Path, front) -> dict:
+# --------------------------------------------------------------------------- #
+# Run-report recognition (C-201…C-206): one timestamp grammar, one classifier,
+# one latest selection — shared by the single-team view and the overview.
+# --------------------------------------------------------------------------- #
+def _match_stamp(name: str):
+    """``(parsed UTC datetime, match end)`` for a valid leading stamp, else ``None``."""
+    match = STAMP_RE.match(name)
+    if not match:
+        return None
+    for group, fmt in STAMP_FORMATS:
+        candidate = match.group(group)
+        if candidate is None:
+            continue
+        try:
+            parsed = datetime.strptime(candidate, fmt)
+        except ValueError:
+            return None
+        return parsed.replace(tzinfo=timezone.utc), match.end()
+    return None
+
+
+def parse_stamp(name: str):
+    """The leading UTC stamp of a file name, or ``None`` — never guessed (C-201)."""
+    matched = _match_stamp(name)
+    return matched[0] if matched else None
+
+
+def classify_run_file(name: str) -> dict:
+    """One ``runs/`` file name → its C1 record, in the fixed C-202 order."""
+    matched = _match_stamp(name)
+    if matched is None:
+        return {"name": name, "kind": "residue", "timestamp": None, "token": None}
+    parsed, end = matched
+    kind = "report" if REPORT_SUFFIX_RE.match(name[end:]) else "auxiliary"
+    return {
+        "name": name,
+        "kind": kind,
+        "timestamp": parsed.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "token": parsed.strftime("%Y%m%dT%H%M%SZ"),
+    }
+
+
+def classify_runs(team_dir: Path) -> dict:
+    """One pass over ``runs/`` → the C3 inventory both output modes consume."""
     runs = team_dir / "runs"
-    reports = {
+    inventory = {
         "state": STATE_MISSING,
         "path": str(runs),
         "total": 0,
         "shown": [],
         "omitted": 0,
         "unrecognized": [],
+        "reports": [],
+        "auxiliaries": [],
+        "residue": {
+            "count": 0,
+            "examples": [],
+            "omitted": 0,
+            "auxiliary_count": 0,
+            "auxiliary_examples": [],
+            "auxiliary_omitted": 0,
+        },
         "latest_path": None,
+        "latest_token": None,
+        "uncertain": False,
+        "unreadable": False,
     }
-    if runs.is_dir():
-        try:
-            entries = sorted(path for path in runs.iterdir() if path.is_file())
-        except OSError:
-            entries = None
-        if entries is None:
-            reports["state"] = STATE_UNREADABLE
+    if not runs.is_dir():
+        return inventory
+    try:
+        entries = sorted(path for path in runs.iterdir() if path.is_file())
+    except OSError:
+        inventory["state"] = STATE_UNREADABLE
+        return inventory
+
+    report_records = []
+    auxiliary_records = []
+    residue_names = []
+    report_paths = {}
+    for path in entries:
+        record = classify_run_file(path.name)
+        if record["kind"] == "report":
+            report_records.append(record)
+            report_paths[record["name"]] = path
+        elif record["kind"] == "auxiliary":
+            auxiliary_records.append(record)
         else:
-            recognized = []
-            unrecognized = []
-            for path in entries:
-                match = REPORT_NAME_RE.match(path.name)
-                if match:
-                    recognized.append((match.group(1), path.name, path))
-                else:
-                    unrecognized.append(path.name)
-            recognized.sort(key=lambda item: item[1])
-            recognized.sort(key=lambda item: item[0], reverse=True)
-            reports["total"] = len(recognized)
-            reports["omitted"] = max(0, len(recognized) - REPORT_SHOWN_CAP)
-            reports["shown"] = [item[1] for item in recognized[:REPORT_SHOWN_CAP]]
-            reports["unrecognized"] = sorted(unrecognized)
-            reports["state"] = STATE_LISTED if recognized else STATE_EMPTY
-            if recognized:
-                reports["latest_path"] = str(recognized[0][2])
+            residue_names.append(record["name"])
+
+    report_records.sort(key=lambda record: record["name"])
+    report_records.sort(key=lambda record: record["token"], reverse=True)
+    auxiliary_records.sort(key=lambda record: record["name"])
+    residue_names.sort()
+    residue_examples = residue_names[:RESIDUE_EXAMPLE_CAP]
+    auxiliary_names = [record["name"] for record in auxiliary_records]
+    auxiliary_examples = auxiliary_names[:RESIDUE_EXAMPLE_CAP]
+    latest = report_records[0] if report_records else None
+    if report_records:
+        state = STATE_LISTED
+    elif residue_names:
+        state = STATE_UNRECOGNIZED
+    else:
+        state = STATE_EMPTY
+
+    inventory.update({
+        "state": state,
+        "total": len(report_records),
+        "shown": [record["name"] for record in report_records[:REPORT_SHOWN_CAP]],
+        "omitted": max(0, len(report_records) - REPORT_SHOWN_CAP),
+        "unrecognized": residue_names,
+        "reports": report_records,
+        "auxiliaries": auxiliary_records,
+        "residue": {
+            "count": len(residue_names),
+            "examples": residue_examples,
+            "omitted": len(residue_names) - len(residue_examples),
+            "auxiliary_count": len(auxiliary_names),
+            "auxiliary_examples": auxiliary_examples,
+            "auxiliary_omitted": len(auxiliary_names) - len(auxiliary_examples),
+        },
+        "latest_path": str(report_paths[latest["name"]]) if latest else None,
+        "latest_token": latest["token"] if latest else None,
+        "uncertain": bool(residue_names),
+    })
+    if inventory["latest_path"] is not None:
+        inventory["unreadable"] = not os.access(inventory["latest_path"], os.R_OK)
+    return inventory
+
+
+def build_persistence(team_dir: Path, front) -> dict:
+    reports = classify_runs(team_dir)
 
     items_path = team_dir / "items.jsonl"
     ledger = {"state": STATE_MISSING, "path": str(items_path)}
@@ -963,6 +1131,14 @@ def build_persistence(team_dir: Path, front) -> dict:
                 ledger["state"] = STATE_FOLDED
                 ledger["path"] = str(items_path)
 
+    pattern = _text(front.get("pattern")) or ""
+    if pattern == "continuous":
+        applicability = "applicable"
+    elif pattern:
+        applicability = "not-applicable-by-pattern"
+    else:
+        applicability = "undeterminable"
+
     spine = []
     for name in SPINE_FILES:
         path = team_dir / name
@@ -971,6 +1147,7 @@ def build_persistence(team_dir: Path, front) -> dict:
             "path": str(path),
             "present": path.is_file(),
             "empty": path.is_file() and path.stat().st_size == 0,
+            "applicability": applicability,
         })
 
     config_raw = front.get("config")
@@ -984,6 +1161,7 @@ def build_persistence(team_dir: Path, front) -> dict:
         "reports": reports,
         "ledger": ledger,
         "spine": spine,
+        "spine_pattern": pattern,
         "summary_delivery": delivery,
     }
 
@@ -993,6 +1171,7 @@ def build_latest(persistence: dict) -> dict:
     if not latest_path:
         return {
             "report": None,
+            "path": None,
             "outcome": None,
             "target_assignment": None,
             "result_summary": None,
@@ -1005,6 +1184,7 @@ def build_latest(persistence: dict) -> dict:
     except OSError:
         return {
             "report": Path(latest_path).name,
+            "path": latest_path,
             "outcome": None,
             "target_assignment": None,
             "result_summary": None,
@@ -1015,6 +1195,7 @@ def build_latest(persistence: dict) -> dict:
     parsed = parse_report(text)
     return {
         "report": Path(latest_path).name,
+        "path": latest_path,
         "outcome": parsed["outcome"],
         "target_assignment": parsed["target_assignment"],
         "result_summary": parsed["result_summary"],
@@ -1047,6 +1228,8 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
     definition = build_definition(front, problems, slug)
     definition["binding"] = binding
     definition["binding_error"] = binding_error
+    definition["goal"] = build_goal_declaration(
+        front, problems, binding_error is not None)
 
     static = build_static(front, definition_body(text))
     dynamic = build_dynamic(front)
@@ -1060,7 +1243,6 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
         "anchor_pointer": "/speckit.anchor view",
     }
 
-    degraded = binding_error is not None or archive["anchor"]["state"] == STATE_UNREADABLE
     errors = []
     if binding_error is not None:
         errors.append({
@@ -1074,6 +1256,14 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
             "message": "anchor 读取失败: %s" % archive["anchor"].get("reason", ""),
             "path": str(team_dir),
         })
+    if persistence["reports"]["uncertain"]:
+        errors.append({
+            "code": "report-recognition-uncertain",
+            "message": "runs/ 存在 %d 份未识别（unrecognized）残留：最新运行判定不可确定"
+                       % persistence["reports"]["residue"]["count"],
+            "path": persistence["reports"]["path"],
+        })
+    degraded = bool(errors)
 
     consumed = [definition_path]
     ledger_path = persistence["ledger"].get("path")
@@ -1098,10 +1288,7 @@ def assemble_single(repo_root: Path, slug: str, spec_dir=None) -> dict:
         "degraded": degraded,
         "errors": errors,
         "as_of": _max_mtime_iso(consumed),
-        "latest_report_timestamp": (
-            REPORT_NAME_RE.match(persistence["reports"]["shown"][0]).group(1)
-            if persistence["reports"]["shown"] else None
-        ),
+        "latest_report_timestamp": persistence["reports"]["latest_token"],
     }
 
 
@@ -1119,18 +1306,6 @@ OVERVIEW_HEADERS = (
 )
 
 
-def _latest_report_token(team_dir: Path):
-    runs = team_dir / "runs"
-    if not runs.is_dir():
-        return None
-    try:
-        names = [path.name for path in runs.iterdir() if path.is_file()]
-    except OSError:
-        return None
-    tokens = [match.group(1) for match in map(REPORT_NAME_RE.match, names) if match]
-    return max(tokens) if tokens else None
-
-
 def build_overview_row(repo_root: Path, slug: str) -> dict:
     team_dir = repo_root / ".specify" / "teams" / slug
     definition_path = team_dir / "team.md"
@@ -1142,6 +1317,7 @@ def build_overview_row(repo_root: Path, slug: str) -> dict:
         "anchor_identity": {"kind": "inferred", "value": slug},
         "updated": None,
         "latest_run": None,
+        "latest_residue": 0,
         "state": STATE_CORRUPT,
         "path": str(definition_path),
     }
@@ -1158,7 +1334,9 @@ def build_overview_row(repo_root: Path, slug: str) -> dict:
     row["lifecycle"] = lifecycle_of(front)
     row["anchor_identity"] = anchor_identity_of(front, slug)
     row["updated"] = _text(front.get("updated"))
-    row["latest_run"] = _latest_report_token(team_dir)
+    runs_inventory = classify_runs(team_dir)
+    row["latest_run"] = runs_inventory["latest_token"]
+    row["latest_residue"] = runs_inventory["residue"]["count"]
     return row
 
 
@@ -1255,6 +1433,9 @@ def render_overview(view: dict) -> str:
             lifecycle_text = lifecycle["value"] if lifecycle["declared"] else (
                 lifecycle["value"] + "（" + STATE_UNDECLARED + "）")
             anchor = row["anchor_identity"]
+            latest_text = row["latest_run"] or STATE_UNRECORDED
+            if row["latest_residue"]:
+                latest_text += "（report-recognition-uncertain：残留 %d）" % row["latest_residue"]
             cells = (
                 row["slug"],
                 row["name"] or STATE_UNRECORDED,
@@ -1262,7 +1443,7 @@ def render_overview(view: dict) -> str:
                 lifecycle_text,
                 "%s — %s" % (anchor["kind"], anchor["value"]),
                 row["updated"] or STATE_UNRECORDED,
-                row["latest_run"] or STATE_UNRECORDED,
+                latest_text,
             )
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
@@ -1281,7 +1462,10 @@ def build_parser() -> argparse.ArgumentParser:
         effects="none; reads the team archive and prints; a flag-only invocation writes nothing",
         codes=(
             "0 rendering produced; 2 input error; 3 team not found; "
-            "4 definition corrupt; 5 rendered with a degraded engine read"
+            "4 definition corrupt; 5 rendered with a degraded engine read "
+            "(degradation reasons: engine-degraded | report-recognition-uncertain; "
+            "owner: .specify/specs/108-team-view-degradation/contracts/"
+            "team-view-program.contract.md)"
         ),
     )
     parser.add_argument(
@@ -1383,6 +1567,9 @@ def _render_identity(view: dict, lines: list) -> None:
     lines.append("- lifecycle: %s" % lifecycle_text)
     if definition["binding_error"]:
         lines.append("- 绑定（binding）: %s（%s）" % (STATE_UNREADABLE, definition["binding_error"]))
+        lines.append(
+            "- 绑定修复（binding repair）: /speckit.team modify（定义修复入口）；"
+            "goal-utils.py bind（引擎写面）；owner: anchor-definitions.md § The Binding Record")
     else:
         binding = definition["binding"] or {}
         lines.append("- 绑定（binding）: owner=%s · owner_id=%s · origin=%s" % (
@@ -1390,6 +1577,11 @@ def _render_identity(view: dict, lines: list) -> None:
             _fact(binding.get("owner_id")),
             _fact(binding.get("origin")),
         ))
+    goal = definition["goal"]
+    if goal["state"]:
+        lines.append(
+            "- goal 归一（goal）: %s —— 修复: /speckit.team modify（将 goal 归一为 anchor_slug）；"
+            "goal-utils.py migrate（派生锚点定义）" % goal["state"])
     identity = definition["anchor_identity"]
     lines.append("- 锚点身份（anchor_identity）: %s — %s" % (identity["kind"], identity["value"]))
     lines.append("- handoff_ref: %s" % _fact(definition["handoff_ref"], "handoff_ref", problems))
@@ -1411,9 +1603,11 @@ def _render_static(view: dict, lines: list) -> None:
     lines.append("- type 来源（type_source）: 正文矩阵（body-matrix）")
     rows = static["matrix_rows"]
     if static["matrix_state"]:
-        lines.append("- 正文矩阵: %s" % static["matrix_state"])
+        note = "（%s）" % static["matrix_note"] if static.get("matrix_note") else ""
+        lines.append("- 正文矩阵: %s%s" % (static["matrix_state"], note))
     else:
         lines.append("- 正文矩阵: %d 行" % len(rows))
+    if rows:
         columns = matrix_columns(rows)
         lines.append("  | " + " | ".join(columns) + " |")
         lines.append("  |" + "|".join("---" for _ in columns) + "|")
@@ -1434,7 +1628,8 @@ def _render_static(view: dict, lines: list) -> None:
         lines.append("- 仅正文矩阵: %s" % (", ".join(delta["only_in_matrix"]) or "无"))
         lines.append("- 仅 frontmatter: %s" % (", ".join(delta["only_in_members"]) or "无"))
     else:
-        lines.append("- 名册差异（roster_delta）: 未记录（%s）" % delta["reason"])
+        lines.append("- 名册差异（roster_delta）: %s（原因：%s）" % (
+            STATE_NOT_COMPARABLE, delta["reason"]))
 
 
 def _render_dynamic(view: dict, lines: list) -> None:
@@ -1467,10 +1662,24 @@ def _render_persistence(view: dict, lines: list) -> None:
             reports["total"], min(reports["total"], REPORT_SHOWN_CAP), reports["omitted"]))
         for name in reports["shown"]:
             lines.append("  - %s" % name)
+    elif reports["state"] == STATE_UNRECOGNIZED:
+        lines.append("- 运行报告: %s—— 仅残留，最新不可确定" % STATE_UNRECOGNIZED)
     else:
         lines.append("- 运行报告: %s（%s）" % (reports["state"], reports["path"]))
-    if reports["unrecognized"]:
-        lines.append("- 未识别（unrecognized）: %s" % ", ".join(reports["unrecognized"]))
+    residue = reports["residue"]
+    if residue["auxiliary_count"]:
+        lines.append("- 辅助产物（auxiliary）: 共 %d 份；示例: %s（省略 %d）" % (
+            residue["auxiliary_count"],
+            ", ".join(residue["auxiliary_examples"]),
+            residue["auxiliary_omitted"],
+        ))
+    if residue["count"]:
+        lines.append("- %s: 共 %d 份；示例: %s（省略 %d）" % (
+            STATE_UNRECOGNIZED,
+            residue["count"],
+            ", ".join(residue["examples"]),
+            residue["omitted"],
+        ))
     if ledger["state"] == STATE_FOLDED:
         counts = " · ".join(
             "%s %d" % (state, count) for state, count in sorted(ledger["by_state"].items())
@@ -1481,13 +1690,25 @@ def _render_persistence(view: dict, lines: list) -> None:
             lines.append("  - 非终态: %s (%s)" % (item["item_id"], item["state"]))
     elif ledger["state"] == STATE_UNREADABLE:
         lines.append("- 台账: 不可读（%s；%s）" % (ledger["path"], ledger.get("reason", "")))
+    elif ledger["state"] == STATE_MISSING:
+        lines.append("- 台账: 缺失（%s；后果：无台账聚合计数、无非终态信号）" % ledger["path"])
     else:
         lines.append("- 台账: %s（%s）" % (ledger["state"], ledger["path"]))
     present = [entry["name"] for entry in persistence["spine"] if entry["present"]]
     if present:
         lines.append("- 脊柱文件（存在）: %s" % ", ".join(present))
+    pattern = persistence["spine_pattern"]
     for entry in persistence["spine"]:
-        if not entry["present"]:
+        if entry["present"]:
+            continue
+        if entry["applicability"] == "not-applicable-by-pattern":
+            lines.append("- %s %s（%s；%s：pattern=%s；owner: operating-loops.md § 8）" % (
+                entry["name"], STATE_MISSING, entry["path"],
+                STATE_SPINE_BY_PATTERN, pattern))
+        elif entry["applicability"] == "undeterminable":
+            lines.append("- %s %s（%s；%s：pattern 未声明；owner: create-mode.md § Schema notes）" % (
+                entry["name"], STATE_MISSING, entry["path"], STATE_SPINE_UNDETERMINABLE))
+        else:
             lines.append("- %s %s（%s）" % (entry["name"], STATE_MISSING, entry["path"]))
     delivery = persistence["summary_delivery"]
     lines.append("- summary 送达目录: %s" % (
@@ -1498,12 +1719,19 @@ def _render_latest(view: dict, lines: list) -> None:
     latest = view["latest"]
     ledger = view["persistence"]["ledger"]
     lines.append(GROUP_HEADINGS[4])
-    lines.append("- 最近报告（latest_report）: %s" % (latest["report"] or STATE_UNRECORDED))
-    lines.append("- Outcome: %s" % (latest["outcome"] or STATE_UNRECORDED))
-    lines.append("- Target 指派: %s" % (latest["target_assignment"] or STATE_UNRECORDED))
-    lines.append("- Result Summary: %s" % _excerpt_text(latest["result_summary"]))
-    lines.append("- Verification: %s" % _excerpt_text(latest["verification"]))
-    lines.append("- Nested SDD Runs: %s" % _nested_text(latest["nested_runs"]))
+    if latest["readable"]:
+        lines.append("- 最近报告（latest_report）: %s" % (latest["report"] or STATE_UNRECORDED))
+        lines.append("- Outcome: %s" % (latest["outcome"] or STATE_UNRECORDED))
+        lines.append("- Target 指派: %s" % (latest["target_assignment"] or STATE_UNRECORDED))
+        lines.append("- Result Summary: %s" % _excerpt_text(latest["result_summary"]))
+        lines.append("- Verification: %s" % _excerpt_text(latest["verification"]))
+        lines.append("- Nested SDD Runs: %s" % _nested_text(latest["nested_runs"]))
+    else:
+        lines.append("- 最近报告（latest_report）: %s（%s：%s）" % (
+            latest["report"], STATE_UNREADABLE, latest["path"]))
+        for label in ("Outcome", "Target 指派", "Result Summary", "Verification",
+                      "Nested SDD Runs"):
+            lines.append("- %s: %s" % (label, STATE_UNREADABLE))
     if ledger["state"] == STATE_FOLDED:
         lines.append("- 台账信号: 非终态 %d · 坏行 %d" % (
             len(ledger["non_terminal"]), ledger["bad_lines"]))
@@ -1557,6 +1785,11 @@ def render_single(view: dict) -> str:
     _render_latest(view, lines)
     lines.append("")
     _render_archive(view, lines)
+    if view["errors"]:
+        lines.append("")
+        lines.append("降级（degraded）:")
+        for error in view["errors"]:
+            lines.append("- %s: %s" % (error["code"], error["message"]))
     return "\n".join(lines)
 
 
