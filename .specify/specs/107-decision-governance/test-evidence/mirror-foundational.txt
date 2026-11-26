@@ -1,0 +1,36 @@
+# T008 mirror regeneration & verification — Foundational (2026-11-26, HEAD after C2 3e7894f03)
+
+$ python3 scripts/python/sync-mirrors.py --write
+MISS  .specify/scripts/python/validate-decisions.py
+sync  scripts/ -> .specify/scripts/ (1 files)
+MISS  .specify/shared/definitions/decision-definitions.md
+sync  shared/ -> .specify/shared/ (1 files)
+rc=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+rc=0
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (394 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (133 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (117 files, byte-identical)
+
+--- drift members (DIFF|MISS|FAIL) vs baseline (test-evidence/sync-mirrors-baseline.txt):
+0
+0 (none)
+
+$ cmp shared/definitions/decision-definitions.md .specify/shared/definitions/decision-definitions.md
+cmp: identical rc=0
+$ cmp scripts/python/validate-decisions.py .specify/scripts/python/validate-decisions.py
+cmp: identical rc=0
+
+$ python3 scripts/python/script-interface-check.py --files scripts/python/validate-decisions.py --json  (candidate row, now tracked)
+violations=0 findings=1 applicable=1
