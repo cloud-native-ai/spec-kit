@@ -8,7 +8,7 @@
 
 | Slot | Test node | Owning task | State |
 |------|-----------|-------------|-------|
-| S-00 | `tests/unit/test_validate_decisions.py::test_cli_surface` | T006 (red) / T007 (green) | pending |
+| S-00 | `tests/unit/test_validate_decisions.py::test_cli_surface` | T006 (red) / T007 (green) | filled |
 | S-01 | `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` | T023 | pending |
 | S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | pending |
 | S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | pending |
@@ -35,11 +35,27 @@
 ### S-00 — `test_cli_surface` (T006 red → T007 green)
 
 - command (red): `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py::test_cli_surface -q`
-- red output: (filled by T006 run)
-- exit status (red): (filled by T006 run)
+- red output (verbatim tail):
+
+```text
+    def test_cli_surface() -> None:
+>       assert ENGINE.is_file(), f"missing checker: {ENGINE}"
+E       AssertionError: missing checker: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-governance/scripts/python/validate-decisions.py
+E       assert False
+tests/unit/test_validate_decisions.py:75: AssertionError
+FAILED tests/unit/test_validate_decisions.py::test_cli_surface - AssertionErr...
+1 failed in 6.20s
+```
+
+- exit status (red): `1` — fails on its own missing-surface assertion, never an import error.
 - command (green): `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_validate_decisions.py::test_cli_surface -q`
-- green output: (filled by T007 run)
-- exit status (green): (filled by T007 run)
+- green output (verbatim): `. [100%]` / `1 passed in 6.31s`
+- exit status (green): `0`
+- interface verification beside the test (T007; manual runs of `python3 scripts/python/validate-decisions.py`):
+  - `--action records|payload|chain|inventory` → each exits `2` with `error: action '<a>' is declared but not implemented yet (read-only skeleton)` (an unimplemented check can never read as a pass);
+  - `--version` → `validate-decisions.py 0.0.22` (one line, exit 0; version read from `pyproject.toml` at run time — no version literal in the file);
+  - `-h` vs `--help` → `cmp` identical (byte-equal help bodies);
+  - `--action records --json` → one JSON line `{"action": "records", "status": "not-implemented", "root": "<worktree root>"}` on stdout, message on stderr, exit 2 — the root resolves from the module's own path to the repository root (mirror guard: a directory named `.specify` is never the root).
 
 ### S-01 — `test_m01_field_closure_reverse_samples` (T023)
 
