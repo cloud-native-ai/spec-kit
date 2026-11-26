@@ -10,16 +10,16 @@
 |------|-----------|-------------|-------|
 | S-00 | `tests/unit/test_validate_decisions.py::test_cli_surface` | T006 (red) / T007 (green) | filled |
 | S-01 | `tests/unit/test_validate_decisions.py::test_m01_field_closure_reverse_samples` | T023 | pending |
-| S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | red captured; green at T017 |
+| S-02 | `tests/contract/test_decision_governance_guards.py::test_m02_locator_red_then_green` | T010 | filled (red -> green at T013/T017) |
 | S-03 | `tests/unit/test_validate_decisions.py::test_m03_option_set_reverse_samples` | T018 | pending |
 | S-04 | `tests/unit/test_validate_decisions.py::test_m04_id_density_register` | T023 | pending |
 | S-05 | `tests/contract/test_decision_governance_guards.py::test_m05_receipt_reverse_samples` | T032 | pending |
 | S-06 | `tests/contract/test_decision_governance_guards.py::test_m06_block_completeness` | T032 | pending |
 | S-07 | `tests/contract/test_decision_governance_guards.py::test_m06_dispatch_without_block_refused` | T032 | pending |
 | S-08 | `tests/contract/test_decision_governance_guards.py::test_m07_chain_three_segments` | T032 | pending |
-| S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | red captured; green at T017 |
+| S-09 | `tests/contract/test_decision_governance_guards.py::test_m08_registered_variant_red` | T010 | filled (red -> green at T013/T017) |
 | S-10 | `tests/contract/test_decision_governance_guards.py::test_broken_pointer_red` (M-09 / C-204) | T024 | pending |
-| S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | red captured; green at T017 |
+| S-11 | `tests/contract/test_decision_governance_contracts.py::test_full_name_minimum_bar_four_surfaces` (C-102 four-surface) | T009 | filled (red -> green at T011/T012/T014/T017) |
 | S-12 | `tests/unit/test_validate_decisions.py::test_ai_replay_deterministic` (C-107 replay) | T018 | pending |
 | S-13 | `tests/contract/test_decision_governance_guards.py::test_no_tension_field_copy` (C-205) | T024 | pending |
 | S-14 | `tests/contract/test_decision_governance_guards.py::test_legacy_two_digit_reported_legacy` (C-206) | T024 | pending |
@@ -77,7 +77,15 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m02_locator_red_t
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the `records` leg does not exist yet), never an import error.
 - fixtures: `tests/fixtures/decision-governance/m02/` — `red-empty-locator.md` (`same_name_conflict: true` + empty `resource_locator`), `red-single-dimension.md` (region id only), `green-complete.md` (business resource group + region id).
-- green output: pending (captured at T017).
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us1-green-slots.txt`):
+
+```text
+.                                                                        [100%]
+1 passed in 6.58s
+```
+
+- exit status (green): `0`. The M-02 red -> green engine verdicts (exit 1 on both red fixtures, exit 0 on the completed locator) are recorded in `notes/us1-green.txt` § SC-002.
 
 ### S-03 — `test_m03_option_set_reverse_samples` (T018)
 
@@ -129,7 +137,15 @@ FAILED tests/contract/test_decision_governance_guards.py::test_m08_registered_va
 
 - exit status (red): `1` — fails on its own missing-surface assertion, never an import error.
 - fixtures: `tests/fixtures/decision-governance/m08/` — `glossary.md` (stubbed variant row), `red-variant.md` (subject uses `spec-kit`), `green-full-name.md` (`Spec Kit`), `green-unregistered.md` (`SK`, unregistered → covered by B-01 only).
-- green output: pending (captured at T017).
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us1-green-slots.txt`):
+
+```text
+.                                                                        [100%]
+1 passed in 6.27s
+```
+
+- exit status (green): `0`. The M-08 red -> green engine verdicts (exit 1 on the variant subject, exit 0 on the full name and on the unregistered abbreviation) are recorded in `notes/us1-green.txt` § SC-002.
 
 ### S-10 — `test_broken_pointer_red` (T024; M-09 / C-204)
 
@@ -150,7 +166,15 @@ FAILED tests/contract/test_decision_governance_contracts.py::test_full_name_mini
 ```
 
 - exit status (red): `1` — fails on its own missing-surface assertion (the text-contract section does not exist yet), never an import error.
-- green output: pending (captured at T017); the four surfaces are asserted separately inside the test.
+- command (green): same single-test command.
+- green output (verbatim tail, captured 2026-11-26; raw log `test-evidence/us1-green-slots.txt`):
+
+```text
+.                                                                        [100%]
+1 passed in 6.25s
+```
+
+- exit status (green): `0`; the four surfaces are asserted separately inside the test (owner page, instruction section, decision-item templates, guard fixtures + named B-01/B-02 review surfaces).
 
 ### S-12 — `test_ai_replay_deterministic` (T018; C-107 replay)
 

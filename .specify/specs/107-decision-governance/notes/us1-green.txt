@@ -1,0 +1,73 @@
+# US1 green evidence — 107-decision-governance (T017)
+
+Captured: 2026-11-26, worktree decision-governance, branch 107-decision-governance.
+Single test entry: SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh (no interpreter-level test command).
+
+## Phase run (contracts + guards)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py -q
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 6.60s
+EXIT=0
+
+## SC-002 — M-02 red -> green (engine verdicts, read-only)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m02/red-empty-locator.md
+M-02 tests/fixtures/decision-governance/m02/red-empty-locator.md:25: same_name_conflict: true requires a machine-parseable resource_locator carrying at least the business resource group + region id pair (the locator is empty)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m02/red-single-dimension.md
+M-02 tests/fixtures/decision-governance/m02/red-single-dimension.md:25: same_name_conflict: true requires a machine-parseable resource_locator carrying at least the business resource group + region id pair (missing named dimension(s): business_resource_group)
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m02/green-complete.md
+PASS: 0 violation(s) (rules: M-02, M-08)
+EXIT=0
+
+## SC-002 — M-08 red -> green (engine verdicts, read-only)
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m08/red-variant.md --glossary tests/fixtures/decision-governance/m08/glossary.md
+M-08 tests/fixtures/decision-governance/m08/red-variant.md:3: decision subject uses the registered glossary variant 'spec-kit'; use the full name 'Spec Kit'
+FAIL: 1 violation(s)
+EXIT=1
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m08/green-full-name.md --glossary tests/fixtures/decision-governance/m08/glossary.md
+PASS: 0 violation(s) (rules: M-02, M-08)
+EXIT=0
+
+$ python3 scripts/python/validate-decisions.py --action records --carrier tests/fixtures/decision-governance/m08/green-unregistered.md --glossary tests/fixtures/decision-governance/m08/glossary.md
+PASS: 0 violation(s) (rules: M-02, M-08)
+EXIT=0
+
+## Instruction landing reading (A-13 / T-015 assertions)
+
+template section bytes: 1274 | live section bytes: 1274 | cap 1500 ok: True
+section cmp template vs live: IDENTICAL
+live total: 40170 | budget 40960 | within: True | headroom: 789
+
+## C-102 four surfaces (asserted by test_full_name_minimum_bar_four_surfaces, green above)
+1. owner page § 决策文本契约 (R1/R2) ; 2. instruction section ## Decision Items（决策项）;
+3. decision-item templates (owner page § 决策类别) ; 4. guard fixtures m02/m08 + named B-01/B-02 review surfaces.
+
+## Gate neutrality (measured 2026-11-26; T-043/T-045 re-baseline owner)
+
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+EXIT=0
+
+## Base-corpus reading — new records legs on this spec (BC-05: legacy records never judged)
+
+$ python3 scripts/python/validate-decisions.py --action records --spec .specify/specs/107-decision-governance
+PASS: 0 violation(s) (rules: M-02, M-08)
+EXIT=0

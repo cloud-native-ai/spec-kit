@@ -1,0 +1,15 @@
+== S-11 green ==
+
+.                                                                        [100%]
+1 passed in 6.25s
+EXIT=0
+== S-02 green ==
+
+.                                                                        [100%]
+1 passed in 6.58s
+EXIT=0
+== S-09 green ==
+
+.                                                                        [100%]
+1 passed in 6.27s
+EXIT=0
