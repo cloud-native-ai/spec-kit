@@ -97,7 +97,8 @@ MUST NOT 在消费点就地扩展。记录以三级子节承载，子节标题�
 - `shared/definitions/derivation-definitions.md` § Contradiction Handling 管两个来源冲突时不取平均；
 - `/speckit.clarify` 与访谈账本管需求阶段的分歧与翻供；
 - `shared/guidelines/fast-fail.md` 管执行中的异常纠正与裁定；
-- `shared/guidelines/critique-and-self-critique.md` 管改进提案的证伪。
+- `shared/guidelines/critique-and-self-critique.md` 管改进提案的证伪；
+- `shared/definitions/decision-definitions.md` 管决策记录：承重决策追加一条决策记录并以 `T-NNN` 交叉引用本文件的六字段，六字段不复制（生产者 P-03）。
 
 本纪律只承接「方向已选定之后的技术取舍」，MUST NOT 承接需求分歧；四条边界的规则正文归各
 owner，本文件不复述。

@@ -226,6 +226,8 @@ Four terms are close enough to be confused and MUST stay distinct in every live 
 
 The bare word "anchoring" MUST NOT be used to mean an action-level Goal, and the bare word "goal" MUST NOT be used to mean an Anchor.
 
+**Decision records are not here.** A decision taken while authoring or ratifying an Anchor is archived per `shared/definitions/decision-definitions.md` (producer P-08); this file owns the Anchor entity only and restates none of the record's form or fields.
+
 **Retired wording (historical record — mapped forward, never reused):**
 
 - "Temporary Goal" / "临时 goal" → an Anchor in the anchor archive (earlier spellings: "temporary goal", "run-scoped goal"). No Anchor carries a lifetime property; the archive position is not an ownership either.

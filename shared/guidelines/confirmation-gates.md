@@ -103,6 +103,8 @@ python3 "${SKILL_WORKDIR:-.}/.specify/scripts/python/feedback-utils.py" --action
 3. gate 对象的锚点是门控点位的单行指针 `> Gate probe: <object_id> — after the user decision, record firing evidence per confirmation-gates.md §门控观察协议 (non-blocking).`,不参与 wrap-up embed 对账;
 4. 指针措辞 MUST NOT 命中 `scan-confirmation-gates.py` 的阻塞模式(不得新增扫描器门控计数)。
 
+**决策记录指针**:门控决定作为决策生产者 P-01,其决策记录的形态、字段闭集与归档义务见 `shared/definitions/decision-definitions.md` § 决策记录 与 § 档案即投影;本文件不复述记录字段与判据。
+
 ## Decision gate (two-axis classification)
 
 Every interruption of a run for the user is a **decision gate** and MUST pass this classification first — a
