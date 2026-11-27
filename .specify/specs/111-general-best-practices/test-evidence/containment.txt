@@ -76,4 +76,22 @@ The change-path set ⊆ FR-009's declared set after the A-20 residual predicate:
 the T019 tick in `tasks.md`, and the wrap-up accounting records land after this reading
 — the first are inside `.specify/specs/111-general-best-practices/**` (declared), the
 last are per-entry accounting records carrying this feature's key or run id (allowed
-residuals). The final-tree re-read is appended below once the wrap-up commit exists.
+residuals).
+
+## Reading 2 — final-tree re-read at `0cbec5aa4` (after the wrap-up accounting commit)
+
+Command: same procedure as Reading 1 (`git diff --name-only 0419adae5..HEAD`, then the
+A-20 classification).
+
+| Quantity | Value |
+|----------|-------|
+| Committed paths in range | **135** |
+| Inside FR-009's declared set | **112** |
+| Residuals in the accounting stores | **23** (the same predicate-hit set as Reading 1; no new engine record was written — all three wrap-up engines returned `duplicate` by design, see `wrap-up-accounting.txt`) |
+| Violations | **0** |
+
+The 4 paths added since Reading 1 are this feature's own closure and accounting evidence
+(`containment.txt`, `verification-input.md`, `closure-gates.txt` from commit `16c40ee7d`
+and `wrap-up-accounting.txt` from `0cbec5aa4`) — all inside the declared spec set. The
+commit that carries this appended re-read modifies only this existing declared file, so
+the final path set stays at 135 with **0 violations**.
