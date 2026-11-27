@@ -1,0 +1,1 @@
+exec-quant: recorded /speckit.checklist run=r20261127T081500Z-112a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-batch-panel/.specify/exec-quant/records/20261127T091728386412Z-1b103a03.json
