@@ -1,0 +1,11 @@
+file: .specify/specs/112-decision-batch-panel/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 439 lines, 55 definition rows, 15 shared strings
+0 error(s), 0 warning(s)
+rc=0

@@ -1,0 +1,13 @@
+# Round-2 mirror parity — repaired tree e319f265b
+# date: 2026-11-27T11:37:08Z
+$ cmp scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py
+cmp: byte-identical (exit 0)
+
+$ python3 scripts/python/sync-mirrors.py --check --only scripts/python/decision-batch.py
+scope --only: scripts/python/decision-batch.py
+ok    scripts/ == .specify/scripts/ (1 files, byte-identical)
+sync-check exit=0
+
+$ sha256sum scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py
+1025f5f154088be2107f8eff796c855f7bd539b385375ae3a5c35a0e9573769b  scripts/python/decision-batch.py
+1025f5f154088be2107f8eff796c855f7bd539b385375ae3a5c35a0e9573769b  .specify/scripts/python/decision-batch.py

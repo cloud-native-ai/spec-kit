@@ -1,0 +1,6 @@
+tests/unit/test_decision_batch_engine.py::test_absent_register_created_from_header
+tests/unit/test_decision_batch_engine.py::test_register_registration_and_status_update
+tests/unit/test_decision_batch_engine.py::test_replay_broken_pointer_nonzero
+tests/unit/test_decision_batch_engine.py::test_replay_from_record_only
+tests/unit/test_decision_batch_engine.py::test_resolution_annotation_and_disclosure
+tests/unit/test_decision_batch_engine.py::test_two_batches_distinct_paths

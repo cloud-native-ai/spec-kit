@@ -1,0 +1,1 @@
+tests/contract/test_decision_batch_contract.py::test_signal_mapping_pointer_only

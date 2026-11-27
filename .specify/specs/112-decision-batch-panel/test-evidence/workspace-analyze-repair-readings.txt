@@ -1,0 +1,7 @@
+workspace-guard pre-artifact-commit check vs workspace-analyze.json (analyze-stage snapshot):
+{"status": "clean", "changed": []} rc 0
+  attribution: no concurrent drift at repair time — branch stays 112-decision-batch-panel, refs and .specify/specs listing match the analyze-stage snapshot exactly. (The analyze-stage readings had attributed sibling-line 111 refs drift that was already clean when that stage took its post-commit snapshot; this stage starts from the same clean signature.)
+
+workspace-guard post-artifact-commit snapshot (workspace-analyze-repair.json): rc 0 — recorded, branch 112-decision-batch-panel.
+workspace-guard post-artifact-commit self-check: {"status": "clean", "changed": []} rc 0.
+clean

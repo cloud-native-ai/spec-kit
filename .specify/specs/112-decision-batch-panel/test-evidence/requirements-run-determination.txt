@@ -1,0 +1,8 @@
+unit: /speckit.requirements   run: r20261127T081500Z-112a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T081500Z-112a clean=false findings=4
+persisted: .specify/session/20261127T082907Z-run-determination-speckit-requirements-r20261127t081500z-112.md

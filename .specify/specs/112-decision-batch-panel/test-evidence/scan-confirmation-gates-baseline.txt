@@ -1,0 +1,6 @@
+# captured 2026-11-27 @ package P1 start (HEAD e4692034e) via: python3 .specify/scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0

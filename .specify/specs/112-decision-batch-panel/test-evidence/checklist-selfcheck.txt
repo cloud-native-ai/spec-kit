@@ -1,0 +1,129 @@
+checklist: .specify/specs/112-decision-batch-panel/checklists/requirements-quality-2026-11-27.md
+item count: 40
+numbering contiguous CHK001..CHK040: True
+unique: True
+items with >=1 trace anchor: 40 / 40
+items missing anchor: none
+items citing >=1 FR/SC: 40 / 40
+items missing FR/SC: none
+FR total: 45 | covered: 45 | missing: none
+SC total: 10 | covered: 10 | missing: none
+clauses total: 54 | covered: 54 | missing: none
+items starting with Verify/Test/Confirm/Check: none
+primary dimension histogram: {'Completeness': 13, 'Ambiguity': 8, 'Consistency': 6, 'Gap': 4, 'Conflict': 3, 'Clarity': 2, 'Assumption': 1, 'Coverage': 1, 'Dependency': 1, 'Traceability': 1}
+all taxonomy dimensions seen across tags: ['Ambiguity', 'Assumption', 'Clarity', 'Completeness', 'Conflict', 'Consistency', 'Coverage', 'Dependency', 'Edge Case', 'Gap', 'Measurability', 'Non-Functional', 'Traceability']
+per-item primary dimension: CHK001:Clarity, CHK002:Ambiguity, CHK003:Ambiguity, CHK004:Conflict, CHK005:Completeness, CHK006:Gap, CHK007:Completeness, CHK008:Completeness, CHK009:Completeness, CHK010:Clarity, CHK011:Ambiguity, CHK012:Conflict, CHK013:Gap, CHK014:Ambiguity, CHK015:Completeness, CHK016:Completeness, CHK017:Completeness, CHK018:Consistency, CHK019:Consistency, CHK020:Completeness, CHK021:Consistency, CHK022:Ambiguity, CHK023:Gap, CHK024:Completeness, CHK025:Completeness, CHK026:Completeness, CHK027:Ambiguity, CHK028:Consistency, CHK029:Consistency, CHK030:Completeness, CHK031:Coverage, CHK032:Ambiguity, CHK033:Completeness, CHK034:Ambiguity, CHK035:Consistency, CHK036:Conflict, CHK037:Gap, CHK038:Traceability, CHK039:Dependency, CHK040:Assumption
+has Notes section: True
+checklists dir files: ['requirements-quality-2026-11-27.md', 'requirements.md']
+FR coverage map:
+  FR-001 : CHK008, CHK038
+  FR-002 : CHK008
+  FR-003 : CHK008
+  FR-004 : CHK008, CHK020
+  FR-005 : CHK008
+  FR-006 : CHK001
+  FR-007 : CHK005
+  FR-008 : CHK028, CHK040
+  FR-009 : CHK003, CHK027
+  FR-010 : CHK002, CHK004, CHK040
+  FR-011 : CHK004, CHK030, CHK040
+  FR-012 : CHK005, CHK022, CHK023
+  FR-013 : CHK025
+  FR-014 : CHK025, CHK026
+  FR-015 : CHK026, CHK027
+  FR-016 : CHK005, CHK028, CHK029
+  FR-017 : CHK029
+  FR-018 : CHK029
+  FR-019 : CHK034
+  FR-020 : CHK033, CHK034
+  FR-021 : CHK009
+  FR-022 : CHK010, CHK011, CHK012
+  FR-023 : CHK013, CHK037
+  FR-024 : CHK009, CHK013, CHK015
+  FR-025 : CHK033
+  FR-026 : CHK016
+  FR-027 : CHK014, CHK015, CHK040
+  FR-028 : CHK017, CHK019
+  FR-029 : CHK036, CHK037
+  FR-030 : CHK017, CHK019, CHK032
+  FR-031 : CHK015
+  FR-032 : CHK020, CHK021, CHK039
+  FR-033 : CHK021, CHK039
+  FR-034 : CHK017, CHK022, CHK037
+  FR-035 : CHK023
+  FR-036 : CHK024
+  FR-037 : CHK020, CHK025, CHK036, CHK040
+  FR-038 : CHK021
+  FR-039 : CHK006, CHK007, CHK010
+  FR-040 : CHK006, CHK018, CHK031, CHK040
+  FR-041 : CHK031
+  FR-042 : CHK007
+  FR-043 : CHK007
+  FR-044 : CHK039
+  FR-045 : CHK035, CHK038
+SC coverage map:
+  SC-001 : CHK001, CHK005, CHK026, CHK027, CHK029, CHK038
+  SC-002 : CHK009
+  SC-003 : CHK010, CHK011, CHK012
+  SC-004 : CHK014, CHK015, CHK016, CHK017, CHK040
+  SC-005 : CHK020, CHK021, CHK022, CHK023, CHK024
+  SC-006 : CHK013, CHK036, CHK037
+  SC-007 : CHK018, CHK030, CHK031, CHK038
+  SC-008 : CHK033, CHK034, CHK035, CHK038
+  SC-009 : CHK007, CHK038
+  SC-010 : CHK025, CHK038
+clause coverage map:
+  C-601 : CHK026
+  C-602 : CHK026, CHK027
+  C-603 : CHK028
+  C-604 : CHK029
+  C-605 : CHK029
+  C-606 : CHK005
+  C-607 : CHK029
+  C-608 : CHK006, CHK007
+  C-301 : CHK009
+  C-302 : CHK009
+  C-303 : CHK010
+  C-304 : CHK011
+  C-305 : CHK012
+  C-306 : CHK013, CHK037
+  C-307 : CHK010
+  C-401 : CHK014
+  C-402 : CHK014
+  C-403 : CHK016
+  C-404 : CHK015
+  C-405 : CHK017, CHK019
+  C-406 : CHK006, CHK018
+  C-407 : CHK016
+  C-408 : CHK017, CHK019, CHK032
+  C-409 : CHK015
+  C-201 : CHK026
+  C-202 : CHK034
+  C-203 : CHK033
+  C-204 : CHK034
+  C-205 : CHK033
+  C-206 : CHK025
+  C-207 : CHK030, CHK031
+  C-208 : CHK035
+  C-501 : CHK025
+  C-502 : CHK025, CHK036
+  C-503 : CHK020, CHK036
+  C-504 : CHK021, CHK039
+  C-505 : CHK022
+  C-506 : CHK023
+  C-507 : CHK025
+  C-508 : CHK024
+  C-509 : CHK021
+  C-510 : CHK036, CHK037
+  C-511 : CHK007, CHK008, CHK039
+  C-512 : CHK008, CHK031, CHK035
+  C-101 : CHK001
+  C-102 : CHK028
+  C-103 : CHK028
+  C-104 : CHK003, CHK027
+  C-105 : CHK002, CHK004
+  C-106 : CHK004, CHK030
+  C-107 : CHK005
+  C-108 : CHK005
+  C-109 : CHK028
+  C-110 : CHK025

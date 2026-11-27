@@ -1,0 +1,113 @@
+{
+  "action": "scan",
+  "result": "presentation",
+  "batch_context": {
+    "why_now": "本批次汇总了登记册中仍标记为待定的决策行，以及项目文档载体中撰写的待决策条目；每次调用都重新扫描全部来源，因此呈现的是此刻完整的未决状态。",
+    "silence_meaning": "在交互式批次中，如果您对本次呈现作出明确回复，未被点名的可结案事项将按建议默认值结案；信息不全、没有唯一默认值、默认不可逆或与既往决定冲突的事项不会因沉默结案。",
+    "how_to_object": "对某项有异议时，请点名该项的完整名称，并写出您选择的完整选项名称；也可以要求暂缓某项。",
+    "what_stays_pending": "本次没有需要保持待定的事项。",
+    "completeness_disclosure": "本次扫描读取了封闭来源清单中的全部来源（register-open-decision-row 在场状态为 read，候选 0 项；authored-pending-item 在场状态为 read，候选 1 项）；每个候选恰被分类一次，恒等式成立：候选 1 = 呈现行 1 + 合并引用 0 + 具名排除 0。完备性按封闭清单声明判定：参照物为本次扫描，比较单元为逐候选处置分类，允许差集为空。 缺席的来源载体：.specify/goals、.specify/anchoring、.specify/teams（按缺席空来源计，不拒绝，也不读作「干净」）。"
+  },
+  "bookkeeping": {
+    "sources": [
+      {
+        "source_id": "register-open-decision-row",
+        "presence": "read",
+        "candidates": 0
+      },
+      {
+        "source_id": "authored-pending-item",
+        "presence": "read",
+        "candidates": 1,
+        "absent_roots": [
+          ".specify/goals",
+          ".specify/anchoring",
+          ".specify/teams"
+        ]
+      }
+    ],
+    "candidates": 1,
+    "presented_rows": 1,
+    "duplicate_merged": 0,
+    "named_exclusions": [],
+    "excluded_families": {
+      "rec-row": 0,
+      "clarification-marker": 0,
+      "parked-idea": 0,
+      "interactive-gate": 0,
+      "autonomous-checkpoint": 0
+    },
+    "verdict": "complete",
+    "completeness_claim": {
+      "referent": "this-scan",
+      "comparison_unit": "per-candidate-classification",
+      "allowed_delta": [],
+      "elements_owner": "shared/guidelines/closed-set-claims.md",
+      "verdict": "complete",
+      "candidates": 1,
+      "partition": {
+        "presented_rows": 1,
+        "duplicate_merged": 0,
+        "not_human_held": 0,
+        "already_resolved": 0
+      },
+      "absent_sources": [
+        ".specify/goals",
+        ".specify/anchoring",
+        ".specify/teams"
+      ]
+    }
+  },
+  "items": [
+    {
+      "identity": {
+        "subject": "演示重放指纹项",
+        "resource_locator": null
+      },
+      "sources": [
+        {
+          "source_id": "authored-pending-item",
+          "carrier": ".specify/specs/demo/item.md",
+          "locator": "L3",
+          "position": 3
+        }
+      ],
+      "block_ref": {
+        "carrier": ".specify/specs/demo/item.md",
+        "line": 3
+      },
+      "decision_class": "human-interactive",
+      "context": "一个完整、可结案的演示项。",
+      "options": [
+        {
+          "label": "方案甲",
+          "consequences": "保持现状",
+          "reversibility": "reversible",
+          "default": "yes",
+          "evidence": ".specify/specs/demo/ref.md"
+        },
+        {
+          "label": "方案乙",
+          "consequences": "改变现状",
+          "reversibility": "reversible",
+          "default": "no",
+          "evidence": ".specify/specs/demo/ref.md"
+        }
+      ],
+      "recommended_default": {
+        "label": "方案甲",
+        "status": "no-evidence",
+        "pointers": [],
+        "basis": "方案甲与现状一致"
+      },
+      "qualification": {
+        "state": "eligible",
+        "reasons": [],
+        "missing_fields": []
+      },
+      "objection_instructions": "点名本项的完整名称，并写出您选择的完整选项名称；也可以说明暂缓本项。"
+    }
+  ],
+  "scan_time": "2026-11-27T10:51:23Z",
+  "presentation_digest": "2b6af46c5948abd8a19656a6a4cd7fcbf976f1ff65ac1af7d70670aa218832d8"
+}

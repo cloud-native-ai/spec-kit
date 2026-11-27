@@ -1,0 +1,9 @@
+unit: /speckit.plan   run: r20261127T081500Z-112a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T081500Z-112a clean=false findings=4
+persisted: .specify/session/20261127T085626Z-run-determination-speckit-plan-r20261127t081500z-112a.md
+settled previous run r20261127T053750Z-109a: not_evaluated

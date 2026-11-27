@@ -104,11 +104,21 @@ BASE_LINE_FIELDS = tuple(name for name in BASE_FIELDS if name != "decision_id")
 
 #: The conditional-layer families (C-202); each field is required exactly when its trigger
 #: holds. Together with the base layer these are the only admitted top-level field lines.
+#: The batch family (Feature 112) joins this closure; the three fields appear together on
+#: batch-produced records only, and their trigger/value rule is judged under M-01 below.
 CONDITIONAL_FIELDS = (
     "same_name_conflict", "resource_locator", "superseded_by",
     "dispatched_at", "acknowledged_at", "implemented_at",
+    "batch_id", "batch_disposition", "recommendation_grounding",
 )
 ADMITTED_FIELD_LINES = frozenset(BASE_LINE_FIELDS) | frozenset(CONDITIONAL_FIELDS)
+
+#: The batch-family conditional layer (Feature 112, owner § 批次记录契约): all three appear
+#: together or none; the values live in their closed domains.
+BATCH_FAMILY_FIELDS = ("batch_id", "batch_disposition", "recommendation_grounding")
+BATCH_ID_RE = re.compile(r"^B-\d{8}T\d{6}Z-[0-9a-f]{8}$")
+BATCH_DISPOSITION_DOMAIN = ("accepted-default", "objected-alternative")
+RECOMMENDATION_GROUNDING_DOMAIN = ("grounded", "no-evidence")
 
 CLASS_DOMAIN = ("human-interactive", "ai-autonomous")
 STATUS_DOMAIN = (
@@ -483,6 +493,28 @@ def check_m01(record: dict) -> list[dict]:
         verdict(record["field_lines"][name],
                 f"field {name!r} is outside the two admitted layers "
                 "(layered field closure; revise the owner page before adding a field)")
+
+    batch_present = [name for name in BATCH_FAMILY_FIELDS if fields.get(name, "").strip()]
+    if batch_present and len(batch_present) != len(BATCH_FAMILY_FIELDS):
+        missing = [name for name in BATCH_FAMILY_FIELDS if name not in batch_present]
+        verdict(record["field_lines"].get(batch_present[0], record["line"]),
+                "the batch-family fields appear together on batch-produced records; "
+                f"missing: {', '.join(missing)}")
+    if batch_present:
+        batch_id = fields.get("batch_id", "").strip()
+        if batch_id and not BATCH_ID_RE.match(batch_id):
+            verdict(record["field_lines"]["batch_id"],
+                    "batch_id does not match the B-<YYYYMMDDTHHMMSSZ>-<8 lowercase hex> form")
+        disposition = fields.get("batch_disposition", "").strip()
+        if disposition and disposition not in BATCH_DISPOSITION_DOMAIN:
+            verdict(record["field_lines"]["batch_disposition"],
+                    f"batch_disposition {disposition!r} is outside the closed set "
+                    f"{' / '.join(BATCH_DISPOSITION_DOMAIN)}")
+        grounding = fields.get("recommendation_grounding", "").strip()
+        if grounding and grounding not in RECOMMENDATION_GROUNDING_DOMAIN:
+            verdict(record["field_lines"]["recommendation_grounding"],
+                    f"recommendation_grounding {grounding!r} is outside the closed set "
+                    f"{' / '.join(RECOMMENDATION_GROUNDING_DOMAIN)}")
 
     decision_class = fields.get("decision_class", "").strip()
     if decision_class and decision_class not in CLASS_DOMAIN:

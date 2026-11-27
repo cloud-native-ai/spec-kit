@@ -1,0 +1,549 @@
+{
+  "stage": "tasks",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 56,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 56,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 323,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 324,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 9,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 16,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 47,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 53,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 60,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 126,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 134,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 134,
+      "message": "path does not exist under the repo: .specify/skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 135,
+      "message": "path does not exist under the repo: .specify/scripts/python/decision-batch.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 136,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 136,
+      "message": "path does not exist under the repo: .specify/templates/commands/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 137,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 147,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 18,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 18,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 18,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 188,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 206,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 207,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 226,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 226,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/two-source/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 227,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 238,
+      "message": "path does not exist under the repo: .specify/scripts/python/decision-batch.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 239,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 239,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 253,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 253,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/eligibility-matrix/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 254,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 264,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 264,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 278,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 278,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/register-updates/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 287,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 301,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 301,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/absent-root/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 303,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 303,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/unreadable-register/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 309,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 309,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 323,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 323,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/prior-conflict/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 324,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 328,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 329,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 332,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 332,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 342,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 344,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 347,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 347,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 44,
+      "message": "path does not exist under the repo: .specify/.tmp/decide-demo/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 4,
+      "message": "path does not exist under the repo: .specify/.tmp/sdd-loop/worktrees/decision-batch-panel"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 50,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 18,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 19,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 22,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 25,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 25,
+      "message": "path does not exist under the repo: tests/unit/test_decision_batch_engine.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 25,
+      "message": "path does not exist under the repo: tests/contract/test_decision_batch_contract.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 33,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 33,
+      "message": "path does not exist under the repo: .specify/skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 34,
+      "message": "path does not exist under the repo: .specify/scripts/python/decision-batch.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 35,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 36,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 84,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 111,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/completeness-refusal.contract.md",
+      "line": 18,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/source-roster.contract.md",
+      "line": 39,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 76,
+    "waived": 0,
+    "fr": 45,
+    "sc": 10,
+    "tasks": 58,
+    "clauses": 54,
+    "files": 14
+  },
+  "checked_at": "2026-11-27T09:08:35Z"
+}

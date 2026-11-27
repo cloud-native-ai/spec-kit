@@ -308,9 +308,12 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
     # skill `skills/internal/view-team/` registered `skill:view-team` in the
     # owner's ledger; the inventory and the ledger grew together (32 commands,
     # 60 skills).
+    # Stale-pin update (2026-11-27, Feature 112): 92 -> 94 rows — `/speckit.decide`
+    # and `skill:decide-batch` registered in the owner's ledger; the inventory and
+    # the ledger grew together (33 commands, 61 skills).
     rows = _ledger_rows()
-    assert len(rows) == 92, (
-        "ledger must carry exactly 92 rows (32 commands + 60 skills); got %d" % len(rows)
+    assert len(rows) == 94, (
+        "ledger must carry exactly 94 rows (33 commands + 61 skills); got %d" % len(rows)
     )
     ids = [row["unit_id"] for row in rows]
     assert len(set(ids)) == len(ids), (
@@ -324,15 +327,15 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
         )
     commands = {unit for unit in ids if unit.startswith("/speckit.")}
     skills = {unit for unit in ids if unit.startswith("skill:")}
-    assert len(commands) == 32, "expected 32 command units, got %d" % len(commands)
-    assert len(skills) == 60, "expected 60 skill units, got %d" % len(skills)
+    assert len(commands) == 33, "expected 33 command units, got %d" % len(commands)
+    assert len(skills) == 61, "expected 61 skill units, got %d" % len(skills)
     inventory_commands, inventory_skills = _inventory()
-    assert len(inventory_commands) == 32, (
-        "inventory self-check: expected 31 templates/commands/*.md, got %d"
+    assert len(inventory_commands) == 33, (
+        "inventory self-check: expected 33 templates/commands/*.md, got %d"
         % len(inventory_commands)
     )
-    assert len(inventory_skills) == 60, (
-        "inventory self-check: expected 60 skills/{external,internal}/*/SKILL.md, got %d"
+    assert len(inventory_skills) == 61, (
+        "inventory self-check: expected 61 skills/{external,internal}/*/SKILL.md, got %d"
         % len(inventory_skills)
     )
     expected = inventory_commands | inventory_skills
@@ -388,6 +391,8 @@ def test_check_reports_79_units_and_zero_gaps():
     # census movement as the ledger-row pin above (`anchor.md` + manage-anchor).
     # Stale-pin update (2026-11-24, Feature 103): 91 -> 92 scanned units, the same
     # census movement as the ledger-row pin above (skill:view-team).
+    # Stale-pin update (2026-11-27, Feature 112): 92 -> 94 scanned units, the same
+    # census movement as the ledger-row pin above (/speckit.decide + skill:decide-batch).
     # No --repo: C-5 requires the engine to resolve the repository root itself.
     proc = _run("--action", "check", "--format", "json")
     record = _json(proc)
@@ -397,8 +402,8 @@ def test_check_reports_79_units_and_zero_gaps():
     )
     assert record.get("action") == "check"
     assert record.get("findings") == []
-    assert record.get("units") == 92, (
-        "check must report 92 scanned units; got %r" % record.get("units")
+    assert record.get("units") == 94, (
+        "check must report 94 scanned units; got %r" % record.get("units")
     )
     assert ISO_Z_RE.match(str(record.get("checked_at", ""))), (
         "checked_at must be ISO-8601 Z; got %r" % record.get("checked_at")
@@ -566,9 +571,12 @@ def test_templates_and_skills_never_assign_class_key():
     # Stale-pin update (2026-11-24, Feature 103): 91 -> 92 files, the same census
     # movement as the pins above (the new view-team skill joins the scanned
     # inventory: 32 templates + 60 skills).
+    # Stale-pin update (2026-11-27, Feature 112): 92 -> 94 files, the same census
+    # movement as the pins above (decide.md + decide-batch join the scanned
+    # inventory: 33 templates + 61 skills).
     paths = sorted(COMMANDS_DIR.glob("*.md")) + sorted(SKILLS_DIR.glob("*/*/SKILL.md"))
-    assert len(paths) == 92, (
-        "expected 32 templates + 60 skills, got %d files" % len(paths)
+    assert len(paths) == 94, (
+        "expected 33 templates + 61 skills, got %d files" % len(paths)
     )
     problems: list[str] = []
     for path in paths:

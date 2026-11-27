@@ -1,0 +1,2 @@
+PASS: .specify/specs/112-decision-batch-panel/tasks.md — 0 error(s), 0 warning(s)
+rc=0

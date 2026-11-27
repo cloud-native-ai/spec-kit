@@ -1,0 +1,95 @@
+# US3 green — 登记、来源更新与只凭记录的重放（T039）
+
+**Feature**: 112-decision-batch-panel · **Package**: P3（T031–T045） · **Date**: 2026-11-27
+**Test entry (only entry)**: `bash scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`
+
+## 1. T038 — US3 mirror pairs
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write
+sync  shared/ -> .specify/shared/ (1 files)         # owner-page US3 sections projected
+$ python3 scripts/python/sync-mirrors.py --check   # rc 0
+ok    shared/ == .specify/shared/ (123 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (135 files, byte-identical)
+$ cmp shared/definitions/decision-definitions.md .specify/shared/definitions/decision-definitions.md   # byte-identical
+$ cmp scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py                       # byte-identical
+```
+
+## 2. T039 — US3 phase tests (green)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py -q -k \
+    "test_register_registration_and_status_update or test_resolution_annotation_and_disclosure or \
+     test_absent_register_created_from_header or test_two_batches_distinct_paths or \
+     test_replay_from_record_only or test_replay_broken_pointer_nonzero"
+6 passed in 6.51s   (rc 0)
+```
+
+Red-first provenance: `notes/red-first-evidence.md` § S4（`6 failed in 6.49s`；`--names-out notes/red-first-names-us3.txt`，6 entries）。
+
+## 3. SC-005 evidence — register diff, resolution annotations
+
+Scratch demo（`register-updates` fixture copy；回复：暂缓「演示登记暂缓项」，其余按建议）：
+
+```text
+$ python3 scripts/python/decision-batch.py record --workspace-root .specify/.tmp/p3-evidence/reg \
+    --presentation .../reg-scan.json --reply .../reg-reply.md --authorization interactive --format json
+record rc=0
+
+# register 之后（仅状态单元格与追加行变化）：
+| OI-801 | 演示登记结案项 | .specify/specs/demo/ledger.md | resolved(batch B-20261127T103840Z-1ce06a37 -> D-001) |
+| OI-802 | 演示登记暂缓项 | .specify/specs/demo/ledger.md | open(batch B-20261127T103840Z-1ce06a37: 暂缓，下次批次重新呈现) |
+| OI-899 | 历史已解决行（不得改写） | .specify/specs/demo/ledger.md | resolved-for-v1 |
+| B-20261127T103840Z-1ce06a37 | 决策批次记录（批次编号） | .specify/knowledge/decision-batch-b-20261127t103840z-1ce06a37.md | recorded |
+| D-001 | 决策批次 B-20261127T103840Z-1ce06a37 产生的决策记录 | .specify/knowledge/decision-batch-b-20261127t103840z-1ce06a37.md | recorded |
+
+# 来源块追加（ledger.md:22）：
+- **resolution**: B-20261127T103840Z-1ce06a37 -> D-001
+```
+
+Rows not deleted; the historical `OI-899` row is byte-identical; the parked row stays `open`-prefixed and names the batch; the resolved identity is not presented again（`via = resolution-field`）。A write failure on the source carrier is disclosed in the record output (`disclosures[].carrier`) without rolling back the batch record, and the prior-batch read-time join keeps the settled identity out of the next presentation（`test_resolution_annotation_and_disclosure`）。Register absence is created from the four-column header before registration（`test_absent_register_created_from_header`）。
+
+## 4. Two-batch path set and replay (SC-005)
+
+```text
+# concurrency fixture copy, batch 1 parks 演示并发乙 / settles 演示并发甲; batch 2 settles 演示并发乙
+rec1 rc=0  .specify/knowledge/decision-batch-b-20261127t103840z-157afafc.md
+rec2 rc=0  .specify/knowledge/decision-batch-b-20261127t103840z-c850ac7e.md
+paths distinct; batch 1 record bytes unchanged after batch 2; batch 2's record contains no 演示并发甲 row.
+```
+
+Replay from the record alone（`replay-broken` fixture copy；presentation/reply deleted, one new source block added after recording）：
+
+```text
+$ python3 scripts/python/decision-batch.py replay --workspace-root .specify/.tmp/p3-evidence/rep \
+    --batch .specify/.tmp/p3-evidence/rep/<record> --format text
+批次重放 B-20261127T103844Z-c102281a
+扫描时点：2026-11-27T10:38:44Z；工具版本：decision-batch 0.0.22；授权：interactive
+完备性：候选 1 = 呈现行 1 + 合并引用 0 + 具名排除 0；判定 complete
+用户应答原文：
+> 没有异议，按建议默认值处理。
+逐项：
+- 演示重放项：eligible；建议默认 方案甲；接地 no-evidence；处置 accepted-default；决策 D-001
+决策记录：
+- D-001 演示重放项：方案甲（accepted-default）
+指针解析：4/4 可解析。
+replay rc=0
+# JSON: items=[('演示重放项','accepted-default','D-001')];
+#       decisions=[('D-001','方案甲','accepted-default','no-evidence')];
+#       pointers all resolved=[True,True,True,True]; two runs byte-identical; snapshot before==after.
+```
+
+Broken pointer（record copy 中把 `.specify/specs/demo/ref.md` 改为不存在的路径）：
+
+```text
+$ python3 scripts/python/decision-batch.py replay --workspace-root ... --batch .../rep-broken.md --format json
+{"action":"replay","result":"refused","refusals":[{"source_id":"replay-pointers",
+ "reason":"unresolvable-pointer",
+ "detail":".specify/specs/demo/missing-ref.md: path does not exist"}]}
+broken replay rc=1
+```
+
+## 5. Clause green points claimed here
+
+`contracts/record-replay.contract.md#C-505`、`#C-506`、`#C-507`、`#C-508`（含 `::test_replay_broken_pointer_nonzero`）。

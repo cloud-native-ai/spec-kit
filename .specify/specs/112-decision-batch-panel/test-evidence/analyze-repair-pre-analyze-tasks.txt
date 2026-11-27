@@ -1,0 +1,2 @@
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=77 waived=0
+rc=0

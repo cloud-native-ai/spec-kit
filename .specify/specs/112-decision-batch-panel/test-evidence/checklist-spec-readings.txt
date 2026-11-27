@@ -1,0 +1,53 @@
+== requirements.md ==
+lines: 437
+FR rows: 45
+SC rows: 10
+STR rows: 15
+A rows: 25
+User stories: 5
+Edge-case bullets: 24
+RS rows: 8
+Clarification sessions: 2
+Clarification Q rows: 16
+STR refs resolved: 15 / 15 distinct referenced; unresolved: []
+FR distinct referenced in body: 45
+SC distinct referenced in body: 10
+NEEDS CLARIFICATION occurrences: 1
+no-evidence occurrences: 13
+nothing-pending occurrences: 7
+PENDING heading literal occurrences: 7
+
+== contracts ==
+completeness-refusal.contract.md clauses: 8
+default-derivation.contract.md clauses: 7
+objection-reply.contract.md clauses: 9
+presentation.contract.md clauses: 8
+record-replay.contract.md clauses: 12
+source-roster.contract.md clauses: 10
+contract files: 6 total clauses: 54
+
+== plan / data-model / quickstart / tasks ==
+plan constitution rows: 23
+plan PA adjudications: 6
+plan EP rows: 7
+data-model entities: 12
+data-model invariants: 0
+data-model state domains: 13
+quickstart scenarios: 0
+task rows: 58
+P rows: 11
+rows carrying >=1 green claim: 5
+green token occurrences: 60
+tasks FR/SC coverage map rows: 15 FR, 10 SC
+
+== roster premises (re-derived) ==
+register open decision rows: 17
+open row ids: OI-3, OI-4, OI-7, OI-9, OI-069b-01, OI-073-01, D-001, D-001-a, OI-082-01, D-1 (092), D-2 (092), D-3 (092), D-4 (092), D-5 (092), D-6 (092), D-7 (092), D-8 (092)
+.specify/specs PENDING blocks: 0
+.specify/goals PENDING blocks: 0
+.specify/anchoring PENDING blocks: 0
+.specify/teams PENDING blocks: 0
+total PENDING blocks: 0
+
+== checklist dir ==
+checklist files present: ['requirements.md']

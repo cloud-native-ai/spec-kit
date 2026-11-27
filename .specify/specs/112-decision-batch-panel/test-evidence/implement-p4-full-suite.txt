@@ -1,0 +1,71 @@
+# Closure full-suite slot — P4 (T058)
+
+**Date**: 2026-11-27 · **Entry (only entry)**: `bash scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`
+**Tier**: fast (default; the runner's slow-marked exclusions are measured by the runner itself). Two passes per run (parallel + declared serial members).
+
+## Head (this package, uncommitted tree on top of `8d5aafb37`)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh -q \
+    --names-out .specify/specs/112-decision-batch-panel/test-evidence/implement-p4-full-suite-names.txt
+229 failed, 10412 passed, 3 skipped, 1538 warnings in 68.88s (0:01:08)   # parallel pass
+1 passed, 10651 deselected, 8 warnings in 19.66s                        # serial pass
+# failed-name list written: …/implement-p4-full-suite-names.txt (229 entries) passes=2
+rc = 1
+```
+
+## Baseline (package base `8d5aafb37`, detached scratch worktree, since removed)
+
+```text
+$ git worktree add .specify/.tmp/p4-baseline-wt 8d5aafb37
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh -q --names-out /tmp/p4-base-names.txt
+229 failed, 10404 passed, 3 skipped, 1538 warnings in 70.54s (0:01:10)   # parallel pass
+1 passed, 10643 deselected, 8 warnings in 19.80s                        # serial pass
+rc = 1
+```
+
+## Attribution — zero new failures, name-level
+
+```text
+$ comm -13 /tmp/p4-base-names.txt …/implement-p4-full-suite-names.txt | wc -l
+0
+$ comm -23 /tmp/p4-base-names.txt …/implement-p4-full-suite-names.txt | wc -l
+0
+$ diff <(sort base-names) <(sort head-names)   # → identical, 229 / 229 names
+```
+
+The two 229-name failure sets are **identical**: no test newly fails in this package. The delta is on the pass
+side — 10,404 → 10,412 (+8 = the two US5 unit tests, the four US5 contract tests, the M-12 determinism guard and
+the distribution-closure test). The pre-existing failure set is environment/state dependent (the largest single
+cause in both runs is the untracked-absent `.specify/memory/features.md` and analogous worktree-local state);
+none of the 229 names lives in a file this feature touches. Baseline names retained at
+`test-evidence/implement-p4-full-suite-baseline-names.txt`.
+
+## Mandated targeted regression set (T058)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py \
+    tests/contract/test_decision_batch_contract.py \
+    tests/contract/test_decision_governance_guards.py \
+    tests/contract/test_migration_distribution.py \
+    tests/contract/test_probe_nonentity_catalog.py \
+    tests/unit/test_validate_decisions.py -q \
+    --names-out …/implement-p4-regression-names.txt
+108 passed in 8.43s
+# failed-name list written: …/implement-p4-regression-names.txt (0 entries) passes=1
+rc = 0
+```
+
+Governance contract suite (the B-row pin moved with the owner page, T048):
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_governance_contracts.py -q
+17 passed in 9.23s
+rc = 0
+```
+
+Implement-baseline comparison: the P1-recorded pre-existing failure list
+(`test-evidence/implement-p1-baseline-failed.txt`) lies entirely inside
+`tests/contract/test_humanize_command_surface.py`, outside the mandated selection; the mandated selection
+records **0 failing names** both before and after this package.

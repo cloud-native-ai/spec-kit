@@ -1,0 +1,7 @@
+workspace-guard pre-artifact-commit check vs workspace-checklist-postcommit.json:
+{"status": "drift", "changed": ["refs"]}
+  attribution: refs/heads/111-general-best-practices removed; refs/heads/master advanced (concurrent line 111 activity in the shared repository). Branch stays 112-decision-batch-panel; .specify/specs listing unchanged; no product file in this worktree changed.
+
+workspace-guard post-artifact-commit snapshot (workspace-analyze.json): rc 0 — recorded, branch 112-decision-batch-panel.
+workspace-guard post-artifact-commit self-check: {"status": "clean", "changed": []} rc 0.
+clean

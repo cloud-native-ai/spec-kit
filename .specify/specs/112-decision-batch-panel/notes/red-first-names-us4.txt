@@ -1,0 +1,6 @@
+tests/unit/test_decision_batch_engine.py::test_absent_source_named_not_clean
+tests/unit/test_decision_batch_engine.py::test_bookkeeping_identity_holds
+tests/unit/test_decision_batch_engine.py::test_completeness_claim_shape
+tests/unit/test_decision_batch_engine.py::test_no_partial_complete_claim
+tests/unit/test_decision_batch_engine.py::test_nothing_pending_success_no_record
+tests/unit/test_decision_batch_engine.py::test_unclassifiable_candidate_refused

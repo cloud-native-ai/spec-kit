@@ -1,0 +1,6 @@
+mode: tasks
+decision: proceed
+fr_count: 45
+task_count: 58
+fr_ceiling: 120
+task_ceiling: 160

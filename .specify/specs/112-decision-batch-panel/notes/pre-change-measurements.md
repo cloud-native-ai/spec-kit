@@ -1,0 +1,24 @@
+# Pre-change measurements — 2026-11-27
+
+Feature 112 `112-decision-batch-panel`; worktree `.specify/.tmp/sdd-loop/worktrees/decision-batch-panel`; branch `112-decision-batch-panel`; package P1 baseline `78a60309b`; all readings taken **before** any implementation edit in this package.
+
+Each row records the command, the real output and the ISO capture date. Later gates compare against these readings; they are never replaced by a count guess.
+
+| # | Premise | Command | Reading @ 2026-11-27 |
+|---|---------|---------|----------------------|
+| M1 | Open register decision rows (the `register-open-decision-row` candidate population; word-boundary `open` on the de-emphasised status cell) | `awk -F'|' '$2 ~ /^ *(OI-\|D-)/ && $5 ~ /^ *open([[:space:],，（(]\|$)/ {n++} END{print n+0}' .specify/register.md` | **17**. Id list (cell text, trimmed): `OI-3 OI-4 OI-7 OI-9 OI-069b-01 OI-073-01 D-001 D-001-a OI-082-01 D-1 (092) D-2 (092) D-3 (092) D-4 (092) D-5 (092) D-6 (092) D-7 (092) D-8 (092)` |
+| M2 | Authored `### PENDING —` blocks in the four closed scan roots | `for d in .specify/specs .specify/goals .specify/anchoring .specify/teams; do printf '%s=' "$d"; grep -rE '^### PENDING —' --include=*.md "$d" \| wc -l; done` | `.specify/specs=0` · `.specify/goals=0` · `.specify/anchoring=0` · `.specify/teams=0` (all roots exist) |
+| M3 | Frozen command / skill inventory | `ls templates/commands/*.md \| wc -l`; `find skills -name SKILL.md \| wc -l` | **32** command templates · **60** skills. `templates/commands/decide.md`, `skills/internal/decide-batch/SKILL.md`, `scripts/python/decision-batch.py` all absent (`ls` → No such file) |
+| M4 | 107 owner-page inventory | `grep -cE '^\| \*\*[A-Z]' shared/definitions/decision-definitions.md`; same with `^\| P-[0-9]`, `^\| M-0[0-9]`, `^\| B-0[0-9]`; `grep -c '^## '` | vocabulary **9** · producer rows **12** (P-01…P-12) · M rows **9** · B rows **7** · H2 sections **9** |
+| M5 | Command reference docs | `ls docs/reference/commands \| wc -l` | **30** files (one per command, no index) |
+| M6 | `## Decision Items` section bytes (live `.specify/instructions.md`) | heading `## Decision Items（决策项）` at line 257; section = heading line through the line before the next `## `, joined with `\n` plus the terminating newline; `len(section.encode('utf-8'))` | **1,276 B** (declared cap 1,500 B; this feature does not edit the section) |
+| M7 | Checker field closure | `importlib` load of `scripts/python/validate-decisions.py`: `len(CONDITIONAL_FIELDS)`, `len(ADMITTED_FIELD_LINES)` | `CONDITIONAL_FIELDS` = **6** (`same_name_conflict`, `resource_locator`, `superseded_by`, `dispatched_at`, `acknowledged_at`, `implemented_at`); `ADMITTED_FIELD_LINES` = **15** (9 base field lines + 6 conditional) |
+| M8 | Existing `decision-batch-` knowledge entries | `python3 scripts/python/memory-utils.py --action list --scope knowledge --format json` → count entries whose JSON contains `decision-batch-` | **0** |
+| M9 | Gate-scanner baseline (recorded verbatim in `test-evidence/scan-confirmation-gates-baseline.txt`) | `python3 .specify/scripts/python/scan-confirmation-gates.py --summary` | `blocking confirmation gates: 30` (destructive 22 / governance_kept 7 / reversible 1) · `violations ...: 0`, rc 0 |
+| M10 | Mirror baseline | `python3 .specify/scripts/python/sync-mirrors.py --check` | rc 0 — `ok shared/ == .specify/shared/ (123 files, byte-identical)`; no pre-existing drift |
+| M11 | Per-tool command copies | `python3 scripts/python/regen-command-copies.py --check` | rc 0 — `OK: all per-tool command copies match the source templates.` |
+| M12 | Probe registry census | `python3 scripts/python/probe-utils.py --action probes --format json`; `grep -n 'assert internal ==' tests/contract/test_probe_nonentity_catalog.py` | **11 classes / 130 internal + 0 external objects**, 0 registry errors; the contract literal is still **122** (8 objects behind the measured registry — T011 re-measures at edit time and pins the measured value, never `122 + 1`) |
+| M13 | Delivered decision artifacts | `ls templates/commands/decide.md skills/internal/decide-batch/SKILL.md scripts/python/decision-batch.py` | all three absent before this package |
+| M14 | Fixture tree state | `ls tests/fixtures/decision-batch \| wc -l`; `find tests/fixtures/decision-batch -name .gitkeep \| wc -l` | 28 case directories, 28 `.gitkeep` markers (created by T001 in this package before these readings) |
+
+**Measurement traps recorded for later readers**: the clause count unit is a line-initial `- **C-NNN**` definition line (`grep -c 'C-'` overcounts at 114); the register row count must use the status word-boundary predicate (`open`), not the id prefix (prefix-only gives 27); the probe census literal is a measured value, not an increment.

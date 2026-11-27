@@ -207,6 +207,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-sanitize-materials-wrapup | skill-wrapup | skill:sanitize-materials | wrap-up |
 | skill-seal-artifact-wrapup | skill-wrapup | skill:seal-artifact | wrap-up |
 | skill-view-team-wrapup | skill-wrapup | skill:view-team | wrap-up |
+| skill-decide-batch-wrapup | skill-wrapup | skill:decide-batch | wrap-up |
 
 ## Handler
 

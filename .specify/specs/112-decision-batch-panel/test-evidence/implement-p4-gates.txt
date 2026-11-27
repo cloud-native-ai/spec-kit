@@ -1,0 +1,14 @@
+GATE-5
+  sync-mirrors --check rc=0
+  regen-command-copies --check rc=0
+  ## Decision Items bytes: 1276
+  protected-path diff:
+  (empty above = no change)
+GATE-6
+blocking confirmation gates: 30
+  destructive: 22
+  governance_kept: 7
+  reversible: 1
+violations (reversible gates still blocking): 0
+GATE-8
+  open tasks: 0
