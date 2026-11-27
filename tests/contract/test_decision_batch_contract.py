@@ -212,7 +212,8 @@ def test_block_grammar_owner_extension() -> None:
 
 
 #: Internal identifiers that MUST NOT leak into the user-facing text body (C-204):
-#: field names, script names, status/reason tokens.
+#: field names, script names, status/reason tokens, the roster source ids and the
+#: presence readings (the completeness disclosure renders the last two as prose).
 INTERNAL_TOKENS = (
     "decision_class", "recommended_default", "recommendation_grounding", "batch_disposition",
     "qualification", "resource_locator", "same_name_conflict", "objection_instructions",
@@ -223,26 +224,73 @@ INTERNAL_TOKENS = (
     "already-resolved", "duplicate-merged",
     "class-missing", "authority-unresolved", "ambiguous-link", "missing-field",
     "option-count-mismatch", "unknown-field", "duplicate-field", "malformed-field",
+    "register-open-decision-row", "authored-pending-item",
+    "read", "absent", "unreadable",
 )
+
+
+#: Carrier and evidence pointers are repo-relative slash paths and are required body
+#: content (C-203 source pointers); the scan masks those spans so that a fixture file
+#: name which happens to contain a state token is not mistaken for an identifier.
+_POINTER_SPAN_RE = re.compile(r"[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+")
+
+
+def _identifier_leaks(body: str) -> list[str]:
+    text = _POINTER_SPAN_RE.sub(" ", body)
+    return sorted(token for token in INTERNAL_TOKENS if token in text)
 
 
 def test_presentation_identifier_boundary(tmp_path: Path) -> None:
     """C-204: the user-facing text body carries no internal identifiers; the structured
-    payload is allowed to carry them."""
-    root = tmp_path / "two-source"
-    shutil.copytree(FIXTURES / "two-source", root)
-    proc = run_engine("scan", "--workspace-root", str(root), "--format", "text")
-    assert proc.returncode == 0, f"scan --format text exited {proc.returncode}: {proc.stderr}"
-    body = proc.stdout
-    leaked = sorted(token for token in INTERNAL_TOKENS if token in body)
-    assert not leaked, f"internal identifiers leaked into the user-facing body: {leaked}"
+    payload is allowed to carry them.
 
-    machine = run_engine("scan", "--workspace-root", str(root), "--format", "json")
+    The reverse samples run first: each leak form (roster source id, presence reading,
+    field name) doctored into a body must red the detector — a guard that cannot fail
+    proves nothing. The delivered bodies then cover every rendering branch: complete
+    rows, missing-field rows, exclusion-only rows and the absent-source disclosure."""
+    probe = "批量决策面板 · 本次呈现\n"
+    for sample in ("register-open-decision-row", "authored-pending-item",
+                   "在场状态为 read", "在场状态为 absent",
+                   "缺少必填内容：decision_class"):
+        assert _identifier_leaks(probe + sample), (
+            f"the C-204 detector missed the leak sample {sample!r}")
+
+    bodies: dict[str, str] = {}
+    for fixture in ("two-source", "incomplete-block", "autonomous", "empty-project"):
+        root = tmp_path / fixture
+        shutil.copytree(FIXTURES / fixture, root)
+        proc = run_engine("scan", "--workspace-root", str(root), "--format", "text")
+        assert proc.returncode == 0, (
+            f"scan --format text exited {proc.returncode} on {fixture}: {proc.stderr}")
+        leaked = _identifier_leaks(proc.stdout)
+        assert not leaked, (
+            f"internal identifiers leaked into the user-facing body ({fixture}): {leaked}")
+        bodies[fixture] = proc.stdout
+
+    # The leak-prone renderings are delivered as plain language, not dropped content.
+    assert "缺少必填内容：决策类别" in bodies["incomplete-block"], (
+        "the missing decision-class label is not rendered")
+    assert "缺少必填内容：上下文" in bodies["incomplete-block"], (
+        "the missing context label is not rendered")
+    assert "登记册中的待定决策行：已读取" in bodies["two-source"], (
+        "the register source reading is not rendered in plain language")
+    assert "登记册中的待定决策行：缺席" in bodies["empty-project"], (
+        "the absent register reading is not rendered in plain language")
+    assert "项目文档中的待决策条目：缺席" in bodies["empty-project"], (
+        "the absent authored reading is not rendered in plain language")
+
+    machine = run_engine("scan", "--workspace-root", str(tmp_path / "incomplete-block"),
+                         "--format", "json")
     assert machine.returncode == 0, machine.stderr
     payload = json.loads(machine.stdout)
     assert any("decision_class" in json.dumps(item) for item in payload["items"]), (
         "the structured payload lost its internal identifiers (it is the machine channel)"
     )
+    assert [source["source_id"] for source in payload["bookkeeping"]["sources"]] == [
+        "register-open-decision-row", "authored-pending-item"], (
+        "the structured payload lost its roster source ids")
+    assert any(item["qualification"]["missing_fields"] for item in payload["items"]), (
+        "the structured payload lost its machine field names")
 
 
 def test_skill_does_not_recompute() -> None:

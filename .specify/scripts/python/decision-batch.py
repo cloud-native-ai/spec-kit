@@ -147,6 +147,28 @@ STATE_TEXT = {
     "prior-decision-conflict": "与既往决策的选中项不一致，需要您明确选择",
 }
 
+#: 用户面正文的平实读法（C-204：正文不出现内部标识符；结构化载荷保留机器取值）。
+SOURCE_TEXT = {
+    "register-open-decision-row": "登记册中的待定决策行",
+    "authored-pending-item": "项目文档中的待决策条目",
+}
+
+PRESENCE_TEXT = {
+    "read": "已读取",
+    "absent": "缺席",
+    "unreadable": "不可读",
+}
+
+FIELD_TEXT = {
+    "decision_class": "决策类别",
+    "subject": "决策主体",
+    "context": "上下文",
+    "options": "选项集",
+    "basis": "建议依据",
+    "origin": "产出身份",
+    "created_at": "创建时点",
+}
+
 OBJECTION_INSTRUCTIONS = (
     "点名本项的完整名称，并写出您选择的完整选项名称；也可以说明暂缓本项。"
 )
@@ -799,7 +821,8 @@ def batch_context(payload_items: list[dict], bookkeeping: dict) -> dict:
     else:
         stays = "本次没有需要保持待定的事项。"
     sources_text = "；".join(
-        f"{source['source_id']} 在场状态为 {source['presence']}，候选 {source['candidates']} 项"
+        f"{SOURCE_TEXT[source['source_id']]}：{PRESENCE_TEXT[source['presence']]}，"
+        f"候选 {source['candidates']} 项"
         for source in bookkeeping["sources"])
     disclosure = (
         f"本次扫描读取了封闭来源清单中的全部来源（{sources_text}）；每个候选恰被分类一次，"
@@ -924,7 +947,7 @@ def state_sentence(item: dict) -> str:
         details = []
         for reason in qualification["reasons"]:
             if reason == "missing-field" and qualification["missing_fields"]:
-                fields = "、".join(qualification["missing_fields"])
+                fields = "、".join(FIELD_TEXT[name] for name in qualification["missing_fields"])
                 details.append(f"缺少必填内容：{fields}")
             else:
                 details.append(REASON_TEXT.get(reason, reason))
