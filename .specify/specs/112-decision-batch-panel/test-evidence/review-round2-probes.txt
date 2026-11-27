@@ -1,0 +1,27 @@
+# Round-2 review probes — tree e319f265b
+# date: 2026-11-27T11:39:07Z
+
+## P1 — clarification row count (F9 remains?)
+grep -c '^- Q:' requirements.md => 16
+.specify/specs/112-decision-batch-panel/plan.md:5:**Input**: Specification from `.specify/specs/112-decision-batch-panel/requirements.md` (45 FR / 10 SC; Assumptions A-1…A-27; 13 clarification rows), the 107 owner page `shared/definitions/decision-definitions.md`, and the adjacent owners named by pointer (confirmation gates, decision tension, closed-set claims, user-facing comprehension, script interface, memory engine, ID Register).
+.specify/specs/112-decision-batch-panel/tasks.md:7:**Prerequisites**: plan.md（Technical Context / Project Structure / Mirror Obligations / EP-001…EP-007 / Inherited Blockers）、requirements.md（45 FR / 10 SC / A-1…A-27 / 13 clarification rows / STR-001…STR-015）、research.md（M-1…M-14 / D-1…D-12）、data-model.md（E-1…E-13 / I-1…I-22 / 5 state domains）、contracts/ ×6（C-101…C-110 / C-201…C-208 / C-301…C-307 / C-401…C-409 / C-501…C-512 / C-601…C-608）、quickstart.md（7 scenarios）、feature-ref.md
+.specify/specs/112-decision-batch-panel/feature-ref.md:5:**Spec**: `.specify/specs/112-decision-batch-panel/requirements.md` (45 FR / 10 SC, A-1…A-27, 13 clarification rows)
+
+## P2 — SC-010 path marker (F10 remains?)
+366:- **SC-010**: 相同输入重复扫描的项集与顺序逐字段一致（时间戳除外）；同一批次编号的第二次记录被拒绝；两个并发批次的记录路径互异且互不修改 **Path**: supporting
+23:- DoD-7: SC-001…SC-010 在 `test-evidence/verification-input.md` 逐条记录状态、命令与证据指针；`final` 路径判据（SC-001…SC-007、SC-010）记 `pass` 并带 smoke 记录（`smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=` 存在且非空）。
+32:- GATE-4: final 路径成功判据 + smoke 记录 — check: `verification.md` 中 `**Path**` 为 `final` 的 SC-001…SC-007 与 SC-010 全部 `pass`，且 `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=`（存在且非空）齐备（条件集 owner：`shared/workflow/acceptance-hardening.md` § Gates）。
+
+## P3 — path containment probe (open important)
+explicit_repo_path('.specify/../../outside/doc.md') => '.specify/../../outside/doc.md'
+(root / rel).resolve() => /workspace/outside/doc.md
+resolve_pointer(root, '.specify/../../outside/doc.md') => (False, 'path does not exist')
+
+## P4 — verification.md smoke line (F5/F6 remain?)
+3:baseline_commit=8d5aafb37
+15:smoke_command=bash scripts/bash/run-tests.sh tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py tests/contract/test_decision_governance_guards.py tests/contract/test_migration_distribution.py tests/contract/test_probe_nonentity_catalog.py tests/unit/test_validate_decisions.py -q
+0
+
+## P5 — presentation wording probe (scan bodies)
+0
+no roster ids / presence tokens in two-source body

@@ -1,0 +1,12 @@
+# Round-2 C-204 guard green — repaired tree e319f265b
+# date: 2026-11-27T11:37:05Z
+# command: env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_decision_batch_contract.py -q
+exit_code=0
+---
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_batch_contract.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 7.52s

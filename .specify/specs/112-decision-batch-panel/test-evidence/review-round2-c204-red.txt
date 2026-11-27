@@ -1,0 +1,49 @@
+# Round-2 C-204 red evidence — baseline engine (fbc998496) vs widened guard (e319f265b)
+# date: 2026-11-27T11:36:35Z
+# procedure: scripts/python/decision-batch.py temporarily restored from fbc998496, test run, engine restored (sha256 checked)
+exit_code=1
+---
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_decision_batch_contract.py::test_presentation_identifier_boundary -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_presentation_identifier_boundary _____________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20873/popen-gw0/test_presentation_identifier_b0')
+
+    def test_presentation_identifier_boundary(tmp_path: Path) -> None:
+        """C-204: the user-facing text body carries no internal identifiers; the structured
+        payload is allowed to carry them.
+    
+        The reverse samples run first: each leak form (roster source id, presence reading,
+        field name) doctored into a body must red the detector — a guard that cannot fail
+        proves nothing. The delivered bodies then cover every rendering branch: complete
+        rows, missing-field rows, exclusion-only rows and the absent-source disclosure."""
+        probe = "批量决策面板 · 本次呈现\n"
+        for sample in ("register-open-decision-row", "authored-pending-item",
+                       "在场状态为 read", "在场状态为 absent",
+                       "缺少必填内容：decision_class"):
+            assert _identifier_leaks(probe + sample), (
+                f"the C-204 detector missed the leak sample {sample!r}")
+    
+        bodies: dict[str, str] = {}
+        for fixture in ("two-source", "incomplete-block", "autonomous", "empty-project"):
+            root = tmp_path / fixture
+            shutil.copytree(FIXTURES / fixture, root)
+            proc = run_engine("scan", "--workspace-root", str(root), "--format", "text")
+            assert proc.returncode == 0, (
+                f"scan --format text exited {proc.returncode} on {fixture}: {proc.stderr}")
+            leaked = _identifier_leaks(proc.stdout)
+>           assert not leaked, (
+                f"internal identifiers leaked into the user-facing body ({fixture}): {leaked}")
+E           AssertionError: internal identifiers leaked into the user-facing body (two-source): ['authored-pending-item', 'read', 'register-open-decision-row']
+E           assert not ['authored-pending-item', 'read', 'register-open-decision-row']
+
+tests/contract/test_decision_batch_contract.py:266: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_batch_contract.py::test_presentation_identifier_boundary
+1 failed in 6.25s

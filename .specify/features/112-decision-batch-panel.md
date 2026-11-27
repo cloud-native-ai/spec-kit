@@ -3,7 +3,7 @@
 **Feature ID**: 112
 **Name**: Batch Decision Panel（批量决策面板）
 **Description**: 决策管理的集中裁决面：一次调用聚合封闭来源清单中的全部待决策项，按 107 完整信息模板逐项呈现，附确定性接地的建议默认值（无证据时明示 `no-evidence`），用户只对异议项发声，其余合格项按建议默认值结案；处置经既有载体记录（knowledge 批次记录 + 107 决策记录 + register 登记 + 来源状态更新），整批可只凭记录重放；只服务人持有的决策，零新存储、零网络、零自动传输。
-**Status**: Implemented
+**Status**: Ready for Review
 **Created**: 2026-11-27
 **Last Updated**: 2026-11-27
 
@@ -17,6 +17,12 @@ Measured baseline (2026-11-27, base `c3489e52c`; corrected by the clarify ruling
 
 ## Latest Review
 
+- **2026-11-27 — review round 2**: four segments + ARC in one consolidation pass on the repaired tree (`e319f265b`; round-1 records archived as `review-r1.md` / `code-review-r1.md`). Process pass (0 P0 / 4 P1 carried from round 1 — framework targets); artifact pass (12/12 expected set; 0 P0 / 2 P1 / 3 P2 open, F7 closed by this round's detail update); implementation pass (round-1 P1 findings F11/F12 closed — the C-204 guard reds on the baseline engine `1 failed` and greens on the repaired tree `10 passed`; smoke re-run exit 0 — `108 passed in 8.51s`; mirror byte-identical); code segment `not-evaluated` — a non-conclusion with 0 coverage gaps (receipt 349 changed / 19 judged / 330 declared legal skips; 0 blocking / 1 important answered / 2 suggestions / 1 praise; gate `allow`; capture skipped — framework hat); ARC `accept` — `final_path` pass 7 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 7, four completion conditions true; Feature 112 `Implemented → Ready for Review`. Reports: `review.md`, `code-review.md`.
+- **2026-11-27 — review round 1**: four segments + ARC; code segment `blocked` — gate `blocking-unresolved` with 2 blocking entries (the user-facing completeness disclosure printed roster source ids and the `read` presence token; the missing-field sentence printed raw field names; the C-204 guard was blind to both), so the status transition was refused and Feature 112 stayed `Implemented`. The blocking gap was repaired at `e319f265b` (plain-language display maps; widened guard with reverse samples; mirror re-synced; two in-passing corrections disclosed). ARC `agree` (`final_path` 7/7). Reports archived: `review-r1.md`, `code-review-r1.md`.
+- **2026-11-27 — implement stage**: tasks T001–T058 closed across four packages; the owner-page extension, the `decide` command, the `decide-batch` skill and the deterministic engine landed in framework sources and ride the mirror projection byte-identically; GATE-1…GATE-8 green; `verification.md` derived spec-side with the three in-scope RS joint-acceptance rows; the closure checker returned `accept` (`final_path` pass 7/7, four conditions true) before the `Planned → Implemented` flip. Evidence: `.specify/specs/112-decision-batch-panel/test-evidence/`.
+- **2026-11-27 — analyze stage**: round 1 found 0 CRITICAL / 2 HIGH (batch isolation vs prior-batch read; supersession write-back vs batch immutability); the repair resolved both at the owner surfaces as A-26/A-27 with one-hop carrier alignment, and round 2 re-read the full declared domain with no open CRITICAL/HIGH.
+- **2026-11-27 — checklist stage**: the 40-item requirements-quality instrument landed with 45/45 FR, 10/10 SC and 54/54 clause coverage; the disclosed residues (count drift, final-set wording) became round-1 review findings F9/F10.
+- **2026-11-27 — tasks stage**: 58 dependency-ordered task rows (tests mode ON), 54 clauses partitioned across eight gates; the stage's `[green:]` claims later backed by the implement evidence set.
 - **2026-11-27 — requirements stage**: spec authored with FR-001…FR-045 and SC-001…SC-010; the brief's six ambiguities adjudicated in A-3…A-9 plus the heavy-decision shape for silence semantics (A-10); validator `status: ok` (0 error / 0 warning; 408 lines / 55 definition rows / 15 shared strings); `pre-analyze-check --stage requirements` `pass` (0 errors, 7 missing-path advisories naming this feature's not-yet-created deliverables; `fr=45 sc=10`); `decomposition-check --mode plan` `proceed` (45 FR / ceiling 120); workspace guard snapshot + check clean. Evidence: `.specify/specs/112-decision-batch-panel/test-evidence/`.
 - **2026-11-27 — plan stage**: `plan.md` (23-row dynamic Constitution Check, Decision Tensions `N/A` with the four-trigger justification, 7 execution premises incl. the falsified first-batch premise with `fallback`, declared dependency set with one `not-applicable` row), `research.md` (14 measured baselines + 12 resolved design points), `data-model.md` (13 entities / 22 invariants / 5 state domains), `contracts/` ×6 (**54 clauses**), `quickstart.md` (7 scenarios; engine examples pinned by named tests with premises), `feature-ref.md` (FR-001…FR-045 → clause map). `pre-analyze-check --stage plan` **pass** (0 errors / 39 missing-path advisories for implementation deliverables; `fr=45 sc=10 clauses=54 files=13`); `validate-decision-tensions.py` `status: ok` (0 records, N/A form); plan integrity: exactly one `# Implementation Plan:` heading, Requirement → Feature stamp present, 0 residual placeholders; workspace guard snapshot + check clean. Test entry not run: documentation-only stage and this worktree carries no pytest interpreter (measured runner error); the constrained-baseline test is unavailable for the same reason. Evidence: `.specify/specs/112-decision-batch-panel/test-evidence/plan-stage-2026-11-27.md`.
 
@@ -69,10 +75,10 @@ Measured baseline (2026-11-27, base `c3489e52c`; corrected by the clarify ruling
 ## Status Tracking
 
 - **Draft**: requirements 112 bound; spec + quality checklist landed; validator and driver gates green. (historical — 2026-11-27)
-- **Planned**: plan/design artifacts exist for the bound spec and the Constitution Check has no unjustified Fail rows. (current — 2026-11-27)
-- **Implemented**: tasks are closed and the guard roster lands green.
-- **Blocked**: tasks are closed and at least one final-path criterion is not `pass`.
-- **Ready for Review**: review evidence exists and the current code-review record has no blocking entry.
+- **Planned**: plan/design artifacts exist for the bound spec and the Constitution Check has no unjustified Fail rows. (historical — 2026-11-27)
+- **Implemented**: tasks are closed and the guard roster lands green. (historical — 2026-11-27; closure checker `accept`, `final_path` pass 7/7, before the flip)
+- **Blocked**: tasks are closed and at least one final-path criterion is not `pass`. (not occupied)
+- **Ready for Review**: review evidence exists and the current code-review record has no blocking entry. (current — 2026-11-27; review round 2 accepted: four segments + ARC, code record 0 blocking, gate `allow`)
 - **Sealed**: review concluded with zero unhandled P0, acceptance records complete, and merge-back done when slices exist.
 - **Completed** (legacy — closed for new work): historical terminal record only; not used for this feature.
 
@@ -87,4 +93,4 @@ Measured baseline (2026-11-27, base `c3489e52c`; corrected by the clarify ruling
 ## Status Criteria
 
 - Implemented: tasks closed, verification derived spec-side, gates green (met 2026-11-27).
-- Ready for Review requires the four-segment review + ARC acceptance.
+- Ready for Review requires the four-segment review + ARC acceptance (met 2026-11-27, review round 2 — see `review.md` § 2.5).

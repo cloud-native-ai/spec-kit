@@ -1,0 +1,13 @@
+# Round-2 smoke — repaired tree e319f265b (review smoke set, same six files as round 1)
+# date: 2026-11-27T11:37:05Z
+# command: env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py tests/contract/test_decision_governance_guards.py tests/contract/test_migration_distribution.py tests/contract/test_probe_nonentity_catalog.py tests/unit/test_validate_decisions.py -q
+exit_code=0
+---
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py tests/contract/test_decision_governance_guards.py tests/contract/test_migration_distribution.py tests/contract/test_probe_nonentity_catalog.py tests/unit/test_validate_decisions.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 66%]
+....................................                                     [100%]
+108 passed in 8.51s
