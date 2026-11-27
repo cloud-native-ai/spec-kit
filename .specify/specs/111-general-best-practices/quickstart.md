@@ -91,13 +91,13 @@ Pinned by the guard's leg (c) — SC-002. Premises: the seed ports in substance 
 ```bash
 # the guard's own steps:
 # 1. feedback-utils.py --help lists the `record` action
-# 2. shared/guidelines/knowledge-promotion.md exists
+# 2. shared/guidelines/knowledge-promotion.md exists (the knowledge-recording owner)
 # 3. the manifest text contains the [[STR-001]] marker
 # 4. no scripts/python/best-practices.py or best_practices.py exists
 # expected after implementation: 2/2 pointers resolve; marker present; engine-file count 0
 ```
 
-Pinned by the guard's leg (d) — SC-003. Premises: the feedback engine keeps its declared action set (research M3); the promotion owner stays at the cited path; the marker literal is [[STR-001]]; textual second-mechanism claims are review's, not the guard's.
+Pinned by the guard's leg (d) — SC-003. Premises: the feedback engine keeps its declared action set (research M3); the knowledge-recording owner stays at the cited path while the promotion procedure is the manifest's own declared rule (A-22, reviewed at T010); the marker literal is [[STR-001]]; textual second-mechanism claims are review's, not the guard's.
 
 ## S-5 — Framework-map registration row in source and mirror (route b)
 

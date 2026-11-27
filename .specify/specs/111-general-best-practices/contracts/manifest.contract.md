@@ -17,7 +17,7 @@ The category declarations MUST be carried by the manifest's only Markdown table,
 
 **C-104** Reader, scope and pointers declared.
 
-Outside the table, the manifest MUST declare: (a) the module's readers and scope — reusable classic daily-development lessons, accumulated progressively rather than a one-time list; (b) the unified entry shape by pointing at `contracts/entry-shape.contract.md` and recalling the shape triple 标题 + 实践 + 反例/证据 (optional 延伸); (c) the accumulation mechanism by pointer to the feedback engine action and the knowledge-promotion owner (C-301…C-305); (d) the seed pointer to [[STR-005]] § [[STR-007]]. (FR-001, FR-004, FR-007(b)(d))
+Outside the table, the manifest MUST declare: (a) the module's readers and scope — reusable classic daily-development lessons, accumulated progressively rather than a one-time list; (b) the unified entry shape by pointing at `contracts/entry-shape.contract.md` and recalling the shape triple 标题 + 实践 + 反例/证据 (optional 延伸); (c) the accumulation mechanism — the observation form by pointer to the feedback engine action (C-301), the module's own promotion procedure and generality criterion declared in the manifest's 逐步积累机制 section (the manifest owns them; C-302, C-305), and the knowledge-recording obligation cited to its owner (C-305); (d) the seed pointer to [[STR-005]] § [[STR-007]]. (FR-001, FR-004, FR-007(b)(d))
 
 **C-105** Scope single ownership.
 

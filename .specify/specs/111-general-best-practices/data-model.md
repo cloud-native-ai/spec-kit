@@ -1,6 +1,6 @@
 # Data Model — General Best Practices (111-general-best-practices)
 
-**Owner statement**: this file owns the **document-set model, the closed category set, the entry/placeholder model, the promotion path and the registration/mirror records** added by 111. It does not own: the accumulation rules (owners: the feedback engine `scripts/python/feedback-utils.py` and `shared/guidelines/knowledge-promotion.md`), the distribution mechanism (`src/specify_cli/__init__.py` + `scripts/python/sync-mirrors.py`), the framework-map table schema (`shared/definitions/framework-map.md`), or the guard's assertion list (live owner `contracts/distribution-guard.contract.md` C-404). Upstream semantics are cited, never restated.
+**Owner statement**: this file owns the **document-set model, the closed category set, the entry/placeholder model, the promotion path and the registration/mirror records** added by 111. It does not own: the accumulation rules — the feedback record shape, store and disposal belong to `scripts/python/feedback-utils.py`; the promotion procedure, the generality criterion and the traceability shape belong to the module manifest `shared/best-practices/README.md` § 逐步积累机制 (A-22); the knowledge-recording obligation belongs to `shared/guidelines/knowledge-promotion.md`; nor the distribution mechanism (`src/specify_cli/__init__.py` + `scripts/python/sync-mirrors.py`), the framework-map table schema (`shared/definitions/framework-map.md`), or the guard's assertion list (live owner `contracts/distribution-guard.contract.md` C-404). Upstream semantics are cited, never restated.
 
 ## Entities
 
@@ -25,7 +25,7 @@ The five documents at the module root, in source and mirror.
 | `category_table` | table | The manifest's **only** table: three columns 模块 / 文件 / 内容, exactly four data rows, exactly one relative link per row, link-target set = the four owner files, literal 封闭集 present (C-102, C-103) |
 | `readers_scope` | prose | Declares the module readers and scope: reusable classic daily-development lessons, accumulated progressively rather than a one-time list (C-104) |
 | `entry_shape_pointer` | pointer | Points at `contracts/entry-shape.contract.md` and recalls the shape triple 标题 + 实践 + 反例/证据 (optional 延伸) (C-104, C-201) |
-| `accumulation_pointer` | pointer | Names the feedback `record` action, the [[STR-001]] marker convention and `shared/guidelines/knowledge-promotion.md` (C-301…C-305) |
+| `accumulation_pointer` | pointer + own rule | Names the feedback `record` action (pointer) and the [[STR-001]] marker convention written to `--review` text (C-301); declares the module's own promotion procedure, generality criterion and `**来源**` shape (the manifest is their owner, C-302/C-305); cites the knowledge-recording obligation owner by path (C-305) |
 | `seed_pointer` | pointer | Names [[STR-005]] § [[STR-007]] as the seed (C-204) |
 
 ### E3 — Category (closed set)
@@ -74,8 +74,9 @@ An existing feedback record used as the accumulation input.
 | Field | Type | Rule |
 |-------|------|------|
 | `store` | existing feedback store | Written through `feedback-utils.py --action record`; no new field, action or store (C-301) |
-| `notes_marker` | literal | Carries [[STR-001]] (C-301) |
-| `notes_stem` | literal | Exactly one owner-file stem, without `.md`: `programming-languages` / `system-interfaces` / `programming-frameworks` / `programming-tools` (C-301) |
+| `review_marker` | literal | Carries [[STR-001]] in the record's `--review` text (C-301) |
+| `review_stem` | literal | Exactly one owner-file stem in the same text, without `.md`: `programming-languages` / `system-interfaces` / `programming-frameworks` / `programming-tools` (C-301) |
+| `unit_convention` | ids | The command/skill run's unit id and run id, or `custom:best-practices/observation` + `--unit-type custom-unit` with a `bp-<yyyy-mm-dd>-<slug>` run id; a registry-carrying workspace first gets the custom unit's external probe from the probe system (C-301) |
 | `module_write` | none | The observation is never written into the module before promotion (C-301) |
 
 ### E8 — Promotion Record
@@ -85,7 +86,7 @@ The traceability carried by a promoted entry's `**来源**` bullet.
 | Field | Type | Rule |
 |-------|------|------|
 | `evidence_ref` | id \| commit \| quote | At least one of: feedback entry ID, hex commit ≥7, quoted session utterance (C-303) |
-| `generality_basis` | prose | Recurrence, or one explicit user correction (C-302, C-303) |
+| `generality_basis` | prose | Recurrence, or one explicit user correction; the criterion is owned by the manifest's 逐步积累机制 section (C-302, C-303) |
 | `observation_rewrite` | none | Promotion does not rewrite E7 and adds no feedback status (C-302) |
 
 ### E9 — Guard
@@ -136,7 +137,7 @@ The traceability carried by a promoted entry's `**来源**` bullet.
 | INV-05 | Placeholder present ⇔ zero entries; the guard never freezes the count 3 | Guard leg (b) |
 | INV-06 | Every entry has `**实践**` and `**反例 / 证据**`; `**延伸**` is optional; promoted entries have `**来源**` | Guard leg (b) |
 | INV-07 | The seed carries the three git-clone facts and the SSH extension; the seed has no fabricated source line | Guard leg (c) |
-| INV-08 | Accumulation is declared by pointer only; the observation form is marker + stem; no second engine file exists | Guard leg (d) + review (textual claims) |
+| INV-08 | Accumulation reuses the feedback engine by pointer and declares the manifest's own promotion procedure and criterion; the observation form is marker + stem in `--review`; no second engine file exists | Guard leg (d) + review (textual claims) |
 | INV-09 | The map registration row exists exactly once in source and once in mirror, carrying both `.specify/shared/best-practices/` and Feature 111 | Guard leg (e) |
 | INV-10 | Source and mirror are byte-identical, generated by write mode, never hand-edited | Existing mirror parity suite (sole adjudicator) |
 | INV-11 | Module text contains zero `ai-harness` / `.ah/` / `/ah.` occurrences; every cited repository path exists | Guard module-read prelude (C-404, FR-008 / SC-005) |

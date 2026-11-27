@@ -6,7 +6,7 @@
 **Flow Class**: execution
 **Flow Type**: -
 **Readers**: 框架维护者（新增/晋升条目、维护四分类封闭集与守卫、判断「一条经验属于哪个分类、何时可以晋升」的人）与下游项目维护者（`specify init` 后在 `.specify/shared/best-practices/` 消费内容、或在本地按积累机制沉淀经验的人）——读者基准不新建，按 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者判定
-**Reading scenario**: 当需要判定「模块由哪些文档构成、四分类封闭集如何变更」「一条最佳实践必须长什么样」「一条开发观察如何经既有 feedback + memory 引擎晋升为条目、如何可回溯」「模块如何随 `shared/` 分发并在框架地图登记」「本特性的改动边界是什么」时打开本规格，据 FR-001…FR-009 与 SC-001…SC-007 放行 `/speckit.clarify` 与后续规划
+**Reading scenario**: 当需要判定「模块由哪些文档构成、四分类封闭集如何变更」「一条最佳实践必须长什么样」「一条开发观察如何经既有 feedback 引擎记录、按清单晋升程序沉淀为条目、如何可回溯」「模块如何随 `shared/` 分发并在框架地图登记」「本特性的改动边界是什么」时打开本规格，据 FR-001…FR-009 与 SC-001…SC-007 放行 `/speckit.clarify` 与后续规划
 **Input**: User description: "Port the closed ai-harness 087 general best-practices capability into spec-kit as new spec 111-general-best-practices: `shared/best-practices/` with the five documents (manifest + four category owner files), distribution through the existing `shared/` shipping/init flow, and any framework-map/instructions wiring the source design requires; additive documentation surfaces only — no engine/runtime change, no store layout, no decision-governance alignment. Bind Feature 111."
 
 **输入校正**：①「五文档」按源交付面读作**清单 README + 四个分类 owner 文件**（共五个文件），不是五个分类；②「closed ai-harness 087 capability」读作源规格 `087-general-best-practices` 的已定稿交付面（`requirements.md` / `plan.md` / `tasks.md` / `contracts/best-practices.contract.md` / `verification.md` 五处所描述的：清单 + 四个分类文件 + 首条 + 积累机制 + 守卫 + 镜像），不是照搬源仓的构建流程；③源规格的 Feature 绑定（ai-harness Feature 040 Knowledge & Session Utilities）**不复用**——spec-kit 注册表没有同名 Feature，本特性按简报绑定为一个新的独立 Feature 111（A-3）；④"verify what the source actually shipped before adding" 是**实测义务**：源仓实测未新增框架地图行、也未新增 instructions 指针（A-6），本特性据目标仓治理判定只补框架地图行。
@@ -16,7 +16,7 @@
 **Feature ID**: 111
 **Feature Name**: General Best Practices（通用最佳实践）
 
-**Binding basis**: 简报固定绑定 Feature 111；本特性是**新的独立 Feature**（无父切片）：它交付随框架分发的**内容模块**，积累机制只按指针复用既有 feedback（Feature 028 Feedback Mechanism）与 memory / knowledge-promotion 引擎，不扩展其行为。源规格绑定的 ai-harness Feature 040 在 spec-kit 注册表中无对应条目，按"源 registry ID 不复用"的简报约束不迁移该绑定。索引行与详情文件的登记属后续澄清/特性阶段动作，本规格不代行（A-3、A-10）。
+**Binding basis**: 简报固定绑定 Feature 111；本特性是**新的独立 Feature**（无父切片）：它交付随框架分发的**内容模块**，观察记录只按指针复用既有 feedback 引擎（Feature 028 Feedback Mechanism），知识记录义务按指针归既有 `knowledge-promotion` owner；晋升程序与通用判据为模块清单自有规则（A-22），不扩展任何引擎行为。源规格绑定的 ai-harness Feature 040 在 spec-kit 注册表中无对应条目，按"源 registry ID 不复用"的简报约束不迁移该绑定。索引行与详情文件的登记属后续澄清/特性阶段动作，本规格不代行（A-3、A-10）。
 
 ## Overview
 
@@ -35,7 +35,7 @@
 
 **本特性交付**：`shared/best-practices/` 模块（清单 + 四个分类 owner 文件 + 首条种子 + 积累机制指针）；`shared/definitions/framework-map.md` 的登记行（同变更落地，镜像再生成）；守卫 `tests/contract/test_general_best_practices.py`；`.specify/shared/best-practices/` 镜像。**全部为增量文档面**，分发复用既有 `shared/` 整目录拷贝与镜像机制。
 
-**不做什么**：不新增引擎、运行时行为、CLI/init 代码、运行时存储或 `.gitignore` 规则；不新建第二积累机制（观察记录与晋升复用既有 feedback + memory / knowledge-promotion）；不改 `.specify/instructions.md` 与模板（Framework Map 段已是指针，One Source of Truth）；不改决策治理面（`shared/definitions/decision-definitions.md` 及其检查器零修改；本特性不产出决策项）；不改写任何 dated record；不在本阶段编辑特性注册表或词汇表（A-10）。
+**不做什么**：不新增引擎、运行时行为、CLI/init 代码、运行时存储或 `.gitignore` 规则；不新建第二积累机制（观察记录按指针复用既有 feedback 引擎；知识记录义务按指针归既有 owner；晋升程序与通用判据由清单自有声明，A-22）；不改 `.specify/instructions.md` 与模板（Framework Map 段已是指针，One Source of Truth）；不改决策治理面（`shared/definitions/decision-definitions.md` 及其检查器零修改；本特性不产出决策项）；不改写任何 dated record；不在本阶段编辑特性注册表或词汇表（A-10）。
 
 ## Assumptions & Decisions *(adjudicated here, not asked)*
 
@@ -44,7 +44,7 @@
 | **A-1** | **类别判定 = `execution`**：验收 oracle 是机器执行的契约守卫（存在性、封闭集、指针解析、镜像一致、零残留），不是"人读懂内容"的表达类 oracle。 | 按验收 oracle 判定（`shared/definitions/flow-class-definitions.md`）；内容写作质量归评审，不改变类别。 |
 | **A-2** | **范围 = 源交付的全部五个文件**：清单 + 四个分类 owner 文件整组移植，含三个"尚无条目"占位与一个首条种子。 | 四分类**封闭集**本身就是能力；只移一部分会破坏封闭集并让守卫失去意义。源设计未声明子集。 |
 | **A-3** | **绑定新的独立 Feature 111**；不迁移源 Feature 040 绑定、不设父切片、不复用源 registry ID。特性索引行与详情文件由后续**特性登记阶段**添加（clarify 阶段写面同样不含注册表，A-10、A-21），本阶段不编辑注册表。 | 简报明确"bind spec-kit Feature 111 (source registry ID not reused)"；目标注册表无 Knowledge & Session Utilities 同义条目，硬绑会误导所有权。 |
-| **A-4** | **命名/路径适配**（逐项核实）：`ai-harness` → `Spec Kit`；`.ah/` → `.specify/`；`/ah.*` → `/speckit.*`（源五文档中实际无 `/ah.*` 引用）；归属声明 `Feature 040` → `Feature 111`；积累机制指针落到目标仓既有路径——`.specify/scripts/python/feedback-utils.py`（`record` 动作已存在）与 `.specify/shared/guidelines/knowledge-promotion.md`（存在）；镜像目标 `.specify/shared/best-practices/`。 | 源文按产品名与运行时路径书写；目标仓路径实测存在（见 Overview § 目标基线）。 |
+| **A-4** | **命名/路径适配**（逐项核实）：`ai-harness` → `Spec Kit`；`.ah/` → `.specify/`；`/ah.*` → `/speckit.*`（源五文档中实际无 `/ah.*` 引用）；归属声明 `Feature 040` → `Feature 111`；观察入口指针落到既有 `.specify/scripts/python/feedback-utils.py`（`record` 动作已存在）；知识记录义务指针落到 `.specify/shared/guidelines/knowledge-promotion.md`（存在；该 owner 不定义 feedback → 分类 owner 文件的晋升程序，见 A-22）；晋升程序与通用判据为清单自有规则；镜像目标 `.specify/shared/best-practices/`。 | 源文按产品名与运行时路径书写；目标仓路径实测存在（见 Overview § 目标基线）。 |
 | **A-5** | **分发 = 复用既有 `shared/` 通道**：`specify init` 的整目录拷贝 + `sync-mirrors.py` 的 `shared → .specify/shared` 镜像对；**零** CLI/打包/`.gitignore` 改动。 | Overview 实测第 2、3 条：两条通道已覆盖任意新增 `shared/` 子目录；新增改动即为过度工程（宪法 IX）。 |
 | **A-6** | **框架地图行 = 目标仓治理要求，MUST 补；instructions 指针 = 不补**。源仓实测两者皆未做；但 `directory-governance.md` § 3 要求新种类目录同变更登记到区域地图（`shared/definitions/framework-map.md`）。`shared/` 是**已分发**目录（source 与 `.specify/shared/` 镜像三副本拓扑），其新子目录种类按框架布局行登记。`.specify/instructions.md` 的 Framework Map 段已是指向地图的指针，补第二段会复制事实（宪法 XIV）。 | 源设计的"未做"是源仓未受该治理约束的证据，不是目标仓可以遗漏登记的理由；登记行满足"文档化含义"义务且不新增第二真源。 |
 | **A-7** | **测试 = 一个内容守卫 + 复用既有镜像参数化套件**，Tests Mode 记为 ON（源规格同为 ON）：`tests/contract/test_general_best_practices.py` 以 red-first 钉住 FR-007 的六组断言；镜像字节一致由 `tests/contract/test_mirror_parity_suite.py` 自动覆盖，本守卫不复制第二套比较逻辑。一次全量跑 `scripts/bash/run-tests.sh` 记录基线。 | 源规格 FR-005 的守卫先例；目标仓已有从 `sync-mirrors.py` 派生参数的镜像套件，重复实现违反 One Source of Truth 与测试执行效率纪律。 |
@@ -57,11 +57,14 @@
 | **A-14** | **客户项目再初始化语义沿用现状**：模块随 `shared/` 整目录拷贝；对客户本地修改的保留/覆盖行为与其它 `shared/` 文档一致，本特性不新增保留保证，也不测试该既有语义。 | 不引入新契约；避免为既有分发行为另立承诺（宪法 IX）。 |
 | **A-15** | **模块形状的机器可判定形态**：`shared/best-practices/` **顶层文件集恰为五文档**（`README.md` + 四个 owner 文件；多余文件即守卫转红）；清单的封闭集声明 MUST 是模块内**唯一表格**——三列（模块 / 文件 / 内容）、恰四行数据行，四行「模块」单元为 编程语言 / 系统接口 / 编程框架 / 编程工具 且一一对应各自文件，每行恰含一个相对链接、链接目标集合恰为 [[STR-002]]…[[STR-005]]，并含字面量「封闭集」。 | FR-007(a) 的"恰为四类"需要可解析的声明载体；表格是源已定稿形态（A-8），钉成守卫可执行的形状不引入新文本内容。 |
 | **A-16** | **条目形态与空分类不变式的机器形态**：条目 = owner 文件中一个 `## ` 标题 + `**实践**` 项目符号 + `**反例 / 证据**` 项目符号（可选 `**延伸**`；晋升条目另须 `**来源**`，A-17）；每个 owner 文件 H1 标题唯一，并携带回指清单的积累机制块引用（README.md 链接 +「积累机制」字样 + 条目形态三元）；**占位 ⇔ 零条目**（恰一行含 [[STR-006]] 的斜体占位、该文件零个 `## ` 条目；首次晋升时同变更移除占位）。守卫 MUST NOT 把占位数量冻结为 3（交付态计数 3 是 SC-001 的测量），也 MUST NOT 宣称能判断条目语义真伪。 | FR-007(b)(c) 的"占位""条目形态"若不钉结构就不可判定；冻结数量会让下一次合法晋升迫使守卫改动，违背渐进积累。 |
-| **A-17** | **晋升与回放的追溯形态**：观察 = 既有 feedback 记录，其 notes 携带 [[STR-001]] 标记与四类之一的 **owner 文件 stem**（`programming-languages` / `system-interfaces` / `programming-frameworks` / `programming-tools`），不新增字段或动作；晋升条目 MUST 携带 `**来源**` 项目符号，至少含 feedback 条目 ID / 提交号（hex，≥7 位）/ 会话原话引用之一，并写明"通用"判定依据（反复出现或一次明确的用户纠正）。晋升不改写既有观察记录、不新增 feedback 状态；**种子条目豁免来源行**——其来源是促成本特性的用户原始报告（Input），模块文本 MUST NOT 编造 feedback ID。 | 回放路径 = 从条目 `**来源**` 行反向抵达观察；源 README 的"留痕"要求需要可执行形态，而反馈存储的处置仍归 feedback 引擎（One Source of Truth）。 |
+| **A-17** | **晋升与回放的追溯形态（可执行字段与身份约定）**：观察 = 既有 feedback 记录，经 `--action record` 写入；[[STR-001]] 标记与四类之一的 **owner 文件 stem**（`programming-languages` / `system-interfaces` / `programming-frameworks` / `programming-tools`）写入该记录的 **`--review` 文本**（记录形态、其余参数与存储处置归引擎 `--help`，不新增字段或动作；AR1-01 裁定）。身份约定：摩擦发生在框架命令/技能运行内时用该运行的 unit id 与类型（`/speckit.<command>`+`command` 或 `skill:<name>`+`skill`）并以该 run id 作 `--run-id`；无此类运行承载的 ad-hoc 观察用 `--unit-id custom:best-practices/observation --unit-type custom-unit --run-id bp-<yyyy-mm-dd>-<slug>`（slug 为 ASCII 稳定短名），装载 probe 注册表的工作区须先按 probe 系统为该 custom 单元建立外部 probe（`probe-utils.py --action probe-inject`，义务归 probe 系统，模块只引用）。晋升条目 MUST 携带 `**来源**` 项目符号，至少含 feedback 条目 ID / 提交号（hex，≥7 位）/ 会话原话引用之一，并写明"通用"判定依据（反复出现或一次明确的用户纠正）。晋升不改写既有观察记录、不新增 feedback 状态；**种子条目豁免来源行**——其来源是促成本特性的用户原始报告（Input），模块文本 MUST NOT 编造 feedback ID。 | 回放路径 = 从条目 `**来源**` 行反向抵达观察；字段与身份约定向引擎实测接口对齐（`--review` 是既有记录中承载自由文本的字段；`custom:` 单元在注册表工作区需要外部 probe，实测记录于 `test-evidence/analyze-repair-round1.md`），反馈存储的处置仍归 feedback 引擎（One Source of Truth）。 |
 | **A-18** | **分发与镜像的执行形态**：镜像 MUST 由 `python3 scripts/python/sync-mirrors.py` 的**写模式**在同一变更内再生成，MUST NOT 手改镜像文件；源/镜像字节一致由既有 `tests/contract/test_mirror_parity_suite.py` **唯一**裁决，守卫 MUST NOT 复制比较逻辑；验证记录 MUST 含 `--check` 零漂移输出。init 分发证明 = 代码路径引用（`src/specify_cli/__init__.py` 的 shared 整目录拷贝步骤）+ 既有 init 集成测试（`tests/integration/test_init_new_layout.py`，运行同一拷贝步骤）+ 一次**记录的只读初始化演练**（同一调用形态 `--here --ai qoder --script sh --no-git`，在 `.specify/.tmp/` 临时根内执行，读 `.specify/shared/best-practices/` 恰含五文档）；不新增第二个测试文件。守卫以 `pytest.mark.contract` 标记注册。 | 既有 init 测试运行拷贝步骤但不点名本模块；演练是只读、可复现、零新契约的证据。FR-009 只允许一个新增测试文件，证明不能寄望新测试。 |
 | **A-19** | **框架地图行的行形态**：登记行 MUST 位于 `shared/definitions/framework-map.md` 唯一布局表内、与既有 `.specify/shared/` 行相邻，沿用三列形态；Where 单元 = `.specify/shared/best-practices/`；Notes 单元 MUST 同时包含 **Feature 111**、清单 `README.md` 指针与兄弟行的 `(framework source: shared/best-practices/)` 来源指针；表内该目录**恰一行**，源与镜像各恰一行（镜像经 sync-mirrors 再生成）。 | FR-007(e) 需要可判定的登记断言；"含路径字符串"不足以证明所有者在场，路径 + Feature 111 双 token 让登记可判定。 |
 | **A-20** | **containment 的残余判定程序**：`git diff --name-only 0419adae5..HEAD` 先减去 FR-009 声明集中的字面路径前缀；残余路径仅当全部落在 `.specify/session/` / `.specify/feedback/` / `.specify/exec-quant/` 三存储、且其**记录体**（frontmatter 或正文）含特性 key `111-general-best-practices` 或 run id `r20261127T071500Z-111a` 时放行，其余残余 = 违规。各阶段 MUST 只写 per-entry 文件；MUST NOT 改写 `.specify/exec-quant/records.jsonl` / `scores.jsonl`、feedback 聚合/索引或任何共享聚合；`.specify/state/`（git-ignored 运行时状态）与 `.specify/trigger/` 不被本特性写。 | 封闭声明须可判定（`closed-set-claims.md`）；记录体谓词是"记账记录"与"共享状态改写"的分界，避免把同目录的任何新文件都当作合法。 |
 | **A-21** | **词汇交接（本阶段不写词表）**：词汇候选 "best practice / 最佳实践"（日常开发中反复出现、值得沉淀的经典工程经验）与 "progressive accumulation / 渐进积累"（观察 → 复核 → 晋升的增量沉淀机制）在本规格定格为**提案文本**；本阶段写面仅本特性产物，**不写** `.specify/glossary.md`。词汇协议点名的检查点是 requirements / plan / tasks / implement，而本线 containment（FR-009）不含词表——因此**本线内**登记词表须先修正 FR-009，否则只能在特性封存后另行登记。 | 简报写面"only this feature's artifacts"与 FR-009 的封闭声明都不含 `glossary.md`；A-10 的"留待澄清阶段提议"在此收敛为"提案文本定格 + 登记时点显式外置"。 |
+| **A-22** | **晋升程序与通用判据的所有者 = 模块清单**（AR1-02 裁定）：源 087 只把晋升指向 `knowledge-promotion.md`，而该 owner 定义知识记录义务与 2+ 强调升级，不含 feedback → 分类 owner 文件的晋升程序；本特性因此把**晋升程序、"通用"判据（反复出现或一次明确的用户纠正）与 `**来源**` 追溯形态**的所有者定为清单「逐步积累机制」节（随 `shared/` 分发的自有声明面）；`knowledge-promotion.md` 只以指针承担知识记录义务与强调升级；`feedback-utils.py` 仍拥有记录形态、存储与处置。 | 声明了 X 的 owner 必须真拥有 X（宪法 XIV）；源指针只有路径存在证据、没有内容适配证据；把规则放进随模块分发的清单，使 owner 与消费者可达同一文件，且特性保持纯增量（引擎零改动）。 |
+| **A-23** | **观察载体 = `--review` 文本 + 身份约定**（AR1-01 裁定）：引擎 `record` 的必填参数为 `--unit-id` / `--run-id` / `--review` / `--points`，无 `notes` 字段且 `--notes` 会被静默丢弃；因此 [[STR-001]] 标记与 owner 文件 stem 写入 `--review` 文本；身份约定与 probe 前提按 A-17 执行。 | 需求必须落在引擎真实存在的字段上；实测 2026-11-27（`--action args-manifest`、legacy 工作区 record 成功读数、带 probe 注册表工作区的 record 失败读数与注册表依赖），记录于 `test-evidence/analyze-repair-round1.md`。 |
+| **A-24** | **任务序修复 = US1 末尾先建镜像（T007A）**（AR1-03 裁定）：C-404 的模块读取前导要求断言模块引用的每个仓内路径（含 `.specify/shared/best-practices/`）存在，而镜像原在 T012 才生成；改为在 US1 内容落地后、T008 绿点前插入写模式镜像再生成（T007A），T012 仍作最终再生成收口。 | 保持 C-404 前导断言不削弱（不放宽为"源侧路径"），修复的是任务图而非契约；T009 之后至 T012 之间镜像短暂落后于源，最终态由 T012/T013 收敛并以既有镜像套件唯一裁决。 |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -83,17 +86,17 @@
 
 ### User Story 2 - 经既有引擎渐进积累新条目（Priority: P1）
 
-框架维护者在一次真实开发摩擦后，用既有 feedback 引擎记下一条带标记的观察；当同一摩擦再次出现或被一次明确的用户纠正证明为**通用**时，他按知识晋升纪律把它提升进匹配的分类 owner 文件，条目带有可回溯的来源（feedback 条目 ID / 提交号 / 会话原话）。全程没有新引擎、新存储或新渲染器。
+框架维护者在一次真实开发摩擦后，用既有 feedback 引擎记下一条带标记的观察；当同一摩擦再次出现或被一次明确的用户纠正证明为**通用**时，他按清单「逐步积累机制」节的晋升程序把它提升进匹配的分类 owner 文件（晋升程序与"通用"判据由清单拥有，知识记录义务按指针归既有 owner），条目带有可回溯的来源（feedback 条目 ID / 提交号 / 会话原话）。全程没有新引擎、新存储或新渲染器。
 
-**Why this priority**: 没有积累路径，模块会停在首条种子；而新建第二机制会与既有 feedback + memory 引擎形成双轨，破坏 One Source of Truth。
+**Why this priority**: 没有积累路径，模块会停在首条种子；而新建第二机制会与既有 feedback 引擎和知识记录 owner 形成双轨，破坏 One Source of Truth。
 
-**Independent Test**: 从清单与 owner 文件核对积累机制声明：观察入口指向既有 feedback 引擎的动作面、晋升规则指向既有 knowledge-promotion 所有者、回溯要素在场；全模块检索无第二引擎/存储声明。守卫断言指针可解析且无第二机制。
+**Independent Test**: 从清单与 owner 文件核对积累机制声明：观察入口指向既有 feedback 引擎的动作面、晋升程序与通用判据由清单「逐步积累机制」节唯一拥有、知识记录义务指向既有 `knowledge-promotion` owner、回溯要素在场；全模块检索无第二引擎/存储声明。守卫断言指针可解析且无第二机制。
 
 **Acceptance Scenarios**:
 
-1. **Given** 一次真实开发摩擦，**When** 维护者用 `.specify/scripts/python/feedback-utils.py --action record` 记录带 [[STR-001]] 标记与所属分类的观察，**Then** 该观察落在既有 feedback 存储，MUST NOT 直接写入模块条目区。
-2. **Given** 一条观察被证明通用（反复出现或一次明确的用户纠正），**When** 按 `.specify/shared/guidelines/knowledge-promotion.md` 晋升，**Then** 条目 MUST 落在匹配的分类 owner 文件并遵守条目形态，且携带观察来源；MUST NOT 编造数值或证据。
-3. **Given** 积累机制声明，**When** 维护者检索模块与守卫，**Then** MUST NOT 存在第二引擎、第二存储、第二渲染器或索引的声明；机制只以指针复用既有 feedback + memory 引擎。
+1. **Given** 一次真实开发摩擦，**When** 维护者用 `.specify/scripts/python/feedback-utils.py --action record` 记录观察——[[STR-001]] 标记与所属分类 stem 写入 `--review` 文本，身份约定按 A-17——**Then** 该观察落在既有 feedback 存储，MUST NOT 直接写入模块条目区。
+2. **Given** 一条观察被证明通用（反复出现或一次明确的用户纠正），**When** 按清单「逐步积累机制」节的晋升程序（A-22 的规则所有者）晋升，**Then** 条目 MUST 落在匹配的分类 owner 文件并遵守条目形态，且携带观察来源；MUST NOT 编造数值或证据。
+3. **Given** 积累机制声明，**When** 维护者检索模块与守卫，**Then** MUST NOT 存在第二引擎、第二存储、第二渲染器或索引的声明；观察与存储按指针复用既有 feedback 引擎，知识记录义务按指针归既有 owner，晋升程序为清单自有规则。
 
 ---
 
@@ -134,7 +137,7 @@
 - **FR-001**: 在 `shared/best-practices/` 创建模块清单 `README.md`，声明**封闭的四分类集**——编程语言 / 系统接口 / 编程框架 / 编程工具，每类恰一个 owner 文件：[[STR-002]]、[[STR-003]]、[[STR-004]]、[[STR-005]]——以及模块读者与范围（日常开发可复用的经典经验库，渐进积累而非一次性清单）和统一**条目形态**（标题 + 实践 + 反例/证据；结构按 A-16：`## ` 标题 + `**实践**` + `**反例 / 证据**` 项目符号，可选 `**延伸**`）。清单的分类表 MUST 逐行链接到四个 owner 文件；机器形态按 **A-15**：分类表是清单唯一表格（三列、恰四行、每行恰一相对链接、链接目标集合 = 四个 owner 文件），模块顶层文件集恰为五文档，清单含字面量「封闭集」。封闭集变更（新增/删除/改名分类）MUST 在同一变更内同时修订清单、建立或迁移对应 owner 文件并更新守卫（FR-007）；MUST NOT 只新增文件不改清单。
 - **FR-002**: 创建四个分类 owner 文件：[[STR-002]]、[[STR-003]]、[[STR-004]]、[[STR-005]]。每个文件 MUST 以唯一 H1 分类标题标识自身，并携带回指清单的积累机制块引用（README 链接 + 条目形态三元，A-16）；分类范围（scope）由清单分类表「内容」列单一拥有，owner 文件不复述（空分类在占位句中复述一句范围说明）。**尚无条目**的分类 MUST 以恰一行含 [[STR-006]] 的斜体占位 + 一句话范围说明交付，且该文件零个 `## ` 条目（占位 ⇔ 零条目的互斥不变式，A-16）；MUST NOT 删除该文件，MUST NOT 以编造条目充数（A-11；语义真伪归评审判定）。
 - **FR-003**: 在 [[STR-005]] 中种子首条 [[STR-007]]：git 这个编程工具的 clone 默认口径——**默认用 HTTPS 作 clone URL**；特殊仓库必须走 HTTP（或 SSH）时 MUST 显式提示该仓库的协议与凭据要求，以此达成统一；反例/证据 MUST 记录 `~/.git-credentials` 记录了 HTTP 认证信息而 install 流程用 HTTPS 发起 clone 导致失败的协议错位认知偏差；延伸口径（内网 git 服务在 HTTPS 需认证而 SSH 匿名/key 可用时，install 源 URL 优先给 SSH 或明确提示认证方式）MUST 保留。条目 MUST 遵守 FR-001 的条目形态。种子条目的来源是促成本特性的用户原始报告（本规格 Input）；模块文本 MUST NOT 编造 feedback ID 或来源行（A-17）。
-- **FR-004**: 在清单中以**指针形态**声明渐进积累机制：开发观察经 `.specify/scripts/python/feedback-utils.py --action record` 落为带 [[STR-001]] 标记与所属分类的观察（约定形态按 A-17：标记与四类之一的 owner 文件 stem 写入既有记录的 notes，不新增字段、动作或存储）；当被证明**通用**（反复出现或一次明确的用户纠正）时，按 `.specify/shared/guidelines/knowledge-promotion.md` 晋升进匹配的分类 owner 文件，并在条目的 `**来源**` 项目符号中记录观察来源（feedback 条目 ID / 提交号 hex ≥7 位 / 会话原话引用之一）与"通用"判定依据，使条目可回溯；晋升不改写既有观察记录（A-17）。红线：干净运行 MUST NOT 追加空洞条目，MUST NOT 编造数值或证据。机制 MUST 复用既有 feedback + memory 引擎，MUST NOT 新建第二引擎、存储、渲染器或索引；机制规则按指针抵达所有者，清单不复述其取值。
+- **FR-004**: 在清单的**逐步积累机制**节声明渐进积累：开发观察经 `.specify/scripts/python/feedback-utils.py --action record` 落为带 [[STR-001]] 标记与所属分类的观察（约定形态按 A-17：标记与四类之一的 owner 文件 stem 写入既有记录的 `--review` 文本，身份与 run id 约定按 A-17，不新增字段、动作或存储）；**晋升程序、"通用"判据（反复出现或一次明确的用户纠正）与 `**来源**` 追溯形态由该节唯一拥有**（A-22）——当观察被证明通用时，按该节程序晋升进匹配的分类 owner 文件，并在条目的 `**来源**` 项目符号中记录观察来源（feedback 条目 ID / 提交号 hex ≥7 位 / 会话原话引用之一）与"通用"判定依据，使条目可回溯；晋升不改写既有观察记录（A-17）。红线：干净运行 MUST NOT 追加空洞条目，MUST NOT 编造数值或证据。机制 MUST 复用既有 feedback 引擎，MUST NOT 新建第二引擎、存储、渲染器或索引；反馈记录的形态与处置按指针归 `feedback-utils.py`，知识记录义务按指针归 `.specify/shared/guidelines/knowledge-promotion.md`——清单只引用这两个所有者、不复述其取值；模块自有的晋升程序与判据由清单声明，不构成复述（A-22）。
 - **FR-005**: 在 `shared/definitions/framework-map.md` 新增一行，登记 `.specify/shared/best-practices/` 为随框架分发的通用最佳实践内容模块，指向本模块清单与 Feature 111；行形态按 A-19：位于地图唯一布局表、与既有 `.specify/shared/` 行相邻、三列形态，Where 单元 = `.specify/shared/best-practices/`，Notes 单元同时含 Feature 111、清单 `README.md` 指针与 `(framework source: shared/best-practices/)` 来源指针，该目录在源与镜像表中各恰一行。该登记 MUST 与模块创建**同一变更**落地（`shared/guidelines/directory-governance.md` § 3）。镜像 `.specify/shared/definitions/framework-map.md` 由既有镜像机制再生成，MUST NOT 手改。`.specify/instructions.md` 与指令模板 MUST NOT 新增指针段（现有 Framework Map 段已是指向地图的指针，A-6）。
 - **FR-006**: 分发 MUST 复用既有 `shared/` 通道，不新增打包或运行时面：(a) `specify init` 既有的 `shared/` 整目录拷贝使模块落到客户项目 `.specify/shared/best-practices/`；(b) `scripts/python/sync-mirrors.py` 的既有 `shared → .specify/shared` 镜像对 MUST 覆盖本模块并保持源/镜像字节一致；(c) 镜像由 sync-mirrors **写模式**在同一变更内再生成，MUST NOT 手改，字节一致由既有参数化镜像套件唯一裁决，守卫 MUST NOT 复制比较逻辑（A-18）。MUST NOT 新增运行时存储、`.gitignore` 规则、CLI 代码或打包清单改动。
 - **FR-007**: 守卫 `tests/contract/test_general_best_practices.py` MUST 以 red-first 方式钉住（结构形态按 A-15 / A-16 / A-17）：(a) 模块顶层文件集恰为五文档；清单唯一分类表恰四行、每行恰一相对链接、链接目标集合恰为 [[STR-002]]、[[STR-003]]、[[STR-004]]、[[STR-005]]，且含「封闭集」字面量；(b) 每个 owner 文件 H1 唯一并携带回指清单的积累机制块引用；空分类 ⇔ 恰一行含 [[STR-006]] 的占位且零个 `## ` 条目；每个条目含 `**实践**` 与 `**反例 / 证据**` 项目符号（可选 `**延伸**`），非种子条目另含 `**来源**`；守卫 MUST NOT 把占位数量冻结为 3，MUST NOT 声称判定条目语义真伪；(c) 首条 [[STR-007]] 在 [[STR-005]] 中的三项内容断言（默认 HTTPS 实践 / 特殊仓库 HTTP 显式提示义务 / `~/.git-credentials` 反例）加延伸 SSH 口径在场；(d) 机制指针可解析——`.specify/scripts/python/feedback-utils.py` 的 `--help` 动作集含 `record`、`.specify/shared/guidelines/knowledge-promotion.md` 存在、清单含 [[STR-001]] 字面量；第二机制检查 = `scripts/python/` 下不存在以 best-practices 命名的引擎文件，文本层的第二机制声明归评审（SC-003）；(e) 框架地图源与镜像各含恰一行同时带 `.specify/shared/best-practices/` 与 `Feature 111` 的表行；(f) 清单 ↔ 四个 owner 文件的相对链接全部可解析。镜像字节一致性由既有 `tests/contract/test_mirror_parity_suite.py` 覆盖，本守卫 MUST NOT 复制第二套镜像比较逻辑。守卫以 `pytest.mark.contract` 标记注册，MUST 经唯一测试入口 `scripts/bash/run-tests.sh` 执行。
@@ -146,7 +149,7 @@
 - **Category（分类，封闭集）**: 编程语言 / 系统接口 / 编程框架 / 编程工具；每个分类恰有一个 owner 文件，集合变更须同变更修订清单、文件与守卫。
 - **Entry（条目）**: 统一形态 = `## ` 标题 + `**实践**` + `**反例 / 证据**`（可选 `**延伸**`）；晋升条目另带 `**来源**`（A-16、A-17）；种子条目以促成规格的用户原始报告为来源，模块文本不编造 feedback ID。
 - **Manifest（清单）**: `README.md` 声明封闭集（唯一三列四行表，A-15）、条目形态、模块读者与范围、积累机制指针。
-- **Observation（观察）**: 既有 feedback 存储中的一条记录，notes 携带 [[STR-001]] 标记与四类之一的 owner 文件 stem（A-17）；"通用"证明前不进入模块。
+- **Observation（观察）**: 既有 feedback 存储中的一条记录，其 `--review` 文本携带 [[STR-001]] 标记与四类之一的 owner 文件 stem，身份约定按 A-17；"通用"证明前不进入模块。
 - **Guard（守卫）**: `tests/contract/test_general_best_practices.py`，red-first 钉住模块形状、指针、登记与零残留；其可判定边界按 A-16 / SC-003（语义真伪不属守卫断言）。
 
 ### Runtime Stack & Dependency Ownership
@@ -156,7 +159,7 @@
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
 | RS-001 | 内容模块（清单 + 四个 owner 文件 + 首条） | in-scope | 本特性：`shared/best-practices/` + 镜像 | 四分类封闭集；随 `shared/` 分发 | 本规格 FR-001…FR-003（plan 阶段契约细化） | FR-007 守卫的 (a)(b)(c)(f) 四条断言转绿 | FR-001, FR-002, FR-003 | EP-001 |
-| RS-002 | 积累机制声明 + 内容守卫 | in-scope | 本特性：`README.md` + `tests/contract/test_general_best_practices.py` | feedback 观察 → 按 knowledge-promotion 晋升（指针）；red-first | 本规格 FR-004、FR-007 | 守卫的 (d) 段断言 + 指针解析；无第二机制声明 | FR-004, FR-007 | EP-002 |
+| RS-002 | 积累机制声明 + 内容守卫 | in-scope | 本特性：`README.md` + `tests/contract/test_general_best_practices.py` | feedback 观察（指针）→ 按清单自有晋升程序沉淀（A-22）；red-first | 本规格 FR-004、FR-007 | 守卫的 (d) 段断言 + 指针解析；无第二机制声明 | FR-004, FR-007 | EP-002 |
 | RS-003 | 分发登记与镜像（框架地图行 + `shared → .specify/shared` 镜像对） | in-scope | 既有：`shared/definitions/framework-map.md` + `scripts/python/sync-mirrors.py`（零修改消费） | 同变更登记；字节一致 | 本规格 FR-005、FR-006 | `sync-mirrors.py --check` 对本模块零漂移；守卫的 (e) 段断言 | FR-005, FR-006 | EP-003 |
 
 ## Success Criteria *(mandatory)*
@@ -165,7 +168,7 @@
 
 - **SC-001**: 模块形状成立：`shared/best-practices/` 顶层文件集恰为清单与四个 owner 文件（5/5，无额外文件）；清单唯一分类表恰四行、声明的封闭集恰为四类（[[STR-002]] / [[STR-003]] / [[STR-004]] / [[STR-005]]）且每类链接到恰一个 owner 文件（4/4，A-15）；清单 ↔ owner 文件相对链接可解析率 = 100%；空分类占位 [[STR-006]] 出现数 = 3 且每个空分类零条目（**交付态**测量；守卫按 A-16 的互斥不变式判定，不冻结该数量）。 **Path**: final
 - **SC-002**: 首条种子在场：[[STR-005]] 中 [[STR-007]] 条目同时包含默认 HTTPS 实践、特殊仓库 HTTP 显式提示义务与 `~/.git-credentials` 反例三项（3/3），且延伸口径（HTTPS 需认证而 SSH 可用时优先 SSH 或明示认证方式）在场；守卫对应断言由红转绿。 **Path**: final
-- **SC-003**: 积累机制仅以指针声明：观察入口 → 晋升规则的指针链可解析（2/2：`feedback-utils.py --action record`、`knowledge-promotion.md`）；[[STR-001]] 标记在机制声明中在场；第二机制的可判定读数 = 0：`scripts/python/` 下无 `best-practices.py` / `best_practices.py` 引擎文件；文本层的第二机制声明由评审确认，守卫不以模糊文本扫描充数（A-16、FR-007(d)）。 **Path**: final
+- **SC-003**: 积累机制的「引擎指针 + 清单自有规则」成立：指针链可解析（2/2：`feedback-utils.py --action record` 动作、`knowledge-promotion.md` 作为知识记录义务 owner 存在）；晋升程序与通用判据由清单「逐步积累机制」节唯一声明（A-22）；[[STR-001]] 标记在机制声明中在场；第二机制的可判定读数 = 0：`scripts/python/` 下无 `best-practices.py` / `best_practices.py` 引擎文件；文本层的第二机制声明由评审确认，守卫不以模糊文本扫描充数（A-16、FR-007(d)）。 **Path**: final
 - **SC-004**: 分发与登记成立：`shared/definitions/framework-map.md` 与 `.specify/shared/definitions/framework-map.md` 各含恰一行同时带 `.specify/shared/best-practices/` 与 `Feature 111` 的登记行（2/2，A-19）；`sync-mirrors.py --check` 对本模块的源/镜像差集 = 空；init 既有 `shared/` 拷贝步骤覆盖新目录的证明记录在场（代码路径引用 + 既有 init 集成测试运行同一拷贝步骤 + 记录的只读初始化演练，按 A-18；不新增第二个测试文件），且 `src/` 改动行数 = 0。 **Path**: final
 - **SC-005**: 适配与零残留：模块五文档中 `ai-harness` / `.ah/` / `/ah.` 出现数 = 0；模块引用的仓内路径存在率 = 100%；归属声明为 Feature 111。 **Path**: final
 - **SC-006**: containment 成立：`git diff --name-only 0419adae5..HEAD` 的变更路径集 ⊆ FR-009 的声明集（集合外路径出现数 = 0；wrap-up 记账记录按 FR-009 / A-20 的残余判定程序——路径集差后仅三记账存储、记录体含特性 key 或 run id 者放行；后续特性登记阶段的注册表例外按 FR-009 判定）；引擎/模板/技能/代理/命令/宪法/指令/存储布局/决策治理面改动数 = 0。 **Path**: final
@@ -218,3 +221,9 @@
 - Q: 框架地图登记行的可判定形态？ → A: 地图唯一布局表内、与 `.specify/shared/` 行相邻的三列一行；Where = `.specify/shared/best-practices/`，Notes 含 Feature 111、`README.md` 指针与 `(framework source: shared/best-practices/)`；源与镜像各恰一行（A-19；FR-005、FR-007(e)）。
 - Q: containment 的残余路径如何判定，记账写入的边界在哪？ → A: 路径集差后，残余仅当落在三记账存储且记录体含特性 key 或 run id 时放行；只写 per-entry 文件，不改写聚合/索引，不触达 trigger/state（A-20；FR-009、SC-006）。
 - Q: 词汇候选何时登记？ → A: 本规格定格提案文本（"best practice / 最佳实践"、"progressive accumulation / 渐进积累"）；本阶段不写 `.specify/glossary.md`；本线 containment 不含词表，线内登记须先修正 FR-009，否则线后另行登记（A-21；A-10 收敛）。
+
+### Session 2026-11-27（analyze 轮次三阻断发现的修复裁定）
+
+- Q: 晋升程序与通用判据归谁所有？ → A: 归**清单「逐步积累机制」节**所有；`knowledge-promotion.md` 只以指针承担知识记录义务与强调升级，`feedback-utils.py` 仍拥有记录形态、存储与处置（A-22；FR-004、A-17、C-104、C-302、C-305 同步改写）。
+- Q: 观察落在哪个既有字段、ad-hoc 观察的 unit-id/run-id 如何合法？ → A: [[STR-001]] 标记与 owner 文件 stem 写入既有 `--review` 文本；有命令/技能运行时用该运行的 unit id 与 run id，无运行时用 `custom:best-practices/observation` + `--unit-type custom-unit` + `bp-<yyyy-mm-dd>-<slug>`，注册表工作区先经 probe 系统建立外部 probe（A-23、A-17）。
+- Q: 守卫前导的镜像路径存在性断言与任务序如何两全？ → A: 在 US1 内容落地后、T008 绿点前插入 T007A（写模式镜像再生成）；C-404 前导断言不放宽，T012 仍作最终再生成收口（A-24）。

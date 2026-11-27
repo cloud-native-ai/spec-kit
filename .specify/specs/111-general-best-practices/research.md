@@ -19,7 +19,8 @@
 ## M3 — Accumulation owners present (measured)
 
 - `python3 .specify/scripts/python/feedback-utils.py --help` → action set starts `record,status,list,dispose,mark-submitted,reindex,package,cleanup,upstream,migrate-legacy,introspect-register,args-manifest,ingest-exec-quant,client-metrics`; `record` exists, so the observation half needs no new action.
-- `shared/guidelines/knowledge-promotion.md` and `.specify/shared/guidelines/knowledge-promotion.md` exist (4849 bytes each), so the promotion half is reachable by pointer in both the source and the runtime mirror.
+- `shared/guidelines/knowledge-promotion.md` and `.specify/shared/guidelines/knowledge-promotion.md` exist (4849 bytes each), so the knowledge-recording obligation is reachable by pointer in both the source and the runtime mirror. The file owns the recording obligation and the 2+ user-emphasis escalation; it defines no feedback → category-owner-file promotion, so the promotion procedure and generality criterion are the module manifest's own rule (A-22).
+- `feedback-utils.py --action args-manifest` (re-measured 2026-11-27 during analyze-repair): `record` requires `--unit-id`/`--run-id`/`--review`/`--points` with an empty source set; no `notes` field exists and `--notes` is silently dropped — the observation marker and stem must travel in `--review` (A-23).
 
 ## M4 — Distribution path (measured)
 
@@ -82,7 +83,7 @@ The seed ports in substance: default HTTPS clone URL; a special repository requi
 
 ### R-5 — Accumulation by pointer with a separable traceability form
 
-Observation form: the existing feedback `record` action with notes carrying [[STR-001]] plus one owner-file stem — no new field, action or store. Promotion: only when general (recurrence or one explicit user correction), following `knowledge-promotion.md`; the observation record is not rewritten. Traceability: the promoted entry's `**来源**` bullet names at least one of feedback entry ID / ≥7-hex commit / quoted session utterance and states the generality basis. The seed is exempt (A-17).
+Observation form: the existing feedback `record` action with its `--review` text carrying [[STR-001]] plus one owner-file stem — no new field, action or store; an ad-hoc observation uses `custom:best-practices/observation` + `--unit-type custom-unit` with a `bp-<yyyy-mm-dd>-<slug>` run id (after the probe system's external-probe setup where the registry is installed), while an observation made inside a command/skill run uses that run's unit id and run id (A-17, A-23). Promotion: only when general (recurrence or one explicit user correction); the procedure and criterion are the manifest's own declared rules, because the source's pointer reaches `knowledge-promotion.md`, which does not define feedback→category promotion (A-22); the observation record is not rewritten. Traceability: the promoted entry's `**来源**` bullet names at least one of feedback entry ID / ≥7-hex commit / quoted session utterance and states the generality basis. The seed is exempt (A-17).
 
 ### R-6 — Distribution reuse, zero code change
 
