@@ -1,0 +1,40 @@
+# Workspace guard — implement P2
+
+## Snapshot (before gates)
+
+```
+$ python3 scripts/python/workspace-guard.py --snapshot .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2.json --repo .
+recorded .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2.json
+exit 0
+```
+
+## Check (after wrap-up) — drift found, external to this slice
+
+```
+$ python3 scripts/python/workspace-guard.py --check .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2.json --repo . --json
+{"status": "drift", "changed": ["refs"], ...}
+exit 1
+```
+
+Changed field: refs only. Diff (current minus stored): the single added ref
+`refs/heads/111-general-best-practices`. Branch (`109-prompt-adherence`) and the
+.specify/specs listing are unchanged. Origin evidence:
+
+```
+$ git reflog show 111-general-best-practices
+0419adae5 111-general-best-practices@{0}: branch: Created from 0419adae5
+$ git log -1 --format="%H %ci %s" 111-general-best-practices
+0419adae5e6e0e208ad6bcb443e45be8d266f04a 2026-11-27 11:26:21 +0800 Merge gitlab/master into master — reconcile draw-diagram readback feature (89946b9da)
+```
+
+The branch was created by a concurrent line in the shared repository between this
+slice's snapshot and check; implement P2 created no git ref (no branch, tag or
+remote change) and no spec directory. The drift is recorded as a reading, not
+silently re-snapshotted away.
+
+## Re-baseline and post-check (clean window from here)
+
+```
+$ python3 scripts/python/workspace-guard.py --snapshot .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2-post.json --repo .
+recorded .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2-post.json
+snapshot rc=0

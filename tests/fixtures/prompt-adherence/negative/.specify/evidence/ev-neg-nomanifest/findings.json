@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "/speckit.plan",
+  "runId": "r20261126T000000Z-negative",
+  "window": {"since": null, "until": null},
+  "platforms": [],
+  "lanes": {},
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "fixture run with no manifest.json: its declared timestamp is missing",
+      "signals": {}
+    }
+  ],
+  "findingsDigest": "sha256:fixture-no-manifest"
+}

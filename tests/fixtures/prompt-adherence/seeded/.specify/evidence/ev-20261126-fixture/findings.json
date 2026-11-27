@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "/speckit.plan",
+  "runId": "r20261126T000000Z-fixture",
+  "window": {"since": null, "until": null},
+  "platforms": [],
+  "lanes": {},
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "feedback",
+      "evidenceState": "Exercised",
+      "summary": "PROSE-MARKER-FINDING-SUMMARY never read by the adherence reading",
+      "signals": {}
+    },
+    {
+      "id": "ev-002",
+      "lane": "project",
+      "evidenceState": "Present",
+      "summary": "fixture project evidence",
+      "signals": {}
+    },
+    {
+      "id": "ev-003",
+      "lane": "assets",
+      "evidenceState": "Missing",
+      "summary": "fixture missing evidence (drives the evidence-missing deviation class)",
+      "signals": {}
+    }
+  ],
+  "findingsDigest": "sha256:fixture-seeded"
+}

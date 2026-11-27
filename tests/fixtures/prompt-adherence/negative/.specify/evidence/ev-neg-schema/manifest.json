@@ -1,0 +1,8 @@
+{
+  "runId": "r20261126T000000Z-negative",
+  "target": "/speckit.plan",
+  "created": "2026-11-26T00:04:00Z",
+  "lanes": {},
+  "engine": {},
+  "findingsDigest": "sha256:fixture-schema-violation"
+}
