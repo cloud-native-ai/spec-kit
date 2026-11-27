@@ -3,7 +3,7 @@
 **Feature ID**: 111
 **Name**: General Best Practices（通用最佳实践模块）
 **Description**: 通用最佳实践模块：清单 README + 四个分类 owner 文件（封闭集）、条目形态、经既有 feedback + memory 引擎的渐进积累/晋升与来源回溯、随 `shared/` 的 init 分发与镜像、守卫与框架地图登记；纯文档新增。
-**Status**: Implemented
+**Status**: Ready for Review
 **Created**: 2026-11-27
 **Last Updated**: 2026-11-27
 
