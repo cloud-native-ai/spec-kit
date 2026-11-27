@@ -95,3 +95,8 @@ SC-011_status=pass
 SC-011_value=landing contract declares exactly three legal cells and three forbidden pairs; layout header is the fixed six columns (no category column); every layout row lands in a legal cell; repository check clean
 
 SC-011_note=command=run-tests.sh tests/contract/test_context_management_owner.py (landing/matrix legs); evidence=test-evidence/guard-convergence.txt, test-evidence/audit-fixtures.txt
+
+# -- Runtime Stack joint acceptance (AS-05 / C-18) --
+
+RS-001_joint_acceptance=verified by behaviour on the delivered tree: layout completeness (owner layout table + four facts + registry row), determinism of the audit reading, read-only containment over the declared roots, absence honesty (not-evaluated labels), offline init run and mirror equality; evidence: the context-management guard suite and the implement evidence set.
+RS-005_joint_acceptance=verified by behaviour on the delivered tree: the five guard groups each go red on a seeded violation, mirrors are byte-identical, the init fixture carries the ambient section, and the concept-pointer/landing guards pass; evidence: the guard suite and the init fixture output.
