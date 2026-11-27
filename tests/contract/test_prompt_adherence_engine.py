@@ -1254,3 +1254,35 @@ def test_the_dated_baseline_entry_replays_against_its_citations():
     assert replay["status"] == ("partial" if expected_partial else baseline["status"]), (
         "the replay status %r does not match the scope-shifted expectation" % replay["status"]
     )
+
+
+# --------------------------------------------------------------------------- #
+# GATE-7 — an undeclared store in a catalog row is a hard error (C-026/FR-030)
+# --------------------------------------------------------------------------- #
+def test_an_undeclared_store_in_a_catalog_row_exits_2_with_no_reading(tmp_path):
+    tree = _copy_tree(tmp_path / "tree")
+    owner = tree / "shared" / "definitions" / "prompt-adherence-definitions.md"
+    text = owner.read_text(encoding="utf-8")
+    needle = "| session | `run-determination.py::load_determinations` |"
+    assert text.count(needle) == 1, (
+        "the catalog shape changed; update the store doctor (found %d of %r)"
+        % (text.count(needle), needle)
+    )
+    owner.write_text(
+        text.replace(needle, "| zz-undeclared | `run-determination.py::load_determinations` |"),
+        encoding="utf-8",
+    )
+    engine = tree / "scripts" / "python" / "prompt-adherence.py"
+    for args in (("--check-coverage",), ()):
+        proc = subprocess.run(
+            [sys.executable, str(engine), *args],
+            cwd=str(tree), capture_output=True, text=True,
+        )
+        assert proc.returncode == 2, (
+            "a catalog row naming an undeclared store must exit 2 for %r; rc=%d stdout=%r "
+            "stderr=%r" % (args, proc.returncode, proc.stdout, proc.stderr)
+        )
+        assert proc.stdout.strip() == "", "no reading or verdict may be emitted after the refusal"
+        assert "zz-undeclared" in proc.stderr, (
+            "the refusal must name the undeclared store: %r" % proc.stderr
+        )

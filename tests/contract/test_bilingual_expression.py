@@ -332,6 +332,11 @@ def _str_allowed_paths() -> set[Path]:
         # update this whitelist before writing the literal — this is that registration.
         REPO_ROOT / "shared" / "definitions" / "mechanism-policy-definitions.md",
         REPO_ROOT / "tests" / "contract" / "test_mechanism_policy_ownership.py",
+        # 2026-11-27 (Feature 109): the prompt-adherence owner document cites this owner's
+        # path in its two-layer model section (the core concept lines carry the bilingual
+        # form per its rule), and the Shared Strings protocol (C-03) requires a new consumer
+        # to update this whitelist before writing the literal — this is that registration.
+        REPO_ROOT / "shared" / "definitions" / "prompt-adherence-definitions.md",
     }
     allowed.update(p for p in FIXTURES.rglob("*") if p.is_file())
     return allowed
