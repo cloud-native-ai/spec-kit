@@ -1,0 +1,43 @@
+== requirements.md ==
+lines: 310
+FR rows: 30
+SC rows: 9
+STR rows: 2
+A rows: 18
+User stories: 5
+Edge-case bullets: 16
+RS rows: 1
+Clarification sessions: 2
+not evaluated (space, backticked): 9
+not_evaluated (underscore, backticked): 16
+layer-B occurrences: 1
+NEEDS CLARIFICATION occurrences: 1 total; in body before ## Clarifications: 0; inside ## Clarifications: 1
+  -> the single occurrence is the Clarifications Q asking whether any remains (answer: none);
+     validator [marker-count] pass (0) confirms no live marker.
+
+== contracts ==
+declarations-and-vocabularies.contract.md clauses: 7
+distribution.contract.md clauses: 3
+engine-and-read.contract.md clauses: 5
+guards-and-boundaries.contract.md clauses: 7
+owner-and-catalog.contract.md clauses: 7
+reading-semantics.contract.md clauses: 10
+contract files: 6 total clauses: 39
+
+== plan / data-model / quickstart / tasks ==
+plan constitution rows: 23
+plan PA adjudications: 16
+plan EP rows: 8
+data-model entities: 11
+data-model invariants: 14
+quickstart scenarios: 6
+task rows: 39
+P rows: 6
+rows carrying >=1 green claim: 6; green token occurrences incl. 2 prose examples: 41
+
+== source 092 (behavior authority) ==
+source contract files: 5; source clause definitions: 39
+source per file: declarations-and-vocabularies.contract.md=7, engine-and-distribution.contract.md=8, guards-and-boundaries.contract.md=7, owner-and-catalog.contract.md=7, reading-contract.contract.md=10
+
+== checklist dir ==
+checklist files present: ['requirements-quality-2026-11-27.md', 'requirements.md']

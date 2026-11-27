@@ -1,0 +1,98 @@
+checklist: .specify/specs/109-prompt-adherence/checklists/requirements-quality-2026-11-27.md
+item count: 40
+numbering contiguous CHK001..CHK040: True
+unique: True
+items with >=1 trace anchor: 40 / 40
+items missing anchor: none
+items citing >=1 FR/SC: 40 / 40
+items missing FR/SC: none
+FR covered: 30 / 30; missing: none
+SC covered: 9 / 9; missing: none
+clauses covered: 39 / 39; missing: none
+items starting with Verify/Test/Confirm/Check: none
+primary dimension histogram: {'Ambiguity': 5, 'Assumption': 1, 'Clarity': 4, 'Completeness': 12, 'Conflict': 1, 'Consistency': 3, 'Coverage': 1, 'Dependency': 1, 'Edge Case': 2, 'Gap': 3, 'Measurability': 4, 'NFR': 2, 'Traceability': 1}
+per-item primary dimension: CHK001:Completeness, CHK002:Completeness, CHK003:Consistency, CHK004:Completeness, CHK005:Measurability, CHK006:Completeness, CHK007:Gap, CHK008:Conflict, CHK009:Clarity, CHK010:Consistency, CHK011:Ambiguity, CHK012:Completeness, CHK013:Consistency, CHK014:Completeness, CHK015:Clarity, CHK016:Measurability, CHK017:Completeness, CHK018:Ambiguity, CHK019:Completeness, CHK020:Gap, CHK021:Edge Case, CHK022:Ambiguity, CHK023:Clarity, CHK024:Completeness, CHK025:Gap, CHK026:Edge Case, CHK027:Ambiguity, CHK028:Ambiguity, CHK029:Completeness, CHK030:Traceability, CHK031:NFR, CHK032:NFR, CHK033:Completeness, CHK034:Measurability, CHK035:Coverage, CHK036:Measurability, CHK037:Clarity, CHK038:Assumption, CHK039:Completeness, CHK040:Dependency
+has Notes section: True
+checklists dir files: ['requirements-quality-2026-11-27.md', 'requirements.md']
+
+FR coverage map:
+  FR-001: CHK001, CHK038
+  FR-002: CHK001, CHK037
+  FR-003: CHK002, CHK003, CHK025
+  FR-004: CHK005
+  FR-005: CHK006, CHK030, CHK040
+  FR-006: CHK034
+  FR-007: CHK030
+  FR-008: CHK022
+  FR-009: CHK010
+  FR-010: CHK010
+  FR-011: CHK008, CHK013, CHK014, CHK015, CHK026
+  FR-012: CHK015
+  FR-013: CHK004, CHK016
+  FR-014: CHK011, CHK013, CHK016, CHK017, CHK018
+  FR-015: CHK008, CHK016, CHK019, CHK020
+  FR-016: CHK005, CHK017, CHK020, CHK021, CHK023
+  FR-017: CHK014, CHK021
+  FR-018: CHK012
+  FR-019: CHK001, CHK028
+  FR-020: CHK029
+  FR-021: CHK031, CHK032
+  FR-022: CHK012, CHK016, CHK026
+  FR-023: CHK024, CHK025, CHK026, CHK027, CHK028
+  FR-024: CHK033, CHK034
+  FR-025: CHK039
+  FR-026: CHK022
+  FR-027: CHK010, CHK039
+  FR-028: CHK006, CHK007, CHK008, CHK009, CHK037
+  FR-029: CHK004, CHK037
+  FR-030: CHK038, CHK040
+SC coverage map:
+  SC-001: CHK023, CHK035
+  SC-002: CHK023, CHK034
+  SC-003: CHK035
+  SC-004: CHK002, CHK035
+  SC-005: CHK031, CHK032
+  SC-006: CHK022, CHK035
+  SC-007: CHK033, CHK035
+  SC-008: CHK022, CHK036
+  SC-009: CHK029, CHK036
+clause coverage map:
+  C-001: CHK001
+  C-002: CHK001
+  C-003: CHK002, CHK003
+  C-004: CHK005
+  C-005: CHK006, CHK007
+  C-006: CHK004
+  C-007: CHK039
+  C-010: CHK012
+  C-011: CHK012
+  C-012: CHK005, CHK012
+  C-013: CHK012
+  C-014: CHK009, CHK020
+  C-015: CHK012
+  C-016: CHK010
+  C-020: CHK017
+  C-021: CHK011, CHK016
+  C-022: CHK008, CHK019
+  C-023: CHK017, CHK020, CHK021, CHK023
+  C-024: CHK014, CHK021
+  C-025: CHK004, CHK016
+  C-026: CHK016
+  C-027: CHK031
+  C-028: CHK014, CHK015
+  C-029: CHK034
+  C-030: CHK024
+  C-031: CHK024
+  C-032: CHK006, CHK040
+  C-033: CHK029, CHK030
+  C-034: CHK032
+  C-035: CHK022, CHK033
+  C-036: CHK027, CHK028
+  C-037: CHK024, CHK029
+  C-040: CHK033
+  C-041: CHK023, CHK034
+  C-042: CHK034
+  C-043: CHK030
+  C-044: CHK039
+  C-045: CHK022, CHK033
+  C-046: CHK039

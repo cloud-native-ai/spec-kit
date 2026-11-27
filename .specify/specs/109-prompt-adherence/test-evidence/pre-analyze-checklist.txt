@@ -1,0 +1,7 @@
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/109-prompt-adherence --stage checklist --repo .
+usage: pre-analyze-check.py [-h] --spec-dir SPEC_DIR
+                            [--stage {requirements,plan,tasks}] [--repo REPO]
+                            [--strict] [--waive CHECK:REL_PATH:LINE]
+                            [--triple-structure] [--json-out JSON_OUT]
+pre-analyze-check.py: error: argument --stage: invalid choice: 'checklist' (choose from 'requirements', 'plan', 'tasks')
+EXIT=2
