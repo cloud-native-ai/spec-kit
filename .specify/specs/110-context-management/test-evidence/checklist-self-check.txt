@@ -1,0 +1,45 @@
+# Checklist self-check — 2026-11-27
+file: .specify/specs/110-context-management/checklists/context-model-2026-11-27.md
+
+## 1. Item count (soft cap 40)
+items: 38
+unique ids (item lines): 38
+first id: CHK001 ; last id: CHK038
+sequential 001..038: yes
+
+## 2. Question form
+items ending with a question mark before the bracket: 38
+items NOT in question form: 0
+
+## 3. Prohibited starts (Verify/Test/Confirm/Check + behaviour)
+hits: 0
+
+## 4. Traceability (>=80% required)
+items with a Req/Gap/Ambiguity/Conflict/Assumption/Dependency reference: 38
+traceability rate: 100%
+
+## 5. Quality-dimension coverage (nine dimensions)
+sections: 10
+Requirement Completeness: 1
+Requirement Clarity: 1
+Requirement Consistency: 1
+Acceptance Criteria & Measurability: 1
+Scenario Coverage: 1
+Edge Case Coverage: 1
+Non-Functional Requirements: 1
+Dependencies & Assumptions: 1
+Ambiguities & Conflicts: 1
+
+## 6. Duplicate detection
+duplicate ids: 0
+
+## 7. Focus areas present
+two-axis: 2
+five material: 3
+eighteen: 3
+trigger: 6
+audit engine: 2
+dispatch: 2
+init/offline: 2
+zero-change: 4
+containment: 4
