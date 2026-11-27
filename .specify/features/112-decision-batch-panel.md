@@ -3,7 +3,7 @@
 **Feature ID**: 112
 **Name**: Batch Decision Panel（批量决策面板）
 **Description**: 决策管理的集中裁决面：一次调用聚合封闭来源清单中的全部待决策项，按 107 完整信息模板逐项呈现，附确定性接地的建议默认值（无证据时明示 `no-evidence`），用户只对异议项发声，其余合格项按建议默认值结案；处置经既有载体记录（knowledge 批次记录 + 107 决策记录 + register 登记 + 来源状态更新），整批可只凭记录重放；只服务人持有的决策，零新存储、零网络、零自动传输。
-**Status**: Planned
+**Status**: Implemented
 **Created**: 2026-11-27
 **Last Updated**: 2026-11-27
 
@@ -83,3 +83,8 @@ Measured baseline (2026-11-27, base `c3489e52c`; corrected by the clarify ruling
   Plan set: `.specify/specs/112-decision-batch-panel/plan.md` (+ `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `feature-ref.md`)
 - Parent capability (pointer, not a slice relation): Feature 107 Decision Governance — `.specify/features/107-decision-governance.md`
 - Parked source: `.specify/todo/20261127-decision-batch-panel.md` (retire at merge per the Park lifecycle)
+
+## Status Criteria
+
+- Implemented: tasks closed, verification derived spec-side, gates green (met 2026-11-27).
+- Ready for Review requires the four-segment review + ARC acceptance.

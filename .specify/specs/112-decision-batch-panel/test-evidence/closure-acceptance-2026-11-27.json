@@ -1,0 +1,38 @@
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-batch-panel/.specify/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 7,
+    "total": 7,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "bash scripts/bash/run-tests.sh tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py tests/contract/test_decision_governance_guards.py tests/contract/test_migration_distribution.py tests/contract/test_probe_nonentity_catalog.py tests/unit/test_validate_decisions.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/112-decision-batch-panel/test-evidence/implement-p4-full-suite.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-batch-panel/.specify/specs/112-decision-batch-panel",
+  "tasks": {
+    "closed": 58,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
