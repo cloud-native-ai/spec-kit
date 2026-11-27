@@ -23,9 +23,9 @@ Legs and their clauses:
   constant names appear at the read point), imports no network module, and resolves the owner
   document by its own copy form (a source-tree copy never reads the installed face).
 
-The longitudinal-window, ``--check-coverage``, advisory and audit-replay legs are later
-slices' rows (T019/T020, T027, T030, T032) and extend this same file there; they are not
-claimed here.
+The ``--check-coverage`` legs (T019/T020) extend this same file below; the longitudinal
+window, advisory and audit-replay legs are later slices' rows (T027, T030, T032) and extend
+this file there; they are not claimed here.
 """
 from __future__ import annotations
 
@@ -673,6 +673,116 @@ def test_engine_imports_no_network_module():
     }
     assert not (imported & forbidden), (
         "the engine imports network modules: %r" % sorted(imported & forbidden)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-003 / C-026 — the --check-coverage action (T019/T020)
+# --------------------------------------------------------------------------- #
+def _scratch_coverage_run(tree):
+    engine = tree / "scripts" / "python" / "prompt-adherence.py"
+    assert engine.is_file(), "the scratch tree carries no engine copy"
+    return subprocess.run(
+        [sys.executable, str(engine), "--check-coverage"],
+        cwd=str(tree), capture_output=True, text=True,
+    )
+
+
+def _doctor_coverage_row(tree, needle, replacement):
+    owner = tree / "shared" / "definitions" / "prompt-adherence-definitions.md"
+    assert owner.is_file(), "cannot doctor an absent owner document"
+    text = owner.read_text(encoding="utf-8")
+    assert text.count(needle) == 1, (
+        "the coverage-map shape changed; update the doctor (found %d of %r)"
+        % (text.count(needle), needle)
+    )
+    owner.write_text(text.replace(needle, replacement), encoding="utf-8")
+
+
+def test_check_coverage_is_clean_on_the_delivered_owner_document():
+    proc = _run("--check-coverage")
+    assert proc.returncode == 0, (
+        "the coverage check must exit 0 on the delivered owner document; rc=%d stdout=%r "
+        "stderr=%r" % (proc.returncode, proc.stdout, proc.stderr)
+    )
+    lines = [line for line in proc.stdout.splitlines() if line.strip()]
+    assert lines == ["coverage-map: ok (0 findings)"], (
+        "a clean coverage check prints exactly the zero-findings line; got %r" % lines
+    )
+
+
+DOCTORED_COVERAGE_CASES = (
+    (
+        "dangling-sensor-target",
+        "| `sensor` | `run-determination-record` |",
+        "| `sensor` | `zz-ghost-row` |",
+        (("unresolved-target", "zz-ghost-row"), ("uncited-catalog-row", "run-determination-record")),
+    ),
+    (
+        "dangling-blind-spot-target",
+        "| `blind-spot` | `instruction-drift-between-reconciles` |",
+        "| `blind-spot` | `zz-ghost-spot` |",
+        (
+            ("unresolved-target", "zz-ghost-spot"),
+            ("uncited-blind-spot", "instruction-drift-between-reconciles"),
+        ),
+    ),
+    (
+        "duplicate-assumed-behavior",
+        "| `AB-12` |",
+        "| `AB-11` |",
+        (("duplicate-assumed-behavior", "AB-11"),),
+    ),
+    (
+        "two-targets-on-one-row",
+        "| `sensor` | `run-determination-record` |",
+        "| `sensor` | `run-determination-record`, `exec-quant-record` |",
+        (("multiple-targets", "AB-01"),),
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    "name,needle,replacement,expected",
+    DOCTORED_COVERAGE_CASES,
+    ids=[case[0] for case in DOCTORED_COVERAGE_CASES],
+)
+def test_check_coverage_reports_sorted_findings_on_doctored_copies(
+    tmp_path, name, needle, replacement, expected
+):
+    tree = _copy_tree(tmp_path / name)
+    _doctor_coverage_row(tree, needle, replacement)
+    proc = _scratch_coverage_run(tree)
+    assert proc.returncode == 1, (
+        "the doctored %r copy must exit 1 with findings; rc=%d stdout=%r stderr=%r"
+        % (name, proc.returncode, proc.stdout, proc.stderr)
+    )
+    findings = [line for line in proc.stdout.splitlines() if line.strip()]
+    assert findings, "exit 1 emitted no finding list"
+    assert findings == sorted(findings), (
+        "the finding list must be sorted: %r" % findings
+    )
+    for marker, subject in expected:
+        assert any(marker in line and subject in line for line in findings), (
+            "the %r doctored copy does not name (%r, %r) in its findings: %r"
+            % (name, marker, subject, findings)
+        )
+    assert not any(line.startswith("coverage-map: ok") for line in findings), (
+        "a doctored copy printed the clean line"
+    )
+
+
+def test_check_coverage_exits_2_when_the_owner_document_is_unusable(tmp_path):
+    tree = _copy_tree(tmp_path / "tree")
+    (tree / "shared" / "definitions" / "prompt-adherence-definitions.md").unlink()
+    proc = _scratch_coverage_run(tree)
+    assert proc.returncode == 2, (
+        "an unusable owner document must exit 2, never report findings; rc=%d stdout=%r"
+        % (proc.returncode, proc.stdout)
+    )
+    assert proc.stdout.strip() == "", "no coverage verdict may be emitted without the subject"
+    assert "owner document" in proc.stderr, (
+        "the exit-2 refusal must name the unusable owner document; stderr=%r" % proc.stderr
     )
 
 

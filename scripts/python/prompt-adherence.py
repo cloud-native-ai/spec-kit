@@ -15,15 +15,15 @@ or lock, makes no network access, and carries no clock field — identical input
 byte-identical reading. It never emits an adherence verdict, composite score or ranking;
 absence is ``not_evaluated`` / ``Unobserved`` with a reason, never clean and never breach.
 
-This package delivers the per-run reading and the interface surface. The longitudinal window
-reading (``--since`` / ``--until``), the ``--check-coverage`` action, the output caps and the
-audit-replay legs ride the owner document's coverage map and later slices of the same feature;
-until then those two actions refuse with exit 2 rather than guess (contract C-026: no reading
-can be produced).
+This package delivers the per-run reading, the interface surface and the ``--check-coverage``
+action over the owner document's assumed-behavior coverage map. The longitudinal window
+reading (``--since`` / ``--until``), the output caps and the audit-replay legs ride later
+slices of the same feature; until then a window request refuses with exit 2 rather than guess
+(contract C-026: no reading can be produced).
 
-Exit codes: 0 a reading was emitted (including status ``no-data`` / ``not-found``); 1 reserved
-for the coverage check's finding list; 2 no reading can be produced — an unusable declaration
-layer or owner document, an unknown token, or invalid arguments.
+Exit codes: 0 a reading was emitted (including status ``no-data`` / ``not-found``) or the
+coverage check is clean; 1 the coverage check reported findings; 2 no reading can be produced —
+an unusable declaration layer or owner document, an unknown token, or invalid arguments.
 """
 from __future__ import annotations
 
@@ -401,6 +401,103 @@ def _parse_blind_spots(text):
     if len(ids) != len(set(ids)):
         raise UsageError("the blind-spot register repeats a class id")
     return ids
+
+
+# --------------------------------------------------------------------------- #
+# the FR-003 coverage-map check (C-003)
+# --------------------------------------------------------------------------- #
+#: The two target kinds a coverage-map row may declare (data-model E-5).
+COVERAGE_TARGET_KINDS = ("sensor", "blind-spot")
+
+
+class CoverageResult:
+    """The ``--check-coverage`` outcome: a sorted finding list, never a reading."""
+
+    def __init__(self, findings):
+        self.findings = list(findings)
+
+
+def _parse_coverage_map(text):
+    chunk = _section(text, _contains("coverage map"))
+    if chunk is None:
+        raise UsageError("owner document carries no machine-parsed coverage map")
+    for header, rows in _tables(chunk):
+        if header and header[0].strip().lower().startswith("assumed behavior"):
+            return _coverage_rows(header, rows)
+    raise UsageError("the coverage-map section carries no assumed-behavior table")
+
+
+def _coverage_rows(header, rows):
+    id_column = _column_exact(header, "Assumed behavior")
+    kind_column = _column_exact(header, "Target kind")
+    target_column = _column_exact(header, "Target")
+    entries = []
+    for row in rows:
+        entry_id = _token(row[id_column])
+        if not entry_id:
+            continue
+        entries.append({
+            "id": entry_id,
+            "kinds": _split_tokens(row[kind_column]),
+            "targets": _split_tokens(row[target_column]),
+        })
+    if not entries:
+        raise UsageError("the coverage map carries no assumed-behavior rows")
+    return entries
+
+
+def _coverage_findings(entries, catalog, blind_spots):
+    """E-5's five checks; findings are plain sorted lines, the same text on every run."""
+    row_ids = {row["row"] for row in catalog}
+    spot_ids = set(blind_spots)
+    findings = []
+    occurrences = {}
+    cited_rows, cited_spots = set(), set()
+    for entry in entries:
+        occurrences[entry["id"]] = occurrences.get(entry["id"], 0) + 1
+        if len(entry["kinds"]) != 1 or len(entry["targets"]) != 1:
+            findings.append(
+                "coverage-map: multiple-targets: %s names %r target kind(s) and %r target(s); "
+                "exactly one of each is required"
+                % (entry["id"], entry["kinds"], entry["targets"])
+            )
+            continue
+        kind, target = entry["kinds"][0], entry["targets"][0]
+        if kind not in COVERAGE_TARGET_KINDS:
+            findings.append(
+                "coverage-map: unresolved-target: %s declares target kind %r; expected one of %r"
+                % (entry["id"], kind, list(COVERAGE_TARGET_KINDS))
+            )
+        elif kind == "sensor":
+            if target in row_ids:
+                cited_rows.add(target)
+            else:
+                findings.append(
+                    "coverage-map: unresolved-target: %s sensor target %r is not a catalog "
+                    "row id" % (entry["id"], target)
+                )
+        elif target in spot_ids:
+            cited_spots.add(target)
+        else:
+            findings.append(
+                "coverage-map: unresolved-target: %s blind-spot target %r is not a register "
+                "id" % (entry["id"], target)
+            )
+    for entry_id in sorted(occurrences):
+        if occurrences[entry_id] > 1:
+            findings.append(
+                "coverage-map: duplicate-assumed-behavior: %s appears %d times"
+                % (entry_id, occurrences[entry_id])
+            )
+    for row_id in sorted(row_ids - cited_rows):
+        findings.append(
+            "coverage-map: uncited-catalog-row: no assumed behavior cites %s" % row_id
+        )
+    for spot_id in sorted(spot_ids - cited_spots):
+        findings.append(
+            "coverage-map: uncited-blind-spot: no assumed behavior cites %s" % spot_id
+        )
+    return sorted(findings)
 
 
 def _validate_registry(catalog, blind_spots, reason_causes, invalid_causes, members,
@@ -1056,10 +1153,9 @@ def _build_reading(args, engine_home, repo):
             row["store_root"] = DECLARATION_ESTATE_ROOT
 
     if args.check_coverage:
-        # The coverage-map action runs over the owner document's coverage map; it lands with
-        # that map (US2), and until then there is nothing to evaluate — no reading is emitted
-        # for this action (C-026).
-        raise UsageError("--check-coverage: the coverage-map check is not delivered")
+        return CoverageResult(
+            _coverage_findings(_parse_coverage_map(owner_text), catalog, blind_spots)
+        )
 
     workspace = Path(args.workspace_root).expanduser().resolve() if args.workspace_root \
         else _workspace_from_cwd()
@@ -1308,6 +1404,13 @@ def main(argv=None):
     except declaration_reader.DeclarationError as error:
         print("prompt-adherence: declaration layer unusable: %s" % error, file=sys.stderr)
         return EXIT_INPUT
+    if isinstance(reading, CoverageResult):
+        for line in reading.findings:
+            print(line)
+        if reading.findings:
+            return EXIT_FINDINGS
+        print("coverage-map: ok (0 findings)")
+        return EXIT_OK
     if args.json:
         print(_render_json(reading))
     else:

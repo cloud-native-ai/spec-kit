@@ -1,0 +1,44 @@
+# US3 read-only containment guard — authored run (T023)
+
+Declared regression guard over behavior already delivered in US1 (the migration/regression
+exception recorded on the T023 row): the per-run engine exists, so the authored run is green.
+The longitudinal containment leg lands red-first with T027 (US4).
+
+## Command (the only test entry)
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/contract/test_prompt_adherence_readonly.py -q
+```
+
+## Real output
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_prompt_adherence_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.....                                                                    [100%]
+5 passed in 6.82s
+```
+
+Exit code: `0`.
+
+## What the authored run decided
+
+- The comparison unit derives from `shared/declarations/facts/runtime-store-layout.yaml`
+  through `declaration_reader.py`: 14 declared stores, each projected as `.specify/<store-name>/`.
+  The seeded fixture populates 4 of them (session 2 files, exec-quant 1, feedback 2, evidence 2)
+  with 7 files in total; the manifest reads (path, SHA-256, size) per file plus the root path
+  set.
+- `test_per_run_reading_leaves_the_store_roots_byte_identical` captures the baseline
+  immediately before each invocation and compares immediately after: default text form,
+  `--json` form and an explicit `--run` pin. Allowed delta: none; zero new files.
+- `test_engine_source_has_zero_write_points` scans the engine AST: no write-mode `open`, no
+  write method, no cache/lock/archive import (the claim is empty by construction).
+- `test_manifest_comparison_would_detect_a_store_write` drills the comparator itself: a byte
+  append, a new file and a new declared root each change the manifest, so its green is not an
+  empty comparison.
+- `test_determinism_is_judged_separately_by_run_a_run_b_equality` judges run-A/run-B equality
+  as its own claim; it is never cited as containment evidence (C-041/C-023 separation).

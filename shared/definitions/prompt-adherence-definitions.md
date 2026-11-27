@@ -62,6 +62,28 @@
 **`host-prompt-content` privacy red line**:原始宿主系统提示与用户直接提示文本从不被读取,读取输出永不复制原始用户对话文本。
 
 **`anomaly-line-persistence` boundary**:fast-fail anomaly 行的持久化边界由 `shared/guidelines/fast-fail.md` 拥有;本特性只把它的缺席登记为盲区,不重新引入被放弃的红状态生产器。
+
+## Premise Chain & Coverage Map(前提链与覆盖图)
+
+本框架的每一项机制都建立在一个前提上:智能体确实遵从了它收到的提示。下列前提链把它分解为十二条具名假定行为(`AB-NN`,文档序致密):六条各映射到恰好一个目录行(可观察的传感器半边),六条各映射到恰好一个盲区条目(今天没有持久化传感器的半边)。机器检查双向执行该映射——假定行为目标不解析、无假定行为引用的目录行、无假定行为引用的盲区都是发现——因此一个假定无法悄悄算作成立。检查经 `python3 .specify/scripts/python/prompt-adherence.py --check-coverage` 触达(退出 `0` 零发现、`1` 排序后的发现列表、`2` owner 文档不可用)。
+
+| Assumed behavior | Statement | Target kind | Target |
+|---|---|---|---|
+| `AB-01` | 一次完成的运行记录四个轴(令牌消耗、耗时、制品正确性、满意度)的自身判定。 | `sensor` | `run-determination-record` |
+| `AB-02` | 一次昂贵执行被量化,其成本记录持久化在执行量化存储中。 | `sensor` | `exec-quant-record` |
+| `AB-03` | 一个在用工作流中使用的框架单元经既有反馈渠道留下一条 feedback 条目。 | `sensor` | `feedback-entry` |
+| `AB-04` | 一次经过的确认门留下门控观察,其运行身份携带协议声明的 `gate:` 族前缀。 | `sensor` | `gate-observation-record` |
+| `AB-05` | 一次证据运行持久化机器可读 findings,其证据状态取自既有封闭值域。 | `sensor` | `evidence-finding` |
+| `AB-06` | 框架声明过的每个 probe 都已接入随框架分发的 probe 注册表。 | `sensor` | `probe-registry-declaration` |
+| `AB-07` | 宿主自身的系统提示与用户的直接提示把运行引向其陈述的规则。 | `blind-spot` | `host-prompt-content` |
+| `AB-08` | 宿主环境把项目规则文件加载并呈现给智能体。 | `blind-spot` | `host-rule-surfacing` |
+| `AB-09` | 智能体在该节规则适用的回合内遵从这一项目规则节。 | `blind-spot` | `in-turn-rule-behavior` |
+| `AB-10` | 派发返回时发出的 fast-fail anomaly 行被持久化以供事后审阅。 | `blind-spot` | `anomaly-line-persistence` |
+| `AB-11` | 一次被跳过的必需确认门把事件本身记录下来。 | `blind-spot` | `gate-breach-and-silent-skip` |
+| `AB-12` | 两次 reconcile 之间的指令节漂移被检出并记录。 | `blind-spot` | `instruction-drift-between-reconciles` |
+
+传感器半边是前提审查中可观察的那一半;盲区半边是今天没有持久化传感器观察的那一半——§ Blind-Spot Register 逐条说明每类为何不可观察、以及 owner 许可的采集变更会走的方向。每次读取的覆盖节把六个盲区全部列为不可观察(FR-013),因此一次读取永不暗示盲区半边成立。
+
 ## Reading Contract(读取契约)
 
 ### Per-run reading fields(按运行读取字段)

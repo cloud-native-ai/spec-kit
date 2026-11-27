@@ -1,0 +1,43 @@
+# US3 init fixture — authored run (T024)
+
+Declared regression guard with its mirror-independent initial form: a temp project initialized
+from this repository's framework sources (`copy_local_templates` + `get_resource_path`
+monkeypatched to the repo root). The mechanism already rides `shared/` + `scripts/`, so the
+authored run is green; the mirror-parity obligation lands with T033.
+
+## Command (the only test entry)
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/integration/test_prompt_adherence_init.py -q
+```
+
+## Real output
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_prompt_adherence_init.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.......                                                                  [100%]
+7 passed in 7.47s
+```
+
+Exit code: `0`.
+
+## What the authored run decided
+
+- The fresh project contains the owner document (`.specify/shared/definitions/`), the five
+  declaration facts (`.specify/shared/declarations/facts/`) and the engine
+  (`.specify/scripts/python/`), installed by the existing publish → install → init flow.
+- The installed entry answers `--version` with one `<script-name> <version>` line and exit 0.
+- The socket blocker is proven to reject a dial before the offline leg relies on it; the bare
+  invocation on the recordless project then completes with exit 0 under that interpreter,
+  carrying explicit `not_evaluated` / `Unobserved` lines with `reason=source-unavailable` and
+  all six blind-spot classes; the `--json` form is the same reading (six observations in
+  catalog order, absent stores never read as a positive state).
+- C-037 holds: neither `templates/instructions-template.md` nor `.specify/instructions.md`
+  carries a prompt-adherence section; no command or skill file for this feature exists in the
+  repo or in the generated `.qoder/commands/`; and the fresh project's prompt-adherence-named
+  inventory is exactly the owner document, the five facts and the engine.
