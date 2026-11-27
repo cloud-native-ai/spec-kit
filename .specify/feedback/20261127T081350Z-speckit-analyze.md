@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:13:50Z"
 summary: "Analyze round 1 for 111-general-best-practices: full read-only consistency analysis over requirements / checklists / plan / data-model / quickstart / feature-ref / tasks / four contracts produced 12 f"
+introspection_ref: "introspection-20261127T162331Z#F-34"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-34"
 ---
 
 ## Review

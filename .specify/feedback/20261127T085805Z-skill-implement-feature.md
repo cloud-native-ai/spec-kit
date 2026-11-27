@@ -8,9 +8,12 @@ probe: "skill-implement-feature-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "110-context-management"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:58:05Z"
 summary: "10 tasks closed (T001-T010); red-first guards authored and observed red (18 owner legs, 12 declaration legs, exit 1 each); the owner guard pins the model, the layout anchor/row grammar and the protoco"
+introspection_ref: "introspection-20261127T162331Z#F-24"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-24"
 ---
 
 ## Review

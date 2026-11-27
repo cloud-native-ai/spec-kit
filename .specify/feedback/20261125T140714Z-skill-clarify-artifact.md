@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-25T14:07:14Z"
 summary: "Clarify (Mode A) on 107-decision-governance: bound the spec to a NEW standalone Feature 107 after scanning the five candidate owners (046/076/053/095/090 — each owns a narrow adjacent fact; sibling se"
+introspection_ref: "introspection-20261127T162331Z#F-15"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-15"
 ---
 
 ## Review

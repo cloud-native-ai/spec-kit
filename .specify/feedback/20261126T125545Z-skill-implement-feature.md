@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "108-team-view-degradation"
 feature_id: "108"
+disposition: "processed"
 partial: false
 created: "2026-11-26T12:55:45Z"
 summary: "Implement stage of 108-team-view-degradation: four verified packages (T001–T029, 29/29 covered by one passing effective verdict per row; P1's a1 fail was superseded by a2 after the spine E2 row's miss"
+introspection_ref: "introspection-20261127T162331Z#F-25"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-25"
 ---
 
 ## Review

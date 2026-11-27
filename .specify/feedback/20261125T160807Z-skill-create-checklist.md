@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-25T16:08:07Z"
 summary: "checklist stage: new 39-item requirements-quality checklist (CHK001-CHK039) authored for 107-decision-governance; 39/39 traceable, 30/30 FR, 10/10 SC, 38/38 contract clauses covered; requirements.md p"
+introspection_ref: "introspection-20261127T162331Z#F-18"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-18"
 ---
 
 ## Review

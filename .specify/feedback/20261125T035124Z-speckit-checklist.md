@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T03:51:24Z"
 summary: "Checklist stage for 105-runtime-store-layout completed: a NEW dated requirements-quality checklist (checklists/runtime-store-layout-2026-11-25.md) with 40 items CHK001…CHK040 across 8 quality-dimensio"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

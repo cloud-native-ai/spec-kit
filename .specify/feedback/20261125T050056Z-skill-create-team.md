@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-create-team-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-25T05:00:56Z"
 summary: "Team definition persisted and validated: reporter seat present, run-checks ok, handoff binding active; territory expanded before implement to grant notes and the two migration sources while keeping de"
+introspection_ref: "introspection-20261127T162331Z#F-04"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-04"
 ---
 
 ## Review

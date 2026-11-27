@@ -8,9 +8,12 @@ probe: "skill-create-plan-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "110-context-management"
+disposition: "processed"
 partial: false
 created: "2026-11-27T07:48:56Z"
 summary: "Plan stage for Feature 110 ported the closed ai-harness 093 design set onto spec-kit's real carriers: plan.md with a dynamic 23-principle Constitution Check, T-001…T-003 decision tensions, EP-001…EP-0"
+introspection_ref: "introspection-20261127T162331Z#F-15"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-15"
 ---
 
 ## Review

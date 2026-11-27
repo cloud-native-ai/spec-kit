@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-manage-features-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:50Z"
 summary: "One fact, two carriers, two statuses: line 107's registry row read `Implemented` while .specify/features/107-decision-governance.md line 6 still read `**Status**: Planned`; the review caught the diver"
+introspection_ref: "introspection-20261127T162331Z#F-05"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-05"
 ---
 
 ## Review

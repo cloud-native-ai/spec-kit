@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "106-background-silent-failure"
 feature_id: "106"
+disposition: "processed"
 partial: false
 created: "2026-11-26T03:35:32Z"
 summary: "Review stage of 106-background-silent-failure: four segments plus ARC at head 0a01f797a. Process: 1 P0 (the Implemented flip landed without verification.md; repaired in-run by materializing it from ve"
+introspection_ref: "introspection-20261127T162331Z#F-20"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-20"
 ---
 
 ## Review

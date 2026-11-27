@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "105-runtime-store-layout"
+disposition: "processed"
 partial: false
 created: "2026-11-25T02:41:26Z"
 summary: "Requirements stage for 105-runtime-store-layout authored the spec from the unattended brief: 26 FR / 8 SC / 6 shared strings; validate-requirements status ok (0 error / 0 warning); pre-analyze require"
+introspection_ref: "introspection-20261127T162331Z#F-15"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-15"
 ---
 
 ## Review

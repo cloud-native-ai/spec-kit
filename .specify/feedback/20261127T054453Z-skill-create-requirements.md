@@ -8,9 +8,12 @@ probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "109-prompt-adherence"
+disposition: "processed"
 partial: false
 created: "2026-11-27T05:44:53Z"
 summary: "Requirements stage ported ai-harness 092 into spec 109-prompt-adherence: owner document, engine, five declaration facts, six-row catalog, six blind spots and guard roster ported; every read surface, r"
+introspection_ref: "introspection-20261127T162331Z#F-26"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-26"
 ---
 
 ## Review

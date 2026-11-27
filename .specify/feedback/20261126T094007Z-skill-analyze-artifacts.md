@@ -8,9 +8,12 @@ probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "108-team-view-degradation"
+disposition: "processed"
 partial: false
 created: "2026-11-26T09:40:07Z"
 summary: "Analyze-repair round 3 for 108-team-view-degradation (analyze gate, 1 validator-confirmed HIGH finding R3-108-W3-06)."
+introspection_ref: "introspection-20261127T162331Z#F-11"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-11"
 ---
 
 ## Review

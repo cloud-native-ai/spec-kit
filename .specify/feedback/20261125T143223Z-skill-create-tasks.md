@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T14:32:23Z"
 summary: "tasks stage: 56-row dependency-ordered tasks.md generated from the 107 plan set; structural validator PASS (0 error / 0 warning); pre-analyze tasks-stage pass (0 errors / 120 expected advisories); cla"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

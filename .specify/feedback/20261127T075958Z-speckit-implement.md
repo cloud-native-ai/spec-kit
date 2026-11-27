@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "processed"
 partial: false
 created: "2026-11-27T07:59:58Z"
 summary: "Implement P4 (T027–T039), the final package, for 109-prompt-adherence. Landed the longitudinal window reading red-first (9 named red legs: per-row state counts, the half-open boundary on exact record "
+introspection_ref: "introspection-20261127T162331Z#F-38"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-38"
 ---
 
 ## Review

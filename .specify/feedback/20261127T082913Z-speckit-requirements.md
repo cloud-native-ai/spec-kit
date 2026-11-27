@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:29:13Z"
 summary: "Requirements stage of 112-decision-batch-panel (run r20261127T081500Z-112a): authored the batch decision panel spec (FR-001…FR-045, SC-001…SC-010) extending only the 107 owner page — two-source pendin"
+introspection_ref: "introspection-20261127T162331Z#F-26"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-26"
 ---
 
 ## Review

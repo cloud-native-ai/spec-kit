@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "106-background-silent-failure"
 feature_id: "106"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T17:40:02Z"
 summary: "Analyze-repair4 (106-background-silent-failure): 1 validator-confirmed round-4 HIGH finding repaired upstream in data-model.md and both contract twins (R4-01 version-bearing made per claim shape: a cl"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

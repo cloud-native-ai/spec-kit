@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:47Z"
 summary: "Containment claims were authored undecidable and analyze paid for it five times: FR-025/SC-008's allowed-delta and ruling-authorization reading survived four repair rounds and a full mid-analyze plan "
+introspection_ref: "introspection-20261127T162331Z#F-11"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-11"
 ---
 
 ## Review

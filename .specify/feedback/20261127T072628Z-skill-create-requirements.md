@@ -8,9 +8,12 @@ probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "110-context-management"
+disposition: "processed"
 partial: false
 created: "2026-11-27T07:26:28Z"
 summary: "Requirements stage for 110 ported the closed ai-harness 093 context-management capability into spec-kit: 29 FRs, 11 SCs, six shared strings. Validator status ok (0 error / 0 warning, 283 lines, 40 def"
+introspection_ref: "introspection-20261127T162331Z#F-19"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-19"
 ---
 
 ## Review

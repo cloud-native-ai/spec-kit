@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T04:10:18Z"
 summary: "Read-only analyze of 105-runtime-store-layout completed over the full artifact set (requirements/plan/tasks/4 contracts/data-model/research/quickstart/feature-ref/40-item checklist/checkpoints/handoff"
+introspection_ref: "introspection-20261127T162331Z#F-11"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-11"
 ---
 
 ## Review

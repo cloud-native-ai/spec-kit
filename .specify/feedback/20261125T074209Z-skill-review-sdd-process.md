@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T07:42:09Z"
 summary: "Process segment on 105: seven framework-friction findings (P1x1/P2x6); no P0. Report .specify/specs/105-runtime-store-layout/review.md."
+introspection_ref: "introspection-20261127T162331Z#F-22"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-22"
 ---
 
 ## Review

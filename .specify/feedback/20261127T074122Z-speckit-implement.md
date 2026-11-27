@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T07:41:22Z"
 summary: "Dated baseline prompt-adherence reading (FR-026 / contract C-035) for Feature 109; one ordinary dated record, no improvement claimed. The reading was produced by the documented invocation in this repo"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

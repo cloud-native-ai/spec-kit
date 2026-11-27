@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "110-context-management"
 feature_id: "110"
+disposition: "processed"
 partial: false
 created: "2026-11-27T10:29:15Z"
 summary: "Four segments + ARC completed on Feature 110: ARC accept (pass 9/9 final), 0 P0 / 6 P1 / 5 P2, code segment not-evaluated by 400 legal non-code/generated skips over a 429-file delta (29 code-path file"
+introspection_ref: "introspection-20261127T162331Z#F-32"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-32"
 ---
 
 ## Review

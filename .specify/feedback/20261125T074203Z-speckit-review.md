@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T07:42:03Z"
 summary: "105-runtime-store-layout four-segment review + ARC on f261f6bac: process P0x0/P1x1/P2x6, artifact P0x1/P2x2, implementation pass, code record not-evaluated (0 blocking, 1 important answered, gate allo"
+introspection_ref: "introspection-20261127T162331Z#F-21"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-21"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-run-agent-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-25T06:26:54Z"
 summary: "Two dispatcher paths coexist: unattended SDD dispatches through the driver's stage-runner fork carrier, while 061 per-dispatch quantification, 070 package coordination and 088 reporter/measure wiring "
+introspection_ref: "introspection-20261127T162331Z#F-06"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-06"
 ---
 
 ## Review

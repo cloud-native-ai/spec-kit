@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "processed"
 partial: false
 created: "2026-11-27T09:14:56Z"
 summary: "Artifact and implementation segments of the composed /speckit.review for 111-general-best-practices: expected set 11 / present 10 — verification.md missing → artifact segment blocked (P0 F-ACCEPTANCE,"
+introspection_ref: "introspection-20261127T162331Z#F-21"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-21"
 ---
 
 ## Review

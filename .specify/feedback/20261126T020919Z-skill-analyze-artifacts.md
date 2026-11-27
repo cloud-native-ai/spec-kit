@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-26T02:09:19Z"
 summary: "analyze round-4 repair (final) on 107-decision-governance: 1 validator-confirmed HIGH + 2 same-surface MEDIUM fixed in one pass. R4-01 unifies FR-025 / C-405 / SC-008 (+ Source) / US5 scenario 4 / CHK"
+introspection_ref: "introspection-20261127T162331Z#F-36"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-36"
 ---
 
 ## Review

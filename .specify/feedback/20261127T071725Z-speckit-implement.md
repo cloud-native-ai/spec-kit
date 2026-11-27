@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T07:17:25Z"
 summary: "Implement P2 (T009–T016) for 109-prompt-adherence. Landed the five-variant fixture family under tests/fixtures/prompt-adherence/ (seeded, project-only, indirect-only, recordless, negative; every seed "
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

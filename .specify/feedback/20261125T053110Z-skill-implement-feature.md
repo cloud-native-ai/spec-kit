@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T05:31:10Z"
 summary: "P1 (T001-T009) executed: declaration, framework map, engine roots, seed rename and fresh-init seeding landed; the package's own gate is green with the two US5-owned residual reds; the full-suite delta"
+introspection_ref: "introspection-20261127T162331Z#F-24"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-24"
 ---
 
 ## Review

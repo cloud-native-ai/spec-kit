@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-26T06:29:16Z"
 summary: "Review stage of 107-decision-governance, process segment at head 3f0200b42: pass with 1 P0 (repaired in-run), 4 P1, 1 P2. P0: implement U4 flipped Planned->Implemented while verification.md was absent"
+introspection_ref: "introspection-20261127T162331Z#F-07"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-07"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "skill-clarify-artifact-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "110-context-management"
+disposition: "processed"
 partial: false
 created: "2026-11-27T07:33:41Z"
 summary: "Clarify (Mode A, unattended) on 110-context-management requirements.md: four material adjudications recorded — (1) Feature 110 registry-write deferral under the line's no-registry constraint (recovery"
+introspection_ref: "introspection-20261127T162331Z#F-19"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-19"
 ---
 
 ## Review

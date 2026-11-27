@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:44Z"
 summary: "Worktree dispatch dies at startup because the runner resolves its prompt after changing directory: skills/external/sdd-loop-driver/scripts/stage-runner.sh chdirs to --project-dir and only then reads -"
+introspection_ref: "introspection-20261127T162331Z#F-07"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-07"
 ---
 
 ## Review

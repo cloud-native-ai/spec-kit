@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "106-background-silent-failure"
 feature_id: "106"
+disposition: "processed"
 partial: false
 created: "2026-11-25T12:35:59Z"
 summary: "checklist stage: produced a NEW dated requirements-quality checklist (checklists/background-settlement-2026-11-25.md, 40 items CHK001…CHK040 across 9 sections covering the brief's eight dimensions plu"
+introspection_ref: "introspection-20261127T162331Z#F-18"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-18"
 ---
 
 ## Review

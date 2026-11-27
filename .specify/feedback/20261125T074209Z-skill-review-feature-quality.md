@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T07:42:09Z"
 summary: "Artifact and implementation segments on 105: artifacts 9/9, implementation pass, three artifact findings (A1 P0, A2/A3 P2)."
+introspection_ref: "introspection-20261127T162331Z#F-21"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-21"
 ---
 
 ## Review

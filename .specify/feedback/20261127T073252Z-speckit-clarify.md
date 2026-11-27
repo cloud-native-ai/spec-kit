@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "111-general-best-practices"
+disposition: "processed"
 partial: false
 created: "2026-11-27T07:32:52Z"
 summary: "Clarify stage (Mode A) for 111-general-best-practices: seven self-adjudicated clarifications pinned the machine-decidable forms of the docs-only slice — (1) closed-set shape: exactly five top-level do"
+introspection_ref: "introspection-20261127T162331Z#F-15"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-15"
 ---
 
 ## Review

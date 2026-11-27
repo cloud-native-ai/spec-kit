@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "processed"
 partial: false
 created: "2026-11-27T06:50:38Z"
 summary: "Analyze 轮 1 对 109-prompt-adherence 的 15 文件域完成只读一致性分析：20 条发现（CRITICAL 0 / HIGH 0 / MEDIUM 13 / LOW 7；inconsistency 9 / underspecification 4 / coverage-gap 3 / ambiguity 3 / feature-relevance 1 / duplic"
+introspection_ref: "introspection-20261127T162331Z#F-10"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-10"
 ---
 
 ## Review

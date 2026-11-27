@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T13:40:23Z"
 summary: "Analyze-repair3 (106-background-silent-failure): 4 validator-confirmed round-3 HIGH findings repaired upstream in data-model.md and enforcement-and-migration.contract.md (R3-W2A-01 legacy carve-out in"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

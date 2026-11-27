@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "108-team-view-degradation"
 feature_id: "108"
+disposition: "processed"
 partial: false
 created: "2026-11-26T13:14:56Z"
 summary: "Review stage of 108-team-view-degradation (run r20261126T071500Z-108a): four segments in fixed order plus ARC. ARC accept — claimed Implemented agrees, final_path pass 4 / blocked 0 / deferred 0 / par"
+introspection_ref: "introspection-20261127T162331Z#F-39"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-39"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:50Z"
 summary: "The checkpoint protocol's workspace-signature obligation was not met at review time: the 107 review took only a post-run snapshot, whose self-check is trivially clean, and its evidence file records ve"
+introspection_ref: "introspection-20261127T162331Z#F-08"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-08"
 ---
 
 ## Review

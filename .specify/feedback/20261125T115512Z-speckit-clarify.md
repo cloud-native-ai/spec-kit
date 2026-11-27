@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "106-background-silent-failure"
 feature_id: "095"
+disposition: "processed"
 partial: false
 created: "2026-11-25T11:55:12Z"
 summary: "Clarify stage (Mode A) for 106 completed: requirements read in full; four residual ambiguities self-adjudicated under unattended mode and integrated (Feature binding to 095 as index slice row 106; sil"
+introspection_ref: "introspection-20261127T162331Z#F-08"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-08"
 ---
 
 ## Review

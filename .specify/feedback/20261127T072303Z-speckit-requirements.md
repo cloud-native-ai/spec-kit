@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "111-general-best-practices"
+disposition: "processed"
 partial: false
 created: "2026-11-27T07:23:03Z"
 summary: "Requirements stage for 111-general-best-practices ported the closed ai-harness 087 general best-practices capability into spec-kit: five documents (manifest + four category owner files, three empty st"
+introspection_ref: "introspection-20261127T162331Z#F-26"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-26"
 ---
 
 ## Review

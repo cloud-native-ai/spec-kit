@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T16:23:29Z"
 summary: "analyze round-1 repair on 107-decision-governance: 5 validator-confirmed HIGH findings fixed in one pass (W1-01 M-09 evidence-pointer rule; W1-02 P-09/FR-014 class-record reconciliation; W2-01 line-le"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

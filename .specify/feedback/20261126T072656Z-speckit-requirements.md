@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "108-team-view-degradation"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:26:56Z"
 summary: "Requirements stage of 108-team-view-degradation, repair attempt 2. Attempt 1 ended REQUIREMENTS-DONE with the spec directory untracked, no workspace signature persisted into test-evidence and no stage"
+introspection_ref: "introspection-20261127T162331Z#F-23"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-23"
 ---
 
 ## Review

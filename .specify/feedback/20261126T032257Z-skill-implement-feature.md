@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "106-background-silent-failure"
 feature_id: "106"
+disposition: "processed"
 partial: false
 created: "2026-11-26T03:22:57Z"
 summary: "Implement stage of 106-background-silent-failure: four verified packages (T001–T037, 37/37) integrated in order P1→P2→P3→P4; task table closed by the integrator (0 open rows, validate-tasks PASS); tar"
+introspection_ref: "introspection-20261127T162331Z#F-25"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-25"
 ---
 
 ## Review

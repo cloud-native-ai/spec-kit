@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T07:42:09Z"
 summary: "Code segment on 105: 4342 changed / 262 judged / 4080 skipped / 0 gap; verdict not-evaluated; gate allow; findings 1 important / 1 suggestion / 1 praise."
+introspection_ref: "introspection-20261127T162331Z#F-20"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-20"
 ---
 
 ## Review
