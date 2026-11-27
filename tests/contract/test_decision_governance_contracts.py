@@ -12,7 +12,8 @@ touching the earlier assertions):
 
 * **F — foundational** (T005): the page exists; § Ownership Declaration names every owned
   surface and the pointer-only duty with its adjacent owners; § Closed Vocabulary carries
-  exactly the nine closed terms; no adjacent owner's criteria-table heading is restated.
+  exactly the seventeen closed terms (nine 107 terms + the eight batch terms the 112
+  extension adds; FR-002); no adjacent owner's criteria-table heading is restated.
 
 Red-first tests live in their own modules (``test_decision_governance_guards.py``,
 ``test_validate_decisions.py``); this module pins the owner-page surface only.
@@ -30,8 +31,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 OWNER = ROOT / "shared" / "definitions" / "decision-definitions.md"
 
-#: The nine closed terms (T004), verbatim.
-NINE_TERMS = (
+#: The seventeen closed terms: the nine 107 terms plus the eight batch terms the 112
+#: additive extension lands (FR-002, T007). Verbatim from the owner page's table.
+SEVENTEEN_TERMS = (
     "Decision Item",
     "Decision Record",
     "Option",
@@ -41,6 +43,14 @@ NINE_TERMS = (
     "Decision Producer",
     "Archive Projection",
     "Decision Class",
+    "Pending Decision Item（待决策项）",
+    "Pending Item Block（待决策项块）",
+    "Decision Batch（决策批次）",
+    "Batch Record（批次记录）",
+    "Recommended Default（建议默认值）",
+    "Recommendation Grounding（建议依据）",
+    "Batch Disposition（批次处置）",
+    "Acceptance by Silence（沉默接受默认）",
 )
 
 #: The nine owned surfaces the § Ownership Declaration MUST name (T004), as the English
@@ -134,16 +144,16 @@ def test_ownership_declaration_names_every_owned_surface() -> None:
         assert path in flat, f"§ Ownership Declaration does not name adjacent owner {path}"
 
 
-def test_closed_vocabulary_has_exactly_nine_terms() -> None:
+def test_closed_vocabulary_has_exactly_seventeen_terms() -> None:
     body = read(OWNER)
     section = h2_section(body, "封闭词汇表", "Closed Vocabulary")
     terms = [m.group(1).strip() for m in map(VOCABULARY_ROW_RE.match, section.splitlines()) if m]
-    assert len(terms) == len(NINE_TERMS), (
+    assert len(terms) == len(SEVENTEEN_TERMS), (
         f"§ Closed Vocabulary carries {len(terms)} term row(s): {terms}"
     )
-    assert set(terms) == set(NINE_TERMS), (
-        f"§ Closed Vocabulary term set differs: missing={set(NINE_TERMS) - set(terms)}, "
-        f"extra={set(terms) - set(NINE_TERMS)}"
+    assert set(terms) == set(SEVENTEEN_TERMS), (
+        f"§ Closed Vocabulary term set differs: missing={set(SEVENTEEN_TERMS) - set(terms)}, "
+        f"extra={set(terms) - set(SEVENTEEN_TERMS)}"
     )
 
 
@@ -362,8 +372,10 @@ def test_no_second_store() -> None:
     ):
         assert token in flat, f"§ Archive as Projection lacks {token!r}"
     producers = re.findall(r"^\| (P-\d{2}) \|", section, re.M)
-    assert set(producers) == {f"P-{n:02d}" for n in range(1, 13)}, (
-        f"the producer inventory rows differ from P-01…P-12: {producers}"
+    # 112 T007 adds P-13 (the batch decision panel producer) to the same inventory; the set
+    # grows with the owner-page row in this change (FR-003 inventory closure).
+    assert set(producers) == {f"P-{n:02d}" for n in range(1, 14)}, (
+        f"the producer inventory rows differ from P-01…P-13: {producers}"
     )
 
 

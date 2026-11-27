@@ -114,7 +114,12 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # step, sharing the `closeout-step` class with 091's Handler row); 121 -> 122.
     # Measured: `probe-utils.py --action probes` reports 122 Objects, 0 external,
     # 0 errors; `--action validate` reports 11 classes, 122 internal + 0 external.
-    assert internal == 122, (
+    # 2026-11-27 (measured value, not an increment): Feature 112 registers
+    # `skill-decide-batch-wrapup` (class skill-wrapup, unit skill:decide-batch).
+    # The literal had been 8 objects behind the measured registry since 091; it now
+    # moves to the re-measured 131 (`probe-utils.py --action probes --validate`
+    # reports 11 classes, 131 internal + 0 external objects). Never 122 + 1.
+    assert internal == 131, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

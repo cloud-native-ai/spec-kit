@@ -799,7 +799,9 @@ def test_inventory_closure(tmp_path: Path) -> None:
     assert payload["status"] == "pass", payload
     assert payload["verdict"] == "observed == declared ± exempt", payload
     declared = {row["id"] for row in payload["declared"]}
-    assert declared == {f"P-{n:02d}" for n in range(1, 13)}, declared
+    # 112 T007 extends the inventory by P-13 (the batch decision panel) in the same change
+    # that lands the owner-page row and its three entry faces (FR-003 inventory closure).
+    assert declared == {f"P-{n:02d}" for n in range(1, 14)}, declared
     exemptions = set(payload["exempt"])
     assert exemptions == {"P-11", "P-12"}, exemptions
     assert set(payload["observed"]) == declared - exemptions, payload["observed"]

@@ -122,9 +122,13 @@ ENGINE_REF = "flow-class-check.py"
 # 2026-11-24 (Feature 103): 59 -> 60 skills. `skill:view-team` (FR-018, the
 # `/speckit.team view` carrier) ships inside the same staged payload; the skill
 # roster and its pinned length move together while the 32-command roster is unchanged.
+# 2026-11-27 (Feature 112): 32 -> 33 commands and 60 -> 61 skills. `/speckit.decide`
+# (FR-039) and `skill:decide-batch` (FR-039/FR-042) ship inside the same staged payload,
+# so both rosters and both pinned lengths move together (FR-042 frozen-baseline duty).
 COMMAND_BASELINE = frozenset(
     {
-        "agents", "anchor", "analyze", "checklist", "clarify", "constitution", "derive",
+        "agents", "anchor", "analyze", "checklist", "clarify", "constitution", "decide",
+        "derive",
         "docs", "feature", "feedback", "goal", "history", "humanize",
         "implement", "improve", "instructions", "interview", "measure",
         "migrate", "plan",
@@ -141,7 +145,7 @@ SKILL_BASELINE = frozenset(
         "archive-session", "clarify-artifact", "code-review",
         "collect-evidence", "create-agent", "create-checklist", "create-plan",
         "create-requirements", "create-tasks", "create-team", "create-tools",
-        "debt-audit", "derive-architecture", "implement-feature", "improve-agent",
+        "debt-audit", "decide-batch", "derive-architecture", "implement-feature", "improve-agent",
         "improve-team", "improve-tools", "manage-agents", "manage-anchor",
         "manage-constitution", "manage-features", "manage-feedback",
         "manage-goal", "manage-history", "manage-instructions", "manage-todo",
@@ -152,8 +156,8 @@ SKILL_BASELINE = frozenset(
         "study-online", "study-kb", "summarize-project", "view-team",
     }
 )
-assert len(COMMAND_BASELINE) == 32
-assert len(SKILL_BASELINE) == 60
+assert len(COMMAND_BASELINE) == 33
+assert len(SKILL_BASELINE) == 61
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

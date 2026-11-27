@@ -1,4 +1,4 @@
-# captured 2026-11-27 @ baseline 23b7a68b9 via: python3 .specify/scripts/python/scan-confirmation-gates.py --summary
+# captured 2026-11-27 @ package P1 start (HEAD e4692034e) via: python3 .specify/scripts/python/scan-confirmation-gates.py --summary
 blocking confirmation gates: 30
   destructive: 22
   governance_kept: 7

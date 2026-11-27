@@ -10,7 +10,7 @@
 四个共享字面量（`execution` / `expression` / `flow_class` / `未声明·按默认`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
 **覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
-清单规模（实测 2026-11-12：`ls templates/commands/*.md | wc -l` → 32；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 59）：命令 32 + 技能 59 = **91 行台账**。
+清单规模（实测 2026-11-27：`ls templates/commands/*.md | wc -l` → 33；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 61）：命令 33 + 技能 61 = **94 行台账**。
 
 **不在本文件**（只给指针，不复述）：
 
@@ -234,6 +234,8 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:study-online | expression | reader-oracle |  | 交付联网调查报告；结论由读者与外部事实判定（与 /speckit.docs 的读者+外部事实面同类） |
 | skill:summarize-project | expression | reader-oracle |  | 交付项目总结报告；呈现是否可用由读者判定 |
 | skill:view-team | execution | behavior-oracle |  | 交付一次团队结构与状态的只读呈现（六组 / 概览 / 错误导航）；组覆盖、三态标签与退出码由脚本与测试复算判定 |
+| /speckit.decide | execution | behavior-oracle |  | 交付一次批量决策会话（扫描—呈现—应答—记录—重放）；记账、成员校验与指针解析由 decision-batch 引擎与测试复算判定 |
+| skill:decide-batch | execution | behavior-oracle |  | 交付一次批量决策交互与逐字应答留痕；引擎判定与落盘结果由脚本与测试复算判定 |
 
 台账完备性以**仓库清单**为准：清单有而台账无 → 缺口，台账有而清单无 → 未登记项，两侧 MUST 双向覆盖、零缺口（对账由 `scripts/python/flow-class-check.py --action check` 执行）。
 同一单元在台账中 MUST 恰好一行；两行同值 → 重复，两行反值 → 双类冲突。

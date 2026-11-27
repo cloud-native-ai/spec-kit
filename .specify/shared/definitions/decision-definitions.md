@@ -4,9 +4,9 @@
 
 ## 所有权声明(Ownership Declaration)
 
-本文档拥有、且只拥有以下九个面：
+本文档拥有、且只拥有以下十个面：
 
-1. **决策词汇表(closed vocabulary)** —— § 封闭词汇表 定义的九个词；其他任何页 MUST NOT 另行定义这些词。
+1. **决策词汇表(closed vocabulary)** —— § 封闭词汇表 定义的十七个词；其他任何页 MUST NOT 另行定义这些词。
 2. **类别呈现与文本契约(class presentation and text contract)** —— 两类决策（`human-interactive` / `ai-autonomous`）的判定依据与各自的呈现模板及其强调义务，以及决策项文本的两条生产规则（完整名称、同名定位）与按类别的强调义务。
 3. **选项集契约(option-set contract)** —— 选项集的封闭性、声明计数与每个选项的五要素。
 4. **记录字段闭集(record field closure)** —— 基础层与条件层（same-name / supersession / transmission 三族）字段，以及 `### D-NNN — <标题>` 加单行字段的记录文法。
@@ -15,6 +15,7 @@
 7. **传递与实施回执义务(transmission obligations)** —— 决策块、确认与实施回执在 superagent→subagent 边上的义务。
 8. **强制边界(enforcement boundary)** —— 机器可判规则与行为类规则的分工；行为类规则永不被机器声称覆盖。
 9. **旧记录规则(legacy rules)** —— 新式记录的最小合格形态、旧记录的只读判别与零改写处置。
+10. **批量决策面(batch faces)** —— § 待决策项来源清单、§ 待决策项块、§ 批次状态、§ 批次呈现契约、§ 建议默认值与依据、§ 决策批次与应答、§ 批次处置与沉默接受默认、§ 批次记录契约、§ 批次登记与来源更新、§ 重放契约、§ 完备性与拒绝、§ 重决与取代 所定义的批量决策规则面（112 加法扩展）；其他任何面 MUST 以指针抵达，MUST NOT 复述其判据表。
 
 **指针义务(pointer-only duty)**：相邻所有者各自保留其事实与判据表，本文档只以路径抵达，MUST NOT 复述它们的表格、阈值或枚举。
 
@@ -28,7 +29,7 @@
 
 ## 封闭词汇表(Closed Vocabulary)
 
-以下九个词是本文档的封闭词汇表；新增一个词 MUST 先修订本节，其他任何页 MUST NOT 定义这些词。
+以下十七个词是本文档的封闭词汇表；新增一个词 MUST 先修订本节，其他任何页 MUST NOT 定义这些词。
 
 | 词(Term) | 一句话含义 |
 |----------|-----------|
@@ -41,6 +42,14 @@
 | **Decision Producer** | 封闭生产者清单中的一行：生产者、既有载体、义务（`record` / `record-when-decision` / `exempt`）与事实所有者。 |
 | **Archive Projection** | 「生产者 × 既有载体」的并集加 register 索引；它是既有载体的投影，不是第二套存储。 |
 | **Decision Class** | 按持有者判定的类别，取 `human-interactive`（人持有）或 `ai-autonomous`（无人在场的代理持有）之一。 |
+| **Pending Decision Item（待决策项）** | 一个尚未裁决、由人持有的决策项：身份（主体完整名称 + 可选定位）、来源引用集、待决策项块与资格状态。 |
+| **Pending Item Block（待决策项块）** | 承载待决策项的 `### PENDING —` 块（字段闭集见 § 待决策项块）；它不是决策记录。 |
+| **Decision Batch（决策批次）** | 一次扫描—呈现—应答—记录的完整会话：批次编号、扫描时点、来源计数、完备性判定与应答原文。 |
+| **Batch Record（批次记录）** | 决策批次在既有 knowledge 存储中的一条日期化记录，含批次头、逐项行表与已决项记录块；审计与重放的唯一入口。 |
+| **Recommended Default（建议默认值）** | 项自身声明的唯一默认选项；面板从不发明默认值或选项。 |
+| **Recommendation Grounding（建议依据）** | 对封闭既往经验载体集的确定性联接结果：`grounded`（至少一条可解析指针）或 `no-evidence` 明示；`basis` 本身不是证据。 |
+| **Batch Disposition（批次处置）** | 一次批次中一项的处置闭集成员：`accepted-default` / `objected-alternative` / `objected-parked`（暂缓不产生记录）。 |
+| **Acceptance by Silence（沉默接受默认）** | 在一次已获用户应答的交互式批次内，未被点名的 `eligible` 项按建议默认值结案；资格合取与适用边界见 § 批次处置与沉默接受默认。 |
 
 ## 决策类别(Decision Classes)
 
@@ -221,7 +230,48 @@
 | P-10 | probe / feedback 处置 | `.specify/feedback/` 条目 + probe 注册面 | record-when-decision（阈值提示不是决策；接受/延后/拒绝处置是决策） | 通常 `ai-autonomous` | `shared/definitions/probe-definitions.md`、`shared/workflow/feedback-step.md` |
 | P-11 | run determination（运行判定） | session 记忆中的判定记录（`run-determination.py`） | exempt —— 对已完成运行的测量/评估，不是选项间选择的决策项 | n/a | `shared/workflow/feedback-step.md` § Run Determination |
 | P-12 | 确定性检查器/门的 verdict | 检查器输出 / 检查点引用 | exempt —— 结果由规则唯一决定，没有选项集；围绕它的处置归 P-04/P-05 | n/a | 各检查器与 `shared/workflow/acceptance-hardening.md` § Gates |
+| P-13 | 批量决策面板（`/speckit.decide` 批次会话） | 批次记录（既有 knowledge 存储中的日期化条目） | record-when-decision（已决项记录；暂缓与不完整不是决策） | 仅 `human-interactive` | 本页 § 批量决策面（`shared/definitions/decision-definitions.md`）；入口面 `templates/commands/decide.md`、`skills/internal/decide-batch/SKILL.md`、`scripts/python/decision-batch.py` |
 
+
+## 待决策项来源清单（Pending Source Roster）
+
+本节是批次面的**来源所有者**：待决策项（Pending Decision Item）只从下列两个封闭来源派生；增删来源或扫描根 MUST 以本节修订进行，MUST NOT 静默增加第三来源。
+
+### 两个封闭来源（closed two-source roster)
+
+| 来源 id | 既有载体 | 候选存在条件（机器可检） |
+|---------|----------|--------------------------|
+| `register-open-decision-row` | `.specify/register.md` 的表格行 | 行 id 单元格去 markdown 强调后以 `OI-` 或 `D-` 起头，且状态单元格去强调与前导空白后以**词边界** `open` 为起始词（`resolved-for-v1`、`openness-pending` 一类前缀不是 `open`） |
+| `authored-pending-item` | 四个封闭扫描根下的 tracked Markdown 载体：`.specify/specs/`、`.specify/goals/`、`.specify/anchoring/`、`.specify/teams/` | 存在标题前缀为 `### PENDING —` 的块（围栏代码块内不计） |
+
+扫描根是**封闭清单**；根缺席记为带原因的缺席空来源（见 § 来源在场读数）。
+
+### 候选与资格分层（candidacy ≠ qualification）
+
+- **候选存在**只由本节的机器可检谓词判定。字段齐备性、块级文法缺陷（未知/重复/畸形字段、声明计数与条目数不符）与类别判定 MUST NOT 成为候选存在条件——它们是呈现资格（`incomplete` 及其具名原因）或具名排除。
+- 块级缺陷 MUST NOT 触发整批拒绝；只有**载体级**不可读、不可解析或不可枚举才触发拒绝（判据归 § 完备性与拒绝，指针）。
+
+### 具名排除族（named exclusion families）
+
+以下族 MUST 以具名理由计入记账，MUST NOT 被静默丢弃，MUST NOT 被改写成「不存在」：已触发的交互门（当场问答，不跨调用挂起）、澄清标记（`/speckit.clarify` 拥有）、parked idea（`.specify/todo/`，想法队列不是决策项）、`ai-autonomous` 检查点裁决（不属人持有）、`REC-` 行（建议是决策的输入，不是决策项）、已在先前批次解决的身份。排除计数与候选计数分列；记账恒等式只含候选。
+
+### register ↔ 块联接（deterministic linkage）
+
+- 联接键 = 块 `origin` 中**逐字出现的** register 行 id（独立 token），且该行单元格给出的**显式仓库相对路径**上**恰有一个** `### PENDING —` 块。
+- `同上`、`Open items § …` 一类相对表述 MUST NOT 被解析为路径，也不作为路径候选。
+- 0 个匹配 → 该行以 `incomplete` 呈现并点名 `authority-unresolved`；多于 1 个匹配 → `incomplete` 点名 `ambiguous-link`。面板 MUST NOT 任选一块、MUST NOT 补全。
+- 未能解析到块的 register 行以**行 id 为单独身份**呈现 `incomplete`，不并入任何块身份。
+
+### 身份与去重（identity and dedupe）
+
+- 身份 = `subject` 去首尾空白后的**逐字节**相等，加同名族的 `resource_locator` 值相等。
+- 重复引用 MUST 合并为一行并列出全部来源引用；同身份而选项标签集不同 → 一行呈现并标 `source-conflict`，要求显式选择。
+- MUST NOT 做大小写折叠、Unicode 归一、标题相似或语义合并；缺定位与有定位的同拼写主体 MUST NOT 合并。
+
+### 来源在场读数（source presence）
+
+- 每个来源记一个在场读数：`read`（成功读取）/ `absent`（载体不存在：记为带原因的缺席空来源，不拒绝，也不读作「干净」）/ `unreadable`（载体级存在但不可读或不可解析 → 触发整批拒绝）。
+- **层级分界**：块级文法缺陷不是 `unreadable`；文件 I/O 失败、register 表结构无法按列解析、或候选无法枚举才是载体级。
 
 ## 传递与实施(Transmission and Implementation)
 

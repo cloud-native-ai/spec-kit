@@ -1,0 +1,5 @@
+tests/contract/test_humanize_command_surface.py::test_c06_registry_rows_resolve
+tests/contract/test_humanize_command_surface.py::test_wc07_skill_body_budget
+tests/contract/test_humanize_command_surface.py::test_wc10_feature_062_status_held
+tests/contract/test_humanize_command_surface.py::test_wc11_feature_row_name_description
+tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured

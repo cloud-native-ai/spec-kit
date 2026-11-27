@@ -1890,12 +1890,14 @@ def test_wc16_command_roster_unchanged():
     # 2026-11-11: Feature 099 (FR-021 / C-041) adds `/speckit.seal`.
     # 2026-11-12: Feature 101 (FR-010) adds `/speckit.anchor`. These are the only
     # sanctioned post-baseline additions to this roster.
-    approved_additions = {"status.md", "measure.md", "migrate.md", "seal.md", "anchor.md"}
+    # 2026-11-27: Feature 112 (FR-039) adds `/speckit.decide`, also a sanctioned addition.
+    approved_additions = {"status.md", "measure.md", "migrate.md", "seal.md", "anchor.md",
+                          "decide.md"}
     assert live == base | approved_additions, (
         f"command roster drifted — added: {sorted(live - base - approved_additions)}; "
         f"removed: {sorted(base - live)} (WC-16)"
     )
-    assert len(live) == 32, f"the roster must stay at 32 command templates, found {len(live)} (WC-16)"
+    assert len(live) == 33, f"the roster must stay at 33 command templates, found {len(live)} (WC-16)"
 
 
 def test_wc17_new_line_gate_zero():
