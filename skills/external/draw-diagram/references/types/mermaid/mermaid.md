@@ -41,7 +41,23 @@ SDS 的相对档位（T1>T2>T3>T4）由本层经 `linkStyle` / `classDef` / `sty
 
 Mermaid 为**自动布局引擎**（dagre，无绝对坐标 API）→ SDS Geometry 只能**逼近**：ghost spacer 锚点（等高/顶对齐分区）、`~~~` 行锁链（行序/rank 控制）、invisible links（列对齐）。无法兑现项（精确 x/y、等高分区、锚点位置等）MUST 在**结果清单中量化声明**（偏离维度 + 幅度 + 原因）——未声明的偏离按 semantic-fidelity 扣分，已声明的计入语法实现质量、不算语义缺陷。
 
+**已知限制与返修判据（引擎事实；某次运行的具体量化值归该次 manifest 与验收记录，不写进本文件当通用门槛）**：
+
+- **隐藏布局边**：`~~~` 只做布局，样式透明且无箭头，必须与业务边**分开统计**，不得计入关系集合或语义验收。
+- **纵长与可读性**：自动布局会拉长纵深；宽缩到目标显示宽度时，有效字号 ≈ 原字号 ×（目标宽度 ÷ 画布宽度）——按本次回读的实际尺寸计算并写入 manifest，不得承诺整图逐字可读；交付按原尺寸查看、拆图集或给 SVG 放大，并在回报中说明。量测入口：[measure-svg-layout.py](scripts/measure-svg-layout.py)（`--display-width` 由本次目标宽度声明）。
+- **交叉与顺序**：线束密度由 dagre 决定，不得声称零交叉；`flowchart` 的边声明顺序是稳定业务 ID 的回读依据，编辑时保持顺序。
+
+四轴验收与 manifest 判据见 [quality-gate.md](../../quality-gate.md)。
+
 → 逼近技术细节（含 wrappingWidth 陷阱、curve:linear、版本 pin、本地 bundle 渲染回退）、档位映射依据与偏离声明模板：[references/sds-realization.md](references/sds-realization.md)
+
+### 可执行生成与回读（compose-flowchart.py / native-readback.py）
+
+- **生成**：[scripts/compose-flowchart.py](scripts/compose-flowchart.py) `--semantics <json> --output <new.mmd> [--direction TB|TD|LR|RL] [--scaffold isolated|all|none] [--member-order declared|flow]`。zone 树按 `parent` 嵌套、容器端点原样保留；关系按输入顺序声明（声明序 = 稳定关系索引），`linkStyle` 索引由生成器按实际边序计算，颜色族不会漂移。`--scaffold isolated`（默认）只给**无业务边**的成员加 `~~~` 锚链，有业务流的成员交给 dagre 按流排序；`all` 是固定行序的全兄弟链（`sds-realization.md` §2.2 的行锁），`none` 不加链。`--member-order flow` 按分区内关系做确定性拓扑排序（并列按输入序）。手写 `.mmd` 不是必需路径，但既有手绘源仍可被下面的回读器读取。
+- **回读**：[scripts/native-readback.py](scripts/native-readback.py) `--source <mmd> --semantics <json> [--svg <svg>] --output <new-report.json>`。语义侧从实际 `.mmd` 抽取元素/分区/父子/关系方向与标签/颜色族/容器端点，并把 `~~~` 布局边单列（不得冒充业务关系；业务关系只认箭头边）。几何侧从实际 SVG 抽取：节点/簇矩形沿祖先 `translate()` 链解析（v11 会把孤立分量包进额外的 `<g class="root">`），业务边折线取 path `d` 的 M/L。
+- **几何口径（逐次声明，禁止跨引擎排名）**：`edge-through-node` = 业务边线段 vs 非自身端点节点矩形的 Liang–Barsky 裁剪，裁剪长度 > `--min-clip-px` 才计，同时报 **pair 数**与 **distinct edge 数**（一条边可穿多个节点）；不可见 `~~~` 边同法测量但单列；边-边交叉只算业务边的严格内点相交，端点 `--crossing-endpoint-exclusion` px 内不计；容器端点按簇矩形边界容差 `--container-tolerance` 分类（落进成员矩形 = `member-landing` 硬失败）；标签按 `L_<from>_<to>_<n>` 绑定并给出锚点到折线距离；预期标签集之外的可见文本单列，图例式文本按硬缺陷处理。
+- **退出码**：0 pass；1 fail（硬语义差异或硬视觉缺陷）；3 partial（不支持语法/几何或非硬缺陷，partial 不算 pass）；2 用法错误；4 拒绝覆盖既有输出；5 输入不可读。
+- **回归链路**：`compose-flowchart.py` → [render-client.py](../../../scripts/render-client.py)（`/healthz` 预检 → `/svg/pako:{state}` → `/img/pako:{state}?type=png`，state 由本层按引擎协议编码）→ `native-readback.py`。四轴与 manifest 判据仍以 [quality-gate.md](../../quality-gate.md) 为准，本层只提供机械证据。
 
 ## PlantUML ↔ Mermaid 图表类型对照
 
@@ -147,6 +163,7 @@ Mermaid 为**自动布局引擎**（dagre，无绝对坐标 API）→ SDS Geomet
 ## 输出要求
 
 - **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
+- **最短可运行链路**：写 `.mmd` → `GET /svg/pako:{state}` 与 `/img/pako:{state}?type=png`（或 `render-mermaid.sh`，把 `MERMAID_SERVER` 指向契约地址）→ 读回 SVG 的 cluster/端点/标签，并与源里业务边声明顺序逐条比对。端口与请求 shape 的 owner 是 [self-deploy-render-service.md](../../self-deploy-render-service.md)，此处不复述。
 - 输出为单个 HTML 文档，包含渲染的图表；**每图附「可复现信息」折叠块**（内嵌 `.mmd` 源码 + 渲染命令，`<details>` 块，见 [12-rendering-and-output.md §4.4](references/howto/12-rendering-and-output.md)），不依赖外部渲染服务在线即可复现
 - 图表通过 [render-mermaid.sh](scripts/render-mermaid.sh) 渲染，同时产出 PNG 与 SVG（**默认远端渲染**：脚本默认 `MERMAID_BACKEND=server`；本地渲染必须先在用户确认后以 `MERMAID_BACKEND=local` 显式启用）
 - **默认优先选用 PNG 格式**引用/嵌入图片（最美观，且在 Preview / Markdown 预览中可直接查看）；仅当图表过宽/过大或需任意无损缩放时改用 SVG

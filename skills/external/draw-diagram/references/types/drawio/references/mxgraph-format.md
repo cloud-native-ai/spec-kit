@@ -65,7 +65,7 @@
 - 子元素 `<mxGeometry relative="1" as="geometry"/>`
 - **不需要手写路径点**：只给两端端点，走线由引擎计算（走线质量与可选的避障/重布 pass 见 `./render-and-export.md` §3）
 - 无端点的浮空连线才需要显式点：`<mxPoint x= y= as="sourcePoint"/>` / `as="targetPoint"`
-- 需要固定折线时才用 `<Array as="points">` 装 waypoint（官方建议**不要**加：「Do NOT add `<Array as="points">` waypoints. Edges are routed automatically.」）
+- 固定几何避障编译路径使用 `<Array as="points">` 装 waypoint，并设 `edgeStyle=none;noEdgeStyle=1;rounded=0`，固定 `exitX/Y`、`entryX/Y` 且两端 `Perimeter=0`；避免导出时改写已验收路线。官方自动路由路径的「不加 waypoint」建议不适用于此预处理路径；路点坐标系见 §5。
 
 ### 2.5 `id`
 
@@ -161,7 +161,7 @@
 </root>
 ```
 
-上例中 `nodeInA` 的 `x=100 y=60` 是**相对 `zoneA` 左上角**的偏移。跨容器的连线仍写在 `parent="1"` 上，`source`/`target` 指向两个子节点 id。
+上例中 `nodeInA` 的 `x=100 y=60` 是**相对 `zoneA` 左上角**的偏移。边的 `parent` 取两端**父容器链的最近共同祖先**；没有共同业务容器时才取默认层 `1`。容器自身作为端点时，从它的父容器开始求交，不把端点本身当作边的 parent。`source`/`target` 保持原生节点或容器 ID；`Array as="points"` 的路点逐点减去边 parent 的绝对原点，不能直接写画布坐标。
 
 > **§3.2 的 `UserObject` 示例同理是片段**（只给包装元素本身，未含 `<root>` 与两根结构 cell）；拼接进完整文档时，包装元素**直接作为 `<root>` 的子元素**，与 `mxCell` 平级。
 

@@ -206,6 +206,13 @@ function validateAgainstSDS(rendered, sds, tol = 1) {
 > 第 6、7 条收编自 [cycle4-improvements.md](cycle4-improvements.md) 的 R1 待办（dated record，
 > 不再作为待办来源）——本关即其落地点。
 
+**可执行实现（本引擎脚本）**：三关的机械核对由 `../scripts/native-readback.py` 承担——它从真实
+`<script>` 提取 SDS（拒绝文档示例/转义副本/非字面量；歧义按 unsupported 上报）、对照语义、
+读 SVG 身份（`data-*` 优先，旧产物按 `node-`/`zone-`/`edge-` 完整余量映射）、检查端点贴边、
+标签绑定与估计框碰撞，并把交叉/共线（原生正交路线口径）与未测项写进报告；身份/图例契约与
+退出码见 [../d3js.md](../d3js.md)「可执行入口」。几何生成由 `../scripts/build-native.py`
+产出冻结 SDS 与 layout report，两者共用同一套标签估计口径。
+
 ## 5. 复刻型 SDS：源实测覆盖规则
 
 **规则**：`fidelity_intent: reproduction` 时，SDS 携带从源图实测的线宽、字号、色值、dash 与几何；

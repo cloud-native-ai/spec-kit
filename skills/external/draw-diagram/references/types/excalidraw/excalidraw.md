@@ -62,19 +62,29 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 
 ### Step 4: 生成场景 JSON / Mermaid 代码
 
-场景 JSON 路径：按元素规范写 `.excalidraw` 文件——先容器后文本再箭头；文本优先用**容器绑定**（`containerId`，渲染服务会自动按真实字体度量重算尺寸并居中）；箭头写全两端 binding。Mermaid 路径：写标准 Mermaid 语法即可。
+场景 JSON 路径：**优先用程序化生成入口** [scripts/generate-scene.py](scripts/generate-scene.py)——输入 caller 提供的 semantics（`--semantics`），确定性产出原生场景与布局/几何报告（`--output` / `--report`）；生成端内置真实绑定、走线避障与标签碰撞门禁，硬缺陷（箭头穿组件、标签压组件、绑定不互指）直接失败而不是交付。只手改/临时小图时才按元素规范手写——先容器后文本再箭头；文本优先用**容器绑定**（`containerId`），箭头写全两端 binding。Mermaid 路径：写标准 Mermaid 语法即可。
 
 → [03-scene-json-generation.md](references/howto/03-scene-json-generation.md)、[scene-schema-reference.md](references/guide/scene-schema-reference.md)
 
 ### Step 5: 渲染
 
-用 [render-excalidraw.sh](scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG（默认远端：`EXCALIDRAW_BACKEND=server` + `EXCALIDRAW_SERVER`；服务不可达时脚本给出指引，须先询问用户）。Mermaid 桥接路径先把 Mermaid 转成场景（`/mermaid-to-scene`）存为 `.excalidraw`，再走同一渲染脚本——保证两条路径交付物一致且源文件可编辑。
+用 [render-excalidraw.sh](scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG（默认远端：`EXCALIDRAW_BACKEND=server` + `EXCALIDRAW_SERVER`；服务不可达时脚本给出指引，须先询问用户）。**共享多引擎渲染服务（端口契约见 [self-deploy-render-service.md](../../self-deploy-render-service.md)）用薄客户端** [scripts/render-client.py](scripts/render-client.py)：`--server <运行时URL> --scene … --out-dir … --prefix …`——先 `GET /healthz` preflight，再 `POST /svg`、`POST /png`，校验产物魔数与尺寸、拒绝覆盖旧产物；服务不可达即阻断（不猜端点、不换渲染器）。Mermaid 桥接路径先把 Mermaid 转成场景（`/mermaid-to-scene`）存为 `.excalidraw`，再走同一渲染链路——保证两条路径交付物一致且源文件可编辑。
 
 → [04-rendering-and-output.md](references/howto/04-rendering-and-output.md)
 
 ### Step 6: 回看比对与微调
 
 读取渲染 PNG 检查：元素齐全？文本溢出容器？箭头穿元素？布局失衡？weight_plan 层级可辨（边框按档递减、流线最细浅）？微调只修**渲染缺陷**（溢出/穿越/重叠/错位），不得挪动 SDS box 与语义；缺陷根源在 SDS 本身（如 box 装不下 label）→ 量化回报语义层/用户。Mermaid 路径不满意版面时，可转为场景 JSON 路径手动微调（转换结果就是可编辑场景）。
+
+**原生回读（交付前必跑）**：[scripts/native-readback.py](scripts/native-readback.py) `--source <scene> --semantics <json> [--svg <实际渲染svg>] --output <新报告>`——从实际产物提取元素/关系/绑定/分组/父子/标签，与语义对照；真实标签互指、箭头端点、穿组件、标签压组件、交叉量化都进报告。退出码：0 pass；1 硬差异；2 用法/IO；3 partial（证据缺口）——**partial 不是 pass**。
+
+**已知限制与返修判据（引擎事实；某次运行的具体量化值归该次 manifest 与验收记录，不写进本文件当通用门槛）**：
+
+- **大图交叉**：自由版面大图会保留可观的严格内部交叉，数量按本次自检口径量化并单列（清单或报告路径写入 manifest，不与其它引擎排名）；交付不得声称零交叉或整屏逐字可读，建议 SVG 放大或白板内局部查看。返修 = 改场景 JSON 的坐标/走线后重渲。
+- **边标签绑定**：业务边标签用**原生箭头绑定**——文本 `containerId` = 箭头 id 且箭头 `boundElements` 反向登记（互相引用缺一不可）；渲染端把文本重定位到箭头 points 的**中间顶点**，所以走线须为标签预留干净走廊。回读脚本按同一锚点复测；只有视觉相邻、没有互指的文本按 `relation-label-not-genuinely-bound` 判硬失败。编辑器内拖拽联动未实操 → `not_performed`，不写「交互通过」。
+- **编辑性**：源文件结构级验证可继续编辑；未在 Excalidraw 编辑器里人工拖拽 → 记 `not_performed`，不写「交互通过」。
+
+四轴验收与 manifest 判据见 [quality-gate.md](../../quality-gate.md)。
 
 ### Step 7: 组装 HTML 输出
 
@@ -85,6 +95,7 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 ## 输出要求
 
 - **交付契约（必读；规则 owner 在前门）**：[../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) —— D1/D2 交付形态、D3–D5 面向用户的文字规则（**图内标签与 HTML 正文同规**）、D6 交付前自检。**条文与示例只存在于契约，本节不复写。**以下各条是本引擎的**机械落地**，与契约冲突时以契约为准。
+- **最短可运行链路**：`generate-scene.py` 写 `.excalidraw` → `render-client.py`（共享契约 `POST /svg`、`POST /png`，body = scene JSON）→ `native-readback.py` 读回元素/绑定/端点/标签。`render-excalidraw.sh` 默认指向单引擎 8383 并探 `/health`（共享服务该路径为 405），共享服务走 `render-client.py`；端口与请求 shape 的 owner 是 [self-deploy-render-service.md](../../self-deploy-render-service.md)，此处不复述。
 - 输出为单个 HTML 文档：渲染图为主体；原始场景 JSON 不嵌入正文，仅放入可折叠「复现性附录」`<details>` 块（默认收起），附录内容必须与磁盘实际渲染的 `.excalidraw` 逐字节一致
 - 图表通过 [render-excalidraw.sh](scripts/render-excalidraw.sh) 渲染，同时产出 PNG 与 SVG
 - **默认优先选用 PNG** 引用/嵌入图片；仅当图表过大需无损缩放时用 SVG
@@ -99,6 +110,6 @@ draw-diagram 委派时语义与几何以 **SDS 为准**——本步仅核对 SDS
 
 ## 参考文档
 
-完整索引见 [references/index.md](references/index.md)。SDS 实现（几何映射、强弱落地、复刻覆盖、无 SDS 兜底）见 [references/sds-realization.md](references/sds-realization.md)。
+完整索引见 [references/index.md](references/index.md)。SDS 实现（几何映射、强弱落地、复刻覆盖、无 SDS 兜底）见 [references/sds-realization.md](references/sds-realization.md)。可执行入口：生成 [scripts/generate-scene.py](scripts/generate-scene.py)、共享服务渲染 [scripts/render-client.py](scripts/render-client.py)、原生回读 [scripts/native-readback.py](scripts/native-readback.py)（均支持 `--help`/`--version`、拒绝覆盖，退出码见各自 `--help`）。
 
 **实战沉淀（务必阅读）**：[best-practices/best-practices.md](best-practices/best-practices.md)（最佳实践）与 [best-practices/pitfalls.md](best-practices/pitfalls.md)（陷阱）——绘制前对照最佳实践，绘制后自查陷阱清单。

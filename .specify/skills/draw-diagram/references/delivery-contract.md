@@ -131,6 +131,9 @@ HTML 说明文字讲的是**系统本身**，不是**这张图**：
 | 图内标签长度、注释策略、标识符规范 | 各引擎 `references/guide/content.md`（mermaid / plantuml 各一份，**已分化**） |
 | 几何、`weight_plan` 档位、偏离声明 | `semantic-model.md` + 各引擎「SDS 实现与强弱落地」小节与 `references/sds-realization.md` |
 | 交互形式分类、档位/默认值、逐 form 验收判据 | `semantic-model.md` § 交互语义与验收 |
+| 四轴验收、硬失败、原生源回读、结果 manifest、视觉 partial 返修 | `quality-gate.md`（交付形态之外的验收判据唯一 owner；本契约 D6 仍是交付前自检清单） |
+| 远端渲染请求怎样安全发出（服务 URL 由调用方提供） | `quality-gate.md` § 共享渲染访问 + `scripts/render-client.py` |
+| 执行记录怎样与验收分轴、引擎回读入口怎样验收 | `quality-gate.md` § 执行记录与验收分离 / 原生回读入口契约 + `scripts/check-run-record.py` / `scripts/check-readback-contract.py` |
 | 各交互形式在引擎内的实现（事件/组件/产物形态） | 各引擎层「交互实现」小节（当前 d3js / echarts 设有） |
 | HTML 模板、渲染脚本、嵌入 Markdown 的具体写法、有效字号量测 | 各引擎 SKILL.md「输出要求 / Output Requirements」与其 `references/howto/*rendering-and-output*.md` |
 | 引擎选择、图类选择 | `routing-matrix.md`；图类专章见各引擎 `references/{howto,document}/` |
