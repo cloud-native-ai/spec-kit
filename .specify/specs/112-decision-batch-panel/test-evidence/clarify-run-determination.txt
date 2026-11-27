@@ -1,0 +1,8 @@
+unit: /speckit.clarify   run: r20261127T081500Z-112a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              regressed
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T081500Z-112a clean=false findings=4
+persisted: .specify/session/20261127T084111Z-run-determination-speckit-clarify-r20261127t081500z-112a.md
