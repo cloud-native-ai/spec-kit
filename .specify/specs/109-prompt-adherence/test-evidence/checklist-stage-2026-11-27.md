@@ -45,7 +45,7 @@ Line `prompt-adherence`; run `r20261127T053750Z-109a`; stage `checklist`; attemp
 
 - **Before**: the tasks stage's signature `.specify/specs/109-prompt-adherence/test-evidence/workspace-tasks.json`; `workspace-guard.py --check … --repo . --json` → `{"status": "clean", "changed": []}`, rc 0; then `--snapshot test-evidence/workspace-checklist.json` → recorded, rc 0.
 - **After (pre-artifact-commit)**: `workspace-guard.py --check test-evidence/workspace-checklist.json --repo .` → `clean`, rc 0 (`workspace-checklist-readings.txt`). Same branch, same refs, same `.specify/specs` listing; no branch created and no spec directory added beyond this feature's own.
-- **Post-artifact-commit and post-records-commit**: re-checked against the same before-signature after each commit; recorded in `workspace-checklist-readings.txt` and the records commit. A commit changes no ref name, so the signature is expected to stay clean; a drift would have surfaced.
+- **Post-artifact-commit and post-records-commit**: re-checked against the same before-signature after each commit; the check outputs are appended to `workspace-checklist-readings.txt` and the final signature is `workspace-checklist-postcommit.json`, both landed in a post-records follow-up commit. A commit changes no ref name, so the signature is expected to stay clean; a drift would have surfaced.
 
 ## Feature Integration
 
