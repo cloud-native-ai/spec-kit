@@ -22,7 +22,7 @@
 
 **问题**：spec-kit 已经拥有机制类文档层——`shared/guidelines/`（纪律）、`shared/definitions/`（概念所有者）、`shared/workflow/`（流程约定）——但没有一个沉淀**日常开发经典最佳实践**的内容层：反复出现的通用工程经验（例如 git clone 的协议口径）没有唯一沉淀点，每次都靠会话记忆或临时口口相传重新发现；即使被记录，也没有"观察 → 复核 → 晋升"的可回溯积累路径。
 
-**源事实（ai-harness 087，2026-11-25 定稿，已实测）**：源仓在 `shared/best-practices/` 建立了**四分类封闭集**模块——清单 `README.md`（声明分类集合、条目形态与积累机制）+ 四个 owner 文件 `programming-languages.md` / `system-interfaces.md` / `programming-frameworks.md` / `programming-tools.md`（其中前三者以"尚无条目"占位）+ 首条种子（`programming-tools.md` § Git clone 的默认协议）+ 契约 `C-001…C-005` + 守卫 `tests/contract/test_general_best_practices.py` + `.ah/shared/best-practices/` 镜像；verification 记录三条 SC 全部 pass。源仓**未**新增框架地图行、**未**新增 instructions 指针（全仓检索 `best-practices` 在模块与规格之外零命中）；accumulation 复用既有 feedback + memory 引擎，不新建机制。
+**源事实（ai-harness 087，2026-11-25 定稿，已实测）**：源仓在 `shared/best-practices/` 建立了**四分类封闭集**模块——清单 `README.md`（声明分类集合、条目形态与积累机制）+ 四个 owner 文件 `programming-languages.md` / `system-interfaces.md` / `programming-frameworks.md` / `programming-tools.md`（其中前三者以"尚无条目"占位）+ 首条种子（`programming-tools.md` § Git clone 的默认协议）+ 源契约 `best-practices.contract.md`（源仓五条条款，其编号不复用） + 守卫 `tests/contract/test_general_best_practices.py` + `.ah/shared/best-practices/` 镜像；verification 记录三条 SC 全部 pass。源仓**未**新增框架地图行、**未**新增 instructions 指针（全仓检索 `best-practices` 在模块与规格之外零命中）；accumulation 复用既有 feedback + memory 引擎，不新建机制。
 
 **目标基线实测（2026-11-27，base `0419adae5`）**：
 

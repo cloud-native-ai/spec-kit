@@ -1,0 +1,186 @@
+=== P1 flow-class lookup (2026-11-27) ===
+unit_id: spec:111-general-best-practices
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0
+
+=== P2 module absence ===
+ls: cannot access 'shared/best-practices': No such file or directory
+ls: cannot access '.specify/shared/best-practices': No such file or directory
+
+=== P3 best-practices zero-hit scan ===
+shared/definitions/framework-map.md:0
+.specify/shared/definitions/framework-map.md:0
+.specify/instructions.md:0
+.specify/glossary.md:0
+
+=== P4 feedback-utils action set ===
+usage: feedback-utils.py [-h] --action
+                         {record,status,list,dispose,mark-submitted,reindex,package,cleanup,upstream,migrate-legacy,introspect-register,args-manifest,ingest-exec-quant,client-metrics}
+                         [--package PACKAGE] [--report-file REPORT_FILE]
+                         [--include-introspection] [--confirm]
+                         [--lifecycle-point LIFECYCLE_POINT]
+                         [--plan-file PLAN_FILE] [--dry-run] [--slice SLICE]
+                         [--kind KIND] [--disposition DISPOSITION] [--id ID]
+                         [--to TO] [--reason REASON] [--ref REF]
+                         [--workspace-root WORKSPACE_ROOT] [--now NOW]
+                         [--unit UNIT] [--unit-id UNIT_ID]
+                         [--unit-type UNIT_TYPE] [--run-id RUN_ID]
+                         [--review REVIEW] [--review-file REVIEW_FILE]
+
+=== P5 owner files present ===
+-rw------- 1 agent agent 4849 Nov 27 15:17 shared/guidelines/knowledge-promotion.md
+-rw------- 1 agent agent 4849 Nov 27 15:17 .specify/shared/guidelines/knowledge-promotion.md
+
+=== P6 init shared copy step ===
+        # Copy shared directory (shared reference documents)
+        if (resource_path / "shared").exists():
+            if tracker:
+                tracker.start("local-templates", "copying shared")
+
+            shared_dest = project_path / ".specify" / "shared"
+            shared_dest.mkdir(parents=True, exist_ok=True)
+
+            copy_tree_with_rewrite(
+                resource_path / "shared",
+                shared_dest,
+            )
+            if tracker:
+                tracker.complete("local-templates", "shared copied")
+
+        if ai_assistant == "copilot":
+
+=== P7 mirror pair line ===
+99:    ("shared", ".specify/shared", False, set()),
+
+=== P8 registry absence ===
+no 111 row
+ls: cannot access '.specify/features/111-general-best-practices.md': No such file or directory
+
+=== P9 guard absence ===
+ls: cannot access 'tests/contract/test_general_best_practices.py': No such file or directory
+
+=== P10 containment baseline 0419adae5..HEAD ===
+.specify/exec-quant/records/20261127T072256895807Z-b2ed5204.json
+.specify/exec-quant/records/20261127T073241883504Z-2aeff455.json
+.specify/feedback/20261127T072303Z-speckit-requirements.md
+.specify/feedback/20261127T073252Z-speckit-clarify.md
+.specify/session/20261127T072252Z-run-determination-speckit-requirements-r20261127t071500z-111.md
+.specify/session/20261127T073236Z-run-determination-speckit-clarify-r20261127t071500z-111a.md
+.specify/specs/111-general-best-practices/checklists/requirements.md
+.specify/specs/111-general-best-practices/checkpoints/01-requirements.md
+.specify/specs/111-general-best-practices/checkpoints/02-clarify.md
+.specify/specs/111-general-best-practices/requirements.md
+.specify/specs/111-general-best-practices/test-evidence/clarify-stage-2026-11-27.md
+.specify/specs/111-general-best-practices/test-evidence/clarify-validator.txt
+.specify/specs/111-general-best-practices/test-evidence/decomposition-requirements.json
+.specify/specs/111-general-best-practices/test-evidence/decomposition-requirements.txt
+.specify/specs/111-general-best-practices/test-evidence/pre-analyze-requirements.json
+.specify/specs/111-general-best-practices/test-evidence/pre-analyze-requirements.txt
+.specify/specs/111-general-best-practices/test-evidence/requirements-stage-2026-11-27.md
+.specify/specs/111-general-best-practices/test-evidence/requirements-validator.txt
+count=18
+
+=== P11 pytest availability ===
+usr-local: 8.4.2 3.11.11
+ModuleNotFoundError: No module named 'pytest'
+
+=== P12 source module inventory ===
+   5 /storage/project/cloud-native-ai/ai-harness/shared/best-practices/programming-frameworks.md
+   5 /storage/project/cloud-native-ai/ai-harness/shared/best-practices/programming-languages.md
+   8 /storage/project/cloud-native-ai/ai-harness/shared/best-practices/programming-tools.md
+  38 /storage/project/cloud-native-ai/ai-harness/shared/best-practices/README.md
+   5 /storage/project/cloud-native-ai/ai-harness/shared/best-practices/system-interfaces.md
+  59 /storage/project/cloud-native-ai/ai-harness/tests/contract/test_general_best_practices.py
+ 120 total
+
+=== P13 source residue lines ===
+/storage/project/cloud-native-ai/ai-harness/shared/best-practices/README.md:3:> 本模块是 ai-harness 框架的**日常开发经典最佳实践**库:记录那些反复出现、值得沉淀的工程经验。它是**渐进积累**的内容,而非一次性清单——每条最佳实践都来自一次真实的开发摩擦/教训,经复核后沉淀到对应模块。
+/storage/project/cloud-native-ai/ai-harness/shared/best-practices/README.md:33:4. **红线**:干净运行 MUST NOT 追加空洞条目;MUST NOT 编造数值或证据;存量模块由 `sync-mirrors.py` 镜像到 `.ah/shared/best-practices/`,MUST 保持字节一致。
+
+=== P14 source README table ===
+9:| 模块 | 文件 | 内容 |
+10:|------|------|------|
+11:| **编程语言** | [programming-languages.md](programming-languages.md) | 语言级惯用法、类型/并发/内存模型陷阱 |
+12:| **系统接口** | [system-interfaces.md](system-interfaces.md) | 操作系统 / 进程 / 网络 / 文件系统的接口约定 |
+13:| **编程框架** | [programming-frameworks.md](programming-frameworks.md) | 框架级结构与流程的可靠做法 |
+14:| **编程工具** | [programming-tools.md](programming-tools.md) | 工具(CLI / 构建 / 版本控制 / 调试)的正确用法与默认口径 |
+
+=== P15 source placeholders ===
+/storage/project/cloud-native-ai/ai-harness/shared/best-practices/programming-frameworks.md:5:*(尚无条目。框架级结构与流程的可靠做法经 feedback 观察逐步沉淀。)*
+/storage/project/cloud-native-ai/ai-harness/shared/best-practices/programming-languages.md:5:*(尚无条目。语言级惯用法、类型/并发/内存模型陷阱经 feedback 观察逐步沉淀。)*
+/storage/project/cloud-native-ai/ai-harness/shared/best-practices/system-interfaces.md:5:*(尚无条目。操作系统 / 进程 / 网络 / 文件系统的接口约定经 feedback 观察逐步沉淀。)*
+
+=== P16 source seed heading ===
+5:## Git clone 的默认协议
+
+=== P17 map sibling rows sample ===
+
+=== P18 directory governance section 3 ===
+- Generated or tool-managed trees (dependency installs, caches, build output) are exempt from
+  registration and MUST be covered by `.gitignore` instead.
+
+## 4. Temporary directories
+
+- A temporary or scratch directory MUST use a sanctioned root and MUST be matched by
+  `.gitignore` before its first write inside the repository. Roots, the pre-write check,
+  cleanup, and exceptions are owned by `shared/guidelines/temp-directory-discipline.md`.
+
+=== P19 source verification status ===
+# Verification Log — 087-general-best-practices
+
+SC-001_status=pass
+SC-002_status=pass
+SC-003_status=pass
+deferred_tasks=
+
+## Evidence
+
+=== P20 source spec set ===
+   77 /storage/project/cloud-native-ai/ai-harness/.ah/specs/087-general-best-practices/requirements.md
+   53 /storage/project/cloud-native-ai/ai-harness/.ah/specs/087-general-best-practices/plan.md
+   23 /storage/project/cloud-native-ai/ai-harness/.ah/specs/087-general-best-practices/tasks.md
+   37 /storage/project/cloud-native-ai/ai-harness/.ah/specs/087-general-best-practices/verification.md
+   31 /storage/project/cloud-native-ai/ai-harness/.ah/specs/087-general-best-practices/contracts/best-practices.contract.md
+  221 total
+=== S-7 evidence-1 command (executed 2026-11-27) ===
+        # Copy shared directory (shared reference documents)
+        if (resource_path / "shared").exists():
+            if tracker:
+                tracker.start("local-templates", "copying shared")
+
+            shared_dest = project_path / ".specify" / "shared"
+            shared_dest.mkdir(parents=True, exist_ok=True)
+
+            copy_tree_with_rewrite(
+                resource_path / "shared",
+                shared_dest,
+            )
+            if tracker:
+                tracker.complete("local-templates", "shared copied")
+
+
+=== S-7 evidence-2 test invocation form ===
+    return subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "from specify_cli import main; main()",
+            "init",
+            "--here",
+            "--ai",
+            "qoder",
+            "--script",
+            "sh",
+            "--no-git",
+        ],
+        cwd=str(project),
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
+        check=False,
