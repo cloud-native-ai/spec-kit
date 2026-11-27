@@ -3,7 +3,7 @@
 **Feature ID**: 112
 **Name**: Batch Decision Panel（批量决策面板）
 **Description**: 决策管理的集中裁决面：一次调用聚合封闭来源清单中的全部待决策项，按 107 完整信息模板逐项呈现，附确定性接地的建议默认值（无证据时明示 `no-evidence`），用户只对异议项发声，其余合格项按建议默认值结案；处置经既有载体记录（knowledge 批次记录 + 107 决策记录 + register 登记 + 来源状态更新），整批可只凭记录重放；只服务人持有的决策，零新存储、零网络、零自动传输。
-**Status**: Draft
+**Status**: Planned
 **Created**: 2026-11-27
 **Last Updated**: 2026-11-27
 
@@ -13,11 +13,12 @@ Registered as a standalone Feature at the requirements stage (2026-11-27) on lin
 
 Scope: one owner-page extension (`shared/definitions/decision-definitions.md`: pending-item form, closed two-source roster, batch presentation and grounding contracts, batch dispositions, batch record contract, batch family fields, P-13 producer row, human/ai boundary, completeness/refusal, replay); one thin command `/speckit.decide` (`templates/commands/decide.md`); one internal skill `decide-batch`; one deterministic stdlib engine `scripts/python/decision-batch.py` with closed actions `scan` / `record` / `replay`; one dated batch record per batch in the existing knowledge store; the existing 107 record grammar extended by three conditional batch-family fields. No new store root, no second registry, no second record schema, no scheduler, no network, no automatic transmission.
 
-Measured baseline (2026-11-27, base `c3489e52c`): the register carries eight open OI-/D-family rows (OI-3, OI-4, OI-7, OI-9, OI-069b-01, OI-073-01, OI-082-01, D-2 (092)); zero `### PENDING —` blocks exist in the four scan roots; the producer inventory ends at P-12; no `decide` command or skill exists. The first honest batch therefore presents those rows as `incomplete` with named missing elements — completing them is the producer/user obligation (A-16), never invented by the panel.
+Measured baseline (2026-11-27, base `c3489e52c`; corrected by the clarify ruling A-21): the register carries **seventeen** open OI-/D-family rows (OI-3, OI-4, OI-7, OI-9, OI-069b-01, OI-073-01, OI-082-01, D-001, D-001-a, D-1 (092), D-2 (092), D-3 (092), D-4 (092), D-5 (092), D-6 (092), D-7 (092), D-8 (092)) — the requirements-stage hand list recorded eight and omitted D-001, D-001-a and D-1/D-3…D-8 (092); the predicate-derived reading is authoritative. Zero `### PENDING —` blocks exist in the four scan roots; the producer inventory ends at P-12; no `decide` command or skill exists. The first honest batch therefore presents those seventeen rows as `incomplete` with named missing elements — completing them is the producer/user obligation (A-16), never invented by the panel.
 
 ## Latest Review
 
 - **2026-11-27 — requirements stage**: spec authored with FR-001…FR-045 and SC-001…SC-010; the brief's six ambiguities adjudicated in A-3…A-9 plus the heavy-decision shape for silence semantics (A-10); validator `status: ok` (0 error / 0 warning; 408 lines / 55 definition rows / 15 shared strings); `pre-analyze-check --stage requirements` `pass` (0 errors, 7 missing-path advisories naming this feature's not-yet-created deliverables; `fr=45 sc=10`); `decomposition-check --mode plan` `proceed` (45 FR / ceiling 120); workspace guard snapshot + check clean. Evidence: `.specify/specs/112-decision-batch-panel/test-evidence/`.
+- **2026-11-27 — plan stage**: `plan.md` (23-row dynamic Constitution Check, Decision Tensions `N/A` with the four-trigger justification, 7 execution premises incl. the falsified first-batch premise with `fallback`, declared dependency set with one `not-applicable` row), `research.md` (14 measured baselines + 12 resolved design points), `data-model.md` (13 entities / 22 invariants / 5 state domains), `contracts/` ×6 (**54 clauses**), `quickstart.md` (7 scenarios; engine examples pinned by named tests with premises), `feature-ref.md` (FR-001…FR-045 → clause map). `pre-analyze-check --stage plan` **pass** (0 errors / 39 missing-path advisories for implementation deliverables; `fr=45 sc=10 clauses=54 files=13`); `validate-decision-tensions.py` `status: ok` (0 records, N/A form); plan integrity: exactly one `# Implementation Plan:` heading, Requirement → Feature stamp present, 0 residual placeholders; workspace guard snapshot + check clean. Test entry not run: documentation-only stage and this worktree carries no pytest interpreter (measured runner error); the constrained-baseline test is unavailable for the same reason. Evidence: `.specify/specs/112-decision-batch-panel/test-evidence/plan-stage-2026-11-27.md`.
 
 ## Key Changes
 
@@ -39,6 +40,8 @@ Measured baseline (2026-11-27, base `c3489e52c`): the register carries eight ope
 - The ambient `## Decision Items` instruction section is deliberately not edited (1,276 B of a 1,500 B cap); discoverability rides the command template, command docs and the framework map (A-15).
 - Existing open OI rows without pending blocks are presented `incomplete`, not auto-completed; curation/authoring of missing elements is out of scope (A-16).
 - No `.specify/.gitignore` rule and no `runtime-store-layout.yaml` change: the feature adds no runtime directory.
+- Plan-stage mechanics fixed for implementation: the engine pre-checks the target path and refuses a duplicate batch id **before** calling the memory engine, because the knowledge scope is upsert-by-slug (research M-6); qualification precedence and named reasons are fixed in `data-model.md` § 2; explicit settlement of ineligible items is bounded by record formability (`objection-reply` C-407).
+- Distribution duties land together: the new skill needs its probe object + bindings and a compiled wrap-up (census pin 122 → 123), and the frozen command/skill baseline moves 32 → 33 / 60 → 61 in the same change.
 
 ## Future Evolution Suggestions
 
@@ -51,16 +54,22 @@ Measured baseline (2026-11-27, base `c3489e52c`): the register carries eight ope
 - Feature Index: `.specify/features.md`
 - Feature Detail: `.specify/features/112-decision-batch-panel.md`
 - Specification: `.specify/specs/112-decision-batch-panel/requirements.md`
+- Plan: `.specify/specs/112-decision-batch-panel/plan.md`
+- Research: `.specify/specs/112-decision-batch-panel/research.md`
+- Data model: `.specify/specs/112-decision-batch-panel/data-model.md`
+- Contracts: `.specify/specs/112-decision-batch-panel/contracts/` (6 files, 54 clauses)
+- Quickstart: `.specify/specs/112-decision-batch-panel/quickstart.md`
+- Feature reference: `.specify/specs/112-decision-batch-panel/feature-ref.md`
 - Quality Checklist: `.specify/specs/112-decision-batch-panel/checklists/requirements.md`
-- Stage evidence: `.specify/specs/112-decision-batch-panel/test-evidence/requirements-stage-2026-11-27.md`
+- Stage evidence: `.specify/specs/112-decision-batch-panel/test-evidence/requirements-stage-2026-11-27.md`, `.specify/specs/112-decision-batch-panel/test-evidence/clarify-stage-2026-11-27.md`, `.specify/specs/112-decision-batch-panel/test-evidence/plan-stage-2026-11-27.md`
 - Extended owner (pointer only, no fact moved): `shared/definitions/decision-definitions.md` (107)
 - Adjacent owners reached by pointer: `shared/guidelines/confirmation-gates.md` (destructive list + gate signals), `shared/guidelines/decision-tension.md` (`T-NNN`), `shared/guidelines/closed-set-claims.md`, `shared/guidelines/user-facing-comprehension.md`, `.specify/register.md` (ID index)
 - Batch record store (existing): `.specify/knowledge/` via `scripts/python/memory-utils.py`
 
 ## Status Tracking
 
-- **Draft**: requirements 112 bound; spec + quality checklist landed; validator and driver gates green. (current — 2026-11-27)
-- **Planned**: plan/design artifacts exist for the bound spec and the Constitution Check has no unjustified Fail rows.
+- **Draft**: requirements 112 bound; spec + quality checklist landed; validator and driver gates green. (historical — 2026-11-27)
+- **Planned**: plan/design artifacts exist for the bound spec and the Constitution Check has no unjustified Fail rows. (current — 2026-11-27)
 - **Implemented**: tasks are closed and the guard roster lands green.
 - **Blocked**: tasks are closed and at least one final-path criterion is not `pass`.
 - **Ready for Review**: review evidence exists and the current code-review record has no blocking entry.
@@ -71,5 +80,6 @@ Measured baseline (2026-11-27, base `c3489e52c`): the register carries eight ope
 
 - Specification: `.specify/specs/112-decision-batch-panel/requirements.md`
   Quality Checklist: `.specify/specs/112-decision-batch-panel/checklists/requirements.md`
+  Plan set: `.specify/specs/112-decision-batch-panel/plan.md` (+ `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `feature-ref.md`)
 - Parent capability (pointer, not a slice relation): Feature 107 Decision Governance — `.specify/features/107-decision-governance.md`
 - Parked source: `.specify/todo/20261127-decision-batch-panel.md` (retire at merge per the Park lifecycle)

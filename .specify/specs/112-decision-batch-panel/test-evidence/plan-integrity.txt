@@ -1,0 +1,4 @@
+h1_heading=1
+feature_stamp=1
+placeholder_tokens=0
+duplicate_template_bodies=1
