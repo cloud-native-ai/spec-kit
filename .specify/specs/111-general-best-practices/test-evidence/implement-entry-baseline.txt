@@ -1,0 +1,13 @@
+# Implement-entry test baseline (captured before any implementation file landed)
+
+- **Command**: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full --names-out .specify/specs/111-general-best-practices/baseline-failed.txt`
+- **Date**: 2026-11-27T08:38Z (before T005–T007 and the guard's green runs; the guard file did not exist yet)
+- **Runner mode line**: `# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load ... passes=2 tier=full excluded_slow=0`
+- **Exit code**: `1` (the repository carries pre-existing red names at entry — this is the frozen comparison surface, not a verdict on this feature)
+- **Failure-name list**: `.specify/specs/111-general-best-practices/baseline-failed.txt` — **223** names
+  (`# failed-name list written: … (223 entries) passes=2`)
+- **Comparison form** (owner: `/speckit.implement` § Test runs): later runs pass
+  `--names-out` and compare with `comm -13 baseline-failed.txt <current>`; zero lines = zero new failures.
+
+Raw full output (local, `*.log` is git-ignored):
+`.specify/specs/111-general-best-practices/test-evidence/implement-entry-baseline.log`.
