@@ -1,0 +1,213 @@
+{
+  "stage": "requirements",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 8,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 10,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 25,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 25,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 47,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 50,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 63,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 67,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 95,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 95,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 103,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 105,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 124,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 128,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 129,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 130,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 130,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 132,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 140,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 148,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 149,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 156,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 159,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 166,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 38,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 28,
+    "waived": 0,
+    "fr": 9,
+    "sc": 7,
+    "tasks": 0,
+    "clauses": 0,
+    "files": 2
+  },
+  "checked_at": "2026-11-27T07:23:58Z"
+}
