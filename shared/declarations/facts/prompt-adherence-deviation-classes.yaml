@@ -1,0 +1,13 @@
+# Feature 109 prompt-adherence, contract C-010/C-011 — the three deviation classes (FR-018, FR-028).
+# Derivations: shared/definitions/prompt-adherence-definitions.md § Reading Contract (deviation truth).
+# Read through scripts/python/declaration_reader.py; do not restate these members elsewhere.
+fact: prompt-adherence-deviation-classes
+kind: closed-set
+statement:
+  - axis-regression
+  - green-unproven
+  - evidence-missing
+consumers:
+  - scripts/python/prompt-adherence.py
+former_carriers: []
+note: "New to this tree with feature 109 (ported from the closed ai-harness specification 092); no earlier carrier exists in this repository."

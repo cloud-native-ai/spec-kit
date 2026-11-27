@@ -1,0 +1,12 @@
+# Feature 109 prompt-adherence, contract C-010/C-011 — the closed two-layer set (FR-018).
+# Meanings: shared/definitions/prompt-adherence-definitions.md § Two-Layer Model.
+# Read through scripts/python/declaration_reader.py; do not restate these members elsewhere.
+fact: prompt-adherence-layers
+kind: closed-set
+statement:
+  - host-prompt
+  - project-rules
+consumers:
+  - scripts/python/prompt-adherence.py
+former_carriers: []
+note: "New to this tree with feature 109 (ported from the closed ai-harness specification 092); no earlier carrier exists in this repository."

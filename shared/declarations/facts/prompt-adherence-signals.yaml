@@ -1,0 +1,17 @@
+# Feature 109 prompt-adherence, contract C-010/C-011 — the six signal row ids (FR-018, FR-028).
+# Order is the catalog declaration order the readings list rows in (contract C-020/C-023).
+# Meanings and per-row attribution: shared/definitions/prompt-adherence-definitions.md § Signal Catalog.
+# Read through scripts/python/declaration_reader.py; do not restate these members elsewhere.
+fact: prompt-adherence-signals
+kind: closed-set
+statement:
+  - run-determination-record
+  - exec-quant-record
+  - feedback-entry
+  - gate-observation-record
+  - evidence-finding
+  - probe-registry-declaration
+consumers:
+  - scripts/python/prompt-adherence.py
+former_carriers: []
+note: "New to this tree with feature 109 (ported from the closed ai-harness specification 092); no earlier carrier exists in this repository."
