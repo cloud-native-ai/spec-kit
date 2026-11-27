@@ -1,0 +1,103 @@
+# US5 green — 重决不覆盖前例；人工与自主不混淆；零传输（T052）
+
+**Feature**: 112-decision-batch-panel · **Package**: P4（T046–T058） · **Date**: 2026-11-27
+**Test entry (only entry)**: `bash scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`
+
+## 1. T051 — US5 mirror pairs and the gate reading
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write
+sync  scripts/ -> .specify/scripts/ (1 files)        # decision-batch.py projected
+sync  shared/ -> .specify/shared/ (1 files)         # owner-page § 重决与取代 + M/B rows projected
+Regenerated command copies for 4 tools.
+$ python3 scripts/python/sync-mirrors.py --check     # rc 0
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (439 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (140 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (135 files, byte-identical)
+ok    shared/ == .specify/shared/ (123 files, byte-identical)
+$ cmp shared/definitions/decision-definitions.md .specify/shared/definitions/decision-definitions.md   # byte-identical
+$ cmp scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py                       # byte-identical
+$ python3 .specify/scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 30 (destructive 22 / governance_kept 7 / reversible 1)
+violations (reversible gates still blocking): 0     # zero NEW hits vs test-evidence/scan-confirmation-gates-baseline.txt
+```
+
+## 2. T052 — US5 phase tests (green)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py \
+    tests/contract/test_decision_batch_contract.py \
+    tests/contract/test_decision_governance_guards.py -q
+76 passed in 7.98s   (rc 0)
+```
+
+Red-first provenance: `notes/red-first-evidence.md` § S6（六条 `6 failed`，名单 `notes/red-first-names-us5.txt`）；§ S7（M-10…M-16 逆向样本执行记录，全部在本轮运行）。
+
+## 3. SC-006 evidence — supersession pair, zero rewrite, refusal on an unwritable carrier
+
+A recorded demo over a `prior-conflict` copy under `.specify/.tmp/p4-supersede-demo/`（teardown at wrap-up）:
+
+```text
+$ python3 scripts/python/decision-batch.py record --workspace-root .specify/.tmp/p4-supersede-demo \
+    --presentation .specify/.tmp/p4-supersede-demo/scan.json \
+    --reply .specify/.tmp/p4-supersede-demo/reply.md --authorization interactive --format json
+record: recorded | supersessions: [{'carrier': '.specify/specs/demo/history-records.md', 'records': ['D-010']}]
+$ diff history-before.md history-records.md
+23a24
+> - **superseded_by**: D-001 (.specify/knowledge/decision-batch-b-20261127t105344z-70415220.md)
+```
+
+`diff` reports an **addition only** (`23a24`): the old record keeps its id, context, chosen option and rationale
+byte-identically; the new record sits in the batch record; the prior record gains the single conditional line.
+`test_supersession_append_only` pins the same shape as an assertion (lines-before == lines-after minus the one
+appended line; `D-001` and the batch record path named in the value).
+
+Unwritable prior carrier (`unwritable-old-record`, chmod 444 on `old-record.md`):
+
+```text
+$ python3 scripts/python/decision-batch.py record --workspace-root <copy> ... --authorization interactive
+拒绝：来源 record-request 不可用（prior-carrier）：演示不可写前例项: the prior record carrier
+.specify/specs/demo/old-record.md is not writable; a redecision cannot degrade to a fresh decision
+rc = 1 · zero writes: no knowledge record, item/register/prior-carrier bytes unchanged
+```
+
+`test_supersession_unwritable_prior_refused` pins the refusal, the named carrier, the named subject and zero writes.
+
+## 4. SC-007 evidence — autonomous separation and unattended refusal
+
+- `ai-autonomous` presentation zero: `test_red_lines_and_boundary`（`autonomous` fixture: `presented_rows=0`, `items=[]`, named exclusion `not-human-held`）; `test_m12_batch_scan_deterministic_and_autonomous_zero` pins the same over the M-12 reverse sample.
+- Unattended record refusal: `test_unattended_and_missing_authorization_refused`（US2, still green in this package's targeted run）.
+- No `ai-autonomous` record is written by a human batch: the only writers are `record` over presented `human-interactive` identities; exclusions never enter the plan.
+
+## 5. M-10…M-16 reverse samples — executed this package
+
+```text
+M-10  scan   tests/fixtures/decision-batch/m10  rc 1  refusal: unparseable
+M-11  scan   tests/fixtures/decision-batch/m11  rc 0  item state incomplete, reasons ['duplicate-field']
+M-12  scan   tests/fixtures/decision-batch/m12  rc 0  presented 1; exclusion ('not-human-held','演示自主项')
+M-13  scan   tests/fixtures/decision-batch/m13  rc 0  state prior-decision-conflict; prior pointer .specify/specs/demo/prior.md; chosen 保留 90 天
+M-14  record tests/fixtures/decision-batch/m14  rc 1  refusal: unknown-identity
+M-15  record tests/fixtures/decision-batch/m15  rc 1  refusal: duplicate-batch
+M-16  replay tests/fixtures/decision-batch/m16  rc 1  refusal: unresolvable-pointer (.specify/specs/demo/missing-ref.md)
+```
+
+Zero-touch readings: every scan/replay run leaves its workspace unchanged; the two record samples refuse before the
+write surface (no `knowledge/` entry, no register row, no block `resolution` written by the guard run). The guard
+roster asserts `dir_snapshot(tests/fixtures/decision-batch)` equality before/after the seven runs.
+
+## 6. B-08 / B-09 surface list (behaviour class, no machine claim)
+
+| Rule | Surface | No machine coverage |
+|------|---------|---------------------|
+| B-08 批次呈现可读性与后果真实性 | 人工决策评审 + `/speckit.review` 产物段 | owner page § 强制边界 B table row + § 批次呈现契约 disclaimer |
+| B-09 建议理由充分性 | `/speckit.analyze` + `/speckit.review` | same |
+
+`test_behavior_surfaces_named` (C-208) pins both rows, their named surfaces and the `不声称机器覆盖` statement.
+
+## 7. Clause green points
+
+C-208 (T052), C-509…C-512 (T052) — the last five of the 54 clauses; the batch contract suite `44 passed` after the
+mirror sync, and the extended guard roster `18 passed`.

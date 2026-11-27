@@ -1347,3 +1347,88 @@ def test_batch_record_head_completeness(tmp_path: Path) -> None:
         assert any(line.strip().startswith(f"- {source['source_id']}: presence={source['presence']};")
                    and f"candidates={source['candidates']}" in line
                    for line in text.splitlines()), (source, "missing per-source count line")
+
+# =====================================================================================
+# US5 — a redecision supersedes the prior record, never overwrites it, and refuses
+# rather than degrades when the prior carrier cannot take the append (T046 red-first;
+# green claimed at T052). The `superseded_by` face lands with T050, so both tests below
+# fail on their own missing behaviour, never on an import error.
+# =====================================================================================
+
+def supersession_reply(subject: str, label: str) -> str:
+    return (
+        "reply_verbatim: |\n"
+        f"  改回「{label}」。\n"
+        "objections:\n"
+        f"  - subject: {subject}\n"
+        "    action: alternative\n"
+        f"    option_label: {label}\n"
+        "no_objections: false\n"
+    )
+
+
+def test_supersession_append_only(tmp_path: Path) -> None:
+    """C-510: a redecision adds a new record and appends `superseded_by` to the prior
+    record, keeping every pre-existing byte of the prior carrier identical."""
+    root = copy_fixture("prior-conflict", tmp_path)
+    prior_carrier = root / ".specify" / "specs" / "demo" / "history-records.md"
+    prior_before = prior_carrier.read_bytes()
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md",
+                        supersession_reply("演示前例冲突项", "保留 30 天"))
+    payload = record_payload(record(root, presentation, reply=reply))
+
+    text = (root / payload["record_path"]).read_text(encoding="utf-8")
+    assert "- **chosen_option**: 保留 30 天" in text, (
+        "the new record does not carry the redecision")
+    assert payload["decisions"] == [
+        {"subject": "演示前例冲突项", "disposition": "objected-alternative",
+         "decision_id": "D-001"}
+    ], payload["decisions"]
+
+    lines_before = prior_before.decode("utf-8").splitlines()
+    lines_after = prior_carrier.read_text(encoding="utf-8").splitlines()
+    appended = [line for line in lines_after if "- **superseded_by**:" in line]
+    assert len(appended) == 1, (
+        "expected exactly one appended superseded_by line, got: "
+        f"{lines_after[-4:]}")
+    stripped = [line for line in lines_after if "- **superseded_by**:" not in line]
+    assert stripped == lines_before, (
+        "the append changed bytes other than the single superseded_by line")
+    assert "D-001" in appended[0] and payload["record_path"] in appended[0], appended[0]
+    old_text = prior_carrier.read_text(encoding="utf-8")
+    assert "### D-010 — 演示前例冲突项" in old_text
+    assert "- **chosen_option**: 保留 90 天" in old_text, (
+        "the prior record's chosen option was rewritten")
+    assert "上一轮讨论" in old_text, "the prior record's context was rewritten"
+
+
+def test_supersession_unwritable_prior_refused(tmp_path: Path) -> None:
+    """C-510: an unwritable prior carrier refuses the redecision with zero writes — it is
+    never degraded to a fresh decision (an unreadable carrier already refuses at scan)."""
+    root = copy_fixture("unwritable-old-record", tmp_path)
+    prior_carrier = root / ".specify" / "specs" / "demo" / "old-record.md"
+    item_carrier = root / ".specify" / "specs" / "demo" / "item.md"
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md",
+                        supersession_reply("演示不可写前例项", "保留 30 天"))
+    prior_before = prior_carrier.read_bytes()
+    item_before = item_carrier.read_bytes()
+    register_before = (root / ".specify" / "register.md").read_bytes()
+    assert os.access(prior_carrier, os.W_OK), "the fixture carrier is already read-only"
+    os.chmod(prior_carrier, 0o444)
+    try:
+        refused = record(root, presentation, reply=reply)
+    finally:
+        os.chmod(prior_carrier, 0o644)
+    assert refused.returncode == 1, (
+        f"an unwritable prior carrier exited {refused.returncode}, expected 1: "
+        f"{refused.stdout} {refused.stderr}")
+    combined = refused.stdout + refused.stderr
+    assert "old-record.md" in combined, (
+        f"the refusal does not name the prior carrier: {combined}")
+    assert "演示不可写前例项" in combined, combined
+    assert knowledge_files(root) == [], "a refused redecision left a batch record behind"
+    assert prior_carrier.read_bytes() == prior_before
+    assert item_carrier.read_bytes() == item_before
+    assert (root / ".specify" / "register.md").read_bytes() == register_before

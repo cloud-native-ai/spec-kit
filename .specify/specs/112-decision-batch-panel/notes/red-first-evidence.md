@@ -89,24 +89,24 @@ All 21 unit tests + 3 contract tests were executed as one red run (command in §
 
 | Slot | Test | Fixture | Run @ 2026-11-27 | rc |
 |------|------|---------|------------------|----|
-| R-X01 | `test_supersession_append_only` | `prior-conflict` | pending — package P4 | — |
-| R-X02 | `test_supersession_unwritable_prior_refused` | `unwritable-old-record` | pending — package P4 | — |
-| R-C509 | `tests/contract/test_decision_batch_contract.py::test_transmission_reuses_107_chain` | owner page + 107 chain | pending — package P4 | — |
-| R-C511 | `tests/contract/test_decision_batch_contract.py::test_owner_extension_single_owner` | owner page + probe + command/skill | pending — package P4 | — |
-| R-C512 | `tests/contract/test_decision_batch_contract.py::test_red_lines_and_boundary` | engine + skill + knowledge store | pending — package P4 | — |
-| R-C208 | `tests/contract/test_decision_batch_contract.py::test_behavior_surfaces_named` | owner page B rows | pending — package P4 | — |
+| R-X01 | `test_supersession_append_only` | `prior-conflict` | **red at T046**（record succeeds but no `superseded_by` append: `expected exactly one appended superseded_by line`）→ **green at T050/T052** | 1 → 0 |
+| R-X02 | `test_supersession_unwritable_prior_refused` | `unwritable-old-record` | **red at T046**（record exits 0 over a read-only prior carrier: `assert 0 == 1`）→ **green at T050/T052** | 1 → 0 |
+| R-C509 | `tests/contract/test_decision_batch_contract.py::test_transmission_reuses_107_chain` | owner page + 107 chain | **red at T047**（§ 重决与取代 absent）→ **green at T048/T052** | 1 → 0 |
+| R-C511 | `tests/contract/test_decision_batch_contract.py::test_owner_extension_single_owner` | owner page + checker + command/skill | **red at T047**（batch sections absent）→ **green at T048/T052** | 1 → 0 |
+| R-C512 | `tests/contract/test_decision_batch_contract.py::test_red_lines_and_boundary` | engine + skill + `autonomous` fixture | **red at T047**（§ 重决与取代 absent）→ **green at T048/T052** | 1 → 0 |
+| R-C208 | `tests/contract/test_decision_batch_contract.py::test_behavior_surfaces_named` | owner page B rows | **red at T047**（B-08/B-09 rows absent）→ **green at T048/T052** | 1 → 0 |
 
-## S7 — M-10…M-16 reverse samples (T049; executed red at T052)
+## S7 — M-10…M-16 reverse samples (T049; executed at T052)
 
 | Slot | Rule | Reverse sample (under `tests/fixtures/decision-batch/`) | Run @ 2026-11-27 | rc |
 |------|------|--------------------------------------------------------|------------------|----|
-| R-M10 | M-10 roster/candidate/exclusions/presence | `m10/` | pending — package P4 | — |
-| R-M11 | M-11 block grammar/identity/linkage/class/resolution | `m11/` | pending — package P4 | — |
-| R-M12 | M-12 ordering/rows/determinism/autonomous zero | `m12/` | pending — package P4 | — |
-| R-M13 | M-13 default/grounding/prior conflict | `m13/` | pending — package P4 | — |
-| R-M14 | M-14 membership/silence/authorization/zero-write | `m14/` | pending — package P4 | — |
-| R-M15 | M-15 batch id/record/fields/register/idempotency | `m15/` | pending — package P4 | — |
-| R-M16 | M-16 replay determinism/pointer resolution | `m16/` | pending — package P4 | — |
+| R-M10 | M-10 roster/candidate/exclusions/presence | `m10/`（unparseable register） | refusal `unparseable`, zero writes | 1 |
+| R-M11 | M-11 block grammar/identity/linkage/class/resolution | `m11/`（duplicate `context` field） | state `incomplete`, reason `duplicate-field` | 0 |
+| R-M12 | M-12 ordering/rows/determinism/autonomous zero | `m12/`（autonomous + human blocks） | presented 1; exclusion `not-human-held`; two scans field-identical | 0 |
+| R-M13 | M-13 default/grounding/prior conflict | `m13/`（prior record vs different default） | state `prior-decision-conflict`, prior pointer + chosen label | 0 |
+| R-M14 | M-14 membership/silence/authorization/zero-write | `m14/`（unknown-identity objection） | refusal `unknown-identity`, zero writes | 1 |
+| R-M15 | M-15 batch id/record/fields/register/idempotency | `m15/`（recorded once, second write） | refusal `duplicate-batch`, zero writes | 1 |
+| R-M16 | M-16 replay determinism/pointer resolution | `m16/`（corrupted option-evidence pointer） | refusal `unresolvable-pointer`, pointer named | 1 |
 
 ## Failing-test name list
 
@@ -273,3 +273,60 @@ Nine-test selection（six red-first legs + two ordered guards + `test_engine_int
 `scripts/python/decision-batch.py`（and `validate-decisions.py` at T031）；`validate-decisions.py
 --action records` over a batch-record carrier → `PASS: 0 violation(s) (rules: M-01, M-02, M-03,
 M-04, M-08, M-09)` rc 0（fixture 见 `notes/us2-green.txt` § 1）。
+
+### S6 — US5 red run at T046/T047 (2026-11-27)
+
+Command (exact):
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py -q \
+  -k "supersession or transmission_reuses_107_chain or owner_extension_single_owner or red_lines_and_boundary or behavior_surfaces_named" \
+  --names-out .specify/specs/112-decision-batch-panel/notes/red-first-names-us5.txt
+```
+Exit status: **1**. Decisive output:
+```text
+FAILED tests/contract/test_decision_batch_contract.py::test_behavior_surfaces_named
+FAILED tests/contract/test_decision_batch_contract.py::test_transmission_reuses_107_chain
+FAILED tests/contract/test_decision_batch_contract.py::test_owner_extension_single_owner
+FAILED tests/contract/test_decision_batch_contract.py::test_red_lines_and_boundary
+FAILED tests/unit/test_decision_batch_engine.py::test_supersession_append_only
+FAILED tests/unit/test_decision_batch_engine.py::test_supersession_unwritable_prior_refused
+6 failed in 6.38s
+# failed-name list written: .../notes/red-first-names-us5.txt (6 entries) passes=1
+```
+Failure signatures are behaviour assertions — the missing § 重决与取代 section and the missing B-08/B-09
+rows for the four contract tests; the missing `superseded_by` append and the unrefused read-only prior
+carrier for the two unit tests — never import errors.
+
+### S6 — US5 green run at T052 (2026-11-27; formal green claim)
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py \
+  tests/contract/test_decision_governance_guards.py -q
+```
+Exit status: **0**. Decisive output: `76 passed in 7.98s`. Full evidence: `notes/us5-green.txt`.
+
+### S7 — M-10…M-16 reverse samples at T049/T052 (2026-11-27)
+
+Documented invocations（`--format json`；record samples carry their own `scan.json` / `reply.md`）:
+
+```text
+$ python3 scripts/python/decision-batch.py scan   --workspace-root tests/fixtures/decision-batch/m10 --format json   → rc 1 refusal  unparseable
+$ python3 scripts/python/decision-batch.py scan   --workspace-root tests/fixtures/decision-batch/m11 --format json   → rc 0 incomplete duplicate-field
+$ python3 scripts/python/decision-batch.py scan   --workspace-root tests/fixtures/decision-batch/m12 --format json   → rc 0 presented 1, exclusion not-human-held（two scans field-identical）
+$ python3 scripts/python/decision-batch.py scan   --workspace-root tests/fixtures/decision-batch/m13 --format json   → rc 0 state prior-decision-conflict
+$ python3 scripts/python/decision-batch.py record --workspace-root tests/fixtures/decision-batch/m14 --presentation …/m14/scan.json --reply …/m14/reply.md --authorization interactive --format json → rc 1 refusal unknown-identity
+$ python3 scripts/python/decision-batch.py record --workspace-root tests/fixtures/decision-batch/m15 --presentation …/m15/scan.json --reply …/m15/reply.md --authorization interactive --format json → rc 1 refusal duplicate-batch
+$ python3 scripts/python/decision-batch.py replay --workspace-root tests/fixtures/decision-batch/m16 --batch …/m16/.specify/knowledge/decision-batch-b-20261127t105123z-4bbb645d.md --format json → rc 1 refusal unresolvable-pointer
+```
+
+`test_every_guard_has_reverse_sample` executes all seven on every run and asserts the exit code, the named
+needle and `dir_snapshot(tests/fixtures/decision-batch)` equality (zero mutation).
+
+### T046/T050 — fixture construction note (2026-11-27)
+
+`m15/` and `m16/` were produced by one real `record` run each over their own workspace (the recorded batch is
+the sample's subject, and `m16/`'s option-evidence pointer was then corrupted to the missing path); the
+presentation payloads `scan.json` were produced by the engine's own `scan`. No fixture is hand-copied from an
+expected output.

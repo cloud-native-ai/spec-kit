@@ -556,6 +556,29 @@
 
 - 引擎退出码闭集：`0` 成功（含 `nothing-pending`）、`1` 文档化拒绝、`2` 用法或环境错误；退出码 MUST 在引擎 `--help` 正文与命令文档（指针：`docs/reference/commands/decide.md`）同批声明，形态遵循 `shared/definitions/script-interface-definitions.md`（指针）。
 
+## 重决与取代（Redecision & Supersession）
+
+本节拥有重决（redecision）的写入形态与取代链义务；决策记录文法归 § 决策记录，批次记录的 create-only 与写后边界归 § 批次记录契约，传递与回执义务归 § 传递与实施（指针）。
+
+### 新增记录，绝不覆盖(add a record, never overwrite)
+
+- 重决 MUST 产生一条**新**的 107 决策记录（文法与分层闭集不变；批次产生的记录携带批次族三字段），MUST NOT 修改、删除或静默改写旧记录的既有内容。
+- 新记录 MUST 恰对应被重决的那一项；一条决策项在一次批次内恰产生一条记录。
+
+### 取代字段(superseded_by)
+
+- 被推翻的旧记录（其 `chosen_option` 与新选择不同）MUST 追加条件层字段 `superseded_by: <新 D-NNN> (<新记录载体路径>)`；该行是旧记录的唯一追加，追加前的既有字节 MUST 逐字节不变。
+- 已携带 `superseded_by` 的旧记录 MUST NOT 被重复追加——取代链只能向前延伸；一次重决只追加当前链尾的旧记录。
+- 当旧记录位于某条批次记录文件之内时，该单行追加是该批次记录唯一受许的写后变更（A-27）：它不是同一批次编号的第二条批次记录，不构成对 create-only 或跨批次写边界的违反，且不改变该文件的批次头、逐项行表与其余记录块。
+- 旧载体不可读或不可写 MUST 具名拒绝该项的重决：整次记录零写入、不铸造批次编号、不登记，MUST NOT 把重决降级为「全新决策」。
+
+### 传递与边界(transmission and boundaries)
+
+- 重决不改变决策类别；每条记录的审计链分别成立。
+- 批次决策被传递实施时 MUST 沿用 107 的审计链（记录 → 派发尝试 → 实施回执）与 § 传递与实施 的形态义务；批次 MUST NOT 生成第二条记录或第二条传输路径。
+- 本节的批量决策面 MUST NOT 与 ai-harness 091 或任何外部决策治理能力对齐；批次 MUST NOT 访问网络、MUST NOT 写入反馈存储、MUST NOT 自动传输任何内容（零网络、零反馈存储写入、零自动传输）；`ai-autonomous` 决策 MUST NOT 被呈现、转换或授权（指针：§ 待决策项来源清单 的类别门）。
+- 机器判定边界：追加形态、单行追加与既有字节保全是机器可判命题（M-15）；重决理由是否充分归 B-05 评审承接，取代时机是否恰当由人工决策评审承接，二者 MUST NOT 被机器声称覆盖。
+
 ## 传递与实施(Transmission and Implementation)
 
 决策跨过 superagent→subagent 边时，传递的是既有派发载荷中的**任务权威内容**，不是新的角色字段、消息类别或通道。通道字段、四项既有注入与上行规则归 `shared/definitions/superagent-definitions.md` § The super↔sub Protocol（按指针抵达，本节不复述）。本节拥有决策块、确认与实施回执的形态义务。
@@ -595,7 +618,7 @@
 
 ## 强制边界(Enforcement Boundary)
 
-本节拥有本特性的**机器可判/行为类分工**：九条机器规则与七条行为规则的封闭名单、逐规则的唯一判据动作与转红条件、以及表—守卫对等和门控中性两项义务。两类规则的反向性质是本节的要点：机器规则 MUST 能被改坏的对象**转红**；行为规则 MUST 被具名评审承接，MUST NOT 被任何文档或测试声称机器覆盖。
+本节拥有本特性的**机器可判/行为类分工**：十六条机器规则与九条行为规则的封闭名单、逐规则的唯一判据动作与转红条件、以及表—守卫对等和门控中性两项义务。两类规则的反向性质是本节的要点：机器规则 MUST 能被改坏的对象**转红**；行为规则 MUST 被具名评审承接，MUST NOT 被任何文档或测试声称机器覆盖。
 
 ### 机器可判规则(M rules, closed)
 
@@ -610,6 +633,13 @@
 | M-07 审计链 | `--action chain` | 记录、派发尝试、回执三段任一缺失或编号不一致 | 机器覆盖 | `tests/fixtures/decision-governance/m07/` |
 | M-08 已登记简称 | `--action records` | 决策主体命中 glossary 已登记 variant 且 canonical 存在 | 机器覆盖（只覆盖已登记词） | `tests/fixtures/decision-governance/m08/` |
 | M-09 evidence 指针可解析 | `--action records` | 任一 evidence 指针不可解析（指向的载体路径/锚不存在或不可读） | 机器覆盖（只判可解析，不判证据是否充分） | `tests/fixtures/decision-governance/m09/` |
+| M-10 待决策来源清单与候选枚举 | `scan` | 载体存在但不可读或不可解析却未整批拒绝；候选被静默丢弃；缺席来源被读作「干净」 | 机器覆盖（只判在场读数与计数恒等） | `tests/fixtures/decision-batch/m10/` |
+| M-11 待决策项块文法与身份联接 | `scan` | 块级缺陷未以具名原因点名；身份未逐字节合并；类别门未排除 `ai-autonomous`；`resolution` 字段或读时联接未阻止已决身份 | 机器覆盖（只判结构与具名原因在场） | `tests/fixtures/decision-batch/m11/` |
+| M-12 批次呈现形态与记账恒等式 | `scan` | 呈现顺序非确定；逐项行数与记账恒等式不一致；`ai-autonomous` 呈现数非零 | 机器覆盖 | `tests/fixtures/decision-batch/m12/` |
+| M-13 建议默认值与接地联接 | `scan` | 建议默认值不是声明的唯一默认成员；接地指针不可解析；前例冲突未检出 | 机器覆盖（只判联接与指针可解析性） | `tests/fixtures/decision-batch/m13/` |
+| M-14 应答成员性与沉默资格 | `record` | 非成员或未知身份的应答未被具名拒绝；非 `eligible` 项被沉默结案；无人值守或未声明授权未被拒绝 | 机器覆盖 | `tests/fixtures/decision-batch/m14/` |
+| M-15 批次记录结构与创建性 | `record` | 批次编号形态错；同编号二次写入未被拒绝；批次族字段缺失或不同批在场；登记与来源更新越出状态单元格与追加行 | 机器覆盖（只判结构与字节边界） | `tests/fixtures/decision-batch/m15/` |
+| M-16 重放确定性与指针解析 | `replay` | 重放写入载体；同一记录两次重放输出不一致；任一不可解析指针却以 0 退出 | 机器覆盖（只判结构与可解析性） | `tests/fixtures/decision-batch/m16/` |
 
 ### 行为类规则(B rules, closed)
 
@@ -622,10 +652,13 @@
 | B-05 理由充分性 | `/speckit.analyze` + `/speckit.review` | 行为类，不声称机器覆盖 |
 | B-06 类别正确性 | `/speckit.review` 产物段 | 行为类，不声称机器覆盖 |
 | B-07 保全裁定充分性（受保护产物改动） | `/speckit.analyze` + `/speckit.review` 产物段 | 行为类，不声称机器覆盖 |
+| B-08 批次呈现可读性与后果真实性 | 人工决策评审 + `/speckit.review` 产物段 | 行为类，不声称机器覆盖 |
+| B-09 建议理由充分性 | `/speckit.analyze` + `/speckit.review` | 行为类，不声称机器覆盖 |
 
 ### 表—守卫对等(table–guard parity)
 
 - 每条 M 规则恰有**一个**确定性判据动作与**一个**转红条件（上表逐行）；改变判据动作或转红条件 MUST 先修订本节。
+- 判据动作取两种形式：107 的九条规则取 `--action <动作>` 形式；批量规则（M-10…M-16）取批次引擎的文档化位置动作形式（`scan` / `record` / `replay`），逐行仍恰有一个动作。测试按两种形式分别断言（`tests/contract/test_decision_governance_guards.py`）。
 - 测试侧的守卫花名册（`tests/contract/test_decision_governance_guards.py` 的 `GUARD_ROSTER`）与本节 M 表 MUST 行集一致；行为面名单与 B 表 MUST 行集一致——任一方向缺一行即缺陷（C-407）。
 - 每条 M 规则 MUST 配一个**逆向样本**（把被检查对象改坏后守卫转红）；无逆向样本的守卫视为缺陷（C-403）。
 - 每条 B 规则 MUST 有具名承接面；文档与测试 MUST NOT 声称任何 B 规则被机器覆盖（C-402）。

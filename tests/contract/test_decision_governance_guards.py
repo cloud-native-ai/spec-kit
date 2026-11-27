@@ -16,7 +16,10 @@ carry the rule id, the carrier path, the line and a message, and the run MUST mu
 nothing inside the fixture tree.
 
 Later user stories APPEND their own guard tests (M-01, M-03…M-07, M-09, the payload and
-chain snapshots) to this module without touching these assertions.
+chain snapshots) to this module without touching these assertions. Feature 112 appends the
+seven batch guards (M-10…M-16): they drive ``scripts/python/decision-batch.py`` through its
+documented positional actions (``scan`` / ``record`` / ``replay``) and are red when the run
+names the defect — a refusal (exit 1) or the named qualification for a block-level defect.
 """
 from __future__ import annotations
 
@@ -695,7 +698,7 @@ def test_supersession_preserves_old() -> None:
 #: One representative reverse sample per machine rule (C-401/C-403). The roster is the
 #: test-side half of the C-407 parity check: its id set MUST equal the owner page's M table.
 #: Each entry: (action, fixture path, extra args, a needle the verdict message must carry).
-GUARD_ROSTER = {
+LEGACY_GUARD_ROSTER = {
     "M-01": ("records", M01 / "red-missing-actor.md", (), "missing base-layer field"),
     "M-02": ("records", FIXTURES / "m02" / "red-empty-locator.md", (), "resource_locator"),
     "M-03": ("records", FIXTURES / "m03" / "red-empty-set.md", (), "empty option set"),
@@ -709,21 +712,84 @@ GUARD_ROSTER = {
     "M-09": ("records", FIXTURES / "m09" / "red-broken.md", (), "does not resolve"),
 }
 
+# --------------------------------------------------------------------------- #
+# Feature 112 — the batch machine rules M-10…M-16 (T049)
+# --------------------------------------------------------------------------- #
+BATCH_ENGINE = ROOT / "scripts" / "python" / "decision-batch.py"
+BATCH_FIXTURES = ROOT / "tests" / "fixtures" / "decision-batch"
+
+
+def batch_record_args(name: str) -> tuple[str, ...]:
+    base = BATCH_FIXTURES / name
+    return ("--presentation", str(base / "scan.json"),
+            "--reply", str(base / "reply.md"),
+            "--authorization", "interactive")
+
+
+#: Each batch reverse sample is the *smallest tree that exercises its rule*; the engine is
+#: driven through its documented positional actions (``scan`` / ``record`` / ``replay``),
+#: and the sample is red when the run names the defect: a refusal (exit 1) for a
+#: carrier-level defect, or the named qualification for a block-level defect that must
+#: not refuse the batch. Entry: (action, workspace, extra args, expected exit, needle).
+BATCH_GUARD_ROSTER = {
+    "M-10": ("scan", BATCH_FIXTURES / "m10", (), 1, "unparseable"),
+    "M-11": ("scan", BATCH_FIXTURES / "m11", (), 0, "duplicate-field"),
+    "M-12": ("scan", BATCH_FIXTURES / "m12", (), 0, "not-human-held"),
+    "M-13": ("scan", BATCH_FIXTURES / "m13", (), 0, "prior-decision-conflict"),
+    "M-14": ("record", BATCH_FIXTURES / "m14", batch_record_args("m14"), 1,
+             "unknown-identity"),
+    "M-15": ("record", BATCH_FIXTURES / "m15", batch_record_args("m15"), 1,
+             "duplicate-batch"),
+    "M-16": ("replay", BATCH_FIXTURES / "m16",
+             ("--batch", str(BATCH_FIXTURES / "m16" / ".specify" / "knowledge" /
+                             "decision-batch-b-20261127t105123z-4bbb645d.md")),
+             1, "unresolvable-pointer"),
+}
+
+#: The whole roster: the nine 107 guards plus the seven batch guards (C-407 parity).
+GUARD_ROSTER = {**LEGACY_GUARD_ROSTER, **BATCH_GUARD_ROSTER}
+
 #: The owner page's § Enforcement Boundary M/B table row sets (closed rosters).
-M_RULES = tuple(f"M-{n:02d}" for n in range(1, 10))
-B_RULES = tuple(f"B-{n:02d}" for n in range(1, 8))
+LEGACY_M_RULES = tuple(f"M-{n:02d}" for n in range(1, 10))
+BATCH_M_RULES = tuple(f"M-{n:02d}" for n in range(10, 17))
+M_RULES = tuple(f"M-{n:02d}" for n in range(1, 17))
+B_RULES = tuple(f"B-{n:02d}" for n in range(1, 10))
 
 
 def run_roster_sample(rule: str) -> subprocess.CompletedProcess:
-    action, fixture, extra, _needle = GUARD_ROSTER[rule]
+    action, fixture, extra, _needle = LEGACY_GUARD_ROSTER[rule]
     flag = "--carrier" if action == "records" else "--fixture"
     return run_action(action, flag, str(fixture), *extra)
 
 
+def run_batch_sample(rule: str) -> subprocess.CompletedProcess:
+    action, workspace, extra, _expect_rc, _needle = BATCH_GUARD_ROSTER[rule]
+    env = dict(os.environ)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return subprocess.run(
+        [sys.executable, str(BATCH_ENGINE), action, "--workspace-root", str(workspace),
+         "--format", "json", *extra],
+        capture_output=True, text=True, env=env, cwd=str(ROOT),
+    )
+
+
+def strip_scan_clock(payload: dict) -> dict:
+    clone = json.loads(json.dumps(payload))
+    clone.pop("scan_time", None)
+    clone.pop("presentation_digest", None)
+    return clone
+
+
 def test_every_guard_has_reverse_sample() -> None:
-    """C-403: every machine rule carries a reverse sample that turns its guard red."""
+    """C-403: every machine rule carries a reverse sample that turns its guard red.
+
+    The nine 107 guards are dispatched to ``validate-decisions.py``; the seven batch
+    guards to the batch engine's documented actions. A batch sample is red when the run
+    names the defect — a refusal for a carrier-level defect, or the named qualification
+    for a block-level defect that must not refuse the batch (C-604/C-606 boundary).
+    """
     assert set(GUARD_ROSTER) == set(M_RULES), (
-        f"the guard roster covers {sorted(GUARD_ROSTER)}, not the nine machine rules"
+        f"the guard roster covers {sorted(GUARD_ROSTER)}, not the sixteen machine rules"
     )
     # The owner page's M table declares each rule's reverse sample; the declared
     # directory must be the one the executable roster actually drives.
@@ -731,13 +797,15 @@ def test_every_guard_has_reverse_sample() -> None:
     for rule in M_RULES:
         row = re.search(rf"^\| {rule}[^|]*\|(.*)$", section, re.M)
         assert row, f"the owner page M table carries no {rule} row"
-        fixture_dir = GUARD_ROSTER[rule][1].parent.relative_to(ROOT).as_posix()
+        fixture = GUARD_ROSTER[rule][1]
+        fixture_dir = (fixture if fixture.is_dir()
+                       else fixture.parent).relative_to(ROOT).as_posix()
         assert fixture_dir in row.group(1), (
             f"the {rule} row does not declare the reverse-sample directory {fixture_dir}"
         )
     before = dir_snapshot(FIXTURES)
-    for rule in M_RULES:
-        action, fixture, extra, needle = GUARD_ROSTER[rule]
+    for rule in LEGACY_M_RULES:
+        action, fixture, extra, needle = LEGACY_GUARD_ROSTER[rule]
         assert fixture.is_file(), f"missing reverse sample for {rule}: {fixture}"
         run = run_roster_sample(rule)
         assert run.returncode == 1, (
@@ -755,6 +823,38 @@ def test_every_guard_has_reverse_sample() -> None:
         assert verdict["message"], (rule, verdict)
         assert needle in verdict["message"], (rule, needle, verdict["message"])
     assert dir_snapshot(FIXTURES) == before, "a roster run mutated the fixture tree"
+
+    before_batch = dir_snapshot(BATCH_FIXTURES)
+    for rule in BATCH_M_RULES:
+        _action, workspace, _extra, expect_rc, needle = BATCH_GUARD_ROSTER[rule]
+        assert workspace.is_dir(), f"missing reverse sample workspace for {rule}: {workspace}"
+        run = run_batch_sample(rule)
+        assert run.returncode == expect_rc, (
+            f"{rule} reverse sample exited {run.returncode}, expected {expect_rc}: "
+            f"{run.stdout[-600:]} {run.stderr[-600:]}"
+        )
+        assert needle in (run.stdout + run.stderr), (
+            f"{rule} reverse sample does not name {needle!r}: {run.stdout[-600:]}"
+        )
+    assert dir_snapshot(BATCH_FIXTURES) == before_batch, (
+        "a batch roster run mutated the fixture tree"
+    )
+
+
+def test_m12_batch_scan_deterministic_and_autonomous_zero() -> None:
+    """M-12: the batch presentation is deterministic and never presents `ai-autonomous`."""
+    first = run_batch_sample("M-12")
+    second = run_batch_sample("M-12")
+    assert first.returncode == 0 and second.returncode == 0, first.stderr + second.stderr
+    payload = json.loads(first.stdout)
+    assert strip_scan_clock(json.loads(first.stdout)) == strip_scan_clock(
+        json.loads(second.stdout)), "two scans of one tree are not field-identical"
+    assert [item["identity"]["subject"] for item in payload["items"]] == ["演示人工项"], (
+        payload["items"])
+    assert payload["bookkeeping"]["presented_rows"] == len(payload["items"])
+    assert any(entry["reason"] == "not-human-held" and entry.get("subject") == "演示自主项"
+               for entry in payload["bookkeeping"]["named_exclusions"]), (
+        payload["bookkeeping"]["named_exclusions"])
 
 
 def documented_scan(root: Path) -> list[str]:
@@ -868,7 +968,7 @@ def test_table_guard_parity() -> None:
         "the guard roster and the owner page M table differ"
     )
     # Each M row names exactly one deterministic judge action, matching the roster's action.
-    for rule in M_RULES:
+    for rule in LEGACY_M_RULES:
         row = re.search(rf"^\| {rule}[^|]*\|(.*)$", section, re.M)
         assert row, f"missing M row {rule}"
         cells = [cell.strip() for cell in row.group(1).split("|")]
@@ -878,3 +978,14 @@ def test_table_guard_parity() -> None:
         assert f"`--action {action}`" in judge_cell, (
             f"{rule} row names {judge_cell!r}, the roster uses --action {action}"
         )
+    # The batch rows take the batch engine's documented positional action form: exactly
+    # one of `scan` / `record` / `replay`, never an `--action` flag.
+    for rule in BATCH_M_RULES:
+        row = re.search(rf"^\| {rule}[^|]*\|(.*)$", section, re.M)
+        assert row, f"missing M row {rule}"
+        cells = [cell.strip() for cell in row.group(1).split("|")]
+        judge_cell = cells[0]
+        assert "`--action" not in judge_cell, (rule, judge_cell)
+        tokens = [token for token in ("scan", "record", "replay")
+                  if f"`{token}`" in judge_cell]
+        assert tokens == [BATCH_GUARD_ROSTER[rule][0]], (rule, judge_cell, tokens)

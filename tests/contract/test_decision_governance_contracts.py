@@ -464,7 +464,7 @@ def behavior_rows() -> dict[str, tuple[str, str]]:
 def test_behavior_surfaces_named() -> None:
     """C-402: every behavior rule names its review surface and disclaims machine coverage."""
     rows = behavior_rows()
-    assert set(rows) == {f"B-{n:02d}" for n in range(1, 8)}, sorted(rows)
+    assert set(rows) == {f"B-{n:02d}" for n in range(1, 10)}, sorted(rows)
     for rule, (surface, coverage) in rows.items():
         assert surface, f"{rule} names no review surface"
         assert "/speckit.review" in surface or "/speckit.analyze" in surface or (

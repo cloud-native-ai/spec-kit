@@ -11,8 +11,9 @@ validation, bookkeeping, pointer resolution) and never restates their tables.
 Actions (closed set):
   scan    read-only: scan the closed source roster and render one presentation
           (text body + machine payload).
-  record  the only writer: re-scan, validate the reply, mint the batch id and write the
-          batch record through the memory engine.
+  record  the only writer: re-scan, validate the reply, mint the batch id, write the
+          batch record through the memory engine, and append the single
+          ``superseded_by`` line to each overturned prior record.
   replay  read-only: reconstruct one recorded batch from the batch record and resolvable
           pointers alone; any unresolvable pointer is reported and the exit is non-zero.
 
@@ -1280,7 +1281,8 @@ def render_decision_record(entry: dict, batch_id: str, record_rel: str,
 
 def compose_batch_record(presentation: dict, reply: dict, plan: list[dict], batch_id: str,
                          record_rel: str, version: str, created_at: str,
-                         pre_disclosures: list[dict] | None = None) -> str:
+                         pre_disclosures: list[dict] | None = None,
+                         supersession: list[dict] | None = None) -> str:
     books = presentation["bookkeeping"]
     context = presentation["batch_context"]
     lines = [f"# 决策批次记录 {batch_id}", "", "## 批次头", ""]
@@ -1374,6 +1376,12 @@ def compose_batch_record(presentation: dict, reply: dict, plan: list[dict], batc
                          f"{disclosure['detail']}")
     else:
         lines.append("- 来源更新披露：无。")
+    if supersession:
+        for update in supersession:
+            for prior_id in update["targets"]:
+                lines.append(f"- 取代追加：{prior_id}（{update['carrier']}）")
+    else:
+        lines.append("- 取代追加：无。")
     lines.append("")
     lines.append("## 批次上下文")
     lines.append("")
@@ -1565,6 +1573,100 @@ def build_block_updates(root: Path, batch_id: str,
                 disclosures.append({"carrier": carrier, **error})
         if text != original:
             updates.append({"carrier": carrier, "text": text})
+    return updates, disclosures
+
+
+def insert_superseded_by(text: str, decision_id: str,
+                         value: str) -> tuple[str, dict | None]:
+    """Append the single ``superseded_by`` line at the end of a prior record block."""
+    lines = text.splitlines()
+    mask = fenced_mask(lines)
+    start = None
+    for index, line in enumerate(lines):
+        if mask[index]:
+            continue
+        heading = RECORD_HEADING_RE.match(line)
+        if heading and heading.group(1) == decision_id:
+            start = index
+            break
+    if start is None:
+        return text, {"reason": "prior-record-missing",
+                      "detail": f"no '### {decision_id}' record in the carrier"}
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("#"):
+            end = index
+            break
+    if any(line.strip().startswith("- **superseded_by**:") for line in lines[start:end]):
+        return text, None
+    insertion = end
+    while insertion > start + 1 and not lines[insertion - 1].strip():
+        insertion -= 1
+    lines.insert(insertion, f"- **superseded_by**: {value}")
+    trailing_newline = "\n" if text.endswith("\n") else ""
+    return "\n".join(lines) + trailing_newline, None
+
+
+def build_supersession_updates(root: Path, plan: list[dict], record_rel: str,
+                               base_texts: dict[str, str] | None = None
+                               ) -> tuple[list[dict], list[dict]]:
+    """The pre-write computation of every overturned prior record's single-line append.
+
+    The whole record is refused when a prior carrier is unreadable or unwritable: a
+    redecision is never degraded to a fresh decision (C-510). ``base_texts`` carries the
+    already-computed block/resolution texts so one carrier takes both edits, not one.
+    """
+    prior = build_prior_index(root)
+    targets: dict[tuple[str, str], dict] = {}
+    for entry in plan:
+        if entry["disposition"] not in ("accepted-default", "objected-alternative"):
+            continue
+        subject = entry["item"]["identity"]["subject"]
+        chosen = entry["chosen"]
+        for record in prior["records"]:
+            if not subject or subject not in record["fields"].get("context", ""):
+                continue
+            prior_choice = record["fields"].get("chosen_option", "").strip()
+            if not prior_choice or prior_choice == chosen:
+                continue
+            if record["fields"].get("superseded_by"):
+                continue
+            targets.setdefault((record["carrier"], record["id"]), {
+                "carrier": record["carrier"],
+                "prior_id": record["id"],
+                "new_id": entry["decision_id"],
+                "subject": subject,
+            })
+    updates: list[dict] = []
+    disclosures: list[dict] = []
+    by_carrier: dict[str, list[dict]] = {}
+    for target in targets.values():
+        by_carrier.setdefault(target["carrier"], []).append(target)
+    for carrier in sorted(by_carrier):
+        path = root / carrier
+        base = (base_texts or {}).get(carrier)
+        if base is None:
+            try:
+                base = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError) as exc:
+                names = "、".join(sorted({t["subject"] for t in by_carrier[carrier]}))
+                raise Refusal("record-request", "prior-carrier",
+                              f"{names}: the prior record carrier {carrier} is unreadable "
+                              f"({exc}); a redecision cannot degrade to a fresh decision")
+        if not os.access(path, os.W_OK):
+            names = "、".join(sorted({t["subject"] for t in by_carrier[carrier]}))
+            raise Refusal("record-request", "prior-carrier",
+                          f"{names}: the prior record carrier {carrier} is not writable; "
+                          "a redecision cannot degrade to a fresh decision")
+        text = base
+        for target in by_carrier[carrier]:
+            value = f"{target['new_id']} ({record_rel})"
+            text, error = insert_superseded_by(text, target["prior_id"], value)
+            if error:
+                disclosures.append({"carrier": carrier, **error})
+        if text != base:
+            updates.append({"carrier": carrier, "text": text,
+                            "targets": [t["prior_id"] for t in by_carrier[carrier]]})
     return updates, disclosures
 
 
@@ -1924,11 +2026,16 @@ def action_record(args: argparse.Namespace) -> int:
         register_update, register_disclosures = build_register_update(
             root, batch_id, record_rel, plan)
         block_updates, block_disclosures = build_block_updates(root, batch_id, plan)
-        pre_disclosures = register_disclosures + block_disclosures
+        supersession_updates, supersession_disclosures = build_supersession_updates(
+            root, plan, record_rel,
+            base_texts={update["carrier"]: update["text"] for update in block_updates})
+        pre_disclosures = (register_disclosures + block_disclosures
+                           + supersession_disclosures)
         created_at = utc_now()
         version = _resolve_version(Path(__file__).resolve())
         body = compose_batch_record(presentation, reply, plan, batch_id, record_rel,
-                                    version, created_at, pre_disclosures)
+                                    version, created_at, pre_disclosures,
+                                    supersession_updates)
         write_batch_record(root, record_rel, title, batch_id, body)
         disclosures = list(pre_disclosures)
         try:
@@ -1936,11 +2043,14 @@ def action_record(args: argparse.Namespace) -> int:
         except OSError as exc:
             disclosures.append({"carrier": register_update["path"], "reason": "write-failed",
                                 "detail": str(exc)})
-        for update in block_updates:
+        final_texts = {update["carrier"]: update["text"] for update in block_updates}
+        final_texts.update({update["carrier"]: update["text"]
+                            for update in supersession_updates})
+        for carrier in sorted(final_texts):
             try:
-                apply_text_update(root, update["carrier"], update["text"])
+                apply_text_update(root, carrier, final_texts[carrier])
             except OSError as exc:
-                disclosures.append({"carrier": update["carrier"], "reason": "write-failed",
+                disclosures.append({"carrier": carrier, "reason": "write-failed",
                                     "detail": str(exc)})
     except Refusal as refusal:
         return emit_refusal("record", refusal, args.format)
@@ -1971,6 +2081,10 @@ def action_record(args: argparse.Namespace) -> int:
                 "status_updates": register_update["status_updates"],
             },
             "blocks_updated": [update["carrier"] for update in block_updates],
+            "supersessions": [
+                {"carrier": update["carrier"], "records": update["targets"]}
+                for update in supersession_updates
+            ],
             "disclosures": disclosures,
         }, ensure_ascii=False, indent=2))
     else:
@@ -1985,6 +2099,8 @@ def action_record(args: argparse.Namespace) -> int:
               f"{len(register_update['status_updates'])} 个状态单元格。")
         for update in block_updates:
             print(f"来源块更新：{update['carrier']}")
+        for update in supersession_updates:
+            print(f"取代追加：{'、'.join(update['targets'])}（{update['carrier']}）")
         for disclosure in disclosures:
             print(f"披露：{disclosure['carrier']}（{disclosure['reason']}）：{disclosure['detail']}")
     return EXIT_OK
@@ -2040,7 +2156,8 @@ def build_parser() -> argparse.ArgumentParser:
     _sig_configure(
         parser,
         effects="scan and replay write nothing; record writes only through the named "
-                "carriers (batch record, register rows/status cells, block resolution)",
+                "carriers (batch record, register rows/status cells, block resolution, "
+                "prior-record superseded_by appends)",
         codes="0 success (including nothing-pending); 1 a documented refusal; "
               "2 usage or environment error",
     )

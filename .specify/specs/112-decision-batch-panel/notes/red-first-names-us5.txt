@@ -1,0 +1,6 @@
+tests/contract/test_decision_batch_contract.py::test_behavior_surfaces_named
+tests/contract/test_decision_batch_contract.py::test_owner_extension_single_owner
+tests/contract/test_decision_batch_contract.py::test_red_lines_and_boundary
+tests/contract/test_decision_batch_contract.py::test_transmission_reuses_107_chain
+tests/unit/test_decision_batch_engine.py::test_supersession_append_only
+tests/unit/test_decision_batch_engine.py::test_supersession_unwritable_prior_refused
