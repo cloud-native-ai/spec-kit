@@ -1,0 +1,367 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_owner.py
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [18 items]
+
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_owner_document_is_the_single_model_home _________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_owner_document_is_the_single_model_home():
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md').is_file
+
+tests/contract/test_context_management_owner.py:194: AssertionError
+____ test_ambient_section_cap_literal_and_roster_mutations_trip_the_checker ____
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_ambient_section_cap_literal_and_roster_mutations_trip_the_checker():
+        assert TEMPLATE.is_file(), f"instructions template missing: {TEMPLATE}"
+        pristine = TEMPLATE.read_text(encoding="utf-8")
+        body = _ambient_section(pristine)
+>       assert body, "the ambient section is missing from the template"
+E       AssertionError: the ambient section is missing from the template
+E       assert ''
+
+tests/contract/test_context_management_owner.py:607: AssertionError
+______________________ test_no_second_layout_home_exists _______________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_no_second_layout_home_exists():
+        """C-004: the layout table lives only in the owner document."""
+        declaring = []
+        for path in sorted(DEFINITIONS_DIR.glob("*.md")):
+            text = path.read_text(encoding="utf-8")
+            header, rows = table_rows(text, "Layout")
+            if header:
+                declaring.append((path.name, header))
+>       assert declaring == [("context-management-definitions.md", LAYOUT_COLUMNS)], (
+            f"exactly one file may declare the six-column layout table, got {declaring}")
+E       AssertionError: exactly one file may declare the six-column layout table, got []
+E       assert [] == [('context-ma... reference'))]
+E         
+E         Right contains one more item: ('context-management-definitions.md', ('class id', 'layer', 'form', 'source', 'owner', 'cap reference'))
+E         Use -v to get more diff
+
+tests/contract/test_context_management_owner.py:214: AssertionError
+________________ test_layout_table_is_the_single_row_data_home _________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_layout_table_is_the_single_row_data_home():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+_____ test_composition_protocol_declares_baseline_once_and_task_selection ______
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_composition_protocol_declares_baseline_once_and_task_selection():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:457: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+________ test_presence_vocabulary_defined_once_with_unobserved_pointer _________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_presence_vocabulary_defined_once_with_unobserved_pointer():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:354: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+___________ test_bilingual_definition_sites_carry_the_fixed_literals ___________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_bilingual_definition_sites_carry_the_fixed_literals():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+___ test_ambient_section_is_present_in_template_and_live_and_pointer_shaped ____
+[gw14] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_ambient_section_is_present_in_template_and_live_and_pointer_shaped():
+        assert TEMPLATE.is_file(), f"instructions template missing: {TEMPLATE}"
+        assert LIVE_INSTRUCTIONS.is_file(), f"live instructions missing: {LIVE_INSTRUCTIONS}"
+        for path in (TEMPLATE, LIVE_INSTRUCTIONS):
+            text = path.read_text(encoding="utf-8")
+>           assert AMBIENT_HEADING in text.splitlines(), (
+                f"the ambient section heading is missing verbatim from {path}")
+E           AssertionError: the ambient section heading is missing verbatim from /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/templates/instructions-template.md
+E           assert '## Context Management(上下文管理)' in ['# Project Instructions for AI Agents', '', '## Project Overview', '[Brief summary of what the LLM need to know, key ... '', '> **Note**: This file is generated by `/speckit.instructions`. Custom content is preserved during updates.', ...]
+E            +  where ['# Project Instructions for AI Agents', '', '## Project Overview', '[Brief summary of what the LLM need to know, key ... '', '> **Note**: This file is generated by `/speckit.instructions`. Custom content is preserved during updates.', ...] = <built-in method splitlines of str object at 0x55645acc9a40>()
+E            +    where <built-in method splitlines of str object at 0x55645acc9a40> = '# Project Instructions for AI Agents\n\n## Project Overview\n[Brief summary of what the LLM need to know, key informa...ew anti-pattern is recorded as feedback and lands in the registry through the improvement flow, never appended here.\n'.splitlines
+
+tests/contract/test_context_management_owner.py:578: AssertionError
+_________ test_ambient_section_mutation_leg_fires_on_the_template_side _________
+[gw15] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_ambient_section_mutation_leg_fires_on_the_template_side():
+        assert TEMPLATE.is_file(), f"instructions template missing: {TEMPLATE}"
+        pristine = TEMPLATE.read_text(encoding="utf-8")
+>       assert _ambient_violations(pristine) == [], (
+            f"the pristine template must be clean: {_ambient_violations(pristine)}")
+E       AssertionError: the pristine template must be clean: ['section missing']
+E       assert ['section missing'] == []
+E         
+E         Left contains one more item: 'section missing'
+E         Use -v to get more diff
+
+tests/contract/test_context_management_owner.py:587: AssertionError
+___________________ test_source_drift_and_reentry_semantics ____________________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_source_drift_and_reentry_semantics():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:482: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+____________ test_composer_roles_resolve_through_the_existing_model ____________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_composer_roles_resolve_through_the_existing_model():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+____________________ test_forms_matrix_matches_the_contract ____________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_forms_matrix_matches_the_contract():
+>       matrix = _forms_matrix(_owner_text())
+                               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+_____ test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline _____
+[gw13] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+____________________ test_red_lines_declare_no_new_surface _____________________
+[gw17] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_red_lines_declare_no_new_surface():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:623: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+_______ test_concept_pointer_slot_carries_the_triple_and_four_structures _______
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_concept_pointer_slot_carries_the_triple_and_four_structures():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+_____ test_landing_contract_declares_three_cells_and_three_forbidden_pairs _____
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_landing_contract_declares_three_cells_and_three_forbidden_pairs():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+_____ test_trigger_set_is_closed_at_seven_with_composer_scope_and_evidence _____
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_trigger_set_is_closed_at_seven_with_composer_scope_and_evidence():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:413: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+_______ test_terminology_boundary_table_names_four_neighbours_by_pointer _______
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_terminology_boundary_table_names_four_neighbours_by_pointer():
+>       text = _owner_text()
+               ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_owner.py:233: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_owner.py:144: in _owner_text
+    return owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_context_management_owner.py::test_owner_document_is_the_single_model_home
+FAILED tests/contract/test_context_management_owner.py::test_ambient_section_cap_literal_and_roster_mutations_trip_the_checker
+FAILED tests/contract/test_context_management_owner.py::test_no_second_layout_home_exists
+FAILED tests/contract/test_context_management_owner.py::test_layout_table_is_the_single_row_data_home
+FAILED tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection
+FAILED tests/contract/test_context_management_owner.py::test_presence_vocabulary_defined_once_with_unobserved_pointer
+FAILED tests/contract/test_context_management_owner.py::test_bilingual_definition_sites_carry_the_fixed_literals
+FAILED tests/contract/test_context_management_owner.py::test_ambient_section_is_present_in_template_and_live_and_pointer_shaped
+FAILED tests/contract/test_context_management_owner.py::test_ambient_section_mutation_leg_fires_on_the_template_side
+FAILED tests/contract/test_context_management_owner.py::test_source_drift_and_reentry_semantics
+FAILED tests/contract/test_context_management_owner.py::test_composer_roles_resolve_through_the_existing_model
+FAILED tests/contract/test_context_management_owner.py::test_forms_matrix_matches_the_contract
+FAILED tests/contract/test_context_management_owner.py::test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline
+FAILED tests/contract/test_context_management_owner.py::test_red_lines_declare_no_new_surface
+FAILED tests/contract/test_context_management_owner.py::test_concept_pointer_slot_carries_the_triple_and_four_structures
+FAILED tests/contract/test_context_management_owner.py::test_landing_contract_declares_three_cells_and_three_forbidden_pairs
+FAILED tests/contract/test_context_management_owner.py::test_trigger_set_is_closed_at_seven_with_composer_scope_and_evidence
+FAILED tests/contract/test_context_management_owner.py::test_terminology_boundary_table_names_four_neighbours_by_pointer
+============================== 18 failed in 6.62s ==============================

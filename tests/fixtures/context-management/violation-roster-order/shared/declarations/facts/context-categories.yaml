@@ -1,0 +1,9 @@
+fact: context-categories
+kind: closed-set
+statement:
+  - invariant
+  - variable
+consumers:
+  - scripts/python/context-audit.py
+  - tests/contract/test_context_management_declarations.py
+former_carriers: []

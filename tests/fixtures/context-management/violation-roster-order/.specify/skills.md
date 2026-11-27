@@ -1,0 +1,3 @@
+# Fixture skills
+
+- fixture-skill
