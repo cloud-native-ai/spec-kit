@@ -1,0 +1,95 @@
+# Completion Gate re-validation — 111-general-best-practices (2026-11-27, P2)
+
+All eight gate items were re-run against the current tree at closure (never trusted from
+an earlier reading). Readings below; commands are verbatim.
+
+## GATE-1 — task-file structure
+
+```bash
+python3 .specify/scripts/python/validate-tasks.py .specify/specs/111-general-best-practices/tasks.md
+```
+
+`PASS: … — 0 error(s), 0 warning(s)`, exit `0`. Zero WARNs → nothing to adjudicate
+(the `green-*` family checks — dangling / clause-collision / cross-phase /
+path-divergence — are part of this validator's 0-error verdict).
+
+## GATE-2 — cross-artifact consistency
+
+```bash
+python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+  --spec-dir .specify/specs/111-general-best-practices --stage tasks --repo .
+```
+
+`decision=pass errors=0 advisories=34 waived=0`; summary `fr=9 sc=7 tasks=20
+clauses=24 files=13`; exit `0`. Every advisory adjudicated:
+
+| Class | Count | Adjudication |
+|-------|-------|--------------|
+| `external-clause` (INV-01…INV-12) | 30 (plan 2, tasks 2, data-model 24, checklist 2) | **False-positive class**: `INV-NN` are data-model-internal invariant ids declared by `data-model.md` itself (§ inner structure `E1–E11 / INV-01…INV-12 / T1–T3`), not contract clauses; the heuristic reads any INV id as a foreign contract namespace. Same 28-token class was adjudicated at the tasks stage; the two extra tokens come from the checklist/plan cross-references. No action. |
+| `missing-path`: `requirements.md:63` → `.specify/state/` | 1 | **By design**: the spine is git-ignored runtime state kept in the main tree; this worktree deliberately carries no `.specify/state/` (requirements.md names the path as the runtime state location, not a deliverable). No action. |
+| `missing-path`: `research.md:3` → `.specify/.tmp/sdd-loop/worktrees/general-best-practices` | 1 | **False positive**: the worktree self-reference; resolved relative to the repository root it names this very worktree (which exists), not a path inside it. No action. |
+| `missing-path`: `.specify/features/111-general-best-practices.md` (`research.md:9`, `feature-ref.md:11`) | 2 | **Declared deferral**: the feature detail file lands in the feature-registration stage — FR-009's single exception ("后续特性登记阶段对 `.specify/features.md` 与 `.specify/features/111-*.md` 的登记行是唯一例外"). No action now. |
+
+## GATE-3 — FR / SC / clause coverage
+
+- `grep -cE '^\- \*\*FR-[0-9]{3}\*\*:' requirements.md` → **9**; every FR row is claimed
+  in § Requirement Coverage Map (9/9).
+- `grep -cE '^\- \*\*SC-[0-9]{3}\*\*:' requirements.md` → **7**; every SC row is claimed
+  (7/7).
+- Clause definition lines `^\*\*C-[0-9]{3}\*\*` per contract: manifest **6**, entry-shape
+  **5**, accumulation **6**, distribution-guard **7** → **24**, each claimed exactly once
+  in § Clause Coverage & Green Partition (validator's green checks report 0 errors).
+- The tasks validator additionally reports `tasks=20` (19 T-rows + T007A) and the
+  pre-analyze summary reports the same `fr=9 sc=7 clauses=24`.
+
+## GATE-4 — final-path criteria + smoke record (input-side)
+
+`verification.md` is derived by the spec side from
+`test-evidence/verification-input.md` (DoD-7; the crew MUST NOT write it). Crew-side
+completeness check of the input, all read 2026-11-27:
+
+- `grep -c '^SC-00[1-7]_status=pass' verification-input.md` → **7** (one row per SC; the
+  six `final`-path criteria SC-001…SC-006 all `pass`, SC-007 `supporting` `pass`).
+- `grep -c '^smoke_command='` → **1**; `grep -c '^smoke_exit_code=0'` → **1**;
+  `smoke_evidence_path=.specify/specs/111-general-best-practices/notes/us3-green.txt`
+  exists and is non-empty (`test -s` rc 0).
+- The smoke command was executed verbatim at T019: `6 passed in 6.29s`, exit `0`.
+
+## GATE-5 — mirror convergence
+
+```bash
+python3 scripts/python/sync-mirrors.py --check
+env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh -q tests/contract/test_mirror_parity_suite.py
+```
+
+`ok    shared/ == .specify/shared/ (122 files, byte-identical)`, zero `DIFF`, exit `0`;
+parity suite `888 passed in 6.72s`, exit `0`.
+
+## GATE-6 — guard + distribution proof
+
+- Guard through the single entry: `6 passed in 6.27s`, exit `0` (six legs (a)–(f)).
+- `test-evidence/init-distribution-proof.txt`: three evidences present (code path
+  citation, existing init integration test rc 0, source-run drill rc 0 listing exactly
+  five documents).
+- `git diff --numstat 0419adae5..HEAD -- src/` → **0 lines**.
+
+## GATE-7 — boundary closure (C-406)
+
+Reading recorded in `test-evidence/containment.txt`: `0419adae5..HEAD` = 131 paths =
+108 in FR-009's declared set + 23 accounting-store residuals (each record body carries
+the feature key or run id) + **0 violations**. The final-tree re-read is appended to that
+file after the wrap-up commit.
+
+## GATE-8 — no open tasks
+
+```bash
+grep -cE '^- \[[ >]\]' .specify/specs/111-general-best-practices/tasks.md
+```
+
+→ **0** (all T001–T019 rows `[X]`; no `[~]` deferrals).
+
+## Verdict
+
+GATE-1…GATE-8 all green at the closure tree. The only spec-side step remaining by design
+is the `verification.md` derivation from `verification-input.md` (gate item GATE-4's
+carrier), which the crew is forbidden to write.
