@@ -1,0 +1,1 @@
+exec-quant: recorded /speckit.tasks run=r20261127T081500Z-112a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/decision-batch-panel/.specify/exec-quant/records/20261127T090925309265Z-98aed753.json
