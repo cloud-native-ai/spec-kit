@@ -675,3 +675,63 @@ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
 ```
 
 Exit code: `0`.
+
+## T036 — the three domain terms registered as proposals
+
+Registered through the existing glossary engine (requirements A-14; `origin=auto`,
+`status=proposed`; no new store, no schema change):
+
+```bash
+python3 scripts/python/glossary-utils.py --action add --canonical "提示遵从度 (Prompt Adherence)" \
+  --variants "prompt adherence, 提示遵从度评价, prompt adherence evaluation" --meaning "..." \
+  --origin auto --status proposed
+python3 scripts/python/glossary-utils.py --action add --canonical "宿主提示层 (Host Prompt Layer)" \
+  --variants "host prompt layer, 宿主提示层, host-prompt" --meaning "..." \
+  --origin auto --status proposed
+python3 scripts/python/glossary-utils.py --action add --canonical "项目规则文件层 (Project Rule File Layer)" \
+  --variants "project rule file layer, 项目规则文件层, project-rules" --meaning "..." \
+  --origin auto --status proposed
+```
+
+```text
+{"written": true, "canonical": "提示遵从度 (Prompt Adherence)", "count": 185}
+{"written": true, "canonical": "宿主提示层 (Host Prompt Layer)", "count": 186}
+{"written": true, "canonical": "项目规则文件层 (Project Rule File Layer)", "count": 187}
+```
+
+Exit code `0` each. The engine's verdict: `{"valid": true, "path": ".specify/glossary.md"}` —
+the three rows carry `origin=auto`, `status=proposed` and meanings that point at the owner
+document (no restated table).
+
+## T038 — the F-1 reading and the one failure it found (repaired, disclosed)
+
+The first F-1 full-suite reading on the feat tree produced exactly one NEW failed name against
+the 222-name baseline:
+
+```text
+tests/contract/test_bilingual_expression.py::test_drift_str_literal_unique_consumers
+```
+
+Cause: the owner document cites `shared/guidelines/bilingual-expression.md`, and that guard's
+owner document fixes STR-001 as a literal with unique consumption points — a new consumer MUST
+register its read point in the whitelist **before** writing the literal (the Shared Strings
+protocol, C-03, stated in the guard's own comment). The repair was that declared registration
+(`REPO_ROOT / "shared" / "definitions" / "prompt-adherence-definitions.md"` added with a dated
+comment, commit 1321bb609) — not a suppression: the same literal is still flagged anywhere
+outside the declared set.
+
+The same commit added the GATE-7 leg that was missing from the guard roster —
+`test_an_undeclared_store_in_a_catalog_row_exits_2_with_no_reading` (a doctored catalog row
+naming `zz-undeclared` exits 2 with no reading for both the reading and the `--check-coverage`
+forms; it guards behavior delivered at T012, so it is a coverage leg, not red-first work).
+
+Because a test-affecting path changed, slot F-1 was re-read and its record replaced:
+
+```text
+==== 222 failed, 10361 passed, 3 skipped, 1538 warnings in 76.63s (0:01:16) ====
+# failed-name list written: .specify/specs/109-prompt-adherence/final-failed.txt (222 entries) passes=2
+comm -13 baseline-failed.txt final-failed.txt → 0 lines
+```
+
+Zero NEW failed names; both set differences (13 and 23) are empty. Full gate readings:
+`test-evidence/implementation-gates.txt`.

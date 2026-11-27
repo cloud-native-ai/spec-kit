@@ -1,0 +1,278 @@
+# Implementation gates — 109-prompt-adherence (P4, T038/T039)
+
+Taken 2026-11-27 in the line worktree on branch `109-prompt-adherence`, after every source,
+test, fixture and registry edit of the feature landed. Slot F-1 is the single full-suite reading
+of this stage.
+
+## GATE-1 — full suite: zero NEW failed names (slot F-1)
+
+Command (the baseline was captured with `--full`; the comparison run mirrors that form):
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full \
+  --names-out .specify/specs/109-prompt-adherence/final-failed.txt
+comm -13 .specify/specs/109-prompt-adherence/baseline-failed.txt \
+        .specify/specs/109-prompt-adherence/final-failed.txt
+```
+
+Recorded reading:
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load
+# test runner: mode=parallel workers=auto dist=load passes=2 tier=full excluded_slow=0
+==== 222 failed, 10361 passed, 3 skipped, 1538 warnings in 76.63s (0:01:16) ====
+(serial pass) =============== 1 passed, 10586 deselected, 8 warnings in 18.62s ===============
+# failed-name list written: .specify/specs/109-prompt-adherence/final-failed.txt (222 entries) passes=2
+f1_rc=1
+comm -13 output: (0 lines)
+```
+
+Exit code: `1` — pytest's own failure exit over the pre-existing suite state; the composed
+names file carries exactly **222** names, the same name set as the baseline (both `comm -13` and
+`comm -23` are empty). Zero NEW failed names.
+
+**F-1 history disclosed (single-run evidence discipline)**: the first reading of this slot ran on
+the b7661f617 tree and produced one NEW name —
+`tests/contract/test_bilingual_expression.py::test_drift_str_literal_unique_consumers` — because
+the owner document cites `shared/guidelines/bilingual-expression.md` while the STR-001 literal
+had no consumer registration. The repair was the Shared Strings protocol's own declared step
+(register the new consumer in the drift guard's whitelist, commit 1321bb609), not a suppression:
+the guard now decides the same way it did before, with the new consumption point declared. The
+reading above is the re-taken one on the corrected tree and replaces the earlier record (T039's
+rule: a test-affecting path changed after the slot, so the slot is re-read).
+
+## GATE-2 — mirror and command-copy parity, no NEW drift
+
+```bash
+python3 scripts/python/sync-mirrors.py --check
+```
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (439 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (134 files, byte-identical)
+projected[bash-version-guard] ... : ok   (3 lines)
+projected[python-version-bridge] ... : ok   (3 lines)
+ok    shared/ == .specify/shared/ (123 files, byte-identical)
+```
+
+Exit code `0`. The pairs this spec touches were ABSENT/DIFF at the pre-change baseline
+(`notes/pre-change-measurements.md`: 15/15 deliverable paths absent, two pairs byte-identical at
+133/117 files); after the single projection they are byte-identical (134/123 files) — no NEW
+diff exists to report, and the second `--write` printed no `sync` line (no-op, exit 0).
+
+```bash
+python3 scripts/python/regen-command-copies.py --check
+```
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+Exit code `0`. This spec changes no `templates/commands/` file.
+
+## GATE-3 — zero open or claimed task rows
+
+```bash
+grep -cE '^- \[[ >]\]' .specify/specs/109-prompt-adherence/tasks.md
+```
+
+```text
+0
+```
+
+Exit code `1` (grep's "no match" — the counted value is the reading: zero open/claimed rows).
+`**DoD Status**: green` (every DoD-1…DoD-10 row satisfied; no void row).
+
+## GATE-4 — final-path criteria `pass` and the smoke record complete
+
+```bash
+python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/109-prompt-adherence --repo . --json
+```
+
+Recorded payload (claim `Planned`, immediately before the flip):
+
+```text
+verdict: accept
+flow_class: execution
+claimed_status: Planned
+final_path: pass=8 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=8
+reasons: []
+completion_conditions: every_final_path_pass=True no_open_rows=True status_row_per_criterion=True smoke_record_pass=True
+smoke.command: env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_owner.py tests/contract/test_prompt_adherence_declarations.py tests/contract/test_prompt_adherence_readonly.py tests/integration/test_prompt_adherence_init.py -q
+smoke.exit_code: 0
+smoke.evidence_path: .specify/specs/109-prompt-adherence/test-evidence/smoke-run.txt (exists, non-empty: 77 passed in 7.65s)
+```
+
+Exit code `0`. SC-001…SC-008 are the `final`-path criteria, all `pass`; SC-009 is `supporting`
+and also `pass` (its F-1 leg is GATE-1 above).
+
+## GATE-5 — the structural validators are silent
+
+```bash
+python3 scripts/python/validate-tasks.py .specify/specs/109-prompt-adherence/tasks.md
+```
+
+```text
+PASS: .specify/specs/109-prompt-adherence/tasks.md — 0 error(s), 0 warning(s)
+```
+
+Exit code `0`.
+
+```bash
+python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+  --spec-dir .specify/specs/109-prompt-adherence --stage tasks --repo .
+```
+
+```text
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0,
+ "waived": 0, "fr": 30, "sc": 9, "tasks": 39, "clauses": 39, "files": 15}}
+```
+
+Exit code `0`; zero advisories to adjudicate.
+
+## GATE-6 — the engine and the declaration layer are clean
+
+```bash
+python3 scripts/python/script-interface-check.py \
+  --files scripts/python/prompt-adherence.py,.specify/scripts/python/prompt-adherence.py --json
+```
+
+Recorded payload fields: `applicable: 2`, `violations: 0`, `violation_rows: []`,
+`findings: []`; exit code `0`. Both copies answer the flag surface; the source copy's probe
+shows `-h`/`--help` identical bodies with usage/options/side-effects/exit-codes, `--version`
+one line resolving `0.0.22` (no source literal), an unknown option rejected with exit 2 before
+any action, and no writes from the flag runs.
+
+```bash
+python3 scripts/python/harness-triple-check.py --action verify
+```
+
+```text
+# harness-triple-check — verify
+declarations: 41
+candidates: 95
+consistency-declarations-to-carriers: 58/62
+consistency-carriers-to-declarations: 16/282
+findings: 10
+finding: unclassified-candidate: shared/workflow/execution-topology.md
+... (nine more unclassified-candidate findings about carriers this feature never touches)
+```
+
+Exit code `1`, driven by the ten pre-existing `unclassified-candidate` findings on unrelated
+carriers (none of the ten paths is in `git diff --name-only 21cab972e --`). The five
+`prompt-adherence-*` slugs are clean: zero findings name them; each reads `kind: closed-set`,
+declaration under `shared/declarations/facts/`, consumers `scripts/python/prompt-adherence.py`,
+and the read point is locatable (`declaration_reader` + slug in the engine source). Full
+per-slug readings: `test-evidence/boundary-readings.txt`.
+
+## GATE-7 — the layout-fact derivation and the undeclared-store refusal
+
+Source scan (the read points and the single root projection; no second root table):
+
+```bash
+grep -n 'declaration_reader' scripts/python/prompt-adherence.py
+grep -n 'STORE_LAYOUT_FACT =\|STORE_ROOT_PREFIX\|def _store_root' scripts/python/prompt-adherence.py
+grep -c '"\.specify/' scripts/python/prompt-adherence.py
+```
+
+```text
+42:import declaration_reader  # noqa: E402  (the one declaration-layer read entry)
+186:            body = declaration_reader.load_fact(str(repo), slug)["body"]
+102:STORE_LAYOUT_FACT = "runtime-store-layout"
+103:STORE_ROOT_PREFIX = ".specify"
+234:def _store_root(name):
+236:    return STORE_ROOT_PREFIX + "/" + name
+0
+```
+
+The engine holds one `STORE_ROOT_PREFIX` and one `_store_root()` projection; zero hard-coded
+`".specify/…"` store literals exist, so no second root table is present.
+
+The undeclared-store refusal is pinned by
+`tests/contract/test_prompt_adherence_engine.py::test_an_undeclared_store_in_a_catalog_row_exits_2_with_no_reading`
+(a doctored catalog row naming `zz-undeclared` exits 2 with no reading and no coverage verdict
+for both the reading and `--check-coverage` forms; green in the engine guard's 44-passed run, and
+in the smoke set).
+
+## GATE-8 — the coverage map is machine-clean
+
+```bash
+python3 scripts/python/prompt-adherence.py --check-coverage
+```
+
+```text
+coverage-map: ok (0 findings)
+```
+
+Exit code `0`. The doctored-copy form exits `1` with the sorted finding list and the unreadable
+owner document exits `2` — measured in `notes/red-first-evidence.md` § SC-004 reading and pinned
+by `test_check_coverage_reports_sorted_findings_on_doctored_copies` (4 parametrized cases) and
+`test_check_coverage_exits_2_when_the_owner_document_is_unusable`.
+
+## Pre-status-flip closure verdict (recorded before the flip)
+
+```text
+verdict: accept · claimed_status: Planned · final_path pass=8 total=8 · reasons: [] ·
+completion_conditions: all four true
+```
+
+## Post-flip closure verdict (claim Implemented)
+
+```bash
+python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/109-prompt-adherence --repo . --json
+```
+
+```text
+verdict: accept
+claimed_status: Implemented
+final_path: pass=8 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=8
+reasons: []
+completion_conditions: every_final_path_pass=True no_open_rows=True status_row_per_criterion=True smoke_record_pass=True
+```
+
+Exit code `0`. The claim now matches the evidence: the registry row and the feature detail both
+read `Implemented`, and the checker re-decides `accept` with zero reasons.
+
+## T039 — final structural re-run after the closure edits
+
+```bash
+python3 scripts/python/sync-mirrors.py --check
+```
+
+Exit code `0`; identical pair readings to GATE-2 (scripts/ 134 files, shared/ 123 files,
+byte-identical; six projections ok; the command-copy line ok).
+
+```bash
+python3 scripts/python/validate-tasks.py .specify/specs/109-prompt-adherence/tasks.md
+```
+
+```text
+PASS: .specify/specs/109-prompt-adherence/tasks.md — 0 error(s), 0 warning(s)
+```
+
+Exit code `0`.
+
+```bash
+python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+  --spec-dir .specify/specs/109-prompt-adherence --stage tasks --repo .
+```
+
+```text
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0,
+ "waived": 0, "fr": 30, "sc": 9, "tasks": 39, "clauses": 39, "files": 15}}
+```
+
+Exit code `0`.
+
+The full suite is not re-run here: no test-affecting path changed after the F-1 reading. The
+edits after it are `tasks.md` marks, `verification.md`, `.specify/features.md` (one Status cell
+plus its dated note), the feature detail, `.specify/glossary.md`, this evidence file and the
+two evidence captures — none is collected by pytest; the registry flip keeps the row schema,
+the header count and the spec-path invariants the suite pins (and the SC-009 value in `verification.md` cites
+the F-1 reading above).

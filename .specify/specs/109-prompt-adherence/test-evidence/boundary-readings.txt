@@ -1,6 +1,11 @@
 # Boundary readings — implement P4 (T035)
 
-## harness-triple-check --action verify (2026-11-27, after the mirror projection)
+Taken 2026-11-27 on the committed tree (`b7661f617`, the P4 feat commit) after the single
+mirror projection.
+
+## harness-triple-check — the five prompt-adherence-* slugs are clean
+
+```bash
 $ python3 scripts/python/harness-triple-check.py --action verify
 # harness-triple-check — verify
 declarations: 41
@@ -14,184 +19,94 @@ finding: unclassified-candidate: skills/external/study-online/SKILL.md
 finding: unclassified-candidate: skills/internal/create-team/SKILL.md
 finding: unclassified-candidate: skills/internal/debt-audit/SKILL.md
 finding: unclassified-candidate: skills/internal/manage-anchor/SKILL.md
-verify_exit=1 (the 10 findings are pre-existing unclassified-candidate findings about carriers this feature never touches: shared/workflow/execution-topology.md, skills/external/study-online/SKILL.md, skills/internal/{create-team,debt-audit,manage-anchor,seal-artifact,study-kb,view-team}/SKILL.md, templates/commands/{anchor,seal}.md)
-prompt-adherence findings: 0 — the five prompt-adherence-* slugs are clean
-$ for slug in the five prompt-adherence-* facts: harness-triple-check.py --action lookup --fact <slug>
-fact: prompt-adherence-layers kind: closed-set consumers: scripts/python/prompt-adherence.py 
-fact: prompt-adherence-strengths kind: closed-set consumers: scripts/python/prompt-adherence.py 
-fact: prompt-adherence-signals kind: closed-set consumers: scripts/python/prompt-adherence.py 
-fact: prompt-adherence-deviation-classes kind: closed-set consumers: scripts/python/prompt-adherence.py 
-fact: prompt-adherence-reading-status kind: closed-set consumers: scripts/python/prompt-adherence.py 
-each: kind closed-set, declaration shared/declarations/facts/<slug>.yaml, consumers scripts/python/prompt-adherence.py; no finding names a prompt-adherence slug (the 10 listed findings repeat on every lookup)
+finding: unclassified-candidate: skills/internal/seal-artifact/SKILL.md
+finding: unclassified-candidate: skills/internal/study-kb/SKILL.md
+finding: unclassified-candidate: skills/internal/view-team/SKILL.md
+finding: unclassified-candidate: templates/commands/anchor.md
+finding: unclassified-candidate: templates/commands/seal.md
+```
 
-## script-interface-check --files scripts/python/prompt-adherence.py,.specify/scripts/python/prompt-adherence.py --json
-{
-  "applicable": 1,
-  "candidates": [
-    {
-      "applicable": true,
-      "basis": "marker-fired",
-      "decided_by": "run-semantics",
-      "evidence": "the marker fired when python ran the instrumented copy as a script (candidate position 1 of 6, 3 statement(s) in the claim): the file reaches code of its own | -h exit=0 --help exit=0 same_body=True labels=exit-codes,options,side-effects,usage | --version exit=0 lines=1 observed='0.0.22' framework='0.0.22' | unknown exit=2 known-first exit=2 after-'--' exit=2 rescue=rejected | the four flag runs left the tree fingerprint identical; -h exit=0 no writes; --help exit=0 no writes; --version exit=0 no writes; --script-interface-check-undeclared-option exit=2 no writes | help-wins: not applicable (the consumer declares no write option)",
-      "help": true,
-      "help_content": {
-        "exit-codes": true,
-        "options": true,
-        "side-effects": true,
-        "usage": true
-      },
-      "help_wins": {
-        "applicable": false,
-        "basis": "no-write-option",
-        "observations": [],
-        "ok": true,
-        "option": ""
-      },
-      "language": "python",
-      "observed": "marker-fired",
-      "path": "scripts/python/prompt-adherence.py",
-      "positions_tried": 1,
-      "probe": "ran",
-      "probing_through": "scripts/python/prompt-adherence.py",
-      "projected": false,
-      "projection_kind": "",
-      "rejection": {
-        "exit_non_zero": true,
-        "output_before_action": true,
-        "recognized_does_not_rescue": true,
-        "rescue_basis": "rejected",
-        "rescued_by_declaration": false,
-        "separator_respected": true
-      },
-      "unknown_rejected": true,
-      "version": "prompt-adherence.py 0.0.22",
-      "version_observations": {
-        "evidence": "--version exit=0 lines=1 observed='0.0.22' framework='0.0.22'",
-        "framework_version": "0.0.22",
-        "line": "prompt-adherence.py 0.0.22",
-        "literal": false,
-        "observed_version": "0.0.22",
-        "ok": true,
-        "output": "prompt-adherence.py 0.0.22\n",
-        "unknown": false
-      },
-      "version_ok": true,
-      "version_unknown": false,
-      "zero_side_effect": true
-    }
-  ],
-  "elapsed_ms": 7004,
-  "exceptions": [
-    {
-      "failed_limbs": [],
-      "handling": "install the optional extras and re-probe; the script's entry layer already answers its flags",
-      "path": "skills/external/document-utils/scripts/office/validate.py",
-      "recomputed": true,
-      "skill": "document-utils",
-      "unsatisfied_clause": "probe-inconclusive: the optional third-party modules (defusedxml / pypdf / python-docx) are not installed on the probe host"
-    },
-    {
-      "failed_limbs": [],
-      "handling": "install the optional extras and re-probe; the script's entry layer already answers its flags",
-      "path": "skills/external/document-utils/scripts/pdf/create_validation_image.py",
-      "recomputed": true,
-      "skill": "document-utils",
-      "unsatisfied_clause": "probe-inconclusive: the optional third-party modules (pypdf / Pillow) are not installed on the probe host"
-    }
-  ],
-  "exempt": 1,
-  "exemptions": [
-    {
-      "basis": "optional-read-only",
-      "evidence": "no write-triggering declaration and no observed write: --help/--version recommended, optional",
-      "path": "scripts/python/prompt-adherence.py"
-    }
-  ],
-  "findings": [
-    {
-      "kind": "candidate-not-collected",
-      "message": ".specify/scripts/python/prompt-adherence.py is neither a tracked candidate nor ignored",
-      "paths": [
-        ".specify/scripts/python/prompt-adherence.py"
-      ],
-      "resolved": false
-    },
-    {
-      "kind": "candidate-not-collected",
-      "message": "requested candidate .specify/scripts/python/prompt-adherence.py is not in the candidate set",
-      "paths": [
-        ".specify/scripts/python/prompt-adherence.py"
-      ],
-      "resolved": false
-    }
-  ],
-  "mode": "subset",
-  "projection": [
-    {
-      "idempotent": true,
-      "kind": "python-version-bridge",
-      "mirror": ".specify/scripts/python/script_interface_cli.py",
-      "problems": [],
-      "source": "scripts/python/script_interface_cli.py",
-      "status": "ok"
-    },
-    {
-      "idempotent": true,
-      "kind": "python-version-bridge",
-      "mirror": ".specify/scripts/python/sync-mirrors.py",
-      "problems": [],
-      "source": "scripts/python/sync-mirrors.py",
-      "status": "ok"
-    },
-    {
-      "idempotent": true,
-      "kind": "python-version-bridge",
-      "mirror": ".specify/scripts/python/script-interface-check.py",
-      "problems": [],
-      "source": "scripts/python/script-interface-check.py",
-      "status": "ok"
-    },
-    {
-      "idempotent": true,
-      "kind": "bash-version-guard",
-      "mirror": ".specify/scripts/bash/check-prerequisites.sh",
-      "problems": [],
-      "source": "scripts/bash/check-prerequisites.sh",
-      "status": "ok"
-    },
-    {
-      "idempotent": true,
-      "kind": "bash-version-guard",
-      "mirror": ".specify/scripts/bash/generate-instructions.sh",
-      "problems": [],
-      "source": "scripts/bash/generate-instructions.sh",
-      "status": "ok"
-    },
-    {
-      "idempotent": true,
-      "kind": "bash-version-guard",
-      "mirror": ".specify/scripts/bash/run-tests.sh",
-      "problems": [],
-      "source": "scripts/bash/run-tests.sh",
-      "status": "ok"
-    }
-  ],
-  "root": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/prompt-adherence",
-  "schema": "script-interface-check/1",
-  "source": "tracked",
-  "violation_rows": [],
-  "violations": 0
-}
-exit=1
+`prompt-adherence` appears zero times in the verify output. The ten findings are
+`unclassified-candidate` findings about carriers this feature never touches (none of the ten
+paths is in `git diff --name-only 21cab972e --`); they are the tree's pre-existing carrier
+classification state, not a prompt-adherence finding. Per-slug lookup:
 
-## instructions section counts (baseline 39 / 40 in notes/pre-change-measurements.md)
-templates/instructions-template.md: 39
-.specify/instructions.md: 40
+```bash
+$ python3 scripts/python/harness-triple-check.py --action lookup --fact <each of the five slugs>
+fact: prompt-adherence-layers           kind: closed-set  consumers: scripts/python/prompt-adherence.py
+fact: prompt-adherence-strengths        kind: closed-set  consumers: scripts/python/prompt-adherence.py
+fact: prompt-adherence-signals          kind: closed-set  consumers: scripts/python/prompt-adherence.py
+fact: prompt-adherence-deviation-classes kind: closed-set consumers: scripts/python/prompt-adherence.py
+fact: prompt-adherence-reading-status   kind: closed-set  consumers: scripts/python/prompt-adherence.py
+```
 
-## no /speckit.* command or skill surface ships
+Each fact is schema-valid, claimed exactly once, and carries a locatable read point in the
+engine (`declaration_reader` plus the slug, the `has_read_point` condition); no finding names a
+prompt-adherence slug.
+
+## script-interface-check — zero violations on both engine copies
+
+```bash
+$ python3 scripts/python/script-interface-check.py \
+    --files scripts/python/prompt-adherence.py,.specify/scripts/python/prompt-adherence.py --json
+```
+
+Real payload fields: `applicable: 2`, `violations: 0`, `violation_rows: []`, `findings: []`;
+exit code `0`. The source copy's probe: `-h`/`--help` identical bodies with the four labels
+(usage / options / side-effects / exit-codes), `--version` one line resolving `0.0.22` from the
+nearest `pyproject.toml` with no source literal, an unknown option rejected with exit 2 before
+any action (including after a bare `--`), and the four flag runs leave the tree fingerprint
+identical. (The earlier pre-commit reading exited 1 with `candidate-not-collected` for the
+uncommitted mirror; after the feat commit the same command reads zero violations and zero
+findings.)
+
+## Instructions section counts — unchanged against the pre-change baseline
+
+```bash
+$ grep -c '^## ' templates/instructions-template.md
+39
+$ grep -c '^## ' .specify/instructions.md
+40
+```
+
+`notes/pre-change-measurements.md` recorded **39 / 40**; no section was added or removed
+(C-037).
+
+## No /speckit.* command or skill surface ships
+
+```bash
 $ grep -rl "prompt-adherence" templates/commands .github 2>/dev/null | wc -l
 0
 $ find skills -maxdepth 2 -name "*prompt-adherence*" | wc -l
 0
 $ find .specify/skills -maxdepth 2 -name "*prompt-adherence*" | wc -l
 0
+```
+
+## The existing owner guards stay green (two baseline failures disclosed)
+
+```bash
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_runtime_store_layout.py tests/contract/test_script_interface_contract.py \
+    tests/contract/test_exec_quant_engine.py tests/contract/test_feedback_utils_cli.py \
+    tests/contract/test_evidence_findings_schema.py tests/contract/test_probe_registry_umbrella.py -q
+```
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" <the six files> -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+FAILED tests/contract/test_script_interface_contract.py::test_c26_generator_skill_carries_the_mandate_entry
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+2 failed, 187 passed, 1 skipped in 12.89s
+```
+
+Exit code: `1`, and both failure names are present in the implement-entry baseline
+(`baseline-failed.txt` lines 120 and 66) — pre-existing failures, not caused by this slice. The
+two failures that appeared before the feat commit were repaired, not suppressed:
+`test_declaration_equals_inventory_and_consumer_sets` required
+`shared/declarations/facts/runtime-store-layout.yaml`'s declared consumer set to name the new
+reader (the fact's own owner invariant: the list is exactly the code files that read the fact)
+and the engine's degraded layout read to print the reader's `absent_label`;
+`test_c20_the_mirror_copy_resolves_to_its_own_root` required the mirror to be committed (the
+candidate screen reads `git ls-files` — an untracked mirror is `candidate-not-collected`). Both
+read green on the committed tree.

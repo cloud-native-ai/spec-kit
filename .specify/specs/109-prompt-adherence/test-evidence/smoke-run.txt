@@ -1,0 +1,8 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_owner.py tests/contract/test_prompt_adherence_declarations.py tests/contract/test_prompt_adherence_readonly.py tests/integration/test_prompt_adherence_init.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 93%]
+.....                                                                    [100%]
+77 passed in 7.65s

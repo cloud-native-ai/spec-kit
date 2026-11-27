@@ -1,0 +1,37 @@
+# Workspace guard — implement P4
+
+## Snapshot (before the feat commit)
+
+```
+$ python3 scripts/python/workspace-guard.py --snapshot .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p4.json --repo .
+recorded .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p4.json
+exit 0
+```
+
+## Check (after the feat commit b7661f617 and the guard-correction commit 1321bb609) — clean
+
+```
+$ python3 scripts/python/workspace-guard.py --check .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p4.json --repo .
+clean
+exit 0
+```
+
+Changed field: none. The branch (`109-prompt-adherence`) and the `.specify/specs` listing are
+unchanged. The refs set already carried the concurrent sibling branches
+(`110-context-management`, `111-general-best-practices`) at snapshot time, so this slice created
+no git ref and observed no drift. The concurrent lines 110/111 share the repository: had a
+sibling branch landed between snapshot and check, a `refs` delta would have been attributed to
+that sibling, re-baselined, and never suppressed or reverted; product-tree drift would still
+have failed this check.
+
+## Script-interface screen (post-commit)
+
+```
+$ python3 scripts/python/script-interface-check.py --files scripts/python/prompt-adherence.py --json
+{"applicable": 1, "violations": 0, "findings": 0, "violation_rows": []}
+exit 0
+```
+
+The tracked engine is an applicable interface candidate with zero violations; no flag, help or
+exit-code surface moved when the longitudinal window path and the output caps landed (the
+two-copy form of the same screen is recorded in `test-evidence/boundary-readings.txt`).
