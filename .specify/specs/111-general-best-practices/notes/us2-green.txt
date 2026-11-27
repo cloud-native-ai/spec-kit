@@ -1,0 +1,56 @@
+# US2 green — guard leg (d) + manifest readings (T010, 2026-11-27T08:41Z)
+
+**Command** (single entry; interpreter per § Environment Prerequisites):
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  -k "accumulation_pointer" \
+  --names-out .specify/specs/111-general-best-practices/test-evidence/us2-names.txt \
+  tests/contract/test_general_best_practices.py
+```
+
+**Result**: exit `0`; `1 passed in 6.27s`; `--names-out` wrote **0** entries.
+Selected leg: `test_accumulation_pointer_chain_and_no_second_engine`.
+Raw capture (local, `*.log` git-ignored): `test-evidence/guard-us2-green.log`.
+
+## SC-003 — engine pointer + manifest-owned rules, no second mechanism
+
+| Reading | Command | Value |
+|---------|---------|-------|
+| Feedback engine exposes `record` | `feedback-utils.py --help \| grep -c '\brecord\b'` (also asserted in-process by leg (d) with rc 0) | `5` occurrences; action set line starts `{record,status,list,…}` |
+| Knowledge-recording owner exists | `ls -la shared/guidelines/knowledge-promotion.md .specify/shared/guidelines/knowledge-promotion.md` | both present, 4849 B each |
+| `[best-practice]` marker in the manifest | `grep -c '\[best-practice\]' shared/best-practices/README.md` | `1` |
+| Owner-file stems declared in the section | `grep -c 'programming-languages\|system-interfaces\|programming-frameworks\|programming-tools' …/README.md` | `6` (table links + stems in the observation clause) |
+| Second engine file | `ls scripts/python/best-practices*.py scripts/python/best_practices*.py` | both globs: `No such file or directory` |
+
+Manifest § 逐步积累机制 (lines 29–40) declares, as its **own owned rules** (A-22): the
+promotion procedure, the generality criterion (反复出现, or 一次明确的用户纠正), and the
+`**来源**` traceability form; `--review` carries the marker + one owner-file stem (A-17/A-23);
+`.specify/shared/guidelines/knowledge-promotion.md` is cited **only** as the
+knowledge-recording/emphasis-escalation owner by pointer; the red line forbids hollow
+entries and fabricated values; no second engine, store, renderer or index is declared.
+
+## C-105 — scope single ownership (manifest reading)
+
+- The manifest's 内容 cells (table lines 11–14) own the four scope sentences.
+- The four owner files carry **no scope restatement** outside the permitted exception:
+  each file is H1 + accumulation blockquote + (three of them) one italic placeholder line
+  that echoes exactly one scope sentence beside 尚无条目. Verified by reading each file in
+  full (5–8 lines each; see `pre-change-measurements.md` for the source inventory and the
+  files as written above).
+
+## C-106 — closed-set change process (manifest reading)
+
+Manifest line 16 carries the same-change trio verbatim:
+
+> 模块集合是**封闭集**:新增模块 MUST 只经修订本 README + 建立对应 owner 文件 + 更新守卫 `tests/contract/test_general_best_practices.py`。
+
+i.e. a category change updates (1) this manifest's table, (2) the owner file, and (3) the
+guard legs — in one change.
+
+## Mirror note (expected transient, A-24)
+
+T009 edited the source `shared/best-practices/README.md` after T007A; the mirror README is
+therefore one revision behind until the P2 package's final fan-out (T012/T013) converges
+it. Byte identity is adjudicated only by `tests/contract/test_mirror_parity_suite.py` at
+that point; this package's guard selection does not compare mirror bytes (C-402).

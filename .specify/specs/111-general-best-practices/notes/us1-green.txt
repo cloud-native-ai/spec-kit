@@ -1,0 +1,51 @@
+# US1 green — guard legs (a)(b)(c)(f) (T008, 2026-11-27T08:40Z)
+
+**Command** (single entry; interpreter per § Environment Prerequisites):
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  -k "module_document_set or owner_files or seed_entry or relative_links" \
+  --names-out .specify/specs/111-general-best-practices/test-evidence/us1-names.txt \
+  tests/contract/test_general_best_practices.py
+```
+
+**Result**: exit `0`; runner mode `mode=parallel workers=auto dist=load passes=1 tier=fast`;
+`4 passed in 6.26s`; `--names-out` wrote **0** entries (`… (0 entries) passes=1`).
+Selection proof (`--collect-only -q`, rc 0): `4/6 tests collected (2 deselected)` —
+`test_module_document_set_and_closed_category_table`,
+`test_owner_files_placeholders_and_entry_shape`,
+`test_seed_entry_three_facts_and_ssh_extension`, `test_relative_links_resolve`.
+Raw captures (local, `*.log` git-ignored): `test-evidence/guard-us1-green.log`,
+`test-evidence/us1-collect.log`.
+
+## SC-001 — module shape (leg (a)(b)(f))
+
+| Reading | Command | Value |
+|---------|---------|-------|
+| Top-level documents = 5/5 | `ls shared/best-practices \| wc -l` | `5` |
+| Sole category table, 4 data rows | `grep -cE '^\| \*\*' shared/best-practices/README.md` | `4` |
+| Table links = one per row, targets = 4 owner files | `grep -oE '\]\([a-z./-]+\.md\)' …/README.md \| sort` | 4 distinct targets (+ the seed pointer's second `programming-tools.md` link) |
+| Every manifest ↔ owner relative link resolves (leg (f)) | guard | pass |
+| Placeholders ⇔ empty categories | `grep -c '尚无条目' shared/best-practices/*.md` | languages 1 / interfaces 1 / frameworks 1 / tools 0 |
+| Entries per owner file | `grep -c '^## ' shared/best-practices/*.md` | languages 0 / interfaces 0 / frameworks 0 / tools 1 (seed) |
+
+Delivery-state measurement: 3 placeholders / 3 empty categories; seed file 1 entry /
+0 placeholders. Equivalence is asserted by leg (b); the count 3 is not frozen.
+
+## SC-002 — seed entry (leg (c))
+
+`shared/best-practices/programming-tools.md` literal readings (each `grep -c` = 1 unless
+noted): `默认用 HTTPS` 1; `必须显式提示` 1; `~/.git-credentials` 1; `导致 clone 失败` 1;
+`SSH` 2 (practice + extension); `**延伸**` bullet present; no `**来源**` bullet.
+
+## SC-005 — adaptation and zero residue (shared prelude)
+
+| Reading | Value |
+|---------|-------|
+| `ai-harness` / `.ah/` / `/ah.` across the five documents | `0` (per-file `grep -c` all zero) |
+| `Feature 111` attribution in the manifest | present (prelude assertion) |
+| Cited repository paths exist | prelude passed (minimum set + every repo-prefixed code span in the module) |
+
+Notes: the mirror (`.specify/shared/best-practices/`, five names) was regenerated in
+write mode by T007A before this run; the map-row leg (e) is outside this selection and
+remains for the P2 package (T011/T012/T015).

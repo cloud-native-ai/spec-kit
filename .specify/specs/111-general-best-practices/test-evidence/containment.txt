@@ -1,0 +1,97 @@
+# Containment reading — 111-general-best-practices (T019 / GATE-7, 2026-11-27)
+
+Procedure owner: requirements A-20 (path-set difference first, then the record-body
+predicate over the three accounting stores). Declared set owner: FR-009. Baseline:
+`0419adae5`.
+
+## Reading 1 — committed range at `f985cca92` (P2 content commit)
+
+Command:
+
+```bash
+git diff --name-only 0419adae5..HEAD          # 131 paths
+# then, per A-20:
+#   subtract FR-009's literal path set:
+#     .specify/specs/111-general-best-practices/**   shared/best-practices/**
+#     .specify/shared/best-practices/**              shared/definitions/framework-map.md
+#     .specify/shared/definitions/framework-map.md   tests/contract/test_general_best_practices.py
+#   residuals are allowed only under .specify/{session,feedback,exec-quant}/ and only
+#   when the record body carries the feature key 111-general-best-practices or the
+#   run id r20261127T071500Z-111a
+```
+
+| Quantity | Value |
+|----------|-------|
+| Committed paths in range | **131** |
+| Inside FR-009's declared set | **108** |
+| Residuals in the accounting stores | **23** (all record-body predicate hits) |
+| Violations (outside declared set and predicate) | **0** |
+
+The 23 residuals (classification per A-20; every record body carries the feature key or
+the run id):
+
+```
+.specify/exec-quant/records/20261127T072256895807Z-b2ed5204.json (hit)
+.specify/exec-quant/records/20261127T073241883504Z-2aeff455.json (hit)
+.specify/exec-quant/records/20261127T074258844219Z-60fd971b.json (hit)
+.specify/exec-quant/records/20261127T075547662238Z-61e5bf4a.json (hit)
+.specify/exec-quant/records/20261127T080451648094Z-4a771e2b.json (hit)
+.specify/exec-quant/records/20261127T081331351003Z-14a31158.json (hit)
+.specify/exec-quant/records/20261127T084428666545Z-8f2106d0.json (hit)
+.specify/feedback/20261127T072303Z-speckit-requirements.md (hit)
+.specify/feedback/20261127T073252Z-speckit-clarify.md (hit)
+.specify/feedback/20261127T074304Z-speckit-plan.md (hit)
+.specify/feedback/20261127T075556Z-speckit-tasks.md (hit)
+.specify/feedback/20261127T080505Z-speckit-checklist.md (hit)
+.specify/feedback/20261127T081350Z-speckit-analyze.md (hit)
+.specify/feedback/20261127T082900Z-speckit-analyze.md (hit)
+.specify/feedback/20261127T084443Z-speckit-implement.md (hit)
+.specify/session/20261127T072252Z-run-determination-speckit-requirements-r20261127t071500z-111.md (hit)
+.specify/session/20261127T073236Z-run-determination-speckit-clarify-r20261127t071500z-111a.md (hit)
+.specify/session/20261127T074258Z-run-determination-speckit-plan-r20261127t071500z-111a.md (hit)
+.specify/session/20261127T075541Z-run-determination-speckit-tasks-r20261127t071500z-111a.md (hit)
+.specify/session/20261127T080445Z-run-determination-speckit-checklist-r20261127t071500z-111a.md (hit)
+.specify/session/20261127T081331Z-run-determination-speckit-analyze-r20261127t071500z-111a.md (hit)
+.specify/session/20261127T082842Z-run-determination-speckit-analyze-r20261127t074400z-111a-ana.md (hit)
+.specify/session/20261127T084422Z-run-determination-speckit-implement-r20261127t071500z-111a.md (hit)
+```
+
+## Zero-difference readings outside the declared set
+
+- `git diff --numstat 0419adae5..HEAD -- src/` — **0 lines** (no CLI/packaging change;
+  GATE-6 re-read).
+- Zero differences for `templates/`, `skills/`, `agents/`, `scripts/`,
+  `.specify/instructions.md`, `.specify/.gitignore`, `.specify/glossary.md`,
+  `.specify/features.md`, `.specify/features/**`, the decision-governance surface and
+  the engine/aggregate files: every path in the range is classified above; nothing else
+  appears.
+- No aggregate/index rewrite: the residual records are per-entry files; the engine
+  aggregates (`.specify/exec-quant/records.jsonl` / `scores.jsonl`) and the feedback
+  index are untouched (absent from the range).
+
+## SC-006 verdict
+
+The change-path set ⊆ FR-009's declared set after the A-20 residual predicate:
+**violations = 0**. T019's own artifacts (`containment.txt`, `verification-input.md`),
+the T019 tick in `tasks.md`, and the wrap-up accounting records land after this reading
+— the first are inside `.specify/specs/111-general-best-practices/**` (declared), the
+last are per-entry accounting records carrying this feature's key or run id (allowed
+residuals).
+
+## Reading 2 — final-tree re-read at `0cbec5aa4` (after the wrap-up accounting commit)
+
+Command: same procedure as Reading 1 (`git diff --name-only 0419adae5..HEAD`, then the
+A-20 classification).
+
+| Quantity | Value |
+|----------|-------|
+| Committed paths in range | **135** |
+| Inside FR-009's declared set | **112** |
+| Residuals in the accounting stores | **23** (the same predicate-hit set as Reading 1; no new engine record was written — all three wrap-up engines returned `duplicate` by design, see `wrap-up-accounting.txt`) |
+| Violations | **0** |
+
+The 4 paths added since Reading 1 are this feature's own closure and accounting evidence
+(`containment.txt`, `verification-input.md`, `closure-gates.txt` from commit `16c40ee7d`
+and `wrap-up-accounting.txt` from `0cbec5aa4`) — all inside the declared spec set. The
+commit that carries this appended re-read modifies only this existing declared file, so
+the final path set stays at 135 with **0 violations**.

@@ -1,0 +1,112 @@
+# Init-distribution proof — 111-general-best-practices (T014, 2026-11-27)
+
+Owner of the three-evidence form: requirements A-18 (code-path citation + existing init
+integration test running the same copy step + one recorded read-only drill under
+`.specify/.tmp/`). No new test file is added (FR-009 allows exactly one:
+`tests/contract/test_general_best_practices.py`).
+
+## Evidence 1 — code path: the wholesale `shared/` copy step (read-only)
+
+Command:
+
+```bash
+sed -n '2743,2755p' src/specify_cli/__init__.py
+```
+
+Real output:
+
+```python
+        # Copy shared directory (shared reference documents)
+        if (resource_path / "shared").exists():
+            if tracker:
+                tracker.start("local-templates", "copying shared")
+
+            shared_dest = project_path / ".specify" / "shared"
+            shared_dest.mkdir(parents=True, exist_ok=True)
+
+            copy_tree_with_rewrite(
+                resource_path / "shared",
+                shared_dest,
+            )
+            if tracker:
+```
+
+`copy_tree_with_rewrite(resource_path / "shared", shared_dest)` copies the whole
+`shared/` tree — a new subdirectory under `shared/` (here `shared/best-practices/`)
+therefore ships with zero CLI or packaging change. `get_resource_path()` resolves the
+development checkout (repo root) when `src/specify_cli/` carries no packaged
+`templates/` (verified 2026-11-27: `MODULE_DIR = src/specify_cli`, no `templates/`
+there), which is what makes the source-run drill below copy THIS worktree's `shared/`.
+
+## Evidence 2 — existing init integration test (runs the same copy step)
+
+Command (single test entry; interpreter per tasks § Environment Prerequisites):
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_init_new_layout.py -q
+```
+
+Real output (tail):
+
+```
+.                                                                        [100%]
+1 passed in 7.50s
+```
+
+Exit code: `0`.
+
+## Evidence 3 — recorded read-only initialization drill under `.specify/.tmp/`
+
+The globally installed `specify` reports `framework commit: fed513bcc… (embedded)` and
+ships its own packaged `shared/`, so it MUST NOT be used for this drill (it would never
+see this worktree's module). Source-run form used instead:
+
+```bash
+mkdir -p .specify/.tmp/p2-package/init-drill
+cd .specify/.tmp/p2-package/init-drill
+PYTHONPATH=/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/general-best-practices/src \
+  /usr/local/bin/python3 -c 'import specify_cli; specify_cli.main()' \
+  init --here --ai qoder --script sh --no-git < /dev/null
+```
+
+Exit code: `0`. Real output (tail):
+
+```
+ skip Initialize git repository: --no-git flag
+   ok Configure VS Code: Updated for generic
+
+Project ready.
+Note: agents may store credentials in .qoder/; consider adding it (or parts of 
+it) to .gitignore.
+
+Next steps
+  1. Start with slash commands: /speckit.constitution -> /speckit.feature -> 
+/speckit.requirements -> /speckit.plan -> /speckit.tasks -> /speckit.implement
+  Optional: /speckit.agents /speckit.analyze /speckit.anchor /speckit.checklist 
+/speckit.clarify /speckit.derive /speckit.docs /speckit.feedback /speckit.goal 
+/speckit.history /speckit.instructions /speckit.interview /speckit.research 
+/speckit.review /speckit.sanitize /speckit.session /speckit.skills /speckit.team 
+/speckit.todo /speckit.tools
+```
+
+Drill reading — `ls -1 .specify/shared/best-practices/`:
+
+```
+programming-frameworks.md
+programming-languages.md
+programming-tools.md
+README.md
+system-interfaces.md
+```
+
+Count: `5` — exactly the five module documents, delivered by the existing `shared/`
+whole-directory copy. Teardown: the drill directory was removed after the reading
+(`rm -rf .specify/.tmp/p2-package/init-drill`); the raw log is kept at the git-ignored
+`.specify/.tmp/p2-package/init-drill.log`.
+
+## Verdict
+
+Three evidences present: code path (Evidence 1) + existing init integration test running
+the same copy step (Evidence 2, rc 0) + recorded read-only drill reading exactly five
+documents (Evidence 3, rc 0). `git diff --numstat 0419adae5..HEAD -- src/` is re-read in
+`test-evidence/containment.txt` and by GATE-6 (zero lines).

@@ -21,7 +21,7 @@ summary: "/speckit.review run=r20261126T071500Z-108a token=not_evaluated elapsed
   "feature": "108-team-view-degradation",
   "feature_id": "108",
   "determined_at": "2026-11-26T13:14:33Z",
-  "settled_at": "2026-11-27T08:10:41Z",
+  "settled_at": "2026-11-27T09:14:37Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {

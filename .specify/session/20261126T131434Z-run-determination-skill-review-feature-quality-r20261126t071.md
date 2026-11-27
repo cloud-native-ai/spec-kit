@@ -21,7 +21,7 @@ skill:review-feature-quality run=r20261126T071500Z-108a token=not_evaluated elap
   "feature": "108-team-view-degradation",
   "feature_id": "108",
   "determined_at": "2026-11-26T13:14:34Z",
-  "settled_at": null,
+  "settled_at": "2026-11-27T09:14:41Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -91,7 +91,7 @@ skill:review-feature-quality run=r20261126T071500Z-108a token=not_evaluated elap
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -175,8 +175,8 @@ skill:review-feature-quality run=r20261126T071500Z-108a token=not_evaluated elap
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -206,7 +206,7 @@ skill:review-feature-quality run=r20261126T071500Z-108a token=not_evaluated elap
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

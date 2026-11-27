@@ -1,0 +1,4 @@
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/111-general-best-practices/tasks.md
+PASS: .specify/specs/111-general-best-practices/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+date=2026-11-27T08:21:46Z

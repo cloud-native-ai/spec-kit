@@ -1,0 +1,17 @@
+checklist: .specify/specs/111-general-best-practices/checklists/general-best-practices-2026-11-27.md
+item count: 40
+numbering contiguous CHK001..CHK040: True
+unique: True
+items with >=1 trace anchor: 40 / 40
+items missing anchor: none
+items citing >=1 FR/SC/clause: 40 / 40
+items missing FR/SC/clause: none
+FR covered: 9 / 9; missing: none
+SC covered: 7 / 7; missing: none
+clauses covered: 24 / 24; missing: none; extra-tokens: none
+items starting with Verify/Test/Confirm/Check: none
+primary dimension histogram: {'Completeness': 11, 'Measurability': 7, 'Clarity': 6, 'Consistency': 6, 'Gap': 5, 'Ambiguity': 3, 'Conflict': 1, 'Dependency': 1}
+per-item primary dimension: CHK001:Completeness, CHK002:Clarity, CHK003:Completeness, CHK004:Completeness, CHK005:Consistency, CHK006:Completeness, CHK007:Clarity, CHK008:Ambiguity, CHK009:Consistency, CHK010:Consistency, CHK011:Measurability, CHK012:Gap, CHK013:Clarity, CHK014:Completeness, CHK015:Ambiguity, CHK016:Consistency, CHK017:Clarity, CHK018:Measurability, CHK019:Gap, CHK020:Completeness, CHK021:Completeness, CHK022:Measurability, CHK023:Gap, CHK024:Completeness, CHK025:Measurability, CHK026:Ambiguity, CHK027:Gap, CHK028:Measurability, CHK029:Clarity, CHK030:Conflict, CHK031:Completeness, CHK032:Consistency, CHK033:Completeness, CHK034:Completeness, CHK035:Measurability, CHK036:Clarity, CHK037:Measurability, CHK038:Gap, CHK039:Consistency, CHK040:Dependency
+has Notes section: True
+section counts: {'一、文档集与封闭分类集（Document set / closed category set）': 5, '二、Owner 文件、条目形态与占位（Owner files / entry shape / placeholder）': 6, '三、渐进积累与晋升回放（Accumulation / promotion replayability）': 6, '四、框架地图登记与分发/镜像（Registration / distribution / mirror）': 6, '五、适配与零残留（Adaptation / zero residue）': 4, '六、边界封闭与记账（Containment / accounting）': 5, '七、守卫与测试范围（Guard / test scope）': 4, '八、可测量性、追溯与假定（Measurability / traceability / assumptions）': 4}
+checklists dir files: ['general-best-practices-2026-11-27.md', 'requirements.md']

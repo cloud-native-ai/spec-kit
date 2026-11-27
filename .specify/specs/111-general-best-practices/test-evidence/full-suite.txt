@@ -1,0 +1,51 @@
+# Full suite — 111-general-best-practices (T018, 2026-11-27)
+
+Single entry only; interpreter per tasks § Environment Prerequisites
+(`SPECKIT_PYTHON=/usr/local/bin/python3`, pytest 8.4.2). Two runs are on record: run 1
+was taken while the executor itself was writing `tasks.md` (an invalid measurement
+window), run 2 is the authoritative frozen-tree reading. Nothing is suppressed: run 1's
+complete name list is preserved as `full-names-run1.txt`, and both raw logs are kept at
+the git-ignored `.specify/.tmp/p2-package/full-suite-*.log`.
+
+## Run 2 — authoritative reading (frozen tree)
+
+Command:
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full \
+  --names-out .specify/specs/111-general-best-practices/test-evidence/full-names.txt
+```
+
+| Reading | Value |
+|---------|-------|
+| Exit code | `1` (pre-existing repository reds; the frozen baseline carries the same set) |
+| Result lines | `223 failed, 10287 passed, 3 skipped, 1538 warnings in 67.70s` (parallel pass) + `1 passed, 10513 deselected` (declared serial pass) |
+| Failure-name list | `.specify/specs/111-general-best-practices/test-evidence/full-names.txt` — **223** entries |
+| `comm -13 baseline-failed.txt full-names.txt` | **0** lines — no NEW failure name |
+| `comm -23 baseline-failed.txt full-names.txt` | 0 lines — no baseline name disappeared |
+| `cmp baseline-failed.txt full-names.txt` | exit `0` — the two lists are byte-identical |
+
+**Subset verdict**: the full-suite failure-name set is **equal to** the implement-entry
+baseline (223 names, zero NEW, zero gone).
+
+## Run 1 — on record, invalid measurement window (attributed, never suppressed)
+
+Same command; result `223 baseline + 2 new = 225` names (`full-names-run1.txt`).
+
+- `tests/unit/test_status_digest_unit.py::test_c43_two_renders_over_one_registry_are_byte_identical`
+  — **clock-boundary flake, pre-existing**: the assertion compares two digest renders
+  below `generated_at`, but the wall-clock-derived `age_seconds` fields differed by
+  exactly `1` between renders that straddled a second boundary under full parallel load
+  (captured: `1839196` vs `1839197`). The test is green in isolation — the pair re-run
+  through the single entry reported `2 passed in 47.13s`, rc `0`. Unrelated to this
+  feature's surface (the test uses its own tmp fixtures and registry).
+- `tests/contract/test_non_disposable_contract.py::test_t089_a_full_run_is_byte_identical_on_git_status`
+  — **executor-induced invalid window**: the executor ticked T011–T017 in `tasks.md`
+  while the suite was in flight; the test's before/after `git status --porcelain`
+  comparison therefore observed ` M .specify/specs/111-general-best-practices/tasks.md`
+  and failed with "the engine changed the working tree". The diff names the executor's
+  own write, not an engine write; the test passes in isolation (same isolated re-run:
+  `2 passed`, rc 0) and in run 2 with the tree frozen.
+
+Both mechanisms are measurement-environment effects, demonstrated by the isolated re-runs
+and by run 2. The authoritative subset reading above is run 2's.

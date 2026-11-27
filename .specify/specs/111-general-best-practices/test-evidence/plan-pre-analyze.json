@@ -1,0 +1,787 @@
+{
+  "stage": "plan",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 148,
+      "message": "references contract clause INV-01 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 148,
+      "message": "references contract clause INV-12 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 132,
+      "message": "references contract clause INV-01 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 133,
+      "message": "references contract clause INV-02 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 134,
+      "message": "references contract clause INV-03 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 135,
+      "message": "references contract clause INV-04 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 136,
+      "message": "references contract clause INV-05 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 137,
+      "message": "references contract clause INV-06 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 138,
+      "message": "references contract clause INV-07 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 139,
+      "message": "references contract clause INV-08 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 140,
+      "message": "references contract clause INV-09 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 141,
+      "message": "references contract clause INV-10 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 142,
+      "message": "references contract clause INV-11 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 143,
+      "message": "references contract clause INV-12 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 149,
+      "message": "references contract clause INV-01 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 149,
+      "message": "references contract clause INV-04 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 150,
+      "message": "references contract clause INV-05 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 151,
+      "message": "references contract clause INV-06 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 151,
+      "message": "references contract clause INV-07 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 152,
+      "message": "references contract clause INV-08 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 153,
+      "message": "references contract clause INV-09 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 154,
+      "message": "references contract clause INV-10 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 155,
+      "message": "references contract clause INV-01 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 155,
+      "message": "references contract clause INV-09 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 156,
+      "message": "references contract clause INV-11 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 157,
+      "message": "references contract clause INV-12 from an external namespace"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 8,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 10,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 25,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 25,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 47,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 50,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 58,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 61,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 62,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 63,
+      "message": "path does not exist under the repo: .specify/state/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 70,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 74,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 102,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 102,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 110,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 112,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 134,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 138,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 138,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 139,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 140,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 140,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 142,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 150,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 158,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 159,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 166,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 169,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 176,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 218,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 9,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 15,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 34,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 40,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 47,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 102,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 114,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 114,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 122,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 13,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 13,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 21,
+      "message": "path does not exist under the repo: shared/best-practices/README.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 93,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 107,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 116,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 116,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "data-model.md",
+      "line": 140,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 60,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 60,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 60,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 107,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 3,
+      "message": "path does not exist under the repo: .specify/.tmp/sdd-loop/worktrees/general-best-practices"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 9,
+      "message": "path does not exist under the repo: .specify/features/111-general-best-practices.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 44,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 81,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 93,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 11,
+      "message": "path does not exist under the repo: .specify/features/111-general-best-practices.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 18,
+      "message": "path does not exist under the repo: shared/best-practices/README.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 18,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/README.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 19,
+      "message": "path does not exist under the repo: shared/best-practices/programming-languages.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 20,
+      "message": "path does not exist under the repo: shared/best-practices/system-interfaces.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 21,
+      "message": "path does not exist under the repo: shared/best-practices/programming-frameworks.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 22,
+      "message": "path does not exist under the repo: shared/best-practices/programming-tools.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 23,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 24,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 38,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/accumulation.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: shared/best-practices/README.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/accumulation.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 16,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 20,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 25,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 28,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 28,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/distribution-guard.contract.md",
+      "line": 40,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/entry-shape.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: shared/best-practices/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/entry-shape.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/manifest.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: shared/best-practices/README.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/manifest.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: .specify/shared/best-practices/README.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/manifest.contract.md",
+      "line": 3,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 38,
+      "message": "path does not exist under the repo: tests/contract/test_general_best_practices.py"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 110,
+    "waived": 0,
+    "fr": 9,
+    "sc": 7,
+    "tasks": 0,
+    "clauses": 24,
+    "files": 11
+  },
+  "checked_at": "2026-11-27T07:42:15Z"
+}

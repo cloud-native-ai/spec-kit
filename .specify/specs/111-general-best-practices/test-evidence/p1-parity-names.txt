@@ -1,0 +1,1 @@
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/best-practices/README.md->.specify/shared/best-practices/README.md]
