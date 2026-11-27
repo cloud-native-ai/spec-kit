@@ -1,0 +1,73 @@
+{
+  "stage": "requirements",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 56,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 56,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 304,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 305,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: templates/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: skills/internal/decide-batch/SKILL.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: docs/reference/commands/decide.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: tests/fixtures/decision-batch/"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 8,
+    "waived": 0,
+    "fr": 45,
+    "sc": 10,
+    "tasks": 0,
+    "clauses": 0,
+    "files": 2
+  },
+  "checked_at": "2026-11-27T08:28:49Z"
+}
