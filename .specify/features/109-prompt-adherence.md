@@ -3,7 +3,7 @@
 **Feature ID**: 109
 **Name**: Prompt Adherence Evaluation（提示遵从度评价）
 **Description**: 只读、确定、可离线的提示遵从度评价机制：只消费既有传感器（feedback 条目与门控观察族、exec-quant 记录、run-determination 四轴记录、evidence findings、probe 注册表声明），读时派生按运行与纵向两种读取，双层模型 + 六行信号目录 + 六类盲区 + 机器可检的假定行为覆盖图，零新增存储/采集点/评分，经既有 init 分发。
-**Status**: Draft
+**Status**: Planned
 **Created**: 2026-11-27
 **Last Updated**: 2026-11-27
 
@@ -15,6 +15,7 @@ Scope: one owner document `shared/definitions/prompt-adherence-definitions.md` (
 
 ## Latest Review
 
+- **2026-11-27 — plan stage**: plan set landed (`plan.md` with the dynamically derived 23-row Constitution Check and 8 verified execution premises, `research.md` R-1…R-11, `data-model.md` E-1…E-11 + I-1…I-14, six contract files / 39 clauses keeping the source ids C-001…C-046, `quickstart.md` 6 scenarios, `feature-ref.md`); Feature 109 advanced `Draft → Planned` with no add / merge / split. Integration decisions of the plan: store roots derive from `runtime-store-layout.yaml#/statement` through `declaration_reader.py` (no ported `store_layout.py`, no second root table); five closed-set facts, no sixth; reason taxonomy owner/engine split pinned by a bidirectional test; two framework-map rows; no `.gitignore` rule and no store-layout change; decision tensions recorded as N/A with the three design-shape records consumed by reference from the source plan. Gates: `pre-analyze-check --stage plan` pass (0 errors; deliverable-path advisories only), `validate-decision-tensions` ok, plan integrity (no placeholders, single H1, stamp present) ok, mirror and command-copy baselines rc 0.
 - **2026-11-27 — clarify stage**: `Related Feature` bound to Feature 109 and this detail registered `Draft`; the six-area scan (sensor mapping, reading semantics, coverage map, engine contract, distribution, tests) adjudicated in the spec's `## Clarifications` Session 2026-11-27, with in-place refinements to the Overview, Related Feature, FR-004, FR-005, FR-011, FR-014, FR-015, FR-023, FR-024, FR-026, A-6 and the Edge Cases; live counts unchanged (FR-001…FR-030 / SC-001…SC-009); validator `status: ok` (0 error / 0 warning).
 
 ## Key Changes
