@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T07:31:55Z"
 summary: "Implement P3 (T017–T026) for 109-prompt-adherence. Landed the owner guard red-first (red run 3 failed / 7 passed, each failure the named missing-coverage-map assertion, no import errors) and closed it"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

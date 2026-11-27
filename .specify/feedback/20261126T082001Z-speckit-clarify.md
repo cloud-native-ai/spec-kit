@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "108-team-view-degradation"
 feature_id: "108"
+disposition: "processed"
 partial: false
 created: "2026-11-26T08:20:01Z"
 summary: "Clarify stage (Mode A) of 108-team-view-degradation. Bound `Related Feature` to Feature 027 (Team Management) per the Feature Binding Rules bind branch: the brief's leading candidate `103-team-view` w"
+introspection_ref: "introspection-20261127T162331Z#F-19"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-19"
 ---
 
 ## Review

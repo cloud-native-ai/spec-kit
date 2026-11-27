@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "processed"
 partial: false
 created: "2026-11-27T11:25:06Z"
 summary: "Review stage of 112-decision-batch-panel (run r20261127T081500Z-112a): four segments + ARC in one consolidation pass. Consolidated verdict blocked — the code segment's merge gate refuses (blocking-unr"
+introspection_ref: "introspection-20261127T162331Z#F-31"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-31"
 ---
 
 ## Review

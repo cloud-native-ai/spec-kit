@@ -1,0 +1,110 @@
+{
+  "aggregation_envelope": {
+    "schema_version": 1,
+    "kind": "speckit.exec-quant-aggregated",
+    "source_project": "xuanji-iac",
+    "source_commit": "e492c50f607b38c79b26549d0393bb7163506e72",
+    "identity_status": "identified",
+    "identity_key": "ec3541ccb76dc3b5f039de638b9499a733ab035f03af02767e054c160bb2e8a0",
+    "content_hash": "4d67246a5f1c1e31b7d9a58cb0212b2037b16a644d2f05f9255a9d567cf2cf4d",
+    "package_file": "feedback-xuanji-iac-20261127T212115.zip",
+    "ingested_at": "2026-11-27T16:03:34Z"
+  },
+  "record": {
+    "kind": "speckit.exec-quant",
+    "schema_version": 2,
+    "unit_id": "/speckit.team",
+    "unit_type": "command",
+    "run_id": "r20261125T163135Z-04b0",
+    "run_id_resolution": "explicit",
+    "collected_at": "2026-11-25T16:55:44Z",
+    "agent": {
+      "name": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "version": {
+        "value": "1.1.96",
+        "provenance": "measured"
+      },
+      "binary": {
+        "value": "qodercli",
+        "provenance": "measured"
+      },
+      "argv": {
+        "value": [
+          "-p",
+          "--output-format",
+          "stream-json",
+          "--dangerously-skip-permissions",
+          "fast-fail-clause: 异常先判\"纠正 vs 裁定\"；纠正就地修并披露，裁定停下回抛。回传 MUST 含行首 `ANOMALY:` 逐条或 `未发现异常`。判据见 `.specify/shared/guidelines/fast-fail.md`。\nHARNESS MANDATE v3: 本席为 **续派收尾席**（前席 04b0 在等 t1 时以 wait-for-scheduled-probe 退出，exit=0，未写报告、未注销）。禁止再以\"等外部通知/scheduled probe\"退出——所有 sleep 必须在本席内前台等完。收尾顺序 报告→commit state→deregister→回传。\nROLE: data-process-handle-storage supervisor（续派）。LINE 不变: `data-process-handle-storage-r20261125T163135Z-04b0`。报告 `.specify/teams/data-process-handle-storage/runs/<UTCstamp>-04b0-report.md`;workdir `.specify/teams/.work/data-process-handle-storage/r20261125T163135Z-04b0-retire-jobs/`。\n## 前席已完成（全部证据在 `evidence/`，先复读再续）：\n- 两作业 `kangaroo-fc-mq-rund-cn-hangzhou-log-fda2b7556d1f8414` / `...-metrics-fda2b7556d1f8414`（PROD `1145409540763519` / `kangaroo-fc` / `cn-hangzhou`，VVP workspace `f7f10f94dd354c`）：StopJob CANCELLED、DeleteDeployment 200、缺席已验证（`vvp-post-t0.json`：deployment_count=42，targets 均 in_deployment_list=false，jobs=[]）。\n- state rm：`32-rund` serial 14→15、entries 11→7，移除 2 deployment + 2 job 条目（`state-diff.json`；备份 `state-backup/20261125T164404Z/`）；剩余含 egress deployment/job、ETL、folder_tree——**均在范围外，保持**。\n- 基线：`kafka-pre/t0.json`、`sls-cg-pre/t0.json`、`sls-writers-post.json`（35 configs 零指向 legacy stores）、`vvp-producer-scan.json`。\n## 本席必做（按顺序）：\n1. **t1 复核（现在已过冻结窗口，立即执行，勿再 sleep 到外部时刻）**：取 t1 快照（同 t0 口径）：SLS `kangaroo-fc-1145409540763519-cn-hangzhou` 的 legacy stores consumer group checkpoint 是否冻结；Kafka 相关 topic 的 offset 增量（pre→t0→t1）是否归零（作业删除后不再有新增写入）。落 `evidence/*-t1.json`。\n2. 判读：若 Kafka 仍有增量 → 定位残余 producer（只读），记为 ANOMALY 并给出写方清单；不扩大范围。\n3. **state commit**：把 `workdir/1145409540763519/kangaroo-fc/cn-hangzhou/32-rund/terraform.tfstate`（已由前席改动）按项目约定提交（`git add <该文件> && git commit -m \"chore: retire mq-rund jobs state rm (fc cn-hangzhou)\"`；不 push，除项目自动备份外不越过；若 .git/index.lock 占用则记录并跳过）。\n4. **写报告** `.specify/teams/data-process-handle-storage/runs/<UTCstamp>-04b0-report.md`：含 §Verification（StopJob/DeleteDeployment RequestId、缺席复核、state-diff、checkpoint 冻结、Kafka 增量）、三元组、§ANOMALY（须含前席 exit 失职的 process 披露）、\"写入方归零\"证据（供 log-metrics 回收 shard）。\n5. **deregister** `--line-id data-process-handle-storage-r20261125T163135Z-04b0 --reason completed-jobs-retired-evidence-captured --evidence-ref <报告路径>`。\n6. wrap-up：run-determination / exec-quant / feedback record（按宿主命令的 Wrap-up 步骤，unit-id `/speckit.team`）。\n## 禁止：新增云写（除只读探针）；其他作业/RG；push；凭据明文。\nRETURN: outcome+报告路径+deregister 结果+三元组+ANOMALY+t1 冻结/增量结论。"
+        ],
+        "provenance": "measured"
+      },
+      "cwd": {
+        "value": "/cws_data/kangaroo-xuanji/xuanji-iac/.specify/teams/.work/data-process-handle-storage/r20261125T163135Z-04b0-retire-jobs",
+        "provenance": "measured"
+      },
+      "resolution": "resolved"
+    },
+    "config": {
+      "config_id": "not_evaluated",
+      "source_chain": "not_evaluated",
+      "method_requested": "not_evaluated",
+      "method_resolved": "not_evaluated",
+      "mode": "not_evaluated",
+      "cli": "not_evaluated",
+      "model": "not_evaluated",
+      "reasoning_effort": "not_evaluated",
+      "context_window": "not_evaluated",
+      "extra_flags": "not_evaluated",
+      "snapshot": "not_evaluated"
+    },
+    "llm": {
+      "model": {
+        "value": "dfmodel",
+        "provenance": "measured"
+      },
+      "context_window": {
+        "value": 1000000,
+        "provenance": "measured"
+      },
+      "reasoning_effort": "not_evaluated",
+      "config_source": {
+        "value": "/home/agent/.qoder/settings.json",
+        "provenance": "measured"
+      },
+      "endpoint_candidates": {
+        "ANTHROPIC_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "OPENAI_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_ANTHROPIC_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "ALIYUN_OPENAI_COMPATIBLE_URL": "https://llm-i8codaz52gj733d2.cn-beijing.maas.aliyuncs.com",
+        "CLAUDE_ALIBABA_BASE_URL": "https://idealab.alibaba-inc.com",
+        "CLAUDE_OFFICIAL_BASE_URL": "https://idealab.alibaba-inc.com"
+      },
+      "connection_evidence": {
+        "value": [
+          "47.57.188.188:443",
+          "8.223.13.163:443",
+          "8.212.124.35:443"
+        ],
+        "provenance": "measured"
+      }
+    },
+    "quality": {
+      "elapsed_ms": {
+        "value": 1419000,
+        "provenance": "carried"
+      },
+      "tokens": "not_evaluated",
+      "errors": "not_evaluated",
+      "satisfaction": "not_evaluated",
+      "exit_code": "not_evaluated"
+    },
+    "qualification": {
+      "value": "qualified",
+      "provenance": "carried"
+    },
+    "truncated": []
+  }
+}

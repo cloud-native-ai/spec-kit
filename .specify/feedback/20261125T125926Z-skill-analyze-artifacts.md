@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T12:59:26Z"
 summary: "Analyze-repair pass resolved the 10 validation-confirmed HIGH findings upstream (W1-02..W3-01) with one-owner pointers: C-25 now owns the three settlement boundary inputs, FR-002 closes the verificati"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

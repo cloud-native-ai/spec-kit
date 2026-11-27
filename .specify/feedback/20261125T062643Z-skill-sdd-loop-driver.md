@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-25T06:26:43Z"
 summary: "061 per-dispatch quantification is not wired into the driver's stage-runner dispatch path: the store holds 439 schema-v2 exec-quant records and zero 'agent:' records. The stage-level key (unit, run_id"
+introspection_ref: "introspection-20261127T162331Z#F-06"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-06"
 ---
 
 ## Review

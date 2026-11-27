@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "processed"
 partial: false
 created: "2026-11-27T09:17:35Z"
 summary: "Checklist stage of 112-decision-batch-panel (run r20261127T081500Z-112a): produced a NEW dated requirements-quality checklist checklists/requirements-quality-2026-11-27.md with 40 items (CHK001-CHK040"
+introspection_ref: "introspection-20261127T162331Z#F-17"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-17"
 ---
 
 ## Review

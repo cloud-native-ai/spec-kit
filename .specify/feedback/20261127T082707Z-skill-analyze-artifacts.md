@@ -8,9 +8,11 @@ probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "110-context-management"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T08:27:07Z"
 summary: "Round-1 read-only consistency analysis complete: 24 findings (2 HIGH / 9 MEDIUM / 13 LOW). Mechanically verified FR 29/29, SC 11/11, all 39 clauses claimed exactly once, the 18-class seed exact at 4/7"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

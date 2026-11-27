@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-25T14:20:34Z"
 summary: "plan stage: full plan set landed (plan/research/data-model/5 contracts/quickstart/feature-ref); deterministic gates green (pre-analyze pass 0 errors / 67 expected advisories, decision-tension validato"
+introspection_ref: "introspection-20261127T162331Z#F-29"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-29"
 ---
 
 ## Review

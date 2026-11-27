@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T06:26:50Z"
 summary: "070 package-coordination efficiency metrics are not recorded: a five-package implement stage ran serially, dependency-independent packages were serialized, and the state spine carries no critical-path"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

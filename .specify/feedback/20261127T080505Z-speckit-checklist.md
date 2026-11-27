@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T08:05:05Z"
 summary: "Checklist stage for 111-general-best-practices produced a NEW dated requirements-quality checklist (checklists/general-best-practices-2026-11-27.md): 40 items CHK001-CHK040 in eight sections mapped to"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

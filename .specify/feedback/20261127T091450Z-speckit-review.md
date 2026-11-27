@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "processed"
 partial: false
 created: "2026-11-27T09:14:50Z"
 summary: "Review stage of 111-general-best-practices (run r20261127T071500Z-111a): four segments in the fixed order plus ARC. ARC refused — the closure checker exits 2 because verification.md is absent; the Imp"
+introspection_ref: "introspection-20261127T162331Z#F-33"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-33"
 ---
 
 ## Review

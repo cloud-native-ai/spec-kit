@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "processed"
 partial: false
 created: "2026-11-27T09:14:56Z"
 summary: "Process segment of the composed /speckit.review for 111-general-best-practices: reconstructed the timeline from 22 commits, 7 checkpoints and the stage records; same-author gate not fired (artifacts p"
+introspection_ref: "introspection-20261127T162331Z#F-22"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-22"
 ---
 
 ## Review

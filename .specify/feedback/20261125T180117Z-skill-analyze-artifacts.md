@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-25T18:01:17Z"
 summary: "analyze round-3 repair on 107-decision-governance: 2 validator-confirmed HIGH findings fixed in one pass — R3-W1-01 turns FR-025 into a five-element containment claim (named baseline fbab7a45c capture"
+introspection_ref: "introspection-20261127T162331Z#F-36"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-36"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "processed"
 partial: false
 created: "2026-11-27T06:34:53Z"
 summary: "Checklist 阶段为 109-prompt-adherence 产出需求质量清单：40 条（CHK001–CHK040）分八节，逐条检验需求文本而非实现；覆盖 30/30 FR、9/9 SC、39/39 契约条款，40/40 携带追溯锚点；主维度直方图 Completeness 12 / Ambiguity 5 / Clarity 4 / Measurability 4 / Consiste"
+introspection_ref: "introspection-20261127T162331Z#F-17"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-17"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-26T06:29:23Z"
 summary: "Artifact + implementation segments of 107-decision-governance at head 3f0200b42. Artifact: pass, coverage 10/10 after the in-run repair (verification.md absent at start); A2 P1 (registry Implemented v"
+introspection_ref: "introspection-20261127T162331Z#F-20"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-20"
 ---
 
 ## Review

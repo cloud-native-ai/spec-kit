@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T16:38:01Z"
 summary: "analyze round-2 repair on 107-decision-governance: 2 validator-confirmed HIGH findings fixed in one pass — R2-W1-01 makes the decision-record grammar layered and closed at each layer (base ten fields "
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

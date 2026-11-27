@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-manage-feedback-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-24T16:06:49Z"
 summary: "manage-feedback routed the framework repository entirely through Path A: probe schema and 87-embed reconciliation were green; five bundles plus 29 local entries were inventoried; four read-only verifi"
+introspection_ref: "introspection-20261127T162331Z#F-01"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-01"
 ---
 
 ## Review

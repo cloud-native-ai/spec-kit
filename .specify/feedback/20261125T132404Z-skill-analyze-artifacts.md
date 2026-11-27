@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T13:24:04Z"
 summary: "Analyze-repair round 2 resolved the 5 validator-confirmed HIGH findings upstream: R2-W1-01 names the wait deadline as the observation trigger with the watcher's existing --deadline-grace as C1's only "
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

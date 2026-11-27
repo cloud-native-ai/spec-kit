@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "processed"
 partial: false
 created: "2026-11-27T05:56:53Z"
 summary: "Clarify stage ran the six-area scan on 109-prompt-adherence: sensor mapping (six catalog rows confirmed; measure.py clarified as an exec-quant projection with no second row), the absence-state four-wa"
+introspection_ref: "introspection-20261127T162331Z#F-19"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-19"
 ---
 
 ## Review

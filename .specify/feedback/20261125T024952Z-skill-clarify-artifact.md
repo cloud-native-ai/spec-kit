@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "ignored"
 partial: false
 created: "2026-11-25T02:49:52Z"
 summary: "Mode A clarify on 105-runtime-store-layout: bound Feature 024 as slice row 105 (parent status held at Ready for Review), integrated four unattended adjudications into the spec (FR-013 migrate-only exe"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

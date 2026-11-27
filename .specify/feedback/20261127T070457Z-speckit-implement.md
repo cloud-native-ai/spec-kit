@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T07:04:57Z"
 summary: "Implement P1 (T001–T008) for 109-prompt-adherence. Setup landed the three evidence landing points; pre-change measurements recorded (mirror checks rc 0/0, 15/15 deliverable paths ABSENT, clause count "
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

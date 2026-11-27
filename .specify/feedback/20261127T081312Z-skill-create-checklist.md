@@ -8,9 +8,11 @@ probe: "skill-create-checklist-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "110-context-management"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T08:13:12Z"
 summary: "Checklist produced as a new dated file: 38 items across nine quality dimensions, 100% traceability (38/38), zero prohibited starts, soft cap respected (38/40). Requirements quality reviewed against re"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

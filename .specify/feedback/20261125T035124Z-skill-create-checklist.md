@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T03:51:24Z"
 summary: "The delegated create-checklist skill executed end to end for spec 105: intent was pre-answered by the stage brief (Depth=Deep, Audience=Reviewer), the same-author gate was evaluated and not fired, 44 "
+introspection_ref: "introspection-20261127T162331Z#F-18"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-18"
 ---
 
 ## Review

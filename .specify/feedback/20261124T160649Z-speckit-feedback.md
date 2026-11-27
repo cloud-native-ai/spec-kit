@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-feedback-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-24T16:06:49Z"
 summary: "Framework-hat Path A consumed five confirmed-new bundles and all 29 local open entries. Exact comparison with the 30 prior bundles reduced 185 inbound entries to 23 new/changed; 52 current entries and"
+introspection_ref: "introspection-20261127T162331Z#F-01"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-01"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:44:43Z"
 summary: "Implement P1 (T001–T010 + T007A) for 111-general-best-practices: the docs-only five-document module under shared/best-practices (manifest with the closed four-category table, three placeholder owner f"
+introspection_ref: "introspection-20261127T162331Z#F-23"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-23"
 ---
 
 ## Review

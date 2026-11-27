@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "processed"
 partial: false
 created: "2026-11-27T09:29:07Z"
 summary: "Analyze round 1 of 112-decision-batch-panel: 15 spec artifacts read in full; 16 findings (0 CRITICAL / 2 HIGH / 6 MEDIUM / 8 LOW). The two HIGH findings are cross-clause contradictions on the batch-re"
+introspection_ref: "introspection-20261127T162331Z#F-09"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-09"
 ---
 
 ## Review

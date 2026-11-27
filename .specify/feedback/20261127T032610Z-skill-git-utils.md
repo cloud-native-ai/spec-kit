@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-git-utils-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T03:26:10Z"
 summary: "Direct user-ordered closeout: verified clean tree, identified the gitlab-only divergence as the same-line residue commit authored by the user, confirmed zero file overlap with local history, merged gi"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-25T17:36:33Z"
 summary: "plan re-review on 107-decision-governance against the repaired layered record grammar: 5 minor PLAN-EDITs landed (dangling Constitution row-IV pointer; guards test-map missing M-09; data-model I-08 pl"
+introspection_ref: "introspection-20261127T162331Z#F-29"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-29"
 ---
 
 ## Review

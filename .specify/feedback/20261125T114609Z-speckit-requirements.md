@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "106-background-silent-failure"
+disposition: "processed"
 partial: false
 created: "2026-11-25T11:46:09Z"
 summary: "Requirements stage for 106 completed with all deterministic gates green: validate-requirements status ok (0 errors, 0 warnings), pre-analyze decision pass (0 findings), decomposition decision proceed,"
+introspection_ref: "introspection-20261127T162331Z#F-27"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-27"
 ---
 
 ## Review

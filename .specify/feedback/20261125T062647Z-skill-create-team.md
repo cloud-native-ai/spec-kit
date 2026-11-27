@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-create-team-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-25T06:26:47Z"
 summary: "093 effective-concurrency reading never settles in practice: every per-dispatch triple is requested=1, effective=not_evaluated, effective_reason=single-unit, while the run declared requested 24 / effe"
+introspection_ref: "introspection-20261127T162331Z#F-03"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-03"
 ---
 
 ## Review

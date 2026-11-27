@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "107-decision-governance"
+disposition: "processed"
 partial: false
 created: "2026-11-25T13:59:29Z"
 summary: "Requirements stage for 107-decision-governance authored the decision-governance spec from the unattended brief: 30 FR / 10 SC / 9 shared strings; `validate-requirements` status ok (0 error / 0 warning"
+introspection_ref: "introspection-20261127T162331Z#F-12"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-12"
 ---
 
 ## Review

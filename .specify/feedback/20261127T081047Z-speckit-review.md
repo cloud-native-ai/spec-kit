@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "109-prompt-adherence"
 feature_id: "109"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:10:47Z"
 summary: "Review stage of 109-prompt-adherence (run r20261127T053750Z-109a): four segments in fixed order plus ARC, one consolidation pass. ARC accept — claimed Implemented agrees, final_path pass 8 / blocked 0"
+introspection_ref: "introspection-20261127T162331Z#F-20"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-20"
 ---
 
 ## Review

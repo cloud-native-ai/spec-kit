@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:47Z"
 summary: "The driver's sanctioned worktree root is rejected by the registry that is supposed to record it: `line-registry.py register --write-line --worktree-path <repo>/.specify/.tmp/sdd-loop/worktrees/<line>`"
+introspection_ref: "introspection-20261127T162331Z#F-07"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-07"
 ---
 
 ## Review

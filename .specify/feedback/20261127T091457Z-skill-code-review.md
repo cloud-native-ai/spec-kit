@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "processed"
 partial: false
 created: "2026-11-27T09:14:57Z"
 summary: "Code segment of the composed /speckit.review for 111-general-best-practices: base explicit 0419adae5, head aca4fb076, renderer text; coverage receipt 138 changed / 15 judged / 123 legally skipped / 0 "
+introspection_ref: "introspection-20261127T162331Z#F-20"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-20"
 ---
 
 ## Review

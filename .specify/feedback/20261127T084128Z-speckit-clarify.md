@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:41:28Z"
 summary: "Clarify stage of 112-decision-batch-panel (run r20261127T081500Z-112a), mode A on requirements.md: five unattended adjudications integrated as A-21…A-25 plus a new Clarifications session (Q rows 11→16"
+introspection_ref: "introspection-20261127T162331Z#F-14"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-14"
 ---
 
 ## Review

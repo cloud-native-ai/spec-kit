@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "111-general-best-practices"
 feature_id: "111"
+disposition: "processed"
 partial: false
 created: "2026-11-27T08:29:00Z"
 summary: "Analyze round 2 (incremental) for 111-general-best-practices: re-checked the 12 round-1 loci repaired in the analyze-repair commit 61e3ccfb6 and their one-hop neighbors, then adjudicated the full CRIT"
+introspection_ref: "introspection-20261127T162331Z#F-14"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-14"
 ---
 
 ## Review

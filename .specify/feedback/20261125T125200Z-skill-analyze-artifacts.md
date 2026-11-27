@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "106-background-silent-failure"
 feature_id: "106"
+disposition: "processed"
 partial: false
 created: "2026-11-25T12:52:00Z"
 summary: "analyze wave 1 integration: merged three domain findings files (31 findings, raw 12 HIGH / 13 MEDIUM / 6 LOW) with 12 validator verdicts (10 confirm, 2 downgrade: W1-01 to MEDIUM, W2-02 to LOW; 0 reje"
+introspection_ref: "introspection-20261127T162331Z#F-37"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-37"
 ---
 
 ## Review

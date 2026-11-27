@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T10:05:46Z"
 summary: "Implement package P1 of 112-decision-batch-panel (run r20261127T081500Z-112a): closed T001-T015 — fixture tree (28 cases) and runtime-evidence dir; pre-change measurements M1-M14 and the verbatim gate"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review

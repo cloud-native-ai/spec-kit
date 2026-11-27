@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:47Z"
 summary: "Analyze worker dispatch carries no output budget: in line 107 a 9-file analyze domain, run without strict output discipline, hit the model's 48k output-token ceiling three times and produced an incomp"
+introspection_ref: "introspection-20261127T162331Z#F-35"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-35"
 ---
 
 ## Review

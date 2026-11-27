@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "108-team-view-degradation"
 feature_id: "108"
+disposition: "processed"
 partial: false
 created: "2026-11-26T09:09:13Z"
 summary: "Analyze-repair round 1 for 108-team-view-degradation (analyze gate, 2 validator-confirmed HIGH findings W1-01 + W2-01). Repaired upstream in live spec artifacts only: FR-022 became the single owner of"
+introspection_ref: "introspection-20261127T162331Z#F-12"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-12"
 ---
 
 ## Review

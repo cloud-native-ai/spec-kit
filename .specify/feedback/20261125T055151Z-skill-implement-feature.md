@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "105-runtime-store-layout"
 feature_id: "024"
+disposition: "processed"
 partial: false
 created: "2026-11-25T05:51:51Z"
 summary: "P2 (T010-T016) executed: the store-layout migrate dimension lands as planner + manifest-first executor + receipt v2/resume, with byte-identical relocation, deterministic refusals and an idempotent rer"
+introspection_ref: "introspection-20261127T162331Z#F-24"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-24"
 ---
 
 ## Review

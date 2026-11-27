@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-26T06:29:23Z"
 summary: "Code segment of 107-decision-governance at base fbab7a45c..head 3f0200b42 (feature-first-commit), renderer text. Receipt: changed 684 / judged 27 / skipped 657 / gap 0; segment not-evaluated (skips ea"
+introspection_ref: "introspection-20261127T162331Z#F-20"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-20"
 ---
 
 ## Review

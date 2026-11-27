@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-create-team-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-26T07:19:50Z"
 summary: "Team-view output degrades on real team workspaces, and the fix belongs where teams are created: the line-107 queued-next-line record (spine decision-governance.md:204) names team-view-degradation — un"
+introspection_ref: "introspection-20261127T162331Z#F-02"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-02"
 ---
 
 ## Review

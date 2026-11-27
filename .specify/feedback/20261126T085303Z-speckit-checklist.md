@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "108-team-view-degradation"
 feature_id: "108"
+disposition: "processed"
 partial: false
 created: "2026-11-26T08:53:03Z"
 summary: "Checklist stage of 108-team-view-degradation (attempt 1). Produced a NEW dated requirements-quality checklist `.specify/specs/108-team-view-degradation/checklists/requirements-quality-2026-11-26.md` ("
+introspection_ref: "introspection-20261127T162331Z#F-17"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-17"
 ---
 
 ## Review

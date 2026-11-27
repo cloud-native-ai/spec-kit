@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "107-decision-governance"
 feature_id: "107"
+disposition: "processed"
 partial: false
 created: "2026-11-26T06:14:00Z"
 summary: "Implement stage of 107-decision-governance: five verified packages (T001–T056, 56/56, one passing package verdict per row) integrated in order P1→P5; the task table was closed by the integrator (0 ope"
+introspection_ref: "introspection-20261127T162331Z#F-25"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-25"
 ---
 
 ## Review

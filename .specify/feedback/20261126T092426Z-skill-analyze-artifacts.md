@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "108-team-view-degradation"
 feature_id: "108"
+disposition: "processed"
 partial: false
 created: "2026-11-26T09:24:26Z"
 summary: "Analyze-repair round 2 for 108-team-view-degradation (analyze gate, 2 validator-confirmed HIGH findings R2-108-W1-01 + R2-108-W3-01)."
+introspection_ref: "introspection-20261127T162331Z#F-12"
+disposition_reason: "introspection:introspection-20261127T162331Z#F-12"
 ---
 
 ## Review

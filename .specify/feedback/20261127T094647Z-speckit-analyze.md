@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "112-decision-batch-panel"
 feature_id: "112"
+disposition: "ignored"
 partial: false
 created: "2026-11-27T09:46:47Z"
 summary: "Analyze round 2 (incremental, C/H-only with residue) of 112-decision-batch-panel at 8aad9c47d: 15 domain files re-read in full (touch-volume gate: 8/15 repaired > half -> full-domain C/H adjudication)"
+disposition_reason: "introspection:introspection-20261127T162331Z:excluded"
 ---
 
 ## Review
