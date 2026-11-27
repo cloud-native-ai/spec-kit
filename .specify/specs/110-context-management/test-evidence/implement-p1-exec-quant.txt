@@ -1,0 +1,4 @@
+# exec quant (implement P1) — 2026-11-27
+$ python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:implement-feature" --unit-type skill --run-id r20261127T070000Z-110a
+exec-quant: recorded skill:implement-feature run=r20261127T070000Z-110a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records/20261127T085800623850Z-9f6a62ee.json
+exit=0

@@ -1,0 +1,151 @@
+# Residue re-anchor verification (analyze round 2) — 2026-11-27
+# Each block lists current line anchors for one round-1 residue finding.
+
+## AN-02 (line-entry trigger) — requirements FR-012/FR-014, C-020
+166:- **FR-012**: owner 文档 MUST 声明**基线组合**：在会话或线的入口（该会话/线的第一个任务），根会话组合不变基线一次——系统层经其使用期发现行、项目层经其 `read-in-full` 治理指针、指针行与
+15:goes through `reentry`); line = the continuous stage series under one state spine (a cross-stage commit is
+
+## AN-03 (inline-digest definition) — FR-008/FR-009, E-10 seed
+163:- **FR-009**: owner 文档 MUST 定义封闭的五形态：`pointer`（按需打开的路径引用，不携带内容）、`read-in-full`（消费者 MUST 完整加载的 canonical 指针，零复制字节）、`bounded-index`（逐条目路径 + 一行相关性，在 owner 的 pe
+78:| `variable` × `task` | the current work item's facts, selected per task and discarded at task end | task-layer rows; on dispatch, the dispatch brief plus the `task-delta` refresh at stage boundari
+89:| scope | `baseline` or `task` (the `task-delta` refresh for `stage-boundary`) | never widens a form |
+190:| `task-statement` | task | inline-digest | `.specify/shared/workflow/user-input-protocol.md` (standing owner) + the ephemeral interaction input | `.specify/shared/workflow/user-input-protocol.md`
+191:| `task-delta` | task | inline-digest | `.specify/register.md`, `.specify/state/` (standing witnesses) + the ephemeral delta records | each owner | `.specify/shared/guidelines/token-efficiency.md`
+
+## AN-05 (Unobserved carrier) — FR-028, SC-010, C-042, C-007
+225:- **SC-010**: 在本仓树上 `--action manifest --layer project` 列出三个概念指针行（`project-vocabulary`、`concept-definitions`、`concept-explanations`），各读 
+239:- **SC-010 Source**: 仓库树与「布局行删除 + 来源不可读」种子 fixture 上的 `--action manifest --json` 机器输出逐行断言；同一 fixture 上可选的 `check` roster-mismatch 共现读数；协
+273:- Q: SC-003/SC-010 的 `unreachable` fixture 如何在不依赖特权（含 root）下构造，在场语义如何不歧义？ → A: 采用**悬空符号链接**（目录项存在、目标不解析）构造 `unreachable`；在场判定按来源实际类型（普通文
+56:`Unobserved` (the evidence-state token; the manifest row's own presence token is one of the four absence
+121:reads `absent` / `unreachable` — and a consistency claim derived from that structure reads `Unobserved`,
+
+## AN-06 (source-reading tuple) — FR-022, E-10, C-033, T011/T018
+176:- **FR-022**: 审计 MUST 确定且诚实：对不变树两次运行逐字节相同；每条 finding 点名文件、行与规则；损坏来源以带原因的在场读数出现，绝不成为被跳过的行；引擎 MUST NOT 做语义任务选择或相关性排序（相
+.specify/specs/110-context-management/data-model.md:139:| source reading | one `source-reading: <digest>` line (text) / `source_reading` (JSON): a SHA-256 over 
+.specify/specs/110-context-management/tasks.md:217:- [ ] T018 [US1] [blockedBy:T015,T017] Implement the engine foundation and `--action manifest` in `scripts/py
+
+## AN-07 (missing/unknown --action) — FR-021, C-031, T011
+175:- **FR-021**: 一个只读审计引擎 `scripts/python/context-audit.py`（安装于 `.specify/scripts/python/context-audit.py`）MUST 是唯一审计入口，并由 framework-map 一行注册。它 MUST：解析 owner 文
+30:read; an undeclared option exits `2` before any action, including after a bare `--`. The closed usage-error
+37:- GATE-7: Audit reading — check: `python3 .specify/scripts/python/context-audit.py --action check` exits 0 with zero 
+174:- [ ] T003 [P] [blockedBy:T001] Capture the pre-change side of every diff premise in `.specify/specs/110-context-man
+217:- [ ] T018 [US1] [blockedBy:T015,T017] Implement the engine foundation and `--action manifest` in `scripts/python/co
+
+## AN-08 (malformed owner document) — A-9, C-032, C-016
+42:| **A-9** | **引擎形态与退出码**：单文件、stdlib-only、只读；`check` 退 `0` 干净 / `1` findings / `2` 用法、不可读输入或声明事实的未知/缺失成员；`manifest` 只要
+272:- Q: 系统层三个探针的判据是什么，网络可达性如何在不违反离线红线的条件下呈现？ → A: 探针为 stdlib 无副作用、元数据-only 观测：`platform` = 平台、架构与解释器标识可读；`path-tools` =
+48:`cap-missing` (a bounded-index row without a cap reference), `category-column` (a header outside the fixed
+115:actions refuse it with exit `2`, emit no partial verdict and guess no default. A pre-migration project
+
+## AN-09 (cap path shape) — FR-008/FR-019, C-013, seed, T017/T038
+.specify/specs/110-context-management/requirements.md:22:**目标形态（移植对象）**：spec-kit 的「上下文」今天由若干各自正确的碎片共同提供——指令层的 Documentation Map（`.specify/instructions.md`）、Token 效率纪律（`shared/guidelines/toke
+.specify/specs/110-context-management/requirements.md:36:| **A-3** | **路径与命名适配（逐目标已核验存在）**：`.ah/` → `.specify/`；`/ah.*` → `/speckit.*`；`ai-harness` → `Spec Kit` / `specify`；源仓的 src/ai_harnes
+.specify/specs/110-context-management/requirements.md:40:| **A-7** | **cap 只引用、不声明（承重）**：本特性不引入任何数值上限。每个 `bounded-index` 行 MUST 指名 cap owner 的**路径 + 小节**；本仓的 token/cap 经济 owner 是 `shared/gui
+.specify/specs/110-context-management/requirements.md:159:- **FR-005**: 机制 MUST NOT 替换或重定义它所组合的任何既有 owner；边界以指针抵达：派发/相对角色模型与载荷（`shared/definitions/superagent-definitions.md` § The super↔sub 
+.specify/specs/110-context-management/requirements.md:173:- **FR-019**: 上限 MUST 引用、绝不重声明：每个 `bounded-index` 行 MUST 指名其 cap owner 的路径 + 小节——`shared/guidelines/token-efficiency.md` § 摘要优先(Summ
+.specify/specs/110-context-management/requirements.md:266:- Q: 上限引用谁？ → A: `shared/guidelines/token-efficiency.md` § 摘要优先(Summary-First)（含升级阶梯与小文件阈值），作为 `bounded-index`、`read-in-full` 与 `inl
+.specify/specs/110-context-management/data-model.md:63:| `read-in-full` | a canonical pointer whose consumer complete-loads the document; zero copied bytes | project only | content-bearing e
+.specify/specs/110-context-management/data-model.md:66:| `inline-digest` | bounded content carried when the pointer form is unreachable | task only | content-bearing exception owner: `shared
+.specify/specs/110-context-management/data-model.md:178:| `governance-baseline` | project | read-in-full | `.specify/constitution.md`, `.specify/instructions.md` | the governance generators 
+.specify/specs/110-context-management/data-model.md:180:| `concept-definitions` | project | bounded-index | `.specify/shared/definitions/` | the definition owners | `.specify/shared/guidelin
+.specify/specs/110-context-management/data-model.md:182:| `capability-inventories` | project | bounded-index | `.specify/skills/`, `.specify/agents/templates/`, `.specify/agents/instances/`,
+.specify/specs/110-context-management/data-model.md:185:| `task-artifacts` | task | bounded-index | `.specify/specs/`, `.specify/features/` | the spec artifacts | `.specify/shared/guidelines
+.specify/specs/110-context-management/data-model.md:186:| `task-capabilities` | task | bounded-index | `.specify/skills/`, `.specify/agents/templates/` | each owner | `.specify/shared/guidel
+.specify/specs/110-context-management/data-model.md:187:| `task-shared-docs` | task | bounded-index | `.specify/shared/` | the shared owners | `.specify/shared/guidelines/token-efficiency.md
+.specify/specs/110-context-management/data-model.md:188:| `task-docs` | task | bounded-index | `docs/` | the documentation space | `.specify/shared/guidelines/token-efficiency.md` § 摘要优先(Sum
+.specify/specs/110-context-management/data-model.md:189:| `task-memory` | task | bounded-index | `.specify/session/`, `.specify/knowledge/` | `scripts/python/memory-utils.py` | `.specify/sha
+.specify/specs/110-context-management/data-model.md:190:| `task-statement` | task | inline-digest | `.specify/shared/workflow/user-input-protocol.md` (standing owner) + the ephemeral interac
+.specify/specs/110-context-management/data-model.md:191:| `task-delta` | task | inline-digest | `.specify/register.md`, `.specify/state/` (standing witnesses) + the ephemeral delta records |
+.specify/specs/110-context-management/contracts/declarations-and-domains.contract.md:71:(`shared/guidelines/token-efficiency.md` § 摘要优先(Summary-First)). The repository scan asserts that no n
+.specify/specs/110-context-management/tasks.md:216:- [ ] T017 [US1] [blockedBy:T016] Author the owner document projection half in `shared/definitions/context-management-definitions.md`: the 
+.specify/specs/110-context-management/tasks.md:314:- [ ] T038 [blockedBy:T037] Run the cap and mirror closure scans: every `bounded-index` row's cap reference resolves to `shared/guidelines/
+
+## AN-10 (roots field) — E-10
+136:| roots | the resolved workspace root and layer root the reading used (workspace-relative paths only); the layer root is the audited workspace's own declaration layer — `<workspace-root>/shared/` 
+
+## AN-11 (dash overloading) — FR-019, E-3/E-10, C-033
+46:| cap reference | `<path> § <section>` where the form is capped (`bounded-index`), or the content-bearing exception owner (`read-in-full`, `inline-digest`) |
+137:| rows | one per roster class of the layer, in roster order — the roster declared by `context-classes.yaml` is the stable row-set expectation, never the cur
+
+## AN-12 (source-drift evidence) — FR-016, C-024
+170:- **FR-016**: **来源漂移** MUST 是**可观测条件**而非轮询：项目已经记录的基线来源变化——宪法修订、指令刷新、词汇表或特性状态变化、git 工作流变化，或一个与已记录项目事实矛盾的新发现——在下一个基线刷新
+204:| RS-001 | 上下文管理运行时面：owner 文档（含布局表）、四个声明事实与注册行、只读审计引擎；宿主为既有 Python 标准库脚本层与共享声明读取器 | in-scope | 本规格：模型、布局花名册、触发协议、审计契
+48:exactly once; the manifest's source reading), and `reentry` (a resumed session acting in the root-session
+79:project plus the manifest's source reading (a deterministic digest over declared sources' metadata, never
+
+## AN-13 (zero copied bytes) — FR-007, C-020
+66:1. **Given** 一个已初始化且 `.specify/constitution.md`、`.specify/instructions.md` 齐备的项目，**When** 组合基线，**Then** 两者以全读 canonical 指针出现且**零复制字节**，其余项目层行以指针或有界索引出现且 sour
+161:- **FR-007**: **项目层** MUST 从 `.specify/` 携带项目事实：治理基线 `governance-baseline`——`.specify/constitution.md` 与 `.specify/instructions.md` 以 `read-in-full` canonic
+163:- **FR-009**: owner 文档 MUST 定义封闭的五形态：`pointer`（按需打开的路径引用，不携带内容）、`read-in-full`（消费者 MUST 完整加载的 canonical 指针，零复制字节）、`bounded-index`（逐条目路径 + 一行相关性，在 owner 的 pe
+183:- **FR-029**: owner 文档 MUST 声明**层级落点契约**——两类别 × 三层矩阵恰有三个合法格，每格陈述定义、载体、允许形态（**按引用** FR-009，绝不复述第二份值列表）与内容-对-指针规则；其余三个组合（`invariant` × `task`、`variable` × `sy
+17:**Red when**: a task switch recomposes the baseline; the governance baseline is carried as copied content;
+
+## AN-14 (upgrade path) — FR-023, SC-005, quickstart
+220:- **SC-005**: 在阻断网络的新初始化项目上，`check` 退 `0`、`manifest --layer project` 完成并对真实缺失来源给出显式缺席行；两次运行中 socket 打开数 = 0、传输 = 0。 **Path**: final
+234:- **SC-005 Source**: init fixture 集成测试：CLI 初始化项目、测试壳阻断网络、两个审计动作全量捕获；socket 守卫断言在同一次运行记录。
+
+## AN-15 (explanations carrier breadth) — FR-028, C-007, seed
+.specify/specs/110-context-management/requirements.md:39:| **A-6** | **布局种子十八类，唯一配对受制裁**：类花名册（成员与次序）由 `context-classes.yaml` 拥有；owner 文档布局表是逐行数据（`class id | layer | form | source | owner | cap referen
+.specify/specs/110-context-management/requirements.md:158:- **FR-004**: owner 文档 MUST 携带唯一的**上下文布局表**，固定六列 `class id | layer | form | source | owner | cap reference`，每行对应一个上下文事实类；该表是逐行数据的唯一书写处，**不存在第二
+.specify/specs/110-context-management/requirements.md:161:- **FR-007**: **项目层** MUST 从 `.specify/` 携带项目事实：治理基线 `governance-baseline`——`.specify/constitution.md` 与 `.specify/instructions.md` 以 `read-in
+.specify/specs/110-context-management/requirements.md:182:- **FR-028**: **概念一致性** MUST 是一条声明义务，由**一个不可省略的指针三元组**承载：`glossary` → `.specify/glossary.md`（由 glossary 协议 `shared/workflow/glossary.md` 登记）；`
+.specify/specs/110-context-management/requirements.md:225:- **SC-010**: 在本仓树上 `--action manifest --layer project` 列出三个概念指针行（`project-vocabulary`、`concept-definitions`、`concept-explanations`），各读 `prese
+.specify/specs/110-context-management/data-model.md:116:| root/superagent turn | the baseline's three project-layer rows (`project-vocabulary`, `concept-definitions`, `concept-explanations`) | pointer
+.specify/specs/110-context-management/data-model.md:181:| `concept-explanations` | project | pointer | `.specify/skills.md`, `.specify/tools.md` | each guide; `docs/concepts/documentation-model.md` na
+.specify/specs/110-context-management/contracts/owner-and-layout.contract.md:108:carried by the project-layer rows `project-vocabulary`, `concept-definitions` and `concept-explanations`.
+
+## AN-16 (directory wording) — plan XVII, spec tree
+167:| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | No new directory is created — every new file lands in an existing, documented directory; no scratch root is add
+263:tests/fixtures/context-management/     # NEW fixture family; each fixture carries its own minimal owner document + four facts
+
+## AN-17 (feature registry deferral) — A-2, plan Feature Integration, tasks head
+.specify/specs/110-context-management/requirements.md:18:**Binding basis**: 独立新特性，无父特性切片。能力语义继承 ai-harness 093（其注册特性 098 Proactive Context Management 的编号在本仓不复用，A-2）；本规格产出
+.specify/specs/110-context-management/requirements.md:35:| **A-2** | **特性绑定 = Feature 110**：独立新特性 `Context Management（上下文管理）`；**不复用**源能力的注册特性编号（ai-harness Feature 098）；本阶
+.specify/specs/110-context-management/requirements.md:262:- Q: `Related Feature` 绑定谁，是否复用源能力注册编号？ → A: 绑定 **Feature 110 `Context Management（上下文管理）`**，独立新特性；**不复用** ai-har
+.specify/specs/110-context-management/requirements.md:271:- Q: 本线禁止 registry 写入，而 Feature Binding Rules 要求 clarify 登记 Feature 110，如何收口？ → A: **本运行不写** `.specify/features.
+.specify/specs/110-context-management/plan.md:135:  recovery point for the line close-out's Feature Integration Protocol — see § Feature Integration.
+.specify/specs/110-context-management/plan.md:368:the line close-out's Feature Integration Protocol as a recovery point, to be reconciled against this spec
+.specify/specs/110-context-management/tasks.md:5:**Related Feature**: 110 Context Management（上下文管理）— the fixed binding per requirements A-2. By the line constraint this r
+.specify/specs/110-context-management/tasks.md:163:- **Review performed at generation (2026-11-27)**: `.specify/features.md` carries no row for Feature 110 — expected und
+.specify/specs/110-context-management/feature-ref.md:13:registrations are a recovery point handed to the line close-out's Feature Integration Protocol. The
+
+## AN-18 (stale Project Context surface) — edge case, C-003, C-044
+60:**Why this priority**: 其余一切都压在它上面。没有不变基线的会话会凭猜测的系统事实与陈旧的规则行动；失败是沉默的，因为答案看起来仍然合理。
+76:**Why this priority**: 正确的不变基线配一个陈旧或错误的任务层，仍产出错误的工作；任务选择是相关性与新鲜度的裁决处。
+143:- **agent 实例的 `## Project Context` 块陈旧**：它是渲染路径拥有的生成产物；机制报告陈旧（披露），不静默修复。
+
+## AN-19 (Tool record vs runtime discovery) — FR-006, E-4
+160:- **FR-006**: **系统层** MUST 携带行动所需的环境事实：运行环境（平台、架构、shell、运行时版本）以 `runtime-discovery:platform` 探针发现；可用系统命令以 `runtime-discovery:path-tools` 发现（有 Tool 记录（`.spec
+
+## AN-20 (superseded Q2 sentence) — clarifications
+262:- Q: `Related Feature` 绑定谁，是否复用源能力注册编号？ → A: 绑定 **Feature 110 `Context Management（上下文管理）`**，独立新特性；**不复用** ai-harness 的 Feature 098 注册编号；本阶段不编辑 `.specify/fea
+271:- Q: 本线禁止 registry 写入，而 Feature Binding Rules 要求 clarify 登记 Feature 110，如何收口？ → A: **本运行不写** `.specify/features.md`、`.specify/features/`、`.specify/register.
+
+## AN-21 (T038 scan scope) — T038, SC-006, C-013
+314:- [ ] T038 [blockedBy:T037] Run the cap and mirror closure scans: every `bounded-index` row's cap reference resolves to `shared/guidelines/token-efficiency.
+173:- **FR-019**: 上限 MUST 引用、绝不重声明：每个 `bounded-index` 行 MUST 指名其 cap owner 的路径 + 小节——`shared/guidelines/token-efficiency.md` § 摘要优先(Summary-
+221:- **SC-006**: 本仓布局中每个 `bounded-index` 行指名的 cap owner 路径 + 小节可解析；四个声明事实不含数值 bound 字段；对本特性持久增量（owner 文档、四事实、引擎、模板段与其 live 段）的扫描中「cap 单位旁的数
+235:- **SC-006 Source**: 解析布局表全部 cap 引用的契约测试 + 四事实数值 bound 字段的静态扫描输出；每次运行捕获。
+
+## AN-22 (recall flags) — SC-008, T003/T035
+223:- **SC-008**: 一次 `scripts/bash/run-tests.sh` 全量运行报告相对 implement 入口基线零新增失败名；镜像与其源逐字节等同；super↔sub 协议的声明项集、`memory-utils.py --action recall
+237:- **SC-008 Source**: `scripts/bash/run-tests.sh` 的全量输出，按名与 implement 入口基线比对；`sync-mirrors.py --check` 输出；协议边界守卫与 `memory-utils.py --acti
+174:- [ ] T003 [P] [blockedBy:T001] Capture the pre-change side of every diff premise in `.specify/specs/110-context-management/notes/pre-change-measurements.md
+302:- [ ] T035 [US5] [blockedBy:T034] Run the full suite through `scripts/bash/run-tests.sh`, capture the complete failure-name list and compare it with the imp
+
+## AN-23 (green partition) — tasks notes and rows
+402:- **Green partition**: all 39 clauses are claimed exactly once, monotonically per contract by row order; the test-authoring rows carry no tags, so no clause
+150:| `contracts/engine-and-distribution.contract.md` | C-035 | `test_context_management_readonly.py::test_containment_claims_are_decidable` | T027 |
+154:| `contracts/guards-and-boundaries.contract.md` | C-041 | `test_context_management_readonly.py::test_containment_claims_are_decidable` | T035 |
+
+## AN-24 (layout anchor/row grammar) — FR-004/FR-021, C-004, E-3
+158:- **FR-004**: owner 文档 MUST 携带唯一的**上下文布局表**，固定六列 `class id | layer | form | source | owner | cap reference`，每行对应一个上下文事实类；该表是逐行数据的唯一书写处，*
+175:- **FR-021**: 一个只读审计引擎 `scripts/python/context-audit.py`（安装于 `.specify/scripts/python/context-audit.py`）MUST 是唯一审计入口，并由 framework-map 一行
+56:**Statement**: the owner document carries one machine-parsed layout table whose fixed column set is
+
+## AN-25 (round-2 new candidate: task-layer absolute no-content phrases)
+217:- [ ] T018 [US1] [blockedBy:T015,T017] Implement the engine foundation and `--action manifest` in `scripts/python/context-audit.py`: the script-interface surface (`-h` and `--help` ident
+238:- [ ] T022 [US2] [blockedBy:T021] Implement `--action check` in `scripts/python/context-audit.py`: the closed nine-rule set (`roster-mismatch`, `roster-order`, `unknown-layer`, `unknown-
+
+## AN-27 (round-2 new candidate: T-002 revision trigger)
+215:- **revision_trigger**: 若连续两轮复审出现「路径可解析但治理来源已失效」导致下游错误决策，或 FR-024 经修订允许内容读取 → 重开。

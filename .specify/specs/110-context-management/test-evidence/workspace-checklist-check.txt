@@ -1,0 +1,29 @@
+# workspace guard (checklist stage) — 2026-11-27
+
+## Comparison against the pre-write snapshot (workspace-checklist.json)
+DRIFT: refs (rc=1)
+added: refs/heads/112-decision-batch-panel
+removed: (none)
+branch_before: 110-context-management | branch_now: 110-context-management
+specs_before_count: 92 | specs_now_count: 92
+All other refs equal; branch and `.specify/specs` listing unchanged.
+
+## Git status (raw, at check time)
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md
+?? .specify/exec-quant/records/20261127T081307767461Z-17befc22.json
+?? .specify/feedback/20261127T081312Z-skill-create-checklist.md
+?? .specify/session/20261127T081302Z-run-determination-skill-create-checklist-r20261127t070000z-1.md
+?? .specify/specs/110-context-management/test-evidence/checklist-exec-quant.txt
+?? .specify/specs/110-context-management/test-evidence/checklist-feedback-record.txt
+?? .specify/specs/110-context-management/test-evidence/checklist-run-determination.txt
+?? .specify/specs/110-context-management/test-evidence/checklist-self-check.txt
+?? .specify/specs/110-context-management/test-evidence/checklist.jsonl
+?? .specify/specs/110-context-management/test-evidence/workspace-checklist-check.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-checklist.json
+
+## Attribution
+- `.specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md` (M) is the pre-existing modification of another run (the clarify-artifact line), disclosed at checkpoint 02 and carried unchanged through tasks. It stays untouched — never committed, never reverted by this stage.
+- Ref drift: `refs/heads/112-decision-batch-panel` appeared between the snapshot and this check. This stage ran no branch-creating or branch-deleting command; the ref is attributed to a concurrent line in the shared repository. It was left untouched; no branch was created, deleted or renamed by this stage.
+- Every other entry is this checklist stage own output: the checklist artifact (committed in cb79bb43d), the self-check and stage-status row, the workspace signature and this check, the wrap-up transcripts, and the accounting records under `.specify/session/`, `.specify/exec-quant/records/` and `.specify/feedback/` for `skill:create-checklist`.
+- No file outside this feature territory and the accounting stores was written; the main tree was not touched; the state spine is read-only for this stage; no push.
+- No settle edit by this run: the only modified path remains the attributed other-run record.

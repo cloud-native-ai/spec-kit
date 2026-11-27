@@ -1,0 +1,58 @@
+# plan-time reads — 2026-11-27 (worktree, branch 110-context-management)
+
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:110-context-management"
+unit_id: spec:110-context-management
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+
+$ python3 .specify/scripts/python/flow-class-check.py --version
+flow-class-check.py 0.0.22
+exit=0
+
+$ python3 scripts/python/declaration_reader.py --action get --fact memory-types --repo .
+{
+  "body": {
+    "consumers": [
+      "scripts/python/memory-utils.py"
+    ],
+    "fact": "memory-types",
+    "former_carriers": [
+      "skills/internal/memory-record/SKILL.md",
+      "skills/internal/memory-recall/SKILL.md"
+    ],
+    "kind": "closed-set",
+    "note": "Order is part of the value only in the sense that `--scope all` expands in this order; membership is the judgement. The scope name IS the store root name: each tier lives at `.specify/<scope>/` (session → `.specify/session/`, knowledge → `.specify/knowledge/`) since the 2026-11-25 runtime-store-layout move, and a store path is not a restatement of the scope set — the set itself is no longer enumerated as a domain in either skill. Measured 2026-11-05 and recorded rather than re-pointed: `docs/reference/skills/memory.md` still names both scopes, as the *roles* of the two tiers and in a `--scope` usage row. That page is this repository's development documentation (not distributed, not a candidate unit), and the tier roles are the judgement it owns; the residual mention is reported to the review stage instead of being absorbed into a pointer here. `shared/workflow/runtime-mode.md` names the same two words only as a store path (`session/`, `knowledge/`) — a path, not the domain.",
+    "statement": [
+      "session",
+      "knowledge"
+    ]
+exit=0
+
+$ python3 scripts/python/declaration_reader.py --action get --fact evidence-seven-states --repo . (statement)
+['Present', 'Wired', 'Exercised', 'Outcome-supported', 'Missing', 'Unobserved', 'Not applicable'] exit=0
+
+$ grep -n "INSTRUCTIONS_BUDGET_BYTES=" scripts/bash/generate-instructions.sh
+119:INSTRUCTIONS_BUDGET_BYTES=40960
+
+$ wc -c .specify/instructions.md
+40170 .specify/instructions.md
+
+$ grep -c "^## " .specify/templates/instructions-template.md .specify/instructions.md
+.specify/templates/instructions-template.md:39
+.specify/instructions.md:40
+
+$ grep -n "Project Context" agents/structure-adjuster.agent.md src/specify_cli/__init__.py | head
+agents/structure-adjuster.agent.md:31:## Project Context
+648:def render_agents_for_tool(project_path, tool, tracker=None):
+
+$ ls scripts/python/project-context-render.py scripts/python/project_facts.py
+ls: cannot access 'scripts/python/project-context-render.py': No such file or directory
+ls: cannot access 'scripts/python/project_facts.py': No such file or directory
+
+$ grep -rn "Tier G|Tier T|7-component" shared/ .specify/shared/ | wc -l
+0

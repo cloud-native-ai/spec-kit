@@ -1,0 +1,11 @@
+# run determination (analyze stage) — 2026-11-27
+$ python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:analyze-artifacts" --unit-type skill --run-id r20261127T070000Z-110a --complexity complex --qualification qualified --feature 110-context-management --token-note "no AI-tool session transcript or proxy reading is available to this worker" --elapsed-ms 694 --elapsed-note "measured from the state spine stage_started_at (1795767324) to this determination call"
+unit: skill:analyze-artifacts   run: r20261127T070000Z-110a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T070000Z-110a clean=false findings=4
+persisted: .specify/session/20261127T082658Z-run-determination-skill-analyze-artifacts-r20261127t070000z.md
+exit=0

@@ -1,0 +1,99 @@
+# Full suite and protected surfaces — 110-context-management — T035 — 2026-11-27T10:14Z
+
+Scope: SC-008 / DoD-8 / GATE-9 — zero NEW failure names against the implement-entry baseline,
+mirrors byte-identical, and the three protected surfaces equal to `notes/pre-change-measurements.md`.
+All runs through `scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`; both
+legs use the full tier (`--full`) and name-level evidence (`--names-out`), so the comparison is
+`comm -13 baseline current`, never count archaeology (owner: the implement **Test runs** bullet).
+
+## Baseline provenance and capture
+
+The implement stage captured no failing-name baseline before this package (no
+`baseline-failed.txt` existed in the spec dir). The baseline is therefore **reconstructed at the
+recorded implement-entry commit** `2cbbb3c8a` in a scratch git worktree
+(`.specify/.tmp/p4/baseline-2cbbb3c8a`, removed after the capture; it carried no feature edits).
+Provenance class: `first capture at the declared entry commit` — not zero drift by assumption.
+
+```
+$ cd .specify/.tmp/p4/baseline-2cbbb3c8a      # scrubbed worktree at 2cbbb3c8a
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full \
+      --names-out <spec-dir>/baseline-failed.txt
+==== 223 failed, 10276 passed, 3 skipped, 1538 warnings in 68.51s (0:01:08) ====
+=============== 1 passed, 10502 deselected, 8 warnings in 18.68s ===============
+# failed-name list written: …/baseline-failed.txt (223 entries) passes=2
+rc=1
+```
+
+Full output: `test-evidence/implement-baseline.log`. Name list:
+`baseline-failed.txt` (spec dir root; 223 unique names, sorted).
+
+## Current-tree full run (the closure full-suite slot)
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh --full \
+      --names-out .specify/specs/110-context-management/test-evidence/full-suite-current-failed.txt
+==== 223 failed, 10341 passed, 3 skipped, 1538 warnings in 77.46s (0:01:17) ====
+=============== 1 passed, 10567 deselected, 8 warnings in 19.09s ===============
+# failed-name list written: …/full-suite-current-failed.txt (223 entries) passes=2
+rc=1
+```
+
+Full output: `test-evidence/full-suite.log`.
+
+## Name-level regression comparison
+
+```
+$ comm -13 <(sort -u baseline-failed.txt) <(sort -u full-suite-current-failed.txt) | wc -l
+0                        # zero NEW failure names
+$ comm -23 <(sort -u baseline-failed.txt) <(sort -u full-suite-current-failed.txt) | wc -l
+0                        # zero disappeared names — the failing sets are identical
+```
+
+Passed count grew by exactly the 65 new feature tests (10276 → 10341); the 223 pre-existing
+failures are the environment's standing red set (documented in prior features' baselines too).
+
+### Intermediate run disclosure (why two current runs exist)
+
+The first current run (same command form) reported **228** names — five more than the baseline.
+Each was root-caused before this closure; the second run above is the recorded slot:
+
+| # | New name | Root cause | Disposition |
+|---|----------|-----------|-------------|
+| 1 | `test_context_management_readonly.py::test_containment_claims_are_decidable` | Parallel-run interaction: the repository-tree hash manifest compares the whole tree while other xdist workers write; passes in isolation and in the recorded run | none needed — green in the recorded run |
+| 2 | `test_declaration_facts.py::test_registration_is_additive_and_both_consumers_are_in_scope` | The 084-era guard pins the exact post-registration `contract.yaml` key set; the four append-only keys (T015) require the same allow-list update 093 and 105 landed for their keys | existing guard updated: `POST_110_FACT_KEYS` added with a dated comment (same-file precedent) |
+| 3 | `test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22` | The template/live `##` count pin (39/40) moves with the T029/T030 ambient section; the test's own contract states the pin is raised in the same commit (plan § PA-8, research § RU-3) | pin raised to 40/41 with a dated bump note |
+| 4 | `test_goal_migration.py::TestHistoricalFacesArePreserved::test_historical_face_is_not_empty` | Environment: its repo-wide grep hits root-owned 0600 build outputs left under `.specify/.tmp/script-interface-b59e92dc/probe-tmp/` by an earlier docker-run docs build; grep exits 2 on permission errors | stale scratch relocated out of the worktree (same-fs rename of the agent-owned ancestor into `<main>/.specify/.tmp/sdd-loop/worktrees/.quarantine-context-management-root-owned/`; root-owned contents preserved, not deleted); test green |
+| 5 | `test_script_interface_contract.py::test_c20_the_mirror_copy_resolves_to_its_own_root` | Same stale scratch: the checker's tree walk reported 204 unresolved `candidate-not-collected` rows from the probe tmp tree → exit 1 | cleared with the scratch relocation; checker `--skip-probe` exits 0 with zero unresolved findings; test green |
+
+None of the five names appears in the recorded run's failed list.
+
+## Protected surfaces (equal to `notes/pre-change-measurements.md`)
+
+1. **Super↔sub protocol declared item set** — re-read of
+   `shared/definitions/superagent-definitions.md` with the pre-change commands:
+   ```
+   role_fields: parent_identity, child_label, role_declaration, dispatch_duty, depth_position, authority_ref, return_channel
+   injections: fast-fail clause, concurrency obligation, reporting duty, re-anchoring anchor digest
+   ```
+   Identical to pre-change § 3. No field, injection, cap, identifier or self-check item added.
+2. **`memory-utils.py --action recall` on the populated stores** —
+   knowledge scope verbatim identical (`{"count": 0, "matches": []}`, rc 0). Session scope
+   has the same 5-result window; all five implement-entry record files exist and are
+   unchanged — `git diff 2cbbb3c8a -- .specify/session/` lists only the attributed other-run
+   record (`20261125T…clarify-artifact…`) and this line's own `implement-feature` run record
+   (legitimate growth anticipated by the pre-change comparison note).
+3. **Rendered-agent fixture output** — the pre-change render command, twice:
+   ```
+   rendered: 20 files: 20 backups: 0
+   sha256-tree: ff7aab2e4c0a3b2ea59f9d0da2f7bc1045906e3932080c744b4e865b6ab98d30
+   ```
+   Equal to the pre-change digest (byte-identical across both runs).
+
+## Mirrors
+
+`python3 scripts/python/sync-mirrors.py --check` → rc 0; six pairs byte-identical:
+templates 23, skills/external 439, skills/internal 139, agents 20, scripts **134**,
+shared **122** — the growth over the plan baseline (133 / 117) is exactly the feature's
+declared additions (one engine, one owner document, four facts); no NEW drift.
+
+[green: contracts/guards-and-boundaries.contract.md#C-041]

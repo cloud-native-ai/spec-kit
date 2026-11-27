@@ -1,0 +1,4 @@
+# exec quant (tasks stage) — 2026-11-27
+$ python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:create-tasks" --unit-type skill --run-id r20261127T070000Z-110a
+exec-quant: recorded skill:create-tasks run=r20261127T070000Z-110a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records/20261127T080412159425Z-df5b2a99.json
+exit=0

@@ -1,0 +1,12 @@
+# feedback record (implement P4) — 2026-11-27T10:09Z
+$ python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:implement-feature" --unit-type skill --run-id r20261127T070000Z-110a --feature 110-context-management --review <text> --points <text>
+{
+  "id": "20261127T085805Z-skill-implement-feature",
+  "path": ".specify/feedback/20261127T085805Z-skill-implement-feature.md",
+  "duplicate": true,
+  "count_since_submission": 609,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
+exit=0

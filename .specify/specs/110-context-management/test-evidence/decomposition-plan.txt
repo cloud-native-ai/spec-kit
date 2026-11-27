@@ -1,0 +1,4 @@
+# decomposition check (plan stage) — 2026-11-27
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/110-context-management/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 29, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-27T07:48:43Z"}
+exit=0

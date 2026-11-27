@@ -1,0 +1,4 @@
+# exec quant (checklist stage) — 2026-11-27
+$ python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:create-checklist" --unit-type skill --run-id r20261127T070000Z-110a
+exec-quant: recorded skill:create-checklist run=r20261127T070000Z-110a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records/20261127T081307767461Z-17befc22.json
+exit=0

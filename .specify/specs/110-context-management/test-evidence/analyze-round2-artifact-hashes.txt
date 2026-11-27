@@ -1,0 +1,19 @@
+# Analyzed artifact hashes (analyze round 2, baseline badc0e149) — 2026-11-27
+# sha256 over the exact tree this round adjudicated
+
+2e967e2f92787a8d302d813d3dbe64b481c7dfbf7ba20306bea3d55675681c12  .specify/specs/110-context-management/requirements.md
+f517048d53fe0de09c2fdc546deb77a349b39abc73ea580ae855e9a6991f91c2  .specify/specs/110-context-management/plan.md
+015d8abec4983767fe6b7d6efc409b938483245d68541f0c0fbb3be49d0e0b9c  .specify/specs/110-context-management/tasks.md
+26c4a90364029bdfeab0545a4bc7ec47c0d51604f1ebe5eea0dc3f250ed933bf  .specify/specs/110-context-management/data-model.md
+997278d6e6dd7864a675a731f5371c3411ac25e9c082934a52f9a97f0d553528  .specify/specs/110-context-management/research.md
+7f0711c55737c7ddc0a9ca054f857d025e40607d5ddc96fa3ab26f83d7b9db79  .specify/specs/110-context-management/quickstart.md
+d41fe4b4d63bf9a03b9f67da1fa23890a23e04c93c87abd53b55609ac29fa7db  .specify/specs/110-context-management/feature-ref.md
+7fde78e68e460a5d6a84f691fbad2b6b983007b549b93552826a255d9de4bfe5  .specify/specs/110-context-management/contracts/owner-and-layout.contract.md
+71dceff572ea043369c3fb5ab84b4b5ad056056ace8bd78e2fe64f0d0be531d1  .specify/specs/110-context-management/contracts/declarations-and-domains.contract.md
+0c0fa6a06cd6e60ae4aecd4dd350f941b61c43cf9906c9b02afc13bdf0c7f2ff  .specify/specs/110-context-management/contracts/matrix-and-triggers.contract.md
+6c997c0518d8acb5808a5ad843f0a5352c508753effc553414b441123127b53e  .specify/specs/110-context-management/contracts/engine-and-distribution.contract.md
+92bdc2e039c11b351bd78b041f961a64ba40d659b0278d987cab8de2f274786c  .specify/specs/110-context-management/contracts/guards-and-boundaries.contract.md
+d3f98933f64b8bde70aedecaed96f0b9fbde0e6fed6b69b13cd3b4c14755fcb2  .specify/specs/110-context-management/checklists/context-model-2026-11-27.md
+
+# HEAD
+badc0e1498cb42e27c0ea3de64e3b0d220be2afd

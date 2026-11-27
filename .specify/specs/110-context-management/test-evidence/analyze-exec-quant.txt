@@ -1,0 +1,4 @@
+# exec quant (analyze stage) — 2026-11-27
+$ python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:analyze-artifacts" --unit-type skill --run-id r20261127T070000Z-110a
+exec-quant: recorded skill:analyze-artifacts run=r20261127T070000Z-110a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records/20261127T082703321162Z-955f127b.json
+exit=0

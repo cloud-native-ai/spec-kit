@@ -1,0 +1,9 @@
+unit: skill:create-requirements   run: r20261127T070000Z-110a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              not_evaluated (not_comparable)
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T070000Z-110a clean=false findings=4
+persisted: .specify/session/20261127T072618Z-run-determination-skill-create-requirements-r20261127t070000.md
+settled previous run r20261124T024654Z-7c3e: not_evaluated

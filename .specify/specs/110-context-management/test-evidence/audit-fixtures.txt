@@ -1,0 +1,67 @@
+# Audit reading battery — 110-context-management — T032 — 2026-11-27T09:47Z
+
+Scope: FR-022 (machine-checkable claim set), SC-001 (repo clean + four seeded fixtures exact +
+byte-identical reruns), SC-004 (merged layer-form fixture exactly two findings). Every run
+invokes the shipped engine at `.specify/scripts/python/context-audit.py` (the installed mirror,
+byte-identical to `scripts/python/context-audit.py` — `cmp` exit 0).
+
+## 1. Repository tree — zero findings, exit 0
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action check
+summary: total=0 findings=0 by_rule=roster-mismatch=0 roster-order=0 unknown-layer=0 unknown-form=0 layer-form-illegal=0 duplicate-class=0 empty-layer=0 cap-missing=0 category-column=0
+exit=0
+```
+
+The `--json` face on the same tree prints `"findings": []` with
+`"summary": {"total": 0, "by_rule": {...all zero...}, "findings": 0}` (capture:
+`.specify/.tmp/p4/t032/repo-check-json.txt`, scratch root, git-ignored).
+
+## 2. The nine seeded rule fixtures — exact findings and exit codes
+
+Command shape (one run per case, plus a text-face run for the same-content leg):
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action check \
+    --workspace-root tests/fixtures/context-management/<case> --json
+```
+
+Observed (rule | row/line | detail | exit):
+
+```
+violation-unknown-layer    | unknown-layer      | row=10 line=32 | layout row 'runtime-probe' names the layer token 'runtime' outside the declared layer domain | exit=1
+violation-unknown-form     | unknown-form       | row=2  line=24 | layout row 'reality-constraints' names the form token 'cache' outside the declared form domain | exit=1
+violation-roster-mismatch  | roster-mismatch    | row=0  line=21 | layer 'task': layout class set differs from the roster (missing=['task-memory'] extra=[]) | exit=1
+violation-roster-order     | roster-order       | row=0  line=21 | layer 'task': layout class order differs from the roster order | exit=1
+violation-layer-form       | layer-form-illegal | row=2  line=24 | layout row 'reality-constraints' combines layer 'system' with form 'bounded-index' outside the ## Forms matrix | exit=1
+violation-layer-form       | layer-form-illegal | row=9  line=31 | layout row 'task-statement' combines layer 'task' with form 'read-in-full' outside the ## Forms matrix | exit=1
+violation-duplicate-class  | duplicate-class    | row=3  line=25 | class 'reality-constraints' is declared by more than one layout row (first at row 2) | exit=1
+violation-empty-layer      | empty-layer        | row=0  line=21 | layout side layer 'task' carries no layout row | exit=1
+violation-cap-missing      | cap-missing        | row=8  line=30 | layout row 'task-memory' carries no cap reference (owner path plus section required) | exit=1
+violation-category-column  | category-column    | row=0  line=21 | the ## Layout header ... sits outside the fixed six columns ... (header-only judgement, row=0) | exit=1
+```
+
+Per-case rule lists equal the expectation map exactly; the merged `violation-layer-form` fixture
+yields exactly **two** findings and no other rule (SC-004). Each JSON object carries the ordered
+keys `action`, `findings`, `summary`; each finding carries exactly `rule`, `file`, `row`, `line`,
+`detail`; each summary carries exactly `total`, `by_rule`, `findings` —
+`.specify/.tmp/p4/t032/` `*.check-json.txt` captures; machine assertion printed `ALL_OK`
+(all cases `match=True key_order=True finding_keys=True summary_keys=True`).
+
+## 3. Declaration-error fixtures — exit 2, no partial verdict
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action check --workspace-root tests/fixtures/context-management/declaration-missing --json
+context-audit: no declaration for fact 'context-forms'
+exit=2
+```
+
+Both fixtures (`declaration-unknown-member`, `declaration-missing`) × both actions
+(`check`, `manifest --layer project`) exit 2 with a single stderr input-error line and **no**
+`"findings"`/`"rows"` payload on stdout (asserted over all six captures: `leaked_partial_verdict=False`).
+The declaration-member boundary is exit 2, never a finding — as C-016/T022 require.
+
+## 4. Rerun byte-identity
+
+Summary of `.specify/specs/110-context-management/test-evidence/determinism.txt` § 1: repo tree
+and all nine rule fixtures are byte-identical across two consecutive runs on unchanged trees.

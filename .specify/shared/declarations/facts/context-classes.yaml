@@ -1,0 +1,28 @@
+fact: context-classes
+kind: mapping
+statement:
+  system:
+    - runtime-environment
+    - available-commands
+    - operation-permissions
+    - reality-constraints
+  project:
+    - governance-baseline
+    - project-vocabulary
+    - concept-definitions
+    - concept-explanations
+    - capability-inventories
+    - project-state-anchors
+    - workspace-map
+  task:
+    - task-artifacts
+    - task-capabilities
+    - task-shared-docs
+    - task-docs
+    - task-memory
+    - task-statement
+    - task-delta
+consumers:
+  - scripts/python/context-audit.py
+  - tests/contract/test_context_management_declarations.py
+former_carriers: []

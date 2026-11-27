@@ -1,0 +1,35 @@
+# workspace guard (implement P1) — 2026-11-27
+
+## Comparison against the close-out snapshot (workspace-implement-p1.json)
+clean
+rc=0
+
+## Comparison against the analyze round-2 snapshot (workspace-analyze-round2.json; stage-entry proxy)
+clean
+rc=0
+
+branch: 110-context-management | HEAD: 2cbbb3c8a4d3751533a2d6ad067e3b02235ed53c
+specs listing count: 92
+
+## Git status (raw, at check time)
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md
+ M .specify/specs/110-context-management/tasks.md
+?? .specify/exec-quant/records/20261127T085800623850Z-9f6a62ee.json
+?? .specify/feedback/20261127T085805Z-skill-implement-feature.md
+?? .specify/session/20261127T085746Z-run-determination-skill-implement-feature-r20261127t070000z.md
+?? .specify/specs/110-context-management/coverage-baseline.txt
+?? .specify/specs/110-context-management/notes/
+?? .specify/specs/110-context-management/test-evidence/implement-entry-readings.txt
+?? .specify/specs/110-context-management/test-evidence/implement-p1-exec-quant.txt
+?? .specify/specs/110-context-management/test-evidence/implement-p1-feedback-record.txt
+?? .specify/specs/110-context-management/test-evidence/implement-p1-run-determination.txt
+?? .specify/specs/110-context-management/test-evidence/red-declarations.txt
+?? .specify/specs/110-context-management/test-evidence/red-owner.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-implement-p1-check.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-implement-p1.json
+?? tests/contract/test_context_management_declarations.py
+?? tests/contract/test_context_management_owner.py
+?? tests/fixtures/context-management/
+?? tests/fixtures/context_management_support.py
+
+Attribution: the modified .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md is the known other-run session record — attributed, never committed or reverted. Concurrent-line refs drift: none since analyze round 2 (rc=0 clean above).

@@ -1,0 +1,1 @@
+# Fixture user input protocol

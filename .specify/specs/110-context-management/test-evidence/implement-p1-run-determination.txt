@@ -1,0 +1,11 @@
+# run determination (implement P1) — 2026-11-27
+$ python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:implement-feature" --unit-type skill --run-id r20261127T070000Z-110a --complexity complex --qualification qualified --feature 110-context-management --token-note "no AI-tool session transcript or proxy reading is available to this worker" --elapsed-ms 804000 --elapsed-note "measured from the state spine stage_started_at (1795769040) to this determination call" --collected 30
+unit: skill:implement-feature   run: r20261127T070000Z-110a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              improved
+  artifact_correctness not_evaluated (no_declared_checks)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T070000Z-110a clean=false findings=3
+persisted: .specify/session/20261127T085746Z-run-determination-skill-implement-feature-r20261127t070000z.md
+exit=0

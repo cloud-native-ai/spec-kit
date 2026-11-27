@@ -1,0 +1,4 @@
+# tasks validator (analyze round 2) — 2026-11-27
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/110-context-management/tasks.md
+PASS: .specify/specs/110-context-management/tasks.md — 0 error(s), 0 warning(s)
+exit=0

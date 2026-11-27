@@ -1,0 +1,22 @@
+# workspace guard (analyze-repair stage) — 2026-11-27
+
+## Comparison against the pre-write snapshot (workspace-analyze-repair.json)
+clean
+rc=0
+
+## Git status (raw, at check time)
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md
+ M .specify/specs/110-context-management/contracts/declarations-and-domains.contract.md
+ M .specify/specs/110-context-management/contracts/engine-and-distribution.contract.md
+ M .specify/specs/110-context-management/contracts/matrix-and-triggers.contract.md
+ M .specify/specs/110-context-management/data-model.md
+ M .specify/specs/110-context-management/plan.md
+ M .specify/specs/110-context-management/requirements.md
+ M .specify/specs/110-context-management/tasks.md
+ M .specify/specs/110-context-management/test-evidence/pre-analyze-tasks.json
+?? .specify/specs/110-context-management/test-evidence/analyze-repair-pre-analyze-tasks.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-repair-requirements-validator.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-repair-round1.md
+?? .specify/specs/110-context-management/test-evidence/analyze-repair-tasks-validator.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-repair-workspace-check.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-analyze-repair.json

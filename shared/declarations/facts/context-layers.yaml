@@ -1,0 +1,10 @@
+fact: context-layers
+kind: closed-set
+statement:
+  - system
+  - project
+  - task
+consumers:
+  - scripts/python/context-audit.py
+  - tests/contract/test_context_management_declarations.py
+former_carriers: []

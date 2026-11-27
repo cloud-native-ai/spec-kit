@@ -1,0 +1,107 @@
+# US1 verification (T020) — 110-context-management — 2026-11-27T09:17Z
+
+## Entry
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh <node ids>
+
+## Run 1 — owner guard model and baseline legs (C-001, C-002, C-003, C-020)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py::test_owner_document_is_the_single_model_home \
+    tests/contract/test_context_management_owner.py::test_no_second_layout_home_exists \
+    tests/contract/test_context_management_owner.py::test_bilingual_definition_sites_carry_the_fixed_literals \
+    tests/contract/test_context_management_owner.py::test_terminology_boundary_table_names_four_neighbours_by_pointer \
+    tests/contract/test_context_management_owner.py::test_forms_matrix_matches_the_contract \
+    tests/contract/test_context_management_owner.py::test_layout_table_is_the_single_row_data_home \
+    tests/contract/test_context_management_owner.py::test_landing_contract_declares_three_cells_and_three_forbidden_pairs \
+    tests/contract/test_context_management_owner.py::test_presence_vocabulary_defined_once_with_unobserved_pointer \
+    tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_owner.py::test_owner_document_is_the_single_model_home tests/contract/test_context_management_owner.py::test_no_second_layout_home_exists tests/contract/test_context_management_owner.py::test_bilingual_definition_sites_carry_the_fixed_literals tests/contract/test_context_management_owner.py::test_terminology_boundary_table_names_four_neighbours_by_pointer tests/contract/test_context_management_owner.py::test_forms_matrix_matches_the_contract tests/contract/test_context_management_owner.py::test_layout_table_is_the_single_row_data_home tests/contract/test_context_management_owner.py::test_landing_contract_declares_three_cells_and_three_forbidden_pairs tests/contract/test_context_management_owner.py::test_presence_vocabulary_defined_once_with_unobserved_pointer tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.........                                                                [100%]
+9 passed in 6.28s
+exit=0
+
+## Run 2 — declarations guard fact-shape and registration legs (C-010…C-016)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_declarations.py::test_four_facts_carry_mandatory_keys_and_kinds \
+    … nine further shape/registration/member nodes (see the runner header below)
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_declarations.py::test_four_facts_carry_mandatory_keys_and_kinds tests/contract/test_context_management_declarations.py::test_registration_keys_are_append_only_and_point_at_the_facts tests/contract/test_context_management_declarations.py::test_closed_sets_members_and_order tests/contract/test_context_management_declarations.py::test_classes_roster_matches_the_owner_layout_row_for_row tests/contract/test_context_management_declarations.py::test_engine_is_a_single_reader_with_no_hard_coded_members tests/contract/test_context_management_declarations.py::test_facts_carry_no_numeric_bound tests/contract/test_context_management_declarations.py::test_cap_references_use_one_form_and_resolve_to_the_cap_owner tests/contract/test_context_management_declarations.py::test_value_domains_agree_with_the_owner_document tests/contract/test_context_management_declarations.py::test_unknown_declaration_member_is_refused_both_actions tests/contract/test_context_management_declarations.py::test_missing_declaration_fact_is_refused_both_actions tests/contract/test_context_management_declarations.py::test_every_declared_member_is_exercised -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+...........                                                              [100%]
+11 passed in 6.27s
+exit=0
+
+## Run 3 — engine guard CLI and manifest legs (C-030, C-031, C-033, C-034)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_engine.py -k "manifest or script_interface or missing_owner or single_documented or source_reading or audit_does_not"
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_engine.py -k manifest or script_interface or missing_owner or single_documented or source_reading or audit_does_not -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+.........                                                                [100%]
+9 passed in 6.68s
+exit=0
+
+## Run 4 — readonly guard supporting run (green points T027/T035; not claimed here)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_readonly.py
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 7.63s
+exit=0
+
+## Mirror flow (T019)
+$ python3 scripts/python/sync-mirrors.py --write; python3 scripts/python/sync-mirrors.py --check
+result: write rc=0; check rc=0 — shared/ == .specify/shared/ (122 files, byte-identical) and
+scripts/ == .specify/scripts/ (134 files, byte-identical); all six pairs byte-identical; six per-file projections ok.
+The installed .specify/scripts/python/context-audit.py answers `--version` -> `context-audit.py 0.0.22` (rc=0).
+Byte identity by `cmp -s` for the owner document, the four facts, contract.yaml and the engine: all IDENTICAL.
+
+## Deliberately still red after this package (their green points are later rows)
+- engine guard check legs + test_decidable_duplication_shapes_are_reported (T022/T024, T031)
+- declarations guard test_layer_and_form_mutations_change_the_engine_output (needs --action check; T022/T024)
+- init guard test_fresh_init_distributes_and_audits_offline (needs --action check; T022/T027)
+- init guard ambient leg and owner-guard US4 surfaces: triggers, composer roles, source-drift/reentry, dispatch mapping, concept pointer, ambient section (T028/T029/T031)
+
+## Clause green claims — T020
+C-001, C-002, C-003 (owner guard), C-020 (owner guard baseline-once leg), C-030, C-031 (engine guard CLI legs).
+Note: the tasks table names C-020 as `test_baseline_composes_once_per_session_or_line`; the guard file authored
+under T009 carries the equivalent leg as `test_composition_protocol_declares_baseline_once_and_task_selection`
+(behavior identical; recorded here, not edited in tasks.md).
+
+## Adjudications landed at implement (from the analyze round-2 open set) and disclosures
+
+- **Fixture repair (disclosed)**: `tests/fixtures/context-management/absence-mixed/` carried only two of the three deviations T007/SC-003 record — the `.specify/session/` empty store and the `.specify/specs` dangling symlink — so no declared source was missing and the `absent` token had no carrier. The fixture's own recorded intent (T007 "one missing source, one empty store, one unreachable source"; SC-003 "逐行恰好读 absent、empty、unreachable") has exactly one reading, so this package removed `absence-mixed/docs/constraints.md` (the `reality-constraints` source). The fixture now reads `absent` / `empty` / `unreachable` exactly; `all-present` is untouched.
+- **AN-02**: the owner document's Composition Protocol states that a line entry inside an already-composed session reuses the session baseline (no recomposition); no eighth trigger is added.
+- **AN-03**: the Forms prose states that the two permanent `inline-digest` rows point at their standing owner witnesses, never at invariant content.
+- **AN-05**: the `Unobserved` consistency reading's carrier is the guard/evidence record (the first option of the disposition); the presence vocabulary section states the derivation, and the manifest face is unchanged (`action`/`layer`/`rows`/`counts`/`source_reading`). The engine guard derives it from the three concept rows and asserts `Unobserved` on the concept-missing fixture.
+- **AN-06**: the `source-reading` digest tuple and its sentinels are documented in the engine module docstring — unresolved sources use -1 (absent) / -2 (unreachable), a missing-layout row -3, a runtime-discovery row the 0/0 pair; content bytes never enter. The guard pins stability and metadata tracking.
+- **AN-07**: a missing or out-of-domain `--action` is in the closed usage-error set (exit 2), asserted by the engine guard.
+- **AN-08**: a present-but-unparsable owner document (missing heading/table, short row, wrong header) is an input error (exit 2), never a tenth rule and never a default; its guard leg (`test_unparsable_owner_document_is_an_input_error`) passes on the current build.
+- **AN-09**: cap cells use the installed shape `.specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First)`, which resolves on both the framework source tree and a client install; the declarations guard pins the form.
+- **AN-10**: the manifest face keeps the fixed FR-021/C-033 keys; no `roots` field is added (the plan-owned data-model line is not edited by this package).
+- **AN-23**: the readonly guard gives C-035 its own action-level leg (`test_no_action_writes_or_opens_a_socket`: hash manifests around in-process runs, socket entry points blocked) beside the C-041 pin `test_containment_claims_are_decidable`; the two clauses no longer share one test path.
+- **AN-25**: the engine guard's honesty leg is scoped to audited sources — the content-only-change leg rewrites a declared audited source's bytes with the same length and a restored mtime and requires byte-identical output; the engine's declared input reads are untouched.
+- **C-027 carrier**: `test_decidable_duplication_shapes_are_reported` is authored in the engine guard (the clause's named carrier). Because the engine's `check` rule set is closed at nine (C-032/PA-7), the two decidable shapes are judged by the guard's own layout reading; the test stays red until the owner document declares the shapes (T021/T031).
+- **`check` action state**: T018 implements the foundation and `--action manifest` only; `--action check` refuses loudly (exit 2, stderr, no verdict) until its own row (T022) lands the closed nine-rule set. Its guard legs, the declarations guard's mutation leg and the init guard's `check` leg therefore remain red by design; their green points are T022/T024/T027/T032.
+- **Clause-table pinning-test names**: the § Clause Coverage table names some carriers differently from the guard files authored under T009/T010 (e.g. C-020's `test_baseline_composes_once_per_session_or_line` is `test_composition_protocol_declares_baseline_once_and_task_selection`; C-005's `test_form_legality_matrix_matches_the_owner_document` is `test_forms_matrix_matches_the_contract`). The behavioral legs are pinned and green; the name column is a prospective label, recorded here rather than edited in tasks.md.
+
+## Script-interface check (C-031 supporting evidence, post-commit)
+
+Command: `python3 scripts/python/script-interface-check.py --files scripts/python/context-audit.py --json`
+Result: `applicable=1`, `violations=0`; the engine's row reads
+`basis=marker-fired`, `-h exit=0 --help exit=0 same_body=True labels=exit-codes,options,side-effects,usage`,
+`--version exit=0 lines=1 observed='0.0.22' framework='0.0.22'`,
+`unknown exit=2 known-first exit=2 after-'--' exit=2 rescue=rejected`,
+`zero_side_effect=true`. The process exit code was 1, driven by two pre-existing
+`probe-inconclusive` exceptions in `skills/external/document-utils/scripts/…` (optional
+third-party modules absent on this host); no violation row names this feature. The engine
+row itself is compliant.

@@ -1,0 +1,55 @@
+# US3 verification (T027) — 110-context-management — 2026-11-27T09:20Z
+
+## Entry
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh <node id or path>
+
+## Distribution confirmation (T025, T026)
+$ python3 scripts/python/sync-mirrors.py --write   # after the framework-map edit
+rc=0
+$ python3 scripts/python/sync-mirrors.py --check
+rc=0 — six pairs byte-identical; "ok    shared/ == .specify/shared/ (122 files, byte-identical)".
+$ cmp shared/definitions/framework-map.md .specify/shared/definitions/framework-map.md → identical
+$ grep -c 'Context-management owner document\|Context value-domain facts\|Context audit entry' .specify/shared/definitions/framework-map.md
+3
+- init flow: `copy_local_templates` copies `resource_path/scripts` → `.specify/scripts`,
+  `resource_path/templates` (excluding `commands/`) → `.specify/templates`, and
+  `resource_path/shared` → `.specify/shared` through `copy_tree_with_rewrite`
+  (`src/specify_cli/__init__.py`); no init-code change was needed or made.
+- The installed map copy carries the three new rows; the owner document, the four facts and
+  the engine ride the same trees (byte-identical mirrors).
+
+## Run 1 — fresh init distributes and audits offline (C-036, SC-005)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_context_management_init.py::test_fresh_init_distributes_and_audits_offline
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/integration/test_context_management_init.py::test_fresh_init_distributes_and_audits_offline -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+192 workers [1 item]
+.                                                                        [100%]
+1 passed in 7.55s
+exit=0
+Observed by the leg: the owner document, the four facts and the engine are present under
+`.specify/` in the fresh tree; `check` exits 0; `manifest --layer project --json` prints the
+project rows with explicit absence lines, each carrying a reason; socket entry points were
+blocked in process and no attempt was recorded.
+
+## Run 2 — full readonly guard (C-029, C-035, C-041, C-045; SC-002)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_readonly.py
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+192 workers [4 items]
+....                                                                     [100%]
+4 passed in 10.14s
+exit=0
+Observed by the legs: per-action SHA-256 tree manifests identical before/after over the
+fixture trees and the repository tree, zero added files, an in-process socket-blocked run
+with no connection attempt, no write-shaped call or write-mode open in the engine source,
+no new command/skill wrapper, and an unchanged runtime-store roster.
+
+## Green claims — clause partition carried by this row
+- C-035, C-041: Run 2 (containment legs; the readonly guard's own C-041 pin).
+- C-036: Run 1 plus the T026 distribution confirmation above.
+
+## Disclosures
+- The fresh-init `check` exercises the same nine-rule reading implemented in T022; the
+  fresh tree is clean because the distributed owner document and facts are the same
+  machine shapes, and the `cap_required_forms` marker rides the mirrored owner document.
+- No init-code change was made; distribution rides the existing tree copy, per C-036.

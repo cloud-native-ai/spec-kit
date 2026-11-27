@@ -1,0 +1,12 @@
+# feedback record (analyze round 2) — 2026-11-27
+$ python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:analyze-artifacts" --unit-type skill --run-id r20261127T070000Z-110a --feature 110-context-management --review <text: incremental round 2; AN-01/AN-04 verified fixed; 22 residues open; 3 new; no open C/H> --points <text: 3 optimization points>
+{
+  "id": "20261127T082707Z-skill-analyze-artifacts",
+  "path": ".specify/feedback/20261127T082707Z-skill-analyze-artifacts.md",
+  "duplicate": true,
+  "count_since_submission": 608,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
+exit=0

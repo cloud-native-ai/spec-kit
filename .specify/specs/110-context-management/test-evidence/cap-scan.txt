@@ -1,0 +1,55 @@
+# Cap closure scan — 110-context-management — T038 — 2026-11-27T10:35Z
+
+Scope: FR-019 / SC-006 — every `bounded-index` row's cap reference resolves (path plus
+section), the four facts carry no numeric bound field, and no numeric cap literal sits beside
+a cap unit anywhere in this feature's persistent increments. The scan reuses the guard's own
+decidable pattern (`CAP_UNIT_RE = \b\d+\s*(?:tokens?|bytes?|chars?|characters?|KB|KiB|B)\b`,
+owner: `tests/contract/test_context_management_declarations.py` § C-013).
+
+## 1. `bounded-index` cap references resolve — 7/7
+
+```
+concept-definitions      .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+capability-inventories   .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+task-artifacts           .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+task-capabilities        .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+task-shared-docs         .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+task-docs                .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+task-memory              .specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First) -> path=ok section=ok
+resolved 7/7
+```
+
+## 2. Content-bearing rows cite the same cap section — 3/3
+
+```
+governance-baseline (read-in-full)   -> ok
+task-statement      (inline-digest)  -> ok
+task-delta          (inline-digest)  -> ok
+```
+
+## 3. Four facts — no numeric bound field, no numeric cap literal
+
+```
+context-categories.yaml: bound_fields=none cap_literals=none
+context-layers.yaml:     bound_fields=none cap_literals=none
+context-forms.yaml:      bound_fields=none cap_literals=none
+context-classes.yaml:    bound_fields=none cap_literals=none
+```
+
+(`NUMERIC_BOUND_KEYS` = bound(s)/limit(s)/cap(s)/max/min/threshold(s)/budget(s), the guard's
+own set.)
+
+## 4. Persistent increments — numeric cap literal scan
+
+```
+owner document            cap_literals=none
+engine                    cap_literals=none
+template ambient section  cap_literals=none
+live ambient section      cap_literals=none
+total numeric cap literals beside a cap unit: 0
+```
+
+The engine's `0-byte` presence-reading phrase does not match the pattern (a hyphen is not
+`\s*`), and it is a metadata reading, not a cap. Zero hits across the feature's increments.
+
+Raw capture: `.specify/.tmp/p4/t038/cap-scan-raw.txt` (scratch).

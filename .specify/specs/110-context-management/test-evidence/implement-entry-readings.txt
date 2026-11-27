@@ -1,0 +1,79 @@
+# Implement-Entry Readings — 110-context-management
+
+**Purpose**: T004 — the implement-entry environment reading plus the containment baseline. Captured 2026-11-27 before any edit of this package, worktree `.specify/.tmp/sdd-loop/worktrees/context-management`.
+**Failing-test baseline owner**: the implement command's **Test runs** bullet (path and flag owned there and referenced, never restated here).
+
+## Baseline referent (SC-008)
+
+```
+implement_start_commit=2cbbb3c8a4d3751533a2d6ad067e3b02235ed53c
+```
+Command: `git rev-parse HEAD` — branch `110-context-management`, checkpoint 06 (`chore(110-context-management): checkpoint 06 — analyze U4 pass`).
+
+## Dependency requirement sets (containment unit: dependency requirement sets)
+
+Command: `/usr/local/bin/python3` parse of `pyproject.toml` (`tomllib`), 2026-11-27.
+
+```
+build-system.requires: ['hatchling']
+project.dependencies: ['typer', 'rich', 'httpx[socks]', 'readchar', "truststore>=0.10.4; python_version >= '3.10'"]
+project.optional-dependencies.dev: ['pytest', "pytest-xdist; python_version >= '3.9'", 'ruff']
+```
+
+Zero new third-party dependencies are permitted by this feature (C-030/C-035; DoD-2).
+
+## Interpreter and toolchain readings
+
+Commands and real output (2026-11-27):
+
+```
+/usr/local/bin/python3 --version        → Python 3.11.11
+/usr/local/bin/python3 -m pytest --version → pytest 8.4.2
+python3 -m pytest --version             → /storage/project/profiles/.venv/bin/python3: No module named pytest
+command -v python3                      → /storage/project/profiles/.venv/bin/python3
+git --version                           → git version 2.43.5
+bash --version (first line)             → GNU bash, version 4.4.20(1)-release (x86_64-koji-linux-gnu)
+```
+
+All test rows run through `scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`.
+
+## Test runner presence and resolution order
+
+Command: `test -f scripts/bash/run-tests.sh` → present (exit `0`).
+
+Resolution order inside `scripts/bash/run-tests.sh` `resolve_python()` (line 65):
+
+```
+"${SPECKIT_PYTHON:-}" "$repo_venv" ".venv/bin/python" "python3" "python"
+```
+
+`repo_venv` is resolved from the runner script's own location (`../../.venv/bin/python`), never from the caller's cwd; the first candidate that answers `-m pytest --version` wins.
+
+## Mirror reading
+
+Command: `python3 scripts/python/sync-mirrors.py --check` → exit status `0` (six pairs byte-identical; six per-file projections `ok`). Full output captured in `notes/pre-change-measurements.md` § 2 (the pre-change side); the implement-time criterion is no NEW drift against that baseline.
+
+## Twelve new artifacts — per-path `test -e` (red-first prerequisite)
+
+Command: per-path `test -e` loop (the same loop and paths as `notes/pre-change-measurements.md` § 7), 2026-11-27.
+
+```
+ABSENT  shared/definitions/context-management-definitions.md
+ABSENT  shared/declarations/facts/context-categories.yaml
+ABSENT  shared/declarations/facts/context-layers.yaml
+ABSENT  shared/declarations/facts/context-forms.yaml
+ABSENT  shared/declarations/facts/context-classes.yaml
+ABSENT  scripts/python/context-audit.py
+ABSENT  tests/contract/test_context_management_owner.py
+ABSENT  tests/contract/test_context_management_declarations.py
+ABSENT  tests/contract/test_context_management_engine.py
+ABSENT  tests/contract/test_context_management_readonly.py
+ABSENT  tests/integration/test_context_management_init.py
+ABSENT  tests/fixtures/context-management
+```
+
+12/12 ABSENT at implement entry. The two guard files and the fixture directory are produced by this package after this reading; the owner document, the four facts and the engine remain absent until their own rows.
+
+## Concurrent-work attribution (not part of the containment unit)
+
+`git status --short` at implement entry reports one modified path — `.specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md` — a pre-existing other-run session record. It is attributed, never committed or reverted by this stage. Ref drift from the concurrent `prompt-adherence` line is likewise attributed, never touched.

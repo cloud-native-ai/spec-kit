@@ -1,0 +1,316 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_declarations.py
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [12 items]
+
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+________ test_cap_references_use_one_form_and_resolve_to_the_cap_owner _________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_cap_references_use_one_form_and_resolve_to_the_cap_owner():
+>       rows = _owner_layout_rows()
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:95: in _owner_layout_rows
+    text = owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+__________ test_engine_is_a_single_reader_with_no_hard_coded_members ___________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_engine_is_a_single_reader_with_no_hard_coded_members():
+>       source, tree = _engine_ast()
+                       ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _engine_ast():
+>       assert ENGINE.is_file(), f"audit engine missing: {ENGINE}"
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py').is_file
+
+tests/contract/test_context_management_declarations.py:202: AssertionError
+________________ test_four_facts_carry_mandatory_keys_and_kinds ________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_four_facts_carry_mandatory_keys_and_kinds():
+        for slug, kind in EXPECTED_KINDS.items():
+            path = fact_path(slug)
+>           assert path.is_file(), f"declaration fact missing: {path}"
+E           AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-categories.yaml
+E           assert False
+E            +  where False = is_file()
+E            +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-categories.yaml').is_file
+
+tests/contract/test_context_management_declarations.py:115: AssertionError
+____________ test_missing_declaration_fact_is_refused_both_actions _____________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20250/popen-gw9/test_missing_declaration_fact_0')
+
+    def test_missing_declaration_fact_is_refused_both_actions(tmp_path: Path):
+        root = copy_case_to(tmp_path, "declaration-missing")
+>       _assert_refused(root)
+
+tests/contract/test_context_management_declarations.py:324: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:309: in _assert_refused
+    completed, payload = run_engine_json(workspace_root, *args)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20250/popen-gw9/test_missing_declaration_fact_0/declaration-missing')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+___________ test_classes_roster_matches_the_owner_layout_row_for_row ___________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_classes_roster_matches_the_owner_layout_row_for_row():
+>       roster = _statement("context-classes")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:84: in _statement
+    return _fact(slug)["statement"]
+           ^^^^^^^^^^^
+tests/contract/test_context_management_declarations.py:80: in _fact
+    return fact_body(slug)
+           ^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:119: in fact_body
+    body = declaration_reader().parse_subset(fact_text(slug), str(fact_path(slug)))
+                                             ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+slug = 'context-classes'
+
+    def fact_text(slug: str) -> str:
+        path = fact_path(slug)
+>       assert path.is_file(), f"declaration fact missing: {path}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-classes.yaml
+
+tests/fixtures/context_management_support.py:114: AssertionError
+________ test_registration_keys_are_append_only_and_point_at_the_facts _________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_registration_keys_are_append_only_and_point_at_the_facts():
+        body = _contract_body()
+        keys = set(body)
+        missing_pre_existing = (PRE_EXISTING_CONTRACT_KEYS | POST_093_FACT_KEYS | POST_105_FACT_KEYS) - keys
+        assert not missing_pre_existing, (
+            f"pre-existing declaration contract keys disappeared: {sorted(missing_pre_existing)}")
+        for slug in EXPECTED_KINDS:
+>           assert slug in keys, f"registration key missing from contract.yaml: {slug}"
+E           AssertionError: registration key missing from contract.yaml: context-categories
+E           assert 'context-categories' in {'completeness_states', 'concurrency-class', 'concurrency-contract', 'concurrency-slot-and-reserve', 'coordinator-dispatch-verdict', 'decomposition-coverage', ...}
+
+tests/contract/test_context_management_declarations.py:142: AssertionError
+___________________ test_every_declared_member_is_exercised ____________________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_every_declared_member_is_exercised():
+        for slug in ("context-categories", "context-layers", "context-forms"):
+>           for member in _statement(slug):
+                          ^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:84: in _statement
+    return _fact(slug)["statement"]
+           ^^^^^^^^^^^
+tests/contract/test_context_management_declarations.py:80: in _fact
+    return fact_body(slug)
+           ^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:119: in fact_body
+    body = declaration_reader().parse_subset(fact_text(slug), str(fact_path(slug)))
+                                             ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+slug = 'context-categories'
+
+    def fact_text(slug: str) -> str:
+        path = fact_path(slug)
+>       assert path.is_file(), f"declaration fact missing: {path}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-categories.yaml
+
+tests/fixtures/context_management_support.py:114: AssertionError
+_______________ test_value_domains_agree_with_the_owner_document _______________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_value_domains_agree_with_the_owner_document():
+>       forms = _owner_forms()
+                ^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:102: in _owner_forms
+    text = owner_text()
+           ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+
+tests/fixtures/context_management_support.py:133: AssertionError
+___________ test_unknown_declaration_member_is_refused_both_actions ____________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20250/popen-gw8/test_unknown_declaration_membe0')
+
+    def test_unknown_declaration_member_is_refused_both_actions(tmp_path: Path):
+        root = copy_case_to(tmp_path, "declaration-unknown-member")
+>       _assert_refused(root)
+
+tests/contract/test_context_management_declarations.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:309: in _assert_refused
+    completed, payload = run_engine_json(workspace_root, *args)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20250/popen-gw8/test_unknown_declaration_membe0/declaration-unknown-member')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+____________ test_layer_and_form_mutations_change_the_engine_output ____________
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20250/popen-gw11/test_layer_and_form_mutations_0')
+
+    def test_layer_and_form_mutations_change_the_engine_output(tmp_path: Path):
+        from fixtures.context_management_support import run_engine_json
+    
+        clean_root = copy_case_to(tmp_path / "clean", "all-present")
+>       clean, _ = run_engine_json(clean_root, "--action", "check")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:367: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20250/popen-gw11/test_layer_and_form_mutations_0/clean/all-present')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+______________________ test_closed_sets_members_and_order ______________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_closed_sets_members_and_order():
+        for slug, expected in EXPECTED_DOMAINS.items():
+>           statement = _statement(slug)
+                        ^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:84: in _statement
+    return _fact(slug)["statement"]
+           ^^^^^^^^^^^
+tests/contract/test_context_management_declarations.py:80: in _fact
+    return fact_body(slug)
+           ^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:119: in fact_body
+    body = declaration_reader().parse_subset(fact_text(slug), str(fact_path(slug)))
+                                             ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+slug = 'context-categories'
+
+    def fact_text(slug: str) -> str:
+        path = fact_path(slug)
+>       assert path.is_file(), f"declaration fact missing: {path}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-categories.yaml
+
+tests/fixtures/context_management_support.py:114: AssertionError
+______________________ test_facts_carry_no_numeric_bound _______________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_facts_carry_no_numeric_bound():
+        for slug in EXPECTED_KINDS:
+>           body = _fact(slug)
+                   ^^^^^^^^^^^
+
+tests/contract/test_context_management_declarations.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_declarations.py:80: in _fact
+    return fact_body(slug)
+           ^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:119: in fact_body
+    body = declaration_reader().parse_subset(fact_text(slug), str(fact_path(slug)))
+                                             ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+slug = 'context-categories'
+
+    def fact_text(slug: str) -> str:
+        path = fact_path(slug)
+>       assert path.is_file(), f"declaration fact missing: {path}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-categories.yaml
+
+tests/fixtures/context_management_support.py:114: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_context_management_declarations.py::test_cap_references_use_one_form_and_resolve_to_the_cap_owner
+FAILED tests/contract/test_context_management_declarations.py::test_engine_is_a_single_reader_with_no_hard_coded_members
+FAILED tests/contract/test_context_management_declarations.py::test_four_facts_carry_mandatory_keys_and_kinds
+FAILED tests/contract/test_context_management_declarations.py::test_missing_declaration_fact_is_refused_both_actions
+FAILED tests/contract/test_context_management_declarations.py::test_classes_roster_matches_the_owner_layout_row_for_row
+FAILED tests/contract/test_context_management_declarations.py::test_registration_keys_are_append_only_and_point_at_the_facts
+FAILED tests/contract/test_context_management_declarations.py::test_every_declared_member_is_exercised
+FAILED tests/contract/test_context_management_declarations.py::test_value_domains_agree_with_the_owner_document
+FAILED tests/contract/test_context_management_declarations.py::test_unknown_declaration_member_is_refused_both_actions
+FAILED tests/contract/test_context_management_declarations.py::test_layer_and_form_mutations_change_the_engine_output
+FAILED tests/contract/test_context_management_declarations.py::test_closed_sets_members_and_order
+FAILED tests/contract/test_context_management_declarations.py::test_facts_carry_no_numeric_bound
+============================== 12 failed in 6.28s ==============================

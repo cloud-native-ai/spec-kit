@@ -1,0 +1,4 @@
+# exec quant (analyze round 2) — 2026-11-27
+$ python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:analyze-artifacts" --unit-type skill --run-id r20261127T070000Z-110a
+exec-quant: duplicate record for (skill:analyze-artifacts, r20261127T070000Z-110a); no second row written -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records
+exit=0

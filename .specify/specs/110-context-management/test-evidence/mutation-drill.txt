@@ -1,0 +1,51 @@
+# Mutation drill — 110-context-management — T034 — 2026-11-27T09:57Z
+
+Scope: C-040 (each `check` rule's guard went red under its own mutation drill), DoD-4.
+Driver: `.specify/.tmp/p4/mutation-drill.py` (scratch, git-ignored). For each rule the driver
+substitutes **only that rule's finding emission** with `pass` (empty-layer: both of its own
+emission sites; category-column: its early-return verdict becomes `return []`), asserts the
+substitution target occurs exactly once, writes the mutated engine, runs that rule's guard
+test through `scripts/bash/run-tests.sh`, restores the original bytes, proves the restore by
+sha256 + `cmp` against a pristine scratch copy, and re-runs the same test green.
+
+The observable is the guard test's verdict, never the engine's finding output.
+
+| Rule | Guard test | Red exit | Red verdict | Restore | Green exit |
+|------|------------|---------|-------------|---------|-----------|
+| `unknown-layer` | `test_rule_unknown_layer_fixture_is_exact` | 1 | FAILED, `1 failed in 6.27s` | ok (exact bytes) | 0, `1 passed in 6.28s` |
+| `unknown-form` | `test_rule_unknown_form_fixture_is_exact` | 1 | FAILED, `1 failed in 6.27s` | ok | 0, `1 passed in 6.28s` |
+| `layer-form-illegal` | `test_rule_layer_form_fixture_yields_exactly_two_findings` | 1 | FAILED, `1 failed in 6.26s` | ok | 0, `1 passed in 6.27s` |
+| `cap-missing` | `test_rule_cap_missing_fixture_is_exact` | 1 | FAILED, `1 failed in 6.26s` | ok | 0, `1 passed in 6.31s` |
+| `duplicate-class` | `test_rule_duplicate_class_fixture_is_exact` | 1 | FAILED, `1 failed in 6.27s` | ok | 0, `1 passed in 6.33s` |
+| `empty-layer` | `test_rule_empty_layer_fixture_is_exact` | 1 | FAILED, `1 failed in 6.26s` | ok | 0, `1 passed in 6.30s` |
+| `roster-mismatch` | `test_rule_roster_mismatch_fixture_is_exact` | 1 | FAILED, `1 failed in 6.26s` | ok | 0, `1 passed in 6.32s` |
+| `roster-order` | `test_rule_roster_order_fixture_is_exact` | 1 | FAILED, `1 failed in 6.28s` | ok | 0, `1 passed in 6.30s` |
+| `category-column` | `test_rule_category_column_fixture_is_exact` | 1 | FAILED, `1 failed in 6.27s` | ok | 0, `1 passed in 6.29s` |
+
+Command shape (per rule; node id varies):
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_engine.py::<guard test> -q
+```
+
+Raw driver transcript (all nine, red and green legs): `.specify/.tmp/p4/t034-drill-raw.txt`;
+decisive tail:
+
+```
+DRILL-SUMMARY failures=0 rules=9
+drill exit=0
+```
+
+## Restore and byte-identity proof
+
+- Pristine engine sha256 before the drill: `ac5df853d34cf27cf86aff3d43a2757a34f883cb70938154f856d31e2807192e`
+- Engine sha256 after the drill: `ac5df853d34cf27cf86aff3d43a2757a34f883cb70938154f856d31e2807192e`
+- `final bytes equal pristine: True`; `cmp scripts/python/context-audit.py .specify/.tmp/p4/engine-pristine.py` exit 0
+- `git diff --stat scripts/python/context-audit.py` after the drill: empty (exit 0, no output)
+
+## Verdict
+
+Every one of the nine `check` rules has a guard test that goes red when exactly that rule's
+emission is removed and green again after the byte-exact restore — the guard set is credible
+per-rule, and the working engine equals its pre-drill state. [green: contracts/guards-and-boundaries.contract.md#C-040]

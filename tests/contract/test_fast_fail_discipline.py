@@ -768,9 +768,13 @@ def test_a7_section_counts_20_to_21_and_21_to_22():
     Bump (2026-11-26, Feature 107 decision governance): the
     `## Decision Items（决策项）` ambient section is added to the template and
     carried into live by the T015 regeneration (38 -> 39 template, 39 -> 40 live).
+
+    Bump (2026-11-27, Feature 110 context management): the
+    `## Context Management(上下文管理)` ambient section is added to the template and
+    carried into live by the T030 regeneration (39 -> 40 template, 40 -> 41 live).
     """
-    TPL_EXPECTED = 39  # 2026-11-26 decision governance: +1 ambient section
-    LIVE_EXPECTED = 40  # the reconcile carries that same section into the live file
+    TPL_EXPECTED = 40  # 2026-11-27 context management: +1 ambient section
+    LIVE_EXPECTED = 41  # the reconcile carries that same section into the live file
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
     assert tpl == TPL_EXPECTED, (

@@ -1,0 +1,85 @@
+# US2 verification (T024) — 110-context-management — 2026-11-27T09:10Z
+
+## Entry
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh <node ids or path>
+
+## Run 1 — owner guard: layout, roster, landing and task-composition legs (C-001, C-002, C-003, C-004, C-005, C-006, C-014, C-020, C-021)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py::test_owner_document_is_the_single_model_home \
+    tests/contract/test_context_management_owner.py::test_no_second_layout_home_exists \
+    tests/contract/test_context_management_owner.py::test_bilingual_definition_sites_carry_the_fixed_literals \
+    tests/contract/test_context_management_owner.py::test_terminology_boundary_table_names_four_neighbours_by_pointer \
+    tests/contract/test_context_management_owner.py::test_forms_matrix_matches_the_contract \
+    tests/contract/test_context_management_owner.py::test_layout_table_is_the_single_row_data_home \
+    tests/contract/test_context_management_owner.py::test_landing_contract_declares_three_cells_and_three_forbidden_pairs \
+    tests/contract/test_context_management_owner.py::test_presence_vocabulary_defined_once_with_unobserved_pointer \
+    tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection \
+    tests/contract/test_context_management_owner.py::test_red_lines_declare_no_new_surface
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" <the ten node ids above> -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+192 workers [10 items]
+..........                                                               [100%]
+10 passed in 6.28s
+exit=0
+
+## Run 2 — full declarations guard (C-010, C-011, C-012, C-013, C-014, C-015, C-016)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_declarations.py
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_declarations.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+192 workers [12 items]
+............                                                             [100%]
+12 passed in 6.32s
+exit=0
+
+## Run 3 — full engine guard (C-027, C-030, C-031, C-032, C-033, C-034)
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_engine.py
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_engine.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+192 workers [23 items]
+.......................                                                  [100%]
+23 passed in 6.70s
+exit=0
+
+## Mirror flow (T023)
+$ python3 scripts/python/sync-mirrors.py --write
+rc=0 — projected 1 shared file (the owner document); the engine projector rows answered ok.
+$ python3 scripts/python/sync-mirrors.py --check
+rc=0 — "ok    shared/ == .specify/shared/ (122 files, byte-identical)".
+$ cmp shared/definitions/context-management-definitions.md .specify/shared/definitions/context-management-definitions.md → identical
+$ cmp scripts/python/context-audit.py .specify/scripts/python/context-audit.py → identical
+
+## Green claims — clause partition carried by this row
+- C-004, C-005, C-006: Run 1 layout/forms/landing legs.
+- C-010, C-011, C-012, C-013, C-014, C-015, C-016: Run 2 (full declarations guard).
+- C-021: Run 1 task-composition leg; Run 3 manifest task rows carry caps and the two inline-digest witnesses with their standing sources.
+- C-032, C-033, C-034: Run 3 (nine seeded rules exact, clean repository check, JSON/text faces, digest, determinism, honesty).
+- C-027: `test_decidable_duplication_shapes_are_reported` (Run 3) green after the owner document's § Duplication subsection landed (T021).
+
+## Adjudications and disclosures (this package)
+
+- **`cap_required_forms:` machine marker (disclosed)**: the engine may carry no hard-coded
+  declaration member (T010's declarations guard scans the engine's string constants against
+  the declared domains), so the `cap-missing` rule reads the form it must judge from the
+  owner document's § Forms machine marker `cap_required_forms: bounded-index`. The marker is
+  data, validated against the declared form domain at load time (missing marker or an
+  out-of-domain token is an input error, exit 2 — never a default). The same line was added
+  to the fourteen fixture owner documents so the clean fixture stays clean and each
+  violation fixture keeps its single deviation; no fixture row or fact changed.
+- **FR-021 finding-key wording vs the binding guard (disclosed)**: FR-021's prose names a
+  finding as `rule`/`file`/`line`/`message` and a summary as `total`/`by_rule`; the
+  machine-decidable carrier (`test_context_management_engine.py`, authored T011) pins
+  `rule`/`file`/`row`/`line`/`detail` with a summary carrying `findings`, and T022's own row
+  says findings name file, row and rule. The engine emits the guard's exact finding keys and
+  a summary that carries both the guard's `findings` count and FR-021's `total`/`by_rule`
+  counts. The guard is the acceptance surface and stays byte-pinned; no test was edited.
+- **`category-column` scope**: the rule is judged by the header alone; when the header falls
+  outside the fixed six columns the row-level rules are not run (their positional meaning is
+  undefined), which is what keeps the seeded fixture at exactly one finding. A header that
+  does not carry the six fixed column names at all remains an unparsable input (exit 2), per
+  AN-08.
+- **Task-layer manifest comparison (Independent Test)**: the manifest prints the roster rows
+  and cap references in roster order, and the two `inline-digest` witnesses
+  (`task-statement` → `.specify/shared/workflow/user-input-protocol.md`; `task-delta` →
+  `.specify/register.md` + `.specify/state/`) appear with their standing sources; the engine
+  performs no selection or ranking (C-034), so two task compositions differ only in what the
+  composing agent chooses — the reading never selects.

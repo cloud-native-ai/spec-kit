@@ -1,0 +1,4 @@
+# run determination (analyze round 2) — 2026-11-27
+$ python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:analyze-artifacts" --unit-type skill --run-id r20261127T070000Z-110a --complexity complex --qualification qualified --feature 110-context-management --token-note "no AI-tool session transcript or proxy reading is available to this worker" --elapsed-ms 335000 --elapsed-note "measured from the state spine stage_started_at (1795768600) to this determination call"
+duplicate: skill:analyze-artifacts r20261127T070000Z-110a was already determined
+exit=0

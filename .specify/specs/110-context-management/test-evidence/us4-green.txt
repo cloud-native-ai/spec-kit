@@ -1,0 +1,167 @@
+# US4 evidence — 110-context-management — 2026-11-27T09:40Z
+
+**Status**: interim — this file carries the P3 (T028–T030) implementation-side readings.
+The full US4 verification slice is T031's run (P4) and appends its complete records here.
+
+## T028 — owner document composition protocol remainder
+
+Sections landed in `shared/definitions/context-management-definitions.md`: the
+`## Triggers` table (closed seven, each row naming composer / scope / evidence), the
+`## Composer Roles` section, the `## Dispatch Mapping` section (seven role fields and the
+four injections by pointer; adds nothing), the `## Concept Pointer` section (glossary /
+definitions / explanations triple plus the four governed structures), and the
+`### Source Drift` / `### Reentry` subsections inside `## Composition Protocol`.
+
+Supporting run (P3, during implementation):
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py::test_concept_pointer_slot_carries_the_triple_and_four_structures \
+    tests/contract/test_context_management_owner.py::test_trigger_set_is_closed_at_seven_with_composer_scope_and_evidence \
+    tests/contract/test_context_management_owner.py::test_composer_roles_resolve_through_the_existing_model \
+    tests/contract/test_context_management_owner.py::test_source_drift_and_reentry_semantics \
+    tests/contract/test_context_management_owner.py::test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline \
+    tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" <the six node ids above> -q
+6 passed in 6.29s
+exit=0
+
+First attempt at this run exposed one in-section pin: the dispatch-mapping leg requires
+the seven role-field tokens to be named in backticks inside the section (set equality with
+the protocol baseline), not only in the marker line. The section now carries the field
+names; no guard or test was edited (the guard is the acceptance surface).
+
+## T029 — ambient section (template side)
+
+`templates/instructions-template.md` gained one top-level section
+`## Context Management(上下文管理)` in summary-plus-pointer shape: baseline-once /
+task-per-selection, pointer-not-content, absence-names-the-gap; owner pointer and audit
+entry; no table, no class roster, no cap literal. Section body: 363 B (generator section
+table). No existing section was trimmed.
+
+## T030 — live regeneration, budget verdict and mirrors
+
+Mechanical order (disclosed): the generator reconciles from the installed template, so the
+template mirror write precedes the regeneration; the row's "regenerate, then sync" wording
+is satisfied in effect by this order because a regeneration before the mirror write would
+reconcile an older template.
+
+$ python3 scripts/python/sync-mirrors.py --write   # project the edited template
+rc=0; `cmp templates/instructions-template.md .specify/templates/instructions-template.md` → identical
+$ bash scripts/bash/generate-instructions.sh
+rc=0
+[info] Backing up existing instructions to .specify/instructions.md-2026-11-27-173718
+[info] Injected missing template section(s): Context Management(上下文管理)
+[info] Instructions size: 40533 B (budget 40960 B, 427 B headroom). Section table, largest first:
+# The generator's raw `BUDGET: 40533 40960 within` verdict is reformatted by its own bash
+# layer into the headroom line above; 40533 < 40960 gives the `within` verdict under the
+# unchanged constant. No budget value changed and no existing section was trimmed.
+$ python3 scripts/python/sync-mirrors.py --check
+rc=0 — "ok    shared/ == .specify/shared/ (122 files, byte-identical)".
+$ grep -n '^## Context Management(上下文管理)$' \
+    templates/instructions-template.md .specify/templates/instructions-template.md .specify/instructions.md
+templates/instructions-template.md:289:## Context Management(上下文管理)
+.specify/templates/instructions-template.md:289:## Context Management(上下文管理)
+.specify/instructions.md:306:## Context Management(上下文管理)
+# AGENTS.md and the other tool files are symlinks into .specify/instructions.md.
+
+Supporting runs (P3):
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py::test_ambient_section_is_present_in_template_and_live_and_pointer_shaped \
+    tests/contract/test_context_management_owner.py::test_ambient_section_mutation_leg_fires_on_the_template_side \
+    tests/contract/test_context_management_owner.py::test_ambient_section_cap_literal_and_roster_mutations_trip_the_checker \
+    tests/integration/test_context_management_init.py::test_fresh_init_instructions_carry_the_ambient_section \
+    tests/contract/test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections
+5 passed in 9.30s
+exit=0
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_instructions_size_budget.py tests/contract/test_instructions_section_propagation.py
+19 passed in 10.62s
+exit=0
+
+## Full feature sweep after these edits (P3 confidence; T031 owns the US4 verification record)
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py
+18 passed in 6.28s
+exit=0
+
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_declarations.py \
+    tests/contract/test_context_management_engine.py \
+    tests/contract/test_context_management_readonly.py \
+    tests/integration/test_context_management_init.py
+41 passed in 10.21s
+exit=0
+
+## Disclosures
+- The `BUDGET:` raw verdict is consumed and reformatted by the generator itself; the
+  authoritative surface is its headroom line. The verdict is `within` (40533 B against the
+  unchanged 40960 B constant; 427 B headroom). Raising the constant or trimming sections was
+  neither needed nor done.
+- The mirror write ordering above is the mechanically correct sequence for the generator's
+  installed-template input; recorded here rather than silently reordered.
+## T031 — US4 verification slice (P4) — 2026-11-27T09:44Z
+
+This section is the complete US4 record the interim note above promised. Every run went
+through `scripts/bash/run-tests.sh`; `SPECKIT_PYTHON=/usr/local/bin/python3` per the task
+file's Environment Prerequisites.
+
+### Full owner guard (trigger set, composer roles, reentry, source-drift, dispatch mapping, concept-pointer slot and structure legs, protocol-boundary leg, ambient template and live and pointer-shape legs)
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py -v
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+[gw0]  PASSED tests/contract/test_context_management_owner.py::test_owner_document_is_the_single_model_home
+[gw2]  PASSED tests/contract/test_context_management_owner.py::test_bilingual_definition_sites_carry_the_fixed_literals
+[gw11] PASSED tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection
+[gw16] PASSED tests/contract/test_context_management_owner.py::test_ambient_section_cap_literal_and_roster_mutations_trip_the_checker
+[gw13] PASSED tests/contract/test_context_management_owner.py::test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline
+[gw7]  PASSED tests/contract/test_context_management_owner.py::test_presence_vocabulary_defined_once_with_unobserved_pointer
+[gw9]  PASSED tests/contract/test_context_management_owner.py::test_trigger_set_is_closed_at_seven_with_composer_scope_and_evidence
+[gw12] PASSED tests/contract/test_context_management_owner.py::test_source_drift_and_reentry_semantics
+[gw17] PASSED tests/contract/test_context_management_owner.py::test_red_lines_declare_no_new_surface
+[gw10] PASSED tests/contract/test_context_management_owner.py::test_composer_roles_resolve_through_the_existing_model
+[gw3]  PASSED tests/contract/test_context_management_owner.py::test_terminology_boundary_table_names_four_neighbours_by_pointer
+[gw15] PASSED tests/contract/test_context_management_owner.py::test_ambient_section_mutation_leg_fires_on_the_template_side
+[gw8]  PASSED tests/contract/test_context_management_owner.py::test_concept_pointer_slot_carries_the_triple_and_four_structures
+[gw5]  PASSED tests/contract/test_context_management_owner.py::test_layout_table_is_the_single_row_data_home
+[gw6]  PASSED tests/contract/test_context_management_owner.py::test_landing_contract_declares_three_cells_and_three_forbidden_pairs
+[gw14] PASSED tests/contract/test_context_management_owner.py::test_ambient_section_is_present_in_template_and_live_and_pointer_shaped
+[gw4]  PASSED tests/contract/test_context_management_owner.py::test_forms_matrix_matches_the_contract
+[gw1]  PASSED tests/contract/test_context_management_owner.py::test_no_second_layout_home_exists
+============================== 18 passed in 6.27s ==============================
+exit=0
+```
+
+### Engine guard — source-reading drift leg
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_engine.py::test_source_reading_digest_is_stable_and_tracks_metadata -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+1 passed in 6.29s
+exit=0
+```
+
+### Init guard — ambient section in a fresh project's instructions
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/integration/test_context_management_init.py::test_fresh_init_instructions_carry_the_ambient_section -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+1 passed in 9.25s
+exit=0
+```
+
+### Green claims (US4 subset of § Clause Coverage & Green Partition)
+
+[green: contracts/owner-and-layout.contract.md#C-007]
+[green: contracts/matrix-and-triggers.contract.md#C-022]
+[green: contracts/matrix-and-triggers.contract.md#C-023]
+[green: contracts/matrix-and-triggers.contract.md#C-024]
+[green: contracts/matrix-and-triggers.contract.md#C-025]
+[green: contracts/matrix-and-triggers.contract.md#C-026]
+[green: contracts/matrix-and-triggers.contract.md#C-027]
+[green: contracts/matrix-and-triggers.contract.md#C-028]
+[green: contracts/engine-and-distribution.contract.md#C-037]

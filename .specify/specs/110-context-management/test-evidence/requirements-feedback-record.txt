@@ -1,0 +1,9 @@
+{
+  "id": "20261127T072628Z-skill-create-requirements",
+  "path": ".specify/feedback/20261127T072628Z-skill-create-requirements.md",
+  "duplicate": false,
+  "count_since_submission": 603,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}

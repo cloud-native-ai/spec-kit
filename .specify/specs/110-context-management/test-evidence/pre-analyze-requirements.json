@@ -1,0 +1,115 @@
+{
+  "stage": "requirements",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 8,
+      "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 24,
+      "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 36,
+      "message": "path does not exist under the repo: .specify/state/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 50,
+      "message": "path does not exist under the repo: tests/fixtures/context-management/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 153,
+      "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 153,
+      "message": "path does not exist under the repo: .specify/shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 160,
+      "message": "path does not exist under the repo: .specify/state/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 173,
+      "message": "path does not exist under the repo: .specify/scripts/python/context-audit.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 268,
+      "message": "path does not exist under the repo: tests/fixtures/context-management/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: .specify/shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: .specify/scripts/python/context-audit.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: tests/fixtures/context-management/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "checklists/requirements.md",
+      "line": 44,
+      "message": "path does not exist under the repo: .specify/state/"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 14,
+    "waived": 0,
+    "fr": 29,
+    "sc": 11,
+    "tasks": 0,
+    "clauses": 0,
+    "files": 2
+  },
+  "checked_at": "2026-11-27T07:25:52Z"
+}

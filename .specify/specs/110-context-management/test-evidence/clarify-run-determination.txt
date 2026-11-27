@@ -1,0 +1,9 @@
+unit: skill:clarify-artifact   run: r20261127T070000Z-110a
+  token_consumption    not_evaluated (source_unavailable)
+  elapsed              improved
+  artifact_correctness not_evaluated (no_baseline)
+  satisfaction         not_evaluated (pending_next_turn)
+trigger_feedback: false
+change_point: cp-r20261127T070000Z-110a clean=false findings=3
+persisted: .specify/session/20261127T073329Z-run-determination-skill-clarify-artifact-r20261127t070000z-1.md
+settled previous run r20261125T134500Z-107a: not_evaluated
