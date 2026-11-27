@@ -1,0 +1,32 @@
+# Spec inventory readings — derived 2026-11-27 (commands + real output)
+
+## requirements.md
+grep -cE '^\- \*\*FR-[0-9]{3}\*\*:' -> 9 (FR-001…FR-009)
+grep -cE '^\- \*\*SC-[0-9]{3}\*\*:' -> 7 (SC-001…SC-007)
+grep -cE '^\| `STR-[0-9]{3}`' -> 7 (STR-001…STR-007)
+grep -cE '^\| \*\*A-[0-9]{1,2}\*\*' -> 21 (A-1…A-21)
+awk Edge-Cases bullets -> 11 
+awk User-Story headings -> 3 
+grep -cE '^\| RS-[0-9]{3}' -> 3 (RS-001…RS-003)
+
+## plan.md
+grep -cE '^\| EP-[0-9]{3}' -> 5 (EP-001…EP-005)
+
+## tasks.md
+grep -cE '^\- \[[ X>~]\] T[0-9]{3}' -> 19 (T001…T019)
+
+## contracts/
+grep -cE '^\*\*C-[0-9]{3}\*\*' per file:
+.specify/specs/111-general-best-practices/contracts/accumulation.contract.md:6
+.specify/specs/111-general-best-practices/contracts/distribution-guard.contract.md:7
+.specify/specs/111-general-best-practices/contracts/entry-shape.contract.md:5
+.specify/specs/111-general-best-practices/contracts/manifest.contract.md:6
+total -> 24 (C-101…C-106 / C-201…C-205 / C-301…C-306 / C-401…C-407)
+
+## quickstart.md
+grep -cE '^## S-[0-9]' -> 9 (S-0…S-8)
+
+## data-model.md
+entities -> 11 (E1…E11)
+invariants -> 12 (INV-01…INV-12)
+transitions -> 3 (T1…T3)
