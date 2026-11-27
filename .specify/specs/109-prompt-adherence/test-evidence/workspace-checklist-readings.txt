@@ -3,3 +3,6 @@ EXIT=0
 --- check vs pre-write snapshot (after all artifact writes) ---
 clean
 EXIT=0
+--- post-commit check vs pre-write snapshot ---
+clean
+EXIT=0
