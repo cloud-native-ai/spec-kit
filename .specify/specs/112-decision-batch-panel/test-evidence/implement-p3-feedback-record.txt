@@ -1,0 +1,9 @@
+{
+  "id": "20261127T100546Z-speckit-implement",
+  "path": ".specify/feedback/20261127T100546Z-speckit-implement.md",
+  "duplicate": true,
+  "count_since_submission": 622,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}

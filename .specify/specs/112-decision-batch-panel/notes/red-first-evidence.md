@@ -61,29 +61,29 @@ All 21 unit tests + 3 contract tests were executed as one red run (command in §
 | R-R12 | `test_decision_record_batch_family` | `batch-family` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
 | R-C408 | `tests/contract/test_decision_batch_contract.py::test_signal_mapping_pointer_only` | owner page + confirmation-gates pointer | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
 
-## S4 — US3 replay legs (T033, 5 tests + absent-register case; green at T039)
+## S4 — US3 register/replay legs (T033, 5 tests + absent-register case; green at T039)
 
 | Slot | Test | Fixture | Run @ 2026-11-27 | rc |
 |------|------|---------|------------------|----|
-| R-P01 | `test_register_registration_and_status_update` | `register-updates` | pending — package P3 | — |
-| R-P02 | `test_resolution_annotation_and_disclosure` | `register-updates` | pending — package P3 | — |
-| R-P03 | `test_two_batches_distinct_paths` | `concurrency` | pending — package P3 | — |
-| R-P04 | `test_replay_from_record_only` | `replay-broken` | pending — package P3 | — |
-| R-P05 | `test_replay_broken_pointer_nonzero` | `replay-broken` | pending — package P3 | — |
-| R-P06 | `test_absent_register_creation` | `register-absent` | pending — package P3 | — |
+| R-P01 | `test_register_registration_and_status_update` | `register-updates` | **red at T033** (no register write-back: settled row unchanged) → **green at T037** | 1 → 0 |
+| R-P02 | `test_resolution_annotation_and_disclosure` | `register-updates` | **red at T033** (no `resolution` append, no disclosure) → **green at T037** | 1 → 0 |
+| R-P03 | `test_two_batches_distinct_paths` | `concurrency` | **red at T033** (`replay` action exits 2, core not landed) → **green at T037** | 1 → 0 |
+| R-P04 | `test_replay_from_record_only` | `replay-broken` | **red at T033** (`replay` exits 2) → **green at T037** | 1 → 0 |
+| R-P05 | `test_replay_broken_pointer_nonzero` | `replay-broken` | **red at T033** (`replay` exits 2, later exit 0 on broken pointers) → **green at T037** | 1 → 0 |
+| R-P06 | `test_absent_register_created_from_header` | `register-absent` | **red at T033** (no register creation) → **green at T037** | 1 → 0 |
 
 ## S5 — US4 completeness legs (T040, 6 tests; green at T045) and ordered guards (T042)
 
 | Slot | Test | Fixture | Run @ 2026-11-27 | rc |
 |------|------|---------|------------------|----|
-| R-K01 | `test_completeness_claim_shape` | `two-source` | pending — package P3 | — |
-| R-K02 | `test_bookkeeping_identity_holds` | `two-source` | pending — package P3 | — |
-| R-K03 | `test_absent_source_named_not_clean` | `absent-root` | pending — package P3 | — |
-| R-K04 | `test_nothing_pending_success_no_record` | `empty-project` | pending — package P3 | — |
-| R-K05 | `test_unclassifiable_candidate_refused` | `incomplete-block` | pending — package P3 | — |
-| R-K06 | `test_no_partial_complete_claim` | `two-source` | pending — package P3 | — |
-| R-K07 | `test_unreadable_source_refusal` (ordered guard — subject T019 predates it) | `unreadable-register` | pending — package P3 | — |
-| R-K08 | `test_batch_head_completeness` (ordered guard — subject T030 predates it) | `batch-family` | pending — package P3 | — |
+| R-K01 | `test_completeness_claim_shape` | `two-source` | **red at T040** (`completeness_claim` absent) → **green at T043** | 1 → 0 |
+| R-K02 | `test_bookkeeping_identity_holds` | four fixtures + `batch-family` record | **red at T040** (partition/claim absent; record head lacks the claim lines) → **green at T043** | 1 → 0 |
+| R-K03 | `test_absent_source_named_not_clean` | `absent-root`, `empty-project` | **red at T040** (`claim.absent_sources` absent) → **green at T043** | 1 → 0 |
+| R-K04 | `test_nothing_pending_success_no_record` | `empty-project` | **red at T040** (claim absent) → **green at T043** | 1 → 0 |
+| R-K05 | `test_unclassifiable_candidate_refused` | `two-source` + unreadable subdirectory | **red at T040** (scan exits 0; `rglob` silently skipped the locked directory) → **green at T043** (`os.walk` onerror → carrier refusal) | 1 → 0 |
+| R-K06 | `test_no_partial_complete_claim` | `two-source` + unreadable subdirectory | **red at T040** (a partial scan claimed `complete`) → **green at T043** | 1 → 0 |
+| R-K07 | `test_unreadable_source_refusal` (ordered guard — subject T019 predates it) | `unreadable-register` | **green at authoring** — disclosed as a regression exception, not claimed red-first | 0 |
+| R-K08 | `test_batch_record_head_completeness` (ordered guard — subject T030 predates it) | `batch-family` | **green at authoring** — disclosed as a regression exception, not claimed red-first | 0 |
 
 ## S6 — US5 supersession legs (T046, 2 tests; green at T052) and contract (T047)
 
@@ -218,4 +218,58 @@ with T032's verification row.
 ### T022/T031 boundary — mirror projections (2026-11-27)
 
 US1 pairs synced and compared at T022 (see § S2). After the US2 edits the same projection ran again
-(`sync-mirrors.py --write` → `sync scripts/ -> .specify/scripts/ (2 files)`, `sync shared/ -> .specify/shared/ (1 files)`; `--check` rc 0; `cmp` byte-identical for the owner page, the batch engine and the validator). The formal T031 verification row (cmp set + validator-over-fixture run) remains open for package P3.
+(`sync-mirrors.py --write` → `sync scripts/ -> .specify/scripts/ (2 files)`, `sync shared/ -> .specify/shared/ (1 files)`; `--check` rc 0; `cmp` byte-identical for the owner page, the batch engine and the validator). The formal T031 verification row is executed in package P3 (see below).
+
+### S4 — US3 red run at T033 (2026-11-27)
+
+Command (exact):
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py -q \
+  --names-out .specify/specs/112-decision-batch-panel/notes/red-first-names-us3.txt \
+  -k "register or resolution or replay or two_batches"
+```
+Exit status: **1**. Decisive output:
+```text
+6 failed in 6.49s
+# failed-name list written: .../notes/red-first-names-us3.txt (6 entries) passes=1
+```
+Failure signatures are behaviour assertions — the settled register row was not updated, the absent
+register was not created, the resolution field was not appended, and the replay action answered
+`action 'replay' is declared but its core has not landed in this build` (exit 2) — never import errors.
+
+### S4 — US3 green run at T039 (2026-11-27; formal green claim)
+
+Same six-test selection → `6 passed in 6.51s` (rc 0). Full evidence: `notes/us3-green.txt`.
+
+### S5 — US4 red run at T040 (2026-11-27)
+
+Command (exact):
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py -q \
+  --names-out .specify/specs/112-decision-batch-panel/notes/red-first-names-us4.txt \
+  -k "completeness or bookkeeping or absent_source or nothing_pending or unclassifiable or partial or unreadable_source or record_head"
+```
+Exit status: **1**. Decisive output:
+```text
+6 failed, 2 passed in 6.28s
+# failed-name list written: .../notes/red-first-names-us4.txt (6 entries) passes=1
+```
+The six red-first legs failed on the missing structured claim / partition / named absent sources and
+on the `rglob` silent-skip of an unreadable directory; the two T042 ordered guards passed at authoring
+(their subjects landed with T019/T030) — recorded as the explicit regression exception, never claimed
+red-first.
+
+### S5 — US4 green run at T045 (2026-11-27; formal green claim)
+
+Nine-test selection（six red-first legs + two ordered guards + `test_engine_interface_contract`）
+→ `9 passed in 7.42s` (rc 0). Full evidence: `notes/us4-green.txt`.
+
+### T031/T038/T044 — US2/US3/US4 mirror and validator runs (2026-11-27)
+
+`sync-mirrors.py --write` → `--check` rc 0（`shared/` 123 files / `scripts/` 135 files byte-identical）；
+`cmp` byte-identical for `shared/definitions/decision-definitions.md` and
+`scripts/python/decision-batch.py`（and `validate-decisions.py` at T031）；`validate-decisions.py
+--action records` over a batch-record carrier → `PASS: 0 violation(s) (rules: M-01, M-02, M-03,
+M-04, M-08, M-09)` rc 0（fixture 见 `notes/us2-green.txt` § 1）。

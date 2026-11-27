@@ -1,0 +1,91 @@
+# US2 green — 异议与应答、沉默结案与批次记录（T032）
+
+**Feature**: 112-decision-batch-panel · **Package**: P3（T031–T045） · **Date**: 2026-11-27
+**Test entry (only entry)**: `bash scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`（runner 解释器阶梯解析出的 pytest 解释器；bare `python3` 无 pytest，见 tasks.md § Environment Prerequisites）
+
+## 1. T031 — US2 mirror pairs
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write
+DIFF .specify/shared/definitions/decision-definitions.md
+sync  shared/ -> .specify/shared/ (1 files)
+$ python3 scripts/python/sync-mirrors.py --check            # rc 0
+ok    shared/ == .specify/shared/ (123 files, byte-identical)
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (439 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (140 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (135 files, byte-identical)
+$ cmp shared/definitions/decision-definitions.md .specify/shared/definitions/decision-definitions.md   # CMP owner OK
+$ cmp scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py                       # CMP engine OK
+$ cmp scripts/python/validate-decisions.py .specify/scripts/python/validate-decisions.py               # CMP validator OK
+```
+
+`validate-decisions.py` over a batch-record fixture（scratch `.specify/.tmp/validator-p3/ws`，`batch-family` 副本；记录落在 `ws/.specify/knowledge/`，校验把记录副本放在工作区根目录，使 M-09 的 carrier-relative 解析口径可解析）：
+
+```text
+$ python3 scripts/python/decision-batch.py record --workspace-root .specify/.tmp/validator-p3/ws \
+    --presentation .../scan.json --reply .../reply.md --authorization interactive --format json
+record rc=0  (.specify/knowledge/decision-batch-b-20261127t103710z-a54ff372.md)
+$ cp ws/<record> ws/record-carrier.md
+$ python3 scripts/python/validate-decisions.py --action records \
+    --carrier ws/record-carrier.md --register ws/.specify/register.md
+PASS: 0 violation(s) (rules: M-01, M-02, M-03, M-04, M-08, M-09)
+validator rc=0
+```
+
+The three batch-family fields are admitted by the checker's field closure and judged by the recorded family rule (together-or-none + value domains), as landed in T030.
+
+## 2. T032 — US2 phase tests (green)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py -q -k \
+    "test_reply_forms_and_abort_zero_records or test_objection_binds_identity_verbatim or \
+     test_reply_membership_refusals or test_silence_eligibility_matrix or \
+     test_park_no_record_stays_pending or test_unattended_and_missing_authorization_refused or \
+     test_ineligible_explicit_settlement or test_no_cross_batch_preauthorization or \
+     test_record_drift_refused_zero_write or test_batch_id_shape_and_duplicate_refusal or \
+     test_batch_record_layout_via_memory_engine or test_decision_record_batch_family or \
+     test_signal_mapping_pointer_only"
+13 passed in 6.51s   (rc 0)
+```
+
+Full-module reading the same day（unit + contract，含 US1/US3/US4 行）：
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py -q
+52 passed in 7.45s   (rc 0)
+```
+
+## 3. SC-004 evidence — the four reply-shape batches, the park row and the family fields
+
+Reply-shape refusals（`reply-shapes` fixture，各零记录；由 `test_reply_forms_and_abort_zero_records` 与 `test_reply_membership_refusals` 钉住）：missing reply file → exit 2（record 的必需参数缺失）/ empty reply → exit 1（`not-a-reply`）/ follow-up-only → exit 1（`not-a-reply`）/ non-member label → exit 1（`non-member-label`，refusal 含 `other`/`path` 规则）；unknown identity 与 duplicate identity → exit 1（`unknown-identity` / `duplicate-identity`）。每例后 `knowledge_files(root) == []`。
+
+Mixed reply batch（scratch 演示，`eligibility-matrix` 副本；一条改选 + 一条暂缓 + 零异议合格项）：
+
+```text
+$ python3 scripts/python/decision-batch.py record --workspace-root .specify/.tmp/p3-evidence/elig \
+    --presentation .../elig-scan.json --reply .../elig-reply.md --authorization interactive --format json
+record rc=0; settled=2 parked=1 pending=2
+| 演示矩阵合格项 | ... | eligible | no-evidence | 方案甲 | accepted-default | D-001 |
+| 演示矩阵不可逆项 | ... | irreversible-default(default-irreversible) | no-evidence | 方案甲 | objected-alternative | D-002 |
+| 演示矩阵无默认项 | ... | no-default(default-missing) | no-evidence | — | objected-parked | — |
+| 演示矩阵前例冲突项 | ... | prior-decision-conflict(prior-decision-conflict) | grounded | 保留 30 天 | pending | — |
+| 演示矩阵不完整项 | ... | incomplete(missing-field) | no-evidence | 方案甲 | pending | — |
+- **batch_id**: B-20261127T103837Z-608d34cd
+- **batch_disposition**: accepted-default
+- **recommendation_grounding**: no-evidence
+- **batch_disposition**: objected-alternative
+- **recommendation_grounding**: no-evidence
+```
+
+The parked item produces no decision record; its row stays `objected-parked` and the next scan re-presents it（`test_park_no_record_stays_pending`）。`rationale` 只带要点（「改选」），逐字原文只出现在批次记录的引用块（`test_objection_binds_identity_verbatim`）。
+
+## 4. Clause green points claimed here
+
+`contracts/objection-reply.contract.md#C-401…#C-409`（9 条）与 `contracts/record-replay.contract.md#C-501…#C-504`（4 条），共 13 条，均由上列 phase run 的具名测试转绿。
+
+## 5. Corrected premise (disclosed)
+
+`test_no_cross_batch_preauthorization`（P2 编写）原先断言第二条批次的排除 `via == "prior-batch"`。T036 落地来源块 `resolution` 追加后，FR-012 的两个合法读时联接中来源侧先行命中，`via` 变为 `resolution-field`；该断言已放宽为「`via` ∈ {`resolution-field`, `prior-batch`}」，`prior-batch` 分支由 `test_resolution_annotation_and_disclosure` 的写失败段落单独钉住（来源更新失败 → 批次记录读时联接仍阻止重复呈现）。这不是行为变化，是断言对两个声明读径的对齐。

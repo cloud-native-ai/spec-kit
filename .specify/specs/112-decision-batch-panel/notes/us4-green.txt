@@ -1,0 +1,81 @@
+# US4 green — 完备性的诚实（T045）
+
+**Feature**: 112-decision-batch-panel · **Package**: P3（T031–T045） · **Date**: 2026-11-27
+**Test entry (only entry)**: `bash scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`
+
+## 1. T044 — US4 mirror pairs
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write
+sync  shared/ -> .specify/shared/ (1 files)         # owner-page § 完备性与拒绝 projected
+$ python3 scripts/python/sync-mirrors.py --check   # rc 0
+ok    shared/ == .specify/shared/ (123 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (135 files, byte-identical)
+$ cmp shared/definitions/decision-definitions.md .specify/shared/definitions/decision-definitions.md   # byte-identical
+$ cmp scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py                       # byte-identical
+```
+
+## 2. T045 — US4 phase tests (green)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py -q -k \
+    "test_completeness_claim_shape or test_bookkeeping_identity_holds or \
+     test_absent_source_named_not_clean or test_nothing_pending_success_no_record or \
+     test_unclassifiable_candidate_refused or test_no_partial_complete_claim or \
+     test_unreadable_source_refusal or test_batch_record_head_completeness or \
+     test_engine_interface_contract"
+9 passed in 7.42s   (rc 0)
+```
+
+Red-first provenance: `notes/red-first-evidence.md` § S5（red-first 六条 `6 failed`；T042 两条有序守卫在编写时即绿，属记录的 regression exception；`--names-out notes/red-first-names-us4.txt`）。
+
+## 3. SC-001 evidence — the three scan fixtures, the bookkeeping identity, refusal and nothing-pending
+
+Two-source（5 候选 = 呈现 2 + 合并引用 3 + 具名排除 0；登记 3 + 自撰 2）：
+
+```text
+$ python3 scripts/python/decision-batch.py scan --workspace-root tests/fixtures/decision-batch/two-source --format json
+claim: {"referent": "this-scan", "comparison_unit": "per-candidate-classification",
+        "allowed_delta": [], "elements_owner": "shared/guidelines/closed-set-claims.md",
+        "verdict": "complete", "candidates": 5,
+        "partition": {"presented_rows": 2, "duplicate_merged": 3,
+                      "not_human_held": 0, "already_resolved": 0},
+        "absent_sources": [".specify/goals", ".specify/anchoring", ".specify/teams"]}
+```
+
+Identity holds on `two-source` / `incomplete-block` / `autonomous` / `absent-root`（`test_bookkeeping_identity_holds`）：`candidates = presented_rows + duplicate_merged + len(named_exclusions)`，逐来源候选数之和等于候选数，分区四计数之和等于候选数；批次记录头携带同一声明（`- 完备性:` / `- 完备性声明:` / `- 分区:` / `- 缺席来源:`）。T042 的有序守卫 `test_batch_record_head_completeness` 单独钉住 T030 已落地的计数与判定行。
+
+Unreadable carrier（`unreadable-register`）：
+
+```text
+$ python3 scripts/python/decision-batch.py scan --workspace-root tests/fixtures/decision-batch/unreadable-register --format json
+{"action": "scan", "result": "refused", "refusals": [{"source_id": "register-open-decision-row",
+ "reason": "unparseable",
+ "detail": ".specify/register.md: the table cannot be parsed into its columns"}]}
+unreadable rc=1
+```
+
+Unenumerable candidate（目录不可读）：`os.walk` 的 onerror 现在是载体级拒绝，不再被 `rglob` 静默跳过。`test_unclassifiable_candidate_refused` 断言 exit 1、点名 `authored-pending-item`、无 `items` / 无 `completeness_claim`、零写入；`test_no_partial_complete_claim` 断言拒绝路径不呈现任何可读候选、不发出 `"verdict": "complete"`、不建批次记录。
+
+Nothing-pending（`empty-project`）：
+
+```text
+$ python3 scripts/python/decision-batch.py scan --workspace-root tests/fixtures/decision-batch/empty-project --format text
+批量决策面板 · 本次呈现
+
+当前没有待决策项。
+
+本次扫描读取了封闭来源清单中的全部来源（register-open-decision-row 在场状态为 absent，候选 0 项；
+authored-pending-item 在场状态为 absent，候选 0 项）；每个候选恰被分类一次，恒等式成立：
+候选 0 = 呈现行 0 + 合并引用 0 + 具名排除 0。完备性按封闭清单声明判定：参照物为本次扫描，
+比较单元为逐候选处置分类，允许差集为空。 缺席的来源载体：.specify/register.md、.specify/specs、
+.specify/goals、.specify/anchoring、.specify/teams（按缺席空来源计，不拒绝，也不读作「干净」）。
+empty rc=0
+```
+
+`test_nothing_pending_success_no_record` additionally observes: no `.specify/knowledge/` is created, and a `record` attempt on the nothing-pending payload is refused (exit 1) with zero writes.
+
+## 4. Clause green points claimed here
+
+`contracts/completeness-refusal.contract.md#C-601…#C-608`（8 条）。C-608's `test_engine_interface_contract` is part of the same run（`--help`/`--version`/undeclared-option/exit-code surface）。

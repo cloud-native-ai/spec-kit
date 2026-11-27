@@ -470,6 +470,92 @@
 - **读侧**：对他批**已落盘**批次记录的读取只允许服务于声明的只读用途——已解决排除（§ 重放契约 之外的读时联接规则见 § 批次状态）、接地联结（§ 建议默认值与依据）、前例冲突检出（同上）与重放指针解析（§ 重放契约）——且 MUST 只读。
 - `.specify/register.md` 保持持久编号的唯一索引；编号冲突按既有 renumber 机制修复，MUST NOT 静默改号。
 
+## 批次登记与来源更新（Register Reflection & Source Updates）
+
+本节拥有批次对既有登记与来源载体的更新义务：登记什么、何时登记、状态单元格如何更新、`resolution` 如何追加、失败如何披露。
+
+### 登记时点与形态(birth registration)
+
+- 批次编号（`B-…` 形态）与各决策编号 MUST 在诞生时登记于 `.specify/register.md`（逐条或按「载体 + 区间」分组行合法）；登记行 MUST 指向批次记录载体路径，使编号可回指其陈述。
+- `.specify/register.md` 保持持久编号的唯一索引（指针：`.specify/instructions.md` § ID Register）；编号冲突按既有 renumber 机制修复，MUST NOT 静默改号。
+- 登记动作面只追加行：批次编号行与决策编号行是批次向 register 追加的全部新行。
+
+### 状态单元格(status cells)
+
+- 已决项的 register 来源行 MUST 只更新**状态单元格**：新的状态以 `resolved` 起头并点名批次编号与决策编号；该行的其余单元格 MUST 逐字节不变；行 MUST NOT 被删除。
+- 暂缓项的 register 来源行 MUST 保持以 `open` 为起始词（保持下一批次可枚举）并标注批次编号；除状态单元格外的字节不变。
+- 除状态单元格与追加行外 MUST NOT 改写 register 的任何字节；历史行（含已解决行）MUST NOT 被触碰。
+
+### 来源块追加(source block annotation)
+
+- 已决项的待决策项块 MUST 追加条件字段 `resolution`，取值 `<batch_id> -> <D-NNN>`；块内容 MUST NOT 因解决而改写或删除，该追加是块的唯一写后变化。
+- 暂缓项的块 MUST NOT 被追加 `resolution`，下一次批次 MUST 重新呈现该项。
+
+### 缺席登记册(absent register)
+
+- register 缺席时 MUST 先按既有四列表头形态创建，再执行登记；创建后的文件与既有登记形态一致，MUST NOT 新增索引或第二登记。
+
+### 失败披露与读时联接(failure disclosure and read-time join)
+
+- 任一来源更新失败（register 或来源块不可写）MUST 被披露，点名载体与原因；MUST NOT 被静默吞掉，MUST NOT 使已落盘的批次记录回滚或改写。
+- 读时联接（§ 批次状态 的 `already-resolved`）MUST 阻止已决身份因来源更新失败而被重复呈现——批次记录本身即足以排除，登记与块字段只是来源侧的镜像。
+
+## 重放契约（Replay Contract）
+
+本节拥有重放（replay）的定义与义务：重放只凭已记录载体重建整批，只读、确定、不补足。
+
+### 定义(definition)
+
+- 重放 MUST 只凭**批次记录 + 可解析指针**重建整批；重建范围 MUST 覆盖：项集（逐项行表）、完备性记账（逐来源计数、分区恒等式与判定）、建议默认值与接地状态、异议与处置、以及全部决策记录（含批次族字段）。
+- 重放 MUST NOT 读取呈现载荷、应答工件或对话记忆来补足记录缺失的字段；记录未携带的内容 MUST NOT 被重放推测或补造。
+
+### 指针与失败(pointers and failure)
+
+- 重放 MUST 解析决策记录 `evidence` 字段与选项 `evidence` 子行的每一条指针（读法与 M-09 一致：路径存在；给出锚时锚可在载体中找到）。
+- 任一不可解析指针 MUST 被点名报告，重放 MUST 以非零退出；MUST NOT 跳过坏指针，MUST NOT 以其可解析部分冒充完整重建。
+- 记录自相矛盾（逐项行表的已决处置没有对应决策记录、决策记录的批次编号与批次头不一致、批次族字段缺失或取值在域外）MUST 作为具名拒绝以非零退出，MUST NOT 猜测修复。
+
+### 确定性与只读(determinism and read-only)
+
+- 同一记录与同一工作区重复重放 MUST 产出逐字节一致的输出；重放 MUST NOT 写入任何载体。
+- 重放属于 § 批次记录契约 声明的跨批次只读用途之一（重放指针解析）；他批已落盘记录的读取只可服务于该用途。
+
+### 机器判定边界(engine judges)
+
+- 项集、记账、处置与决策记录的重建、指针解析与自洽判断 MUST 由确定性引擎完成；「记录是否易读、重建是否宜用」是行为类判断，由评审承接面判定（名单见 § 强制边界 的 B 表，指针），MUST NOT 被机器声称覆盖。
+
+## 完备性与拒绝（Completeness & Refusal）
+
+本节拥有「完备性凭什么成立、什么情况整批拒绝、空集与缺席如何明说、引擎的退出语义」的规则。完备性是封闭清单声明（判据 owner：`shared/guidelines/closed-set-claims.md`，指针），不是观感。
+
+### 完备性声明(completeness claim)
+
+- 完备性 MUST 以封闭清单声明表达，逐要素为：**参照物** = 本次扫描的来源清单与候选集；**比较单元** = 每个候选的处置分类；**允许差集** = 恒为空集；声明 MUST 以指针携带判据 owner 的元素要求，MUST NOT 用未定义的聚合词（「其余」「未受影响」一类）充当比较单元或承载验收语义。
+- 每个候选 MUST 被恰分类一次；记账恒等式「扫描候选 = 呈现行来源 + 合并引用 + 具名排除」MUST 成立；分区计数（`presented_rows` / `duplicate_merged` / `not_human_held` / `already_resolved`）之和 MUST 等于候选数。
+- 完备性声明与逐来源计数 MUST 同时出现在扫描 payload 与批次记录头中；判定与计数 MUST 由引擎计算，MUST NOT 由呈现层改写。
+
+### 拒绝(carrier-level refusal)
+
+- 任一来源或候选**载体**存在但不可读或不可解析（文件 I/O 失败、目录不可枚举、register 表结构无法按列解析）MUST 触发整批拒绝：不呈现、不记录任何处置、给具名来源与原因、以文档化退出码退出。
+- 拒绝 MUST NOT 呈现半批并称完备；被拒绝的尝试 MUST NOT 写任何载体。
+
+### 块级缺陷(block-level defects)
+
+- 块级文法缺陷（未知/重复/畸形字段、声明计数与条目数不符、选项五要素缺失）不触发拒绝，按 `incomplete` 呈现并逐项点名（指针：§ 待决策项块 / § 批次状态）。
+
+### 缺席与空集(absence and emptiness)
+
+- 来源缺席（文件/目录不存在）MUST 记为带原因的缺席空来源，MUST NOT 使整批拒绝，MUST NOT 被读成「干净」；完备性声明 MUST 具名列出缺席来源，判定 MUST 如实标注缺席。
+- 零候选 MUST 产出显式 `nothing-pending` 成功结果（退出 0），MUST NOT 是空输出，MUST NOT 创建批次记录，MUST NOT 呈现空壳。
+
+### 不静默丢弃(no silent drop)
+
+- 既不能被呈现、也不能被具名排除的候选 MUST 是拒绝，MUST NOT 被静默省略；遗漏任何候选时，完备性声明 MUST NOT 被发出。
+
+### 退出语义(exit semantics)
+
+- 引擎退出码闭集：`0` 成功（含 `nothing-pending`）、`1` 文档化拒绝、`2` 用法或环境错误；退出码 MUST 在引擎 `--help` 正文与命令文档（指针：`docs/reference/commands/decide.md`）同批声明，形态遵循 `shared/definitions/script-interface-definitions.md`（指针）。
+
 ## 传递与实施(Transmission and Implementation)
 
 决策跨过 superagent→subagent 边时，传递的是既有派发载荷中的**任务权威内容**，不是新的角色字段、消息类别或通道。通道字段、四项既有注入与上行规则归 `shared/definitions/superagent-definitions.md` § The super↔sub Protocol（按指针抵达，本节不复述）。本节拥有决策块、确认与实施回执的形态义务。

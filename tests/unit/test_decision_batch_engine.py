@@ -715,7 +715,9 @@ def test_no_cross_batch_preauthorization(tmp_path: Path) -> None:
     subjects = [item["identity"]["subject"] for item in second_scan["items"]]
     assert subjects == ["演示漂移乙"], subjects
     exclusions = second_scan["bookkeeping"]["named_exclusions"]
-    assert any(entry["reason"] == "already-resolved" and entry.get("via") == "prior-batch"
+    assert any(entry["reason"] == "already-resolved"
+               and entry.get("via") in ("resolution-field", "prior-batch")
+               and entry.get("subject") == "演示漂移甲"
                for entry in exclusions), exclusions
 
     second_presentation = write_presentation(root, tmp_path / "scan2.json")
@@ -859,3 +861,489 @@ def test_decision_record_batch_family(tmp_path: Path) -> None:
     assert "- **batch_disposition**: objected-alternative" in second
     assert "- **chosen_option**: 方案甲" in second
     assert "改选" in second
+
+# =====================================================================================
+# US3 — register registration, source updates and replay (T033 red-first; green
+# claimed at T039). The register/status/resolution write-back and the replay action
+# are unimplemented until T036/T037, so every test below fails on its own missing
+# behaviour, never on an import error.
+# =====================================================================================
+
+def register_file(root: Path) -> Path:
+    return root / ".specify" / "register.md"
+
+
+def register_cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def register_row(text: str, row_id: str) -> str | None:
+    matches = [line for line in text.splitlines()
+               if line.strip().startswith("|")
+               and register_cells(line)
+               and register_cells(line)[0].replace("*", "").replace("`", "") == row_id]
+    assert len(matches) <= 1, f"more than one register row names {row_id!r}: {matches}"
+    return matches[0] if matches else None
+
+
+def replay(root: Path, batch: Path, fmt: str = "json") -> subprocess.CompletedProcess:
+    return run_engine("replay", "--workspace-root", str(root), "--batch", str(batch),
+                      "--format", fmt)
+
+
+REGISTER_HEADER_CELLS = ["编号", "含义(一行)", "权威路径(完整陈述)", "状态"]
+
+
+def test_register_registration_and_status_update(tmp_path: Path) -> None:
+    """C-505: settled row gains the batch and decision id, parked row stays open, rows append."""
+    root = copy_fixture("register-updates", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    before = register_file(root).read_text(encoding="utf-8")
+    before_rows = [line for line in before.splitlines() if line.strip().startswith("|")]
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n  先暂缓「演示登记暂缓项」，其余按建议。\n"
+        "objections:\n"
+        "  - subject: 演示登记暂缓项\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    batch_id = payload["batch_id"]
+    record_path = payload["record_path"]
+    after = register_file(root).read_text(encoding="utf-8")
+
+    settled = register_row(after, "OI-801")
+    assert settled is not None, "the settled register row was deleted"
+    settled_cells = register_cells(settled)
+    assert batch_id in settled_cells[3] and "D-001" in settled_cells[3], settled_cells
+    before_cells = register_cells(register_row(before, "OI-801"))
+    assert settled_cells[:3] == before_cells[:3], "cells other than the status were rewritten"
+
+    parked = register_row(after, "OI-802")
+    assert parked is not None, "the parked register row was deleted"
+    parked_status = register_cells(parked)[3]
+    assert parked_status.startswith("open"), parked_status
+    assert batch_id in parked_status, parked_status
+
+    assert register_row(after, "OI-899") == register_row(before, "OI-899"), (
+        "a resolved historical register row was rewritten")
+
+    after_rows = [line for line in after.splitlines() if line.strip().startswith("|")]
+    assert len(after_rows) == len(before_rows) + 2, (
+        "the register must gain exactly the batch row and the decision range row")
+    appended = [line for line in after_rows if record_path in line]
+    assert len(appended) == 2, f"expected the batch row and the decision range row: {appended}"
+    assert any(batch_id in line for line in appended), appended
+    decision_rows = [line for line in appended if "D-001" in line]
+    assert len(decision_rows) == 1, appended
+    assert payload["decisions"] == [
+        {"subject": "演示登记结案项", "disposition": "accepted-default", "decision_id": "D-001"}
+    ], payload["decisions"]
+
+
+def test_resolution_annotation_and_disclosure(tmp_path: Path) -> None:
+    """C-506: settlement appends the block resolution; a write failure is disclosed."""
+    root = copy_fixture("register-updates", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    carrier = root / ".specify" / "specs" / "demo" / "ledger.md"
+    original = carrier.read_text(encoding="utf-8")
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n  先暂缓「演示登记暂缓项」，其余按建议。\n"
+        "objections:\n"
+        "  - subject: 演示登记暂缓项\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    batch_id = payload["batch_id"]
+    after = carrier.read_text(encoding="utf-8")
+
+    needle = f"- **resolution**: {batch_id} -> D-001"
+    assert after.count("- **resolution**:") == 1, (
+        "the settled block must gain exactly one resolution field")
+    assert needle in after, after[-400:]
+    restored = after.replace(needle + "\n", "", 1)
+    assert restored == original, "the block content changed beyond the appended resolution"
+
+    second = scan_payload(root)
+    assert "演示登记结案项" not in {item["identity"]["subject"] for item in second["items"]}
+    exclusions = second["bookkeeping"]["named_exclusions"]
+    assert any(entry["reason"] == "already-resolved"
+               and entry.get("via") == "resolution-field"
+               and entry.get("subject") == "演示登记结案项"
+               for entry in exclusions), exclusions
+
+    read_only_root = copy_fixture("register-updates", tmp_path / "read-only")
+    read_only_scan = write_presentation(read_only_root, tmp_path / "read-only-scan.json")
+    read_only_carrier = read_only_root / ".specify" / "specs" / "demo" / "ledger.md"
+    os.chmod(read_only_carrier, 0o444)
+    try:
+        proc = record(read_only_root, read_only_scan, reply=write_reply(
+            tmp_path / "read-only-reply.md", NO_OBJECTIONS_REPLY))
+    finally:
+        os.chmod(read_only_carrier, 0o644)
+    assert proc.returncode == 0, (
+        f"a settled batch with an unwritable source carrier exited {proc.returncode}: "
+        f"{proc.stdout} {proc.stderr}")
+    disclosed = json.loads(proc.stdout)
+    assert disclosed.get("disclosures"), "the source update failure was not disclosed"
+    assert any(".specify/specs/demo/ledger.md" in json.dumps(entry)
+               for entry in disclosed["disclosures"]), disclosed["disclosures"]
+    assert "- **resolution**:" not in read_only_carrier.read_text(encoding="utf-8")
+    again = scan_payload(read_only_root)
+    assert "演示登记结案项" not in {item["identity"]["subject"] for item in again["items"]}
+    assert any(entry["reason"] == "already-resolved" and entry.get("via") == "prior-batch"
+               and entry.get("subject") == "演示登记结案项"
+               for entry in again["bookkeeping"]["named_exclusions"]), (
+        "the prior-batch read-time join did not prevent re-presentation")
+
+
+def test_absent_register_created_from_header(tmp_path: Path) -> None:
+    """C-505: an absent register is created from the existing header form before registration."""
+    root = copy_fixture("register-absent", tmp_path)
+    assert not register_file(root).exists()
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    payload = record_payload(record(root, presentation, reply=reply))
+    assert register_file(root).is_file(), "the absent register was not created"
+    text = register_file(root).read_text(encoding="utf-8")
+    header = register_row(text, "编号")
+    assert header is not None, f"the created register lacks the four-column header: {text[:300]}"
+    assert register_cells(header) == REGISTER_HEADER_CELLS, register_cells(header)
+    assert payload["batch_id"] in text
+    assert "D-001" in text
+
+
+def test_two_batches_distinct_paths(tmp_path: Path) -> None:
+    """C-507: distinct batches write distinct paths, stay mutually read-only, reuse no record."""
+    root = copy_fixture("concurrency", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan1.json")
+    reply = write_reply(tmp_path / "reply1.md", (
+        "reply_verbatim: |\n  「演示并发乙」先放着，其余按建议。\n"
+        "objections:\n"
+        "  - subject: 演示并发乙\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    first = record_payload(record(root, presentation, reply=reply))
+    first_path = root / first["record_path"]
+    first_bytes = first_path.read_bytes()
+
+    second_scan = scan_payload(root)
+    assert [item["identity"]["subject"] for item in second_scan["items"]] == ["演示并发乙"]
+    assert any(entry["reason"] == "already-resolved"
+               and entry.get("subject") == "演示并发甲"
+               for entry in second_scan["bookkeeping"]["named_exclusions"])
+
+    second_presentation = write_presentation(root, tmp_path / "scan2.json")
+    second_reply = write_reply(tmp_path / "reply2.md", NO_OBJECTIONS_REPLY)
+    second = record_payload(record(root, second_presentation, reply=second_reply))
+
+    assert second["batch_id"] != first["batch_id"]
+    assert second["record_path"] != first["record_path"]
+    assert len(knowledge_files(root)) == 2, knowledge_files(root)
+    assert first_path.read_bytes() == first_bytes, (
+        "a later batch wrote into another batch's record")
+    second_text = (root / second["record_path"]).read_text(encoding="utf-8")
+    assert "演示并发甲" not in second_text, "a settled identity was re-recorded in batch two"
+
+    replayed = replay(root, first_path)
+    assert replayed.returncode == 0, (
+        f"replaying the first batch after the second exited {replayed.returncode}: "
+        f"{replayed.stdout[-600:]} {replayed.stderr[-600:]}")
+    assert json.loads(replayed.stdout)["batch_id"] == first["batch_id"]
+
+
+def test_replay_from_record_only(tmp_path: Path) -> None:
+    """C-508: replay rebuilds the batch from the record alone, read-only and deterministic."""
+    root = copy_fixture("replay-broken", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    payload = record_payload(record(root, presentation, reply=reply))
+    record_file = root / payload["record_path"]
+    presentation.unlink()
+    reply.unlink()
+    source = root / ".specify" / "specs" / "demo" / "replay.md"
+    with source.open("a", encoding="utf-8") as handle:
+        handle.write(
+            "\n### PENDING — 演示重放新增项\n\n"
+            "- **decision_class**: human-interactive\n"
+            "- **subject**: 演示重放新增项\n"
+            "- **context**: 记录之后新增的来源，不得出现在重放结果里。\n"
+            "- **options**: 1\n"
+            "  - label: 唯一方案\n"
+            "    consequences: 保持现状\n"
+            "    reversibility: reversible\n"
+            "    default: yes\n"
+            "    evidence: .specify/specs/demo/ref.md\n"
+            "  forced: 只有一种可行做法\n"
+            "- **basis**: 无\n"
+            "- **origin**: demo-producer\n"
+            "- **created_at**: 2026-11-20T00:00:00Z\n")
+    before = snapshot(root)
+    proc = replay(root, record_file)
+    assert proc.returncode == 0, f"replay exited {proc.returncode}: {proc.stderr[-600:]}"
+    out = json.loads(proc.stdout)
+    assert out["action"] == "replay" and out["result"] == "replayed"
+    assert out["batch_id"] == payload["batch_id"]
+    assert [item["subject"] for item in out["items"]] == ["演示重放项"], (
+        "replay re-scanned live sources instead of reconstructing the recorded item set")
+    assert out["reply_verbatim"] == "没有异议，按建议默认值处理。"
+    assert out["completeness"]["verdict"] == "complete"
+    assert out["completeness"]["candidates"] == out["completeness"]["presented_rows"]
+    assert [{
+        "decision_id": item["decision_id"],
+        "subject": item["subject"],
+        "chosen_option": item["chosen_option"],
+        "batch_disposition": item["batch_disposition"],
+        "recommendation_grounding": item["recommendation_grounding"],
+    } for item in out["decisions"]] == [{
+        "decision_id": "D-001",
+        "subject": "演示重放项",
+        "chosen_option": "方案甲",
+        "batch_disposition": "accepted-default",
+        "recommendation_grounding": "no-evidence",
+    }], out["decisions"]
+    assert out["items"][0]["disposition"] == "accepted-default"
+    assert out["items"][0]["decision_id"] == "D-001"
+    assert out["pointers"] and all(pointer["resolved"] for pointer in out["pointers"])
+    assert snapshot(root) == before, "replay wrote into the workspace"
+    again = replay(root, record_file)
+    assert again.returncode == 0
+    assert again.stdout == proc.stdout, "two replays of one record are not byte-identical"
+
+
+def test_replay_broken_pointer_nonzero(tmp_path: Path) -> None:
+    """C-508: an unresolvable pointer is named and the replay exits non-zero."""
+    root = copy_fixture("replay-broken", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    payload = record_payload(record(root, presentation, reply=reply))
+    record_file = root / payload["record_path"]
+    text = record_file.read_text(encoding="utf-8")
+    assert ".specify/specs/demo/ref.md" in text
+    broken_pointer = ".specify/specs/demo/missing-ref.md"
+    record_file.write_text(text.replace(".specify/specs/demo/ref.md", broken_pointer),
+                           encoding="utf-8")
+    proc = replay(root, record_file)
+    assert proc.returncode == 1, (
+        f"replay over a broken pointer exited {proc.returncode}, expected 1")
+    combined = proc.stdout + proc.stderr
+    assert broken_pointer in combined, f"the broken pointer is not named: {combined[-600:]}"
+
+# =====================================================================================
+# US4 — completeness is honest: bookkeeping, refusal, explicit emptiness (T040 red-first;
+# green claimed at T045) and the regression guards authored after their subjects (T042).
+# The structured closed-set claim, the partition and the named absent-source list land
+# with T043, so every red-first test below fails on its own missing behaviour.
+# =====================================================================================
+
+US4_FIXTURES = ("two-source", "incomplete-block", "autonomous", "absent-root")
+
+
+def test_completeness_claim_shape(tmp_path: Path) -> None:
+    """C-601: completeness is a closed-set claim with the owner's elements."""
+    payload = scan_payload(copy_fixture("two-source", tmp_path))
+    books = payload["bookkeeping"]
+    claim = books.get("completeness_claim")
+    assert claim, "bookkeeping lacks the structured closed-set completeness claim"
+    assert claim["referent"] == "this-scan", claim
+    assert claim["comparison_unit"] == "per-candidate-classification", claim
+    assert claim["allowed_delta"] == [], "the allowed delta must be unconditionally empty"
+    assert "closed-set-claims.md" in claim["elements_owner"], claim
+    assert claim["verdict"] == "complete", claim
+    partition = claim["partition"]
+    assert set(partition) == {"presented_rows", "duplicate_merged", "not_human_held",
+                              "already_resolved"}, partition
+    assert (partition["presented_rows"] + partition["duplicate_merged"]
+            + partition["not_human_held"] + partition["already_resolved"]) == books["candidates"], (
+        "the partition does not sum to the candidate count")
+
+
+def test_bookkeeping_identity_holds(tmp_path: Path) -> None:
+    """C-602: the identity holds on every fixture and is carried into the batch-record head."""
+    for name in US4_FIXTURES:
+        payload = scan_payload(copy_fixture(name, tmp_path))
+        books = payload["bookkeeping"]
+        assert books["candidates"] == (books["presented_rows"] + books["duplicate_merged"]
+                                       + len(books["named_exclusions"])), name
+        assert sum(source["candidates"] for source in books["sources"]) == books["candidates"], name
+        claim = books["completeness_claim"]
+        partition = claim["partition"]
+        assert partition["presented_rows"] == books["presented_rows"], name
+        assert partition["duplicate_merged"] == books["duplicate_merged"], name
+        assert (partition["not_human_held"] + partition["already_resolved"]
+                == len(books["named_exclusions"])), name
+        assert (partition["presented_rows"] + partition["duplicate_merged"]
+                + partition["not_human_held"] + partition["already_resolved"]
+                == books["candidates"]), name
+
+    root = copy_fixture("batch-family", tmp_path / "record")
+    presentation = write_presentation(root, tmp_path / "record-scan.json")
+    books = json.loads(presentation.read_text(encoding="utf-8"))["bookkeeping"]
+    payload = record_payload(record(root, presentation, reply=write_reply(
+        tmp_path / "record-reply.md", NO_OBJECTIONS_REPLY)))
+    text = (root / payload["record_path"]).read_text(encoding="utf-8")
+    identity = next(line for line in text.splitlines() if line.startswith("- 完备性:"))
+    assert f"candidates={books['candidates']}" in identity, identity
+    assert f"presented_rows={books['presented_rows']}" in identity, identity
+    assert f"duplicate_merged={books['duplicate_merged']}" in identity, identity
+    assert f"named_exclusions={len(books['named_exclusions'])}" in identity, identity
+    assert "verdict=complete" in identity, identity
+    assert "- 完备性声明:" in text, "the batch head carries no completeness claim"
+    assert "referent=this-scan" in text and "comparison_unit=per-candidate-classification" in text
+    assert "allowed_delta=空" in text
+    assert "closed-set-claims.md" in text
+    assert "- 分区:" in text and "not_human_held=" in text and "already_resolved=" in text
+    assert "- 缺席来源:" in text
+
+
+def test_absent_source_named_not_clean(tmp_path: Path) -> None:
+    """C-604: an absent carrier is a named empty source, never a clean full scan."""
+    root = copy_fixture("absent-root", tmp_path)
+    payload = scan_payload(root)
+    assert payload["result"] == "presentation"
+    authored = next(source for source in payload["bookkeeping"]["sources"]
+                    if source["source_id"] == "authored-pending-item")
+    assert authored["presence"] == "read", authored
+    assert sorted(authored["absent_roots"]) == [".specify/anchoring", ".specify/goals",
+                                                ".specify/teams"], authored
+    claim = payload["bookkeeping"]["completeness_claim"]
+    for absent_root in authored["absent_roots"]:
+        assert absent_root in claim["absent_sources"], claim["absent_sources"]
+    assert claim["verdict"] == "complete"
+    assert "缺席" in payload["batch_context"]["completeness_disclosure"]
+
+    empty = scan_payload(copy_fixture("empty-project", tmp_path / "empty-project"))
+    assert empty["result"] == "nothing-pending"
+    named = empty["bookkeeping"]["completeness_claim"]["absent_sources"]
+    assert ".specify/register.md" in named, named
+    for rel_root in (".specify/specs", ".specify/goals", ".specify/anchoring", ".specify/teams"):
+        assert rel_root in named, named
+
+
+def test_nothing_pending_success_no_record(tmp_path: Path) -> None:
+    """C-605: zero candidates is an explicit success with no batch record."""
+    root = copy_fixture("empty-project", tmp_path)
+    proc = scan(root, "json")
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["result"] == "nothing-pending", payload["result"]
+    claim = payload["bookkeeping"]["completeness_claim"]
+    assert claim["candidates"] == 0 and claim["verdict"] == "complete", claim
+    assert not (root / ".specify" / "knowledge").exists(), (
+        "nothing-pending created a knowledge store")
+    text, _ = scan_text(root)
+    assert "没有待决策项" in text
+
+    presentation = tmp_path / "empty-scan.json"
+    presentation.write_text(proc.stdout, encoding="utf-8")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    refused = record(root, presentation, reply=reply)
+    assert refused.returncode == 1, (
+        f"record over a nothing-pending result exited {refused.returncode}, expected 1")
+    assert not (root / ".specify" / "knowledge").exists()
+
+
+def lock_a_scan_root_candidate(root: Path) -> Path:
+    locked = root / ".specify" / "specs" / "demo" / "locked"
+    locked.mkdir()
+    (locked / "hidden.md").write_text(
+        "# 演示不可枚举\n\n### PENDING — 演示不可枚举项\n\n"
+        "- **decision_class**: human-interactive\n"
+        "- **subject**: 演示不可枚举项\n"
+        "- **context**: 所在目录不可读，候选无法被枚举。\n"
+        "- **options**: 1\n"
+        "  - label: 唯一方案\n"
+        "    consequences: 保持现状\n"
+        "    reversibility: reversible\n"
+        "    default: yes\n"
+        "    evidence: .specify/specs/demo/ref.md\n"
+        "  forced: 只有一种可行做法\n"
+        "- **basis**: 无\n"
+        "- **origin**: demo-producer\n"
+        "- **created_at**: 2026-11-20T00:00:00Z\n",
+        encoding="utf-8")
+    return locked
+
+
+def test_unclassifiable_candidate_refused(tmp_path: Path) -> None:
+    """C-606: a candidate that cannot be enumerated refuses the batch, never drops silently."""
+    root = copy_fixture("two-source", tmp_path)
+    locked = lock_a_scan_root_candidate(root)
+    before = snapshot(root)
+    os.chmod(locked, 0o000)
+    try:
+        proc = scan(root, "json")
+    finally:
+        os.chmod(locked, 0o755)
+    assert proc.returncode == 1, (
+        "a scan that could not enumerate every candidate exited "
+        f"{proc.returncode}, expected 1: {proc.stdout[-600:]}")
+    payload = json.loads(proc.stdout)
+    assert payload["result"] == "refused", payload
+    assert any(refusal["source_id"] == "authored-pending-item"
+               for refusal in payload["refusals"]), payload["refusals"]
+    assert "items" not in payload and "completeness_claim" not in payload
+    assert snapshot(root) == before, "a refused scan wrote into the workspace"
+
+
+def test_no_partial_complete_claim(tmp_path: Path) -> None:
+    """C-607: a batch that missed a candidate never claims completeness or presents a part."""
+    root = copy_fixture("two-source", tmp_path)
+    locked = lock_a_scan_root_candidate(root)
+    os.chmod(locked, 0o000)
+    try:
+        proc = scan(root, "json")
+    finally:
+        os.chmod(locked, 0o755)
+    assert proc.returncode == 1, (
+        f"a partial scan exited {proc.returncode}, expected 1: {proc.stdout[-600:]}")
+    payload = json.loads(proc.stdout)
+    assert payload["result"] == "refused", payload
+    assert "items" not in payload, "a refused batch presented a partial item set"
+    assert "completeness_claim" not in payload
+    assert '"verdict": "complete"' not in proc.stdout
+    assert "演示数据保留期" not in proc.stdout, (
+        "a readable candidate was presented inside a refused partial batch")
+    assert not (root / ".specify" / "knowledge").exists()
+
+# -------------------------------------------------------------------------------------
+# T042 — regression-exception guards: their subjects predate the guards (scan refusal
+# landed with T019, the batch-record head with T030), so these samples are not red-first
+# by construction; they pin the landed behaviour and go red when it is doctored.
+# -------------------------------------------------------------------------------------
+
+def test_unreadable_source_refusal(tmp_path: Path) -> None:
+    """C-603 guard: a carrier-level unreadable register refuses the whole batch."""
+    root = copy_fixture("unreadable-register", tmp_path)
+    before = snapshot(root)
+    proc = scan(root, "json")
+    assert proc.returncode == 1, proc.stdout
+    payload = json.loads(proc.stdout)
+    assert payload["result"] == "refused", payload
+    refusal = payload["refusals"][0]
+    assert refusal["source_id"] == "register-open-decision-row", refusal
+    assert "register.md" in refusal["detail"], refusal
+    assert "演示登记表不可读项" not in proc.stdout, "a partial batch was presented"
+    assert snapshot(root) == before, "a refused scan wrote into the workspace"
+
+
+def test_batch_record_head_completeness(tmp_path: Path) -> None:
+    """C-602 guard: the batch-record head carries the per-source counts, identity and verdict."""
+    root = copy_fixture("batch-family", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    books = json.loads(presentation.read_text(encoding="utf-8"))["bookkeeping"]
+    payload = record_payload(record(root, presentation, reply=write_reply(
+        tmp_path / "reply.md", NO_OBJECTIONS_REPLY)))
+    text = (root / payload["record_path"]).read_text(encoding="utf-8")
+    identity = next(line for line in text.splitlines() if line.startswith("- 完备性:"))
+    assert f"candidates={books['candidates']}" in identity, identity
+    assert f"presented_rows={books['presented_rows']}" in identity, identity
+    assert f"duplicate_merged={books['duplicate_merged']}" in identity, identity
+    assert f"named_exclusions={len(books['named_exclusions'])}" in identity, identity
+    assert "verdict=complete" in identity, identity
+    for source in books["sources"]:
+        assert any(line.strip().startswith(f"- {source['source_id']}: presence={source['presence']};")
+                   and f"candidates={source['candidates']}" in line
+                   for line in text.splitlines()), (source, "missing per-source count line")

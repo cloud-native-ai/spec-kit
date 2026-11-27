@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -353,12 +354,35 @@ def parse_batch_record_subjects(text: str) -> set[str]:
     return {record["subject"] for record in parse_decision_records(text) if record["subject"]}
 
 
+def iter_tree_markdown(base: Path, rel_root: str) -> list[Path]:
+    """Every ``*.md`` under ``base``; an unenumerable directory is a carrier refusal.
+
+    ``pathlib.Path.rglob`` silently skips directories it cannot list, which would drop
+    candidates from the scan while the batch still claimed completeness (C-606/C-607).
+    """
+    errors: list[OSError] = []
+    files: list[Path] = []
+
+    def record_error(exc: OSError) -> None:
+        errors.append(exc)
+
+    for dirpath, dirnames, filenames in os.walk(base, onerror=record_error):
+        dirnames.sort()
+        for name in sorted(filenames):
+            if name.endswith(".md"):
+                files.append(Path(dirpath) / name)
+    if errors:
+        detail = "; ".join(f"{exc.filename}: {exc.strerror}" for exc in errors)
+        raise Refusal("authored-pending-item", "unreadable", f"{rel_root}: {detail}")
+    return sorted(files)
+
+
 def iter_scan_root_files(root: Path):
     for rel_root in SCAN_ROOTS:
         base = root / rel_root
         if not base.is_dir():
             continue
-        for path in sorted(base.rglob("*.md")):
+        for path in iter_tree_markdown(base, rel_root):
             rel = path.relative_to(root).as_posix()
             yield rel, path
 
@@ -565,6 +589,7 @@ def resolve_row_block(root: Path, row: dict) -> tuple[dict | None, str | None]:
         return None, "authority-unresolved"
     if len(blocks) > 1:
         return None, "ambiguous-link"
+    blocks[0]["carrier"] = rel
     return blocks[0], None
 
 
@@ -578,10 +603,11 @@ def scan_authored(root: Path) -> dict:
             outcome["absent_roots"].append(rel_root)
             continue
         present += 1
-        for path in sorted(base.rglob("*.md")):
+        for path in iter_tree_markdown(base, rel_root):
             rel = path.relative_to(root).as_posix()
             text = read_text(path, "authored-pending-item", rel)
             for block in parse_blocks(text):
+                block["carrier"] = rel
                 outcome["candidates"].append({
                     "source_id": "authored-pending-item",
                     "carrier": rel,
@@ -725,6 +751,9 @@ def classify_groups(root: Path, groups: list[list[dict]], prior: dict) -> tuple[
                  "locator": member["locator"], "position": member["position"]}
                 for member in members
             ],
+            **({"block_ref": {"carrier": primary_block["carrier"],
+                              "line": primary_block["line"]}}
+               if primary_block is not None and primary_block.get("carrier") else {}),
             "decision_class": block_class(primary_block) if primary_block else None,
             "context": (primary_block["fields"].get("context") or None) if primary_block else None,
             "options": options,
@@ -771,16 +800,16 @@ def batch_context(payload_items: list[dict], bookkeeping: dict) -> dict:
     sources_text = "；".join(
         f"{source['source_id']} 在场状态为 {source['presence']}，候选 {source['candidates']} 项"
         for source in bookkeeping["sources"])
-    absent_roots = []
-    for source in bookkeeping["sources"]:
-        absent_roots.extend(source.get("absent_roots", []))
     disclosure = (
         f"本次扫描读取了封闭来源清单中的全部来源（{sources_text}）；每个候选恰被分类一次，"
         f"恒等式成立：候选 {bookkeeping['candidates']} = 呈现行 {bookkeeping['presented_rows']}"
         f" + 合并引用 {bookkeeping['duplicate_merged']} + 具名排除 {len(bookkeeping['named_exclusions'])}。"
+        "完备性按封闭清单声明判定：参照物为本次扫描，比较单元为逐候选处置分类，允许差集为空。"
     )
-    if absent_roots:
-        disclosure += " 缺席的扫描根：" + "、".join(absent_roots) + "（按缺席空来源计）。"
+    absent_sources = (bookkeeping.get("completeness_claim") or {}).get("absent_sources") or []
+    if absent_sources:
+        disclosure += (" 缺席的来源载体：" + "、".join(absent_sources)
+                       + "（按缺席空来源计，不拒绝，也不读作「干净」）。")
     return {
         "why_now": "本批次汇总了登记册中仍标记为待定的决策行，以及项目文档载体中撰写的待决策条目；"
                    "每次调用都重新扫描全部来源，因此呈现的是此刻完整的未决状态。",
@@ -827,6 +856,12 @@ def scan_workspace(root: Path) -> dict:
         if subject in {item["identity"]["subject"] for item in items}:
             duplicate_merged += len(members) - 1
 
+    not_human_held = sum(1 for entry in exclusions if entry["reason"] == "not-human-held")
+    already_resolved = sum(1 for entry in exclusions if entry["reason"] == "already-resolved")
+    absent_sources: list[str] = []
+    if register["presence"] == "absent":
+        absent_sources.append(REGISTER_REL)
+    absent_sources.extend(authored["absent_roots"])
     books = {
         "sources": [
             {"source_id": register["source_id"], "presence": register["presence"],
@@ -844,6 +879,21 @@ def scan_workspace(root: Path) -> dict:
         "excluded_families": {**{key: 0 for key in EXCLUDED_FAMILY_KEYS},
                               "rec-row": register["rec_rows"]},
         "verdict": "complete",
+        "completeness_claim": {
+            "referent": "this-scan",
+            "comparison_unit": "per-candidate-classification",
+            "allowed_delta": [],
+            "elements_owner": "shared/guidelines/closed-set-claims.md",
+            "verdict": "complete",
+            "candidates": len(candidates),
+            "partition": {
+                "presented_rows": presented_rows,
+                "duplicate_merged": duplicate_merged,
+                "not_human_held": not_human_held,
+                "already_resolved": already_resolved,
+            },
+            "absent_sources": absent_sources,
+        },
     }
     del presented_refs
     result = "nothing-pending" if not candidates else "presentation"
@@ -1229,7 +1279,8 @@ def render_decision_record(entry: dict, batch_id: str, record_rel: str,
 
 
 def compose_batch_record(presentation: dict, reply: dict, plan: list[dict], batch_id: str,
-                         record_rel: str, version: str, created_at: str) -> str:
+                         record_rel: str, version: str, created_at: str,
+                         pre_disclosures: list[dict] | None = None) -> str:
     books = presentation["bookkeeping"]
     context = presentation["batch_context"]
     lines = [f"# 决策批次记录 {batch_id}", "", "## 批次头", ""]
@@ -1250,6 +1301,19 @@ def compose_batch_record(presentation: dict, reply: dict, plan: list[dict], batc
                  f"duplicate_merged={books['duplicate_merged']} + "
                  f"named_exclusions={len(books['named_exclusions'])}; "
                  f"verdict={books['verdict']}")
+    claim = books.get("completeness_claim") or {}
+    partition = claim.get("partition") or {}
+    allowed_delta = claim.get("allowed_delta")
+    lines.append(f"- 完备性声明: referent={claim.get('referent')}; "
+                 f"comparison_unit={claim.get('comparison_unit')}; "
+                 f"allowed_delta={'空' if not allowed_delta else allowed_delta}; "
+                 f"owner={claim.get('elements_owner')}")
+    lines.append(f"- 分区: presented_rows={partition.get('presented_rows')}; "
+                 f"duplicate_merged={partition.get('duplicate_merged')}; "
+                 f"not_human_held={partition.get('not_human_held')}; "
+                 f"already_resolved={partition.get('already_resolved')}")
+    absent_sources = claim.get("absent_sources") or []
+    lines.append("- 缺席来源: " + ("、".join(absent_sources) if absent_sources else "无"))
     lines.append("- 授权: interactive")
     lines.append("- 用户应答原文:")
     lines.append("")
@@ -1301,7 +1365,15 @@ def compose_batch_record(presentation: dict, reply: dict, plan: list[dict], batc
         if entry["disposition"] == "objected-parked":
             lines.append(f"- 暂缓：{entry['item']['identity']['subject']}"
                          "（不产生决策记录，下次批次重新呈现）")
-    lines.append("- 来源更新：本批次写入批次记录；登记册与待决策项的更新由批次登记动作承接。")
+    lines.append("- 登记册更新：追加批次编号行与决策编号行；已决来源行的状态单元格更新为"
+                 "点名批次与决策编号；暂缓来源行保持 open 并标注批次。")
+    lines.append("- 来源块更新：已决项追加 resolution 字段；暂缓项不加。")
+    if pre_disclosures:
+        for disclosure in pre_disclosures:
+            lines.append(f"- 来源更新披露：{disclosure['carrier']}（{disclosure['reason']}）："
+                         f"{disclosure['detail']}")
+    else:
+        lines.append("- 来源更新披露：无。")
     lines.append("")
     lines.append("## 批次上下文")
     lines.append("")
@@ -1350,6 +1422,436 @@ def write_batch_record(root: Path, record_rel: str, title: str, batch_id: str,
     if not target.is_file():
         raise Refusal("record-request", "write-verification",
                       f"the memory engine reported success but {record_rel} is absent")
+
+
+# --------------------------------------------------------------------------- #
+# Register reflection and source updates (owner: § 批次登记与来源更新)
+# --------------------------------------------------------------------------- #
+REGISTER_HEADER_LINES = (
+    "# ID Register (编号登记册)",
+    "",
+    "| 编号 | 含义(一行) | 权威路径(完整陈述) | 状态 |",
+    "|------|------------|--------------------|------|",
+)
+
+
+def status_cell_replaced(line: str, new_status: str) -> str:
+    parts = line.split("|")
+    if len(parts) < 6:
+        return line
+    parts[-2] = f" {new_status} "
+    return "|".join(parts)
+
+
+def build_register_update(root: Path, batch_id: str, record_rel: str,
+                          plan: list[dict]) -> tuple[dict, list[dict]]:
+    """The register projection of one batch: appended rows and status cells only."""
+    path = root / REGISTER_REL
+    created = not path.is_file()
+    if created:
+        text = "\n".join(REGISTER_HEADER_LINES) + "\n"
+    else:
+        text = read_text(path, "register-open-decision-row", REGISTER_REL)
+    disclosures: list[dict] = []
+    lines = text.splitlines()
+    rows = parse_register_rows(text)
+    if rows is None:
+        raise Refusal("record-request", "register-update",
+                      f"{REGISTER_REL}: the table cannot be parsed into its columns")
+    line_by_row: dict[str, int] = {}
+    for line_no, cells in rows:
+        line_by_row.setdefault(de_emphasis(cells[0]), line_no)
+    status_updates: list[dict] = []
+    for entry in plan:
+        disposition = entry["disposition"]
+        if disposition not in ("accepted-default", "objected-alternative", "objected-parked"):
+            continue
+        for source in entry["item"]["sources"]:
+            if source["source_id"] != "register-open-decision-row":
+                continue
+            row_id = source["locator"]
+            if row_id not in line_by_row:
+                disclosures.append({"carrier": REGISTER_REL, "reason": "row-missing",
+                                    "detail": f"{row_id}: the register row disappeared"})
+                continue
+            if disposition == "objected-parked":
+                new_status = f"open(batch {batch_id}: 暂缓，下次批次重新呈现)"
+            else:
+                new_status = f"resolved(batch {batch_id} -> {entry['decision_id']})"
+            line_no = line_by_row[row_id]
+            lines[line_no - 1] = status_cell_replaced(lines[line_no - 1], new_status)
+            status_updates.append({"row": row_id, "status": new_status})
+    appended = [f"| {batch_id} | 决策批次记录（批次编号） | {record_rel} | recorded |"]
+    decisions = [entry for entry in plan if entry.get("decision_id")]
+    if decisions:
+        first = decisions[0]["decision_id"]
+        last = decisions[-1]["decision_id"]
+        grouping = first if first == last else f"{first}…{last}"
+        appended.append(f"| {grouping} | 决策批次 {batch_id} 产生的决策记录 | "
+                        f"{record_rel} | recorded |")
+    last_table = None
+    for index, line in enumerate(lines):
+        if line.strip().startswith("|"):
+            last_table = index
+    if last_table is None:
+        lines.extend(REGISTER_HEADER_LINES[2:])
+        last_table = len(lines) - 1
+    lines[last_table + 1:last_table + 1] = appended
+    return {
+        "path": REGISTER_REL,
+        "created": created,
+        "text": "\n".join(lines) + "\n",
+        "appended": appended,
+        "status_updates": status_updates,
+    }, disclosures
+
+
+def insert_resolution(text: str, subject: str, resolution: str) -> tuple[str, dict | None]:
+    lines = text.splitlines()
+    mask = fenced_mask(lines)
+    start = None
+    for index, line in enumerate(lines):
+        if mask[index]:
+            continue
+        heading = BLOCK_HEADING_RE.match(line)
+        if heading and heading.group(1).strip() == subject:
+            start = index
+            break
+    if start is None:
+        return text, {"reason": "block-missing",
+                      "detail": f"no '### PENDING — {subject}' block in the carrier"}
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("#"):
+            end = index
+            break
+    insertion = end
+    while insertion > start + 1 and not lines[insertion - 1].strip():
+        insertion -= 1
+    if any(line.strip() == resolution for line in lines[start:end]):
+        return text, None
+    lines.insert(insertion, resolution)
+    trailing_newline = "\n" if text.endswith("\n") else ""
+    return "\n".join(lines) + trailing_newline, None
+
+
+def build_block_updates(root: Path, batch_id: str,
+                        plan: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Append the conditional ``resolution`` field to every settled item's source block."""
+    updates: list[dict] = []
+    disclosures: list[dict] = []
+    by_carrier: dict[str, list[dict]] = {}
+    for entry in plan:
+        if entry["disposition"] not in ("accepted-default", "objected-alternative"):
+            continue
+        block_ref = entry["item"].get("block_ref")
+        if not block_ref:
+            continue
+        by_carrier.setdefault(block_ref["carrier"], []).append(entry)
+    for carrier in sorted(by_carrier):
+        path = root / carrier
+        try:
+            original = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            disclosures.append({"carrier": carrier, "reason": "unreadable", "detail": str(exc)})
+            continue
+        text = original
+        for entry in sorted(by_carrier[carrier],
+                            key=lambda item: item["item"]["block_ref"]["line"], reverse=True):
+            subject = entry["item"]["identity"]["subject"]
+            resolution = f"- **resolution**: {batch_id} -> {entry['decision_id']}"
+            text, error = insert_resolution(text, subject, resolution)
+            if error:
+                disclosures.append({"carrier": carrier, **error})
+        if text != original:
+            updates.append({"carrier": carrier, "text": text})
+    return updates, disclosures
+
+
+def apply_text_update(root: Path, rel: str, text: str) -> None:
+    (root / rel).write_text(text, encoding="utf-8")
+
+
+# --------------------------------------------------------------------------- #
+# Replay (owner: § 重放契约)
+# --------------------------------------------------------------------------- #
+REPLAY_HEAD_RE = re.compile(r"^- ([^:]+):\s*(.*)$")
+REPLAY_SOURCE_RE = re.compile(
+    r"^([a-z][a-z0-9-]*):\s*presence=([a-z]+);\s*candidates=(\d+)(.*)$")
+REPLAY_COMPLETENESS_RE = re.compile(
+    r"^candidates=(\d+) = presented_rows=(\d+) \+ duplicate_merged=(\d+) \+ "
+    r"named_exclusions=(\d+);\s*verdict=([a-z-]+)")
+OPTION_EVIDENCE_RE = re.compile(r"^\s+evidence:\s*(.+)$")
+
+
+def parse_batch_sections(text: str) -> dict[str, list[str]]:
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in text.splitlines():
+        if line.startswith("## "):
+            current = line[3:].strip()
+            sections[current] = []
+            continue
+        if line.startswith("# "):
+            current = None
+            continue
+        if current is not None:
+            sections[current].append(line)
+    return sections
+
+
+def parse_record_decision_blocks(text: str) -> list[dict]:
+    lines = text.splitlines()
+    mask = fenced_mask(lines)
+    blocks: list[dict] = []
+    current: dict | None = None
+    for index, line in enumerate(lines, start=1):
+        if mask[index - 1]:
+            continue
+        heading = RECORD_HEADING_RE.match(line)
+        if heading:
+            current = {"decision_id": heading.group(1), "subject": heading.group(2).strip(),
+                       "fields": {}, "option_evidence": []}
+            blocks.append(current)
+            continue
+        if line.startswith("#"):
+            current = None
+            continue
+        if current is None:
+            continue
+        field = FIELD_RE.match(line)
+        if field:
+            current["fields"].setdefault(field.group(1), field.group(2).strip())
+            continue
+        option = OPTION_EVIDENCE_RE.match(line)
+        if option:
+            current["option_evidence"].extend(
+                part.strip() for part in option.group(1).split(";") if part.strip())
+    return blocks
+
+
+def split_evidence(value: str) -> list[str]:
+    return [part.strip() for part in value.split(";") if part.strip()]
+
+
+def strip_locator(subject: str) -> str:
+    return re.split(r"（", subject, maxsplit=1)[0].strip()
+
+
+def parse_replay_head(lines: list[str], batch_id: str) -> dict:
+    head: dict = {"sources": [], "reply_verbatim": ""}
+    collecting_reply = False
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if collecting_reply:
+            if stripped.startswith(">"):
+                head.setdefault("_reply", []).append(stripped[1:].lstrip(" "))
+                continue
+            collecting_reply = False
+        if line.startswith("  - "):
+            match = REPLAY_SOURCE_RE.match(stripped[2:])
+            if match:
+                entry = {"source_id": match.group(1), "presence": match.group(2),
+                         "candidates": int(match.group(3))}
+                extra = match.group(4)
+                reason = re.search(r"缺席原因:\s*([^;]+)", extra)
+                if reason:
+                    entry["absent_reason"] = reason.group(1).strip()
+                roots = re.search(r"缺席根:\s*(.+)$", extra)
+                if roots:
+                    entry["absent_roots"] = [part.strip()
+                                             for part in roots.group(1).split("、") if part.strip()]
+                head["sources"].append(entry)
+            continue
+        field = REPLAY_HEAD_RE.match(stripped)
+        if not field:
+            continue
+        key, value = field.group(1).strip(), field.group(2).strip()
+        if key == "batch_id":
+            head["batch_id"] = value
+        elif key == "扫描时点":
+            head["scan_time"] = value
+        elif key == "工具版本":
+            head["tool_version"] = value
+        elif key == "授权":
+            head["authorization"] = value
+        elif key == "用户应答原文":
+            collecting_reply = True
+        elif key == "完备性":
+            match = REPLAY_COMPLETENESS_RE.search(value)
+            if not match:
+                raise Refusal("replay-record", "malformed-record",
+                              f"the completeness line cannot be parsed: {value!r}")
+            head["completeness"] = {
+                "sources": head["sources"],
+                "candidates": int(match.group(1)),
+                "presented_rows": int(match.group(2)),
+                "duplicate_merged": int(match.group(3)),
+                "named_exclusions": int(match.group(4)),
+                "verdict": match.group(5),
+            }
+    head["reply_verbatim"] = "\n".join(head.pop("_reply", [])).strip("\n")
+    if head.get("batch_id") != batch_id:
+        raise Refusal("replay-record", "malformed-record",
+                      "the batch head id does not match the record title")
+    if "completeness" not in head:
+        raise Refusal("replay-record", "malformed-record",
+                      "the batch head carries no completeness bookkeeping")
+    return head
+
+
+def build_replay_payload(root: Path, batch_path: Path) -> dict:
+    if not batch_path.is_file():
+        raise Refusal("replay-record", "missing-record", str(batch_path))
+    try:
+        text = batch_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Refusal("replay-record", "unreadable", f"{batch_path}: {exc}")
+    title = re.search(r"(?m)^# 决策批次记录 (\S+)\s*$", text)
+    if not title:
+        raise Refusal("replay-record", "malformed-record", "the record carries no batch title")
+    batch_id = title.group(1)
+    if not BATCH_ID_RE.match(batch_id):
+        raise Refusal("replay-record", "malformed-record",
+                      f"the batch title does not carry a B-… id: {batch_id!r}")
+    sections = parse_batch_sections(text)
+    head = parse_replay_head(sections.get("批次头", []), batch_id)
+
+    items: list[dict] = []
+    for line in sections.get("逐项行表", []):
+        if not line.strip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) < 7 or cells[0] == "主体":
+            continue
+        if set("".join(cells)) <= set("-: "):
+            continue
+        items.append({
+            "subject": cells[0],
+            "sources": cells[1],
+            "qualification": cells[2],
+            "grounding": cells[3],
+            "default": cells[4],
+            "disposition": cells[5],
+            "decision_id": None if cells[6] in ("—", "-", "") else cells[6],
+        })
+
+    decisions: list[dict] = []
+    by_id: dict[str, dict] = {}
+    for block in parse_record_decision_blocks(text):
+        fields = block["fields"]
+        missing = [name for name in ("batch_id", "batch_disposition", "recommendation_grounding")
+                   if not fields.get(name)]
+        if missing:
+            raise Refusal("replay-record", "inconsistent-record",
+                          f"{block['decision_id']}: the batch family is incomplete "
+                          f"({', '.join(missing)})")
+        if fields.get("batch_id") != batch_id:
+            raise Refusal("replay-record", "inconsistent-record",
+                          f"{block['decision_id']}: batch_id {fields.get('batch_id')!r} does "
+                          f"not match the record's batch id")
+        record = {
+            "decision_id": block["decision_id"],
+            "subject": block["subject"],
+            "chosen_option": fields.get("chosen_option", ""),
+            "batch_disposition": fields.get("batch_disposition", ""),
+            "recommendation_grounding": fields.get("recommendation_grounding", ""),
+            "evidence": split_evidence(fields.get("evidence", "")),
+            "option_evidence": block["option_evidence"],
+        }
+        decisions.append(record)
+        by_id[record["decision_id"]] = record
+
+    for item in items:
+        if item["disposition"] in ("accepted-default", "objected-alternative"):
+            if not item["decision_id"] or item["decision_id"] not in by_id:
+                raise Refusal("replay-record", "inconsistent-record",
+                              f"{item['subject']}: settled disposition {item['disposition']} "
+                              "has no decision record")
+            decision_subject = by_id[item["decision_id"]]["subject"]
+            if decision_subject not in (item["subject"], strip_locator(item["subject"])):
+                raise Refusal("replay-record", "inconsistent-record",
+                              f"{item['subject']}: the decision record names a different subject")
+        elif item["disposition"] in ("pending", "objected-parked"):
+            if item["decision_id"]:
+                raise Refusal("replay-record", "inconsistent-record",
+                              f"{item['subject']}: a {item['disposition']} row names a decision id")
+    for decision in decisions:
+        if not any(item["decision_id"] == decision["decision_id"] for item in items):
+            raise Refusal("replay-record", "inconsistent-record",
+                          f"{decision['decision_id']}: the decision record has no item row")
+
+    pointers: list[dict] = []
+    unresolved: list[str] = []
+    seen_unresolved: set[str] = set()
+    for decision in decisions:
+        for purpose, values in (("decision-evidence", decision["evidence"]),
+                                ("option-evidence", decision["option_evidence"])):
+            for pointer in values:
+                resolved, why = resolve_pointer(root, pointer)
+                entry = {"pointer": pointer, "purpose": purpose, "resolved": resolved}
+                if not resolved:
+                    entry["reason"] = why
+                    message = f"{pointer}: {why}"
+                    if message not in seen_unresolved:
+                        seen_unresolved.add(message)
+                        unresolved.append(message)
+                pointers.append(entry)
+    if unresolved:
+        raise Refusal("replay-pointers", "unresolvable-pointer", "; ".join(unresolved))
+
+    try:
+        record_rel = batch_path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        record_rel = str(batch_path)
+    return {
+        "action": "replay",
+        "result": "replayed",
+        "batch_id": batch_id,
+        "record_path": record_rel,
+        "scan_time": head.get("scan_time", ""),
+        "tool_version": head.get("tool_version", ""),
+        "authorization": head.get("authorization", ""),
+        "reply_verbatim": head["reply_verbatim"],
+        "completeness": head["completeness"],
+        "items": items,
+        "decisions": decisions,
+        "pointers": pointers,
+    }
+
+
+def render_replay(payload: dict) -> str:
+    lines = [f"批次重放 {payload['batch_id']}", f"记录：{payload['record_path']}", ""]
+    lines.append(f"扫描时点：{payload['scan_time']}；工具版本：{payload['tool_version']}；"
+                 f"授权：{payload['authorization']}")
+    comp = payload["completeness"]
+    lines.append(f"完备性：候选 {comp['candidates']} = 呈现行 {comp['presented_rows']} + "
+                 f"合并引用 {comp['duplicate_merged']} + 具名排除 {comp['named_exclusions']}；"
+                 f"判定 {comp['verdict']}")
+    absent = [source for source in comp["sources"] if source.get("presence") == "absent"]
+    if absent:
+        lines.append("缺席来源：" + "、".join(source["source_id"] for source in absent))
+    lines.append("")
+    lines.append("用户应答原文：")
+    for line in payload["reply_verbatim"].splitlines() or [""]:
+        lines.append("> " + line if line else ">")
+    lines.append("")
+    lines.append("逐项：")
+    for item in payload["items"]:
+        decision = f"；决策 {item['decision_id']}" if item["decision_id"] else ""
+        lines.append(f"- {item['subject']}：{item['qualification']}；"
+                     f"建议默认 {item['default']}；接地 {item['grounding']}；"
+                     f"处置 {item['disposition']}{decision}")
+    lines.append("")
+    lines.append("决策记录：")
+    for decision in payload["decisions"]:
+        lines.append(f"- {decision['decision_id']} {decision['subject']}："
+                     f"{decision['chosen_option']}（{decision['batch_disposition']}）")
+    lines.append("")
+    lines.append(f"指针解析：{len(payload['pointers'])}/{len(payload['pointers'])} 可解析。")
+    return "\n".join(lines) + "\n"
 def emit_refusal(action: str, refusal: Refusal, fmt: str) -> int:
     if fmt == "json":
         print(json.dumps({
@@ -1419,11 +1921,27 @@ def action_record(args: argparse.Namespace) -> int:
                    ("accepted-default", "objected-alternative")]
         for number, entry in enumerate(settled, start=1):
             entry["decision_id"] = f"D-{number:03d}"
+        register_update, register_disclosures = build_register_update(
+            root, batch_id, record_rel, plan)
+        block_updates, block_disclosures = build_block_updates(root, batch_id, plan)
+        pre_disclosures = register_disclosures + block_disclosures
         created_at = utc_now()
         version = _resolve_version(Path(__file__).resolve())
         body = compose_batch_record(presentation, reply, plan, batch_id, record_rel,
-                                    version, created_at)
+                                    version, created_at, pre_disclosures)
         write_batch_record(root, record_rel, title, batch_id, body)
+        disclosures = list(pre_disclosures)
+        try:
+            apply_text_update(root, register_update["path"], register_update["text"])
+        except OSError as exc:
+            disclosures.append({"carrier": register_update["path"], "reason": "write-failed",
+                                "detail": str(exc)})
+        for update in block_updates:
+            try:
+                apply_text_update(root, update["carrier"], update["text"])
+            except OSError as exc:
+                disclosures.append({"carrier": update["carrier"], "reason": "write-failed",
+                                    "detail": str(exc)})
     except Refusal as refusal:
         return emit_refusal("record", refusal, args.format)
 
@@ -1446,6 +1964,14 @@ def action_record(args: argparse.Namespace) -> int:
             "parked": len(parked),
             "pending": len(pending),
             "decisions": decisions,
+            "register": {
+                "path": register_update["path"],
+                "created": register_update["created"],
+                "appended": register_update["appended"],
+                "status_updates": register_update["status_updates"],
+            },
+            "blocks_updated": [update["carrier"] for update in block_updates],
+            "disclosures": disclosures,
         }, ensure_ascii=False, indent=2))
     else:
         print(f"批次记录已写入：{record_rel}")
@@ -1453,16 +1979,34 @@ def action_record(args: argparse.Namespace) -> int:
         print(f"已结案 {len(settled)} 项，暂缓 {len(parked)} 项，保持待定 {len(pending)} 项。")
         for decision in decisions:
             print(f"  {decision['decision_id']}  {decision['subject']}  {decision['disposition']}")
+        print(f"登记册：{register_update['path']}"
+              f"{'（新建）' if register_update['created'] else ''}，追加 "
+              f"{len(register_update['appended'])} 行，更新 "
+              f"{len(register_update['status_updates'])} 个状态单元格。")
+        for update in block_updates:
+            print(f"来源块更新：{update['carrier']}")
+        for disclosure in disclosures:
+            print(f"披露：{disclosure['carrier']}（{disclosure['reason']}）：{disclosure['detail']}")
     return EXIT_OK
 
 
 def action_replay(args: argparse.Namespace) -> int:
-    print(
-        "decision-batch.py: action 'replay' is declared but its core has not landed in "
-        "this build; it lands with the replay package",
-        file=sys.stderr,
-    )
-    return EXIT_USAGE
+    if not args.batch:
+        print("decision-batch.py: replay requires --batch PATH", file=sys.stderr)
+        return EXIT_USAGE
+    root = Path(args.workspace_root).expanduser().resolve()
+    batch_path = Path(args.batch).expanduser()
+    if not batch_path.is_absolute():
+        batch_path = (Path.cwd() / batch_path).resolve()
+    try:
+        payload = build_replay_payload(root, batch_path)
+    except Refusal as refusal:
+        return emit_refusal("replay", refusal, args.format)
+    if args.format == "json":
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(render_replay(payload), end="")
+    return EXIT_OK
 
 
 def build_parser() -> argparse.ArgumentParser:
