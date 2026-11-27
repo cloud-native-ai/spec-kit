@@ -14,6 +14,8 @@ per-row data. The audit engine reads both tables; the guard tests pin their shap
 | `runtime-discovery` | system |
 | `inline-digest` | task |
 
+cap_required_forms: bounded-index
+
 ## Layout
 
 | class id | layer | form | source | owner | cap reference |

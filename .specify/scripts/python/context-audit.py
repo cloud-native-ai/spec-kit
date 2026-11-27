@@ -20,9 +20,17 @@ prints one line per row and ends with one `source-reading: <digest>` line over t
 printed layer (content bytes never enter it; unresolved sources use the -1/-2 sentinels,
 runtime-discovery rows the 0/0 pair, a missing-layout row the -3/-3 pair).
 
-`--action check` is the layout-integrity reading; its closed nine-rule set lands with its
-own task row. Until then the action refuses loudly (exit 2) instead of reporting a green
-it cannot support.
+`--action check` is the layout-integrity reading over the owner document's `## Layout`
+table and the four facts. Its closed nine-rule set is `roster-mismatch`, `roster-order`,
+`unknown-layer`, `unknown-form`, `layer-form-illegal`, `duplicate-class`, `empty-layer`
+(the finding names the side and the layer), `cap-missing` (a row whose form the owner
+document's `cap_required_forms` marker names, carrying no `<path> § <section>` cap
+reference) and `category-column` (a `## Layout` header outside the fixed six columns,
+judged by the header alone). Every finding names the file, the row ordinal, the line and
+the violated rule. A layout-table token outside its declared domain is a finding (exit 1);
+a declaration fact's unknown or missing member stays the input error (exit 2). The JSON
+face carries the ordered keys `action`, `findings` (each `rule`, `file`, `row`, `line`,
+`detail`) and `summary` (`total`, `by_rule`, `findings`).
 
 Read-only: no file, directory or cache is written and no socket is opened. The only
 content reads are the declared inputs (the owner document and the four facts) and the
@@ -42,6 +50,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -66,6 +75,20 @@ SENTINEL_MISSING_ROW_SIZE = -3
 EXIT_OK = 0
 EXIT_FINDINGS = 1
 EXIT_INPUT = 2
+
+CHECK_RULE_NAMES = (
+    "roster-mismatch",
+    "roster-order",
+    "unknown-layer",
+    "unknown-form",
+    "layer-form-illegal",
+    "duplicate-class",
+    "empty-layer",
+    "cap-missing",
+    "category-column",
+)
+CAP_MARKER = "cap_required_forms"
+CAP_REFERENCE_RE = re.compile(r"^(.+?)\s+§\s+(.+)$")
 
 _ENGINE_DIR = Path(__file__).resolve().parent
 if str(_ENGINE_DIR) not in sys.path:
@@ -111,11 +134,38 @@ def _is_separator(cells: list) -> bool:
     return bool(cells) and all(set(cell) <= set("-: ") for cell in cells)
 
 
-def _first_table(text: str, heading: str):
-    """The first pipe table under ``## <heading>`` as (header, rows, line numbers).
+def _section_body(text: str, heading: str) -> str:
+    """The body of the first ``## <heading>`` section (heading line excluded)."""
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.strip() == "## %s" % heading:
+            start = index + 1
+            break
+    if start is None:
+        return ""
+    out = []
+    for line in lines[start:]:
+        if line.startswith("## "):
+            break
+        out.append(line)
+    return "\n".join(out)
 
-    Returns ``(None, [], [])`` when the heading or its table is absent. A non-table line
-    after the table starts ends it.
+
+def _marker_value(body: str, marker: str) -> str:
+    """The value of a ``<marker>: <value>`` line inside a section body."""
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(marker + ":"):
+            return stripped[len(marker) + 1:].strip()
+    return ""
+
+
+def _first_table(text: str, heading: str):
+    """The first pipe table under ``## <heading>`` as (header, rows, lines, header line).
+
+    Returns ``(None, [], [], 0)`` when the heading or its table is absent. A non-table
+    line after the table starts ends it.
     """
     lines = text.splitlines()
     start = None
@@ -124,8 +174,9 @@ def _first_table(text: str, heading: str):
             start = index + 1
             break
     if start is None:
-        return None, [], []
+        return None, [], [], 0
     header = None
+    header_line = 0
     rows, line_numbers = [], []
     for index in range(start, len(lines)):
         line = lines[index]
@@ -136,6 +187,7 @@ def _first_table(text: str, heading: str):
             cells = _split_row(stripped)
             if header is None:
                 header = cells
+                header_line = index + 1
                 continue
             if _is_separator(cells):
                 continue
@@ -143,7 +195,7 @@ def _first_table(text: str, heading: str):
             line_numbers.append(index + 1)
         elif header is not None:
             break
-    return header, rows, line_numbers
+    return header, rows, line_numbers, header_line
 
 
 def _split_sources(cell: str) -> list:
@@ -215,10 +267,10 @@ def _validate_facts(facts: dict) -> None:
         raise InputError("context-forms: the closed set is empty")
 
 
-def _parse_forms(text: str, facts: dict) -> dict:
+def _parse_forms(text: str, facts: dict):
     layers = list(facts["context-layers"]["statement"])
     forms = list(facts["context-forms"]["statement"])
-    header, rows, _lines = _first_table(text, "Forms")
+    header, rows, _lines, _header_line = _first_table(text, "Forms")
     if header is None:
         raise InputError("owner document: the ## Forms table is missing")
     if tuple(header) != FORMS_COLUMNS:
@@ -249,24 +301,43 @@ def _parse_forms(text: str, facts: dict) -> dict:
         if not any(layer in legal for legal in matrix.values()):
             raise InputError(
                 "owner document: layer %r never appears in the ## Forms matrix" % layer)
-    return matrix
+
+    raw = _marker_value(_section_body(text, "Forms"), CAP_MARKER)
+    cap_forms = tuple(token.strip() for token in raw.split(",") if token.strip())
+    if not cap_forms:
+        raise InputError(
+            "owner document: the ## Forms section carries no %s marker" % CAP_MARKER)
+    outside = sorted(set(cap_forms) - set(forms))
+    if outside:
+        raise InputError(
+            "owner document: %s names token(s) outside the declared form domain: %s"
+            % (CAP_MARKER, outside))
+    return matrix, cap_forms
 
 
-def _parse_layout(text: str) -> list:
-    header, rows, line_numbers = _first_table(text, "Layout")
+def _read_layout(text: str):
+    """The ## Layout table as (header, header line, row cells, row line numbers).
+
+    The header is returned unvalidated so `check` can judge it by the header alone;
+    a row whose cell count disagrees with the header, or that carries an empty cell,
+    is an unparsable input (exit 2), never a finding.
+    """
+    header, rows, line_numbers, header_line = _first_table(text, "Layout")
     if header is None:
         raise InputError("owner document: the ## Layout table is missing")
-    if tuple(header) != LAYOUT_COLUMNS:
-        raise InputError(
-            "owner document: the ## Layout header must be %s, got %s" % (LAYOUT_COLUMNS, header))
-    parsed = []
-    for ordinal, (row, line_number) in enumerate(zip(rows, line_numbers), start=1):
-        if len(row) != 6:
+    for row, line_number in zip(rows, line_numbers):
+        if len(row) != len(header):
             raise InputError(
-                "owner document: line %d carries %d layout cells, expected 6"
-                % (line_number, len(row)))
+                "owner document: line %d carries %d layout cells, expected %d"
+                % (line_number, len(row), len(header)))
         if not all(cell.strip() for cell in row):
             raise InputError("owner document: line %d carries an empty layout cell" % line_number)
+    return header, header_line, rows, line_numbers
+
+
+def _layout_rows(rows: list, line_numbers: list) -> list:
+    parsed = []
+    for ordinal, (row, line_number) in enumerate(zip(rows, line_numbers), start=1):
         parsed.append({
             "class": row[0],
             "layer": row[1],
@@ -301,15 +372,22 @@ def load_context(workspace: Path) -> dict:
         text = owner_path.read_text(encoding="utf-8")
     except OSError as error:
         raise InputError("owner document unreadable: %s (%s)" % (owner_path, error))
-    matrix = _parse_forms(text, facts)
-    layout = _parse_layout(text)
+    matrix, cap_forms = _parse_forms(text, facts)
+    header, header_line, cells, line_numbers = _read_layout(text)
+    shape_ok = tuple(header) == LAYOUT_COLUMNS
+    layout = _layout_rows(cells, line_numbers) if shape_ok else []
     return {
         "facts": facts,
         "layers": list(facts["context-layers"]["statement"]),
         "roster": facts["context-classes"]["statement"],
         "matrix": matrix,
+        "cap_forms": cap_forms,
+        "layout_header": list(header),
+        "layout_header_line": header_line,
+        "layout_shape_ok": shape_ok,
         "layout": layout,
         "layout_by_class": {row["class"]: row for row in layout},
+        "owner_ref": owner_path.relative_to(workspace).as_posix(),
     }
 
 
@@ -458,16 +536,117 @@ def action_manifest(context: dict, workspace: Path, layer: str, as_json: bool) -
     return EXIT_OK
 
 
-def action_check(context: dict, as_json: bool) -> int:
-    """The layout-integrity reading. The closed nine-rule set lands with its own row.
+def _finding(rule: str, file_ref: str, row: int, line: int, detail: str) -> dict:
+    return {"rule": rule, "file": file_ref, "row": row, "line": line, "detail": detail}
 
-    A green it cannot support is worse than a refusal: the action exits 2 and writes no
-    verdict until the rule set exists.
-    """
-    del context, as_json
-    print("check: the closed nine-rule set is not implemented in this build; "
-          "the audit refuses to report a verdict it cannot support", file=sys.stderr)
-    return EXIT_INPUT
+
+def check_findings(context: dict) -> list:
+    """The closed nine-rule set over the ## Layout table and the four facts."""
+    owner_ref = context["owner_ref"]
+    header = context["layout_header"]
+    header_line = context["layout_header_line"]
+    if not context["layout_shape_ok"]:
+        return [_finding(
+            "category-column", owner_ref, 0, header_line,
+            "the ## Layout header %s sits outside the fixed six columns %s"
+            % (" | ".join(header), " | ".join(LAYOUT_COLUMNS)))]
+
+    layers = context["layers"]
+    roster = context["roster"]
+    forms = list(context["facts"]["context-forms"]["statement"])
+    matrix = context["matrix"]
+    cap_forms = set(context["cap_forms"])
+    findings = []
+    first_seen = {}
+    for row in context["layout"]:
+        layer, form = row["layer"], row["form"]
+        if layer not in layers:
+            findings.append(_finding(
+                "unknown-layer", owner_ref, row["row"], row["line"],
+                "layout row %r names the layer token %r outside the declared layer domain"
+                % (row["class"], layer)))
+            continue
+        if form not in forms:
+            findings.append(_finding(
+                "unknown-form", owner_ref, row["row"], row["line"],
+                "layout row %r names the form token %r outside the declared form domain"
+                % (row["class"], form)))
+            continue
+        if layer not in matrix[form]:
+            findings.append(_finding(
+                "layer-form-illegal", owner_ref, row["row"], row["line"],
+                "layout row %r combines layer %r with form %r outside the ## Forms matrix"
+                % (row["class"], layer, form)))
+        if form in cap_forms and not CAP_REFERENCE_RE.match(row["cap"]):
+            findings.append(_finding(
+                "cap-missing", owner_ref, row["row"], row["line"],
+                "layout row %r carries no cap reference (owner path plus section required)"
+                % row["class"]))
+        if row["class"] in first_seen:
+            findings.append(_finding(
+                "duplicate-class", owner_ref, row["row"], row["line"],
+                "class %r is declared by more than one layout row (first at row %d)"
+                % (row["class"], first_seen[row["class"]])))
+        else:
+            first_seen[row["class"]] = row["row"]
+
+    for layer in layers:
+        layout_ids = [row["class"] for row in context["layout"] if row["layer"] == layer]
+        roster_ids = list(roster[layer])
+        if not layout_ids:
+            findings.append(_finding(
+                "empty-layer", owner_ref, 0, header_line,
+                "layout side layer %r carries no layout row" % layer))
+            continue
+        if not roster_ids:
+            findings.append(_finding(
+                "empty-layer", owner_ref, 0, header_line,
+                "roster side layer %r declares no class id" % layer))
+            continue
+        ordered = []
+        for class_id in layout_ids:
+            if class_id not in ordered:
+                ordered.append(class_id)
+        if set(ordered) != set(roster_ids):
+            findings.append(_finding(
+                "roster-mismatch", owner_ref, 0, header_line,
+                "layer %r: layout class set differs from the roster (missing=%s extra=%s)"
+                % (layer, sorted(set(roster_ids) - set(ordered)),
+                   sorted(set(ordered) - set(roster_ids)))))
+        elif ordered != roster_ids:
+            findings.append(_finding(
+                "roster-order", owner_ref, 0, header_line,
+                "layer %r: layout class order differs from the roster order" % layer))
+    return findings
+
+
+def _check_summary(findings: list) -> dict:
+    by_rule = {rule: 0 for rule in CHECK_RULE_NAMES}
+    for finding in findings:
+        by_rule[finding["rule"]] += 1
+    return {"total": len(findings), "by_rule": by_rule, "findings": len(findings)}
+
+
+def action_check(context: dict, as_json: bool) -> int:
+    """The layout-integrity reading; exit 0 clean, 1 findings, 2 only before this point."""
+    findings = check_findings(context)
+    summary = _check_summary(findings)
+    if as_json:
+        payload = {"action": "check", "findings": findings, "summary": summary}
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        lines = []
+        for finding in findings:
+            lines.append(
+                "finding: %s | file=%s | row=%d | line=%d | detail=%s"
+                % (finding["rule"], finding["file"], finding["row"],
+                   finding["line"], finding["detail"]))
+        lines.append("summary: total=%d findings=%d by_rule=%s"
+                     % (summary["total"], summary["findings"],
+                        " ".join("%s=%d" % (rule, summary["by_rule"][rule])
+                                 for rule in CHECK_RULE_NAMES)))
+        print("\n".join(lines))
+    return EXIT_FINDINGS if findings else EXIT_OK
 
 
 # --------------------------------------------------------------------------- #
@@ -534,6 +713,10 @@ def main(argv=None) -> int:
         if args.layer not in context["layers"]:
             return _usage(
                 "context-audit: --layer %r is outside the declared layer domain" % args.layer)
+        if not context["layout_shape_ok"]:
+            return _usage(
+                "context-audit: the ## Layout header must be %s, got %s"
+                % (LAYOUT_COLUMNS, context["layout_header"]))
         return action_manifest(context, workspace, args.layer, args.json)
     return action_check(context, args.json)
 

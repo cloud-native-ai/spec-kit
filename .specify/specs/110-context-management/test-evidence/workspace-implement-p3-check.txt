@@ -1,0 +1,44 @@
+# workspace guard (implement P3) — 2026-11-27T09:40Z
+
+## Comparison against the P3 snapshot (workspace-implement-p3.json)
+clean
+rc=0
+
+## Comparison against the P2 snapshot (workspace-implement-p2.json)
+DRIFT: refs
+  - `refs/heads/111-general-best-practices` present before, absent now.
+  - branch `110-context-management` unchanged; `.specify/specs` listing unchanged
+    (the same 95 feature directories, ending at `110-context-management`).
+rc=1 — **attributed**: the missing branch is the sibling line 111's own branch, removed by
+that concurrently running line; this package wrote no branch and no spec directory. Never
+committed or reverted here.
+
+## Comparison against the analyze round-2 snapshot (workspace-analyze-round2.json; stage-entry proxy)
+DRIFT: refs — same single attributed delta as above (`refs/heads/111-general-best-practices`
+removed by the sibling line); branch and spec listing unchanged.
+rc=1 — attributed, not a P3 drift.
+
+## Verdict
+Branch, refs except the attributed concurrent branch and `.specify/specs` are unchanged
+across the P3 window: no probe or subagent of this package resolved a foreign repository
+root. The sole refs delta is the concurrent line 111 branch removal, attributed and left
+untouched.
+
+## Git status (raw, at check time; before the P3 closing commit)
+ M .specify/instructions.md
+ M .specify/scripts/python/context-audit.py
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md   # other-run record, never touched
+ M .specify/shared/definitions/context-management-definitions.md
+ M .specify/shared/definitions/framework-map.md
+ M .specify/specs/110-context-management/tasks.md
+ M .specify/templates/instructions-template.md
+ M .specify/trigger/index.json   # machine-managed dirty file, never touched
+ M scripts/python/context-audit.py
+ M shared/definitions/context-management-definitions.md
+ M shared/definitions/framework-map.md
+ M templates/instructions-template.md
+ M tests/fixtures/context-management/<14 cases>/shared/definitions/context-management-definitions.md
+?? .specify/specs/110-context-management/test-evidence/us2-green.txt
+?? .specify/specs/110-context-management/test-evidence/us3-green.txt
+?? .specify/specs/110-context-management/test-evidence/us4-green.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-implement-p3.json

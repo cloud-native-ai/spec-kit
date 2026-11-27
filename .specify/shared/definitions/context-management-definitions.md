@@ -44,6 +44,10 @@ owns: umbrella-term, categories, layers, forms, landing-contract, layout-table, 
 | `runtime-discovery` | system |
 | `inline-digest` | task |
 
+cap_required_forms: bounded-index
+
+`cap_required_forms:` 是 `check` 的 `cap-missing` 规则读取的机器标记：它点名必须携带 `<路径> § <小节>` cap 引用的形态。标记缺失或点名的 token 超出声明形态值域是输入错误（退 2），绝不默认。
+
 - `pointer`：只携带路径引用，按需打开；不携带内容。
 - `read-in-full`：canonical 指针，消费者完整加载文档；**零复制字节**；仅限 project 层。
 - `bounded-index`：逐条路径加一行相关性，保持在 owner 声明的 cap 之内；cap 以 `<path> § <section>` 引用，绝不写数值。
@@ -133,3 +137,76 @@ baseline_scope: session, line
 - **系统层**：使用期发现加约束 owner 指针；**项目层**：治理基线以 `read-in-full` canonical 指针完整加载、零复制字节，其余行只以 pointer 或有界索引携带。
 - **任务层**：在声明的三个任务组合触发点按任务范围与关键词选择；不变来源只以 pointer 引用；组合保持在 owner 声明的 cap 之内，绝不加宽形态；任务结束时 discard 任务内容，任务内容绝不保留到下一任务。
 - **确定性**：行按花名册顺序打印与组合；审计读数不含时间戳与宿主值。
+
+### Task Composition(可变层逐任务选择)
+
+- 在 `task-entry`、`task-switch` 与 `stage-boundary`，持有当前工作项的既有角色选择或刷新任务层；派发边上，superagent 在 `pre-dispatch` 组合每次派发的任务层与基线指针（C-021）。
+- 选择按任务范围与关键词：只带在范围内的制品、任务相关能力、相关共享文档与 docs 索引、记忆召回投影、蒸馏的 `task-statement` 与 `task-delta` 增量。正文按需打开，绝不整体注入。
+- 不变来源只以 pointer 引用；pointer 行绝不整体打开进载荷；组合保持在该行 owner 声明的 cap 之内，绝不加宽形态，也绝不发明上限。
+- 两条常驻 `inline-digest` 行以各自的常驻 owner 路径为在场见证：`task-statement` → `shared/workflow/user-input-protocol.md`；`task-delta` → `.specify/register.md` 加 `.specify/state/`。瞬态输入不构成常驻来源，也绝不使该行变成缺席。
+- 任务切换只重组任务层，绝不触碰基线。
+
+### Duplication(不变内容绝不复述)
+
+不变内容绝不在可变层被复述：触及不变来源的任务层行只以 `pointer` 引用它。**可判定的** duplication 恰为两种形状，由审计报告：任务层行以 `read-in-full` 覆盖一个不变层行已声明的来源；任务层行以 `inline-digest` 覆盖一个被不变层行以 `read-in-full` 物化的来源。其余形状（例如对仅以指针物化的不变来源做内联摘要）留给 review 复审判定；审计只报告上述形状，绝不代替评审判定内容重复。
+
+### Source Drift(来源漂移)
+
+`source-drift` 是**已记录的记录变更**——宪法修订、指令刷新、词汇表或特性状态变化、git 工作流变化，或与已记录项目事实矛盾的新发现——在下一个声明触发点触发**恰好一次**基线刷新（根会话执行）。证据是项目已保存的变化记录加 manifest 的 source reading（对已声明来源元数据的确定性摘要，绝不读内容）。机制不新增 watcher、daemon 或后台检查：**no watcher, no poll**，一次变化绝不引起两次刷新，已记录的变更也绝不触发零次。
+
+### Reentry(重入)
+
+`reentry` 是压缩、交接或停滞重读后被恢复的会话以根会话身份重引基线：它按指针 **re-cite** 基线（仅当基线刷新触发同时命中时才重组），刷新 **task-delta**，并记录 **re-anchoring statement** 作为证据。重锚定层级由 `shared/definitions/re-anchoring-definitions.md` 拥有，本文件只按指针抵达，绝不复述。
+
+## Triggers
+
+触发集封闭于七项；每项点名其组合者、范围与证据。增删触发是 owner 修订，不新增第八个触发。
+
+| trigger | composer | scope | evidence |
+|---------|----------|-------|----------|
+| `session-entry` | root session | 组合不变基线（the invariant baseline, once） | 基线的 manifest 行（the manifest baseline rows） |
+| `task-entry` | composer of the current work | 组合任务层（the task layer） | 任务层的 manifest 行（the manifest task rows） |
+| `task-switch` | composer of the current work | 只重组任务层（the task layer only） | 任务层的 manifest 行（the manifest task rows） |
+| `pre-dispatch` | superagent | 每次派发的任务层与基线指针（the per-dispatch task layer plus pointers） | 派发简报（the dispatch brief） |
+| `stage-boundary` | composer of the current work | 刷新 task-delta | 任务层的 manifest 行（the manifest task rows） |
+| `source-drift` | root session | 恰好重组基线一次（the invariant baseline） | manifest 的 source reading |
+| `reentry` | resumed session | 重引基线并刷新 task-delta（baseline re-cite plus the task-delta refresh） | 重锚定陈述（the re-anchoring statement） |
+
+## Composer Roles
+
+组合者角色经既有相对角色模型解析（owner: `shared/definitions/superagent-definitions.md`）；本文件不引入新角色值、深度规则或授权：
+
+- 根会话（root session）在 `session-entry` 组合基线、在 `source-drift` 刷新它、在 `reentry` 以被恢复的会话身份按指针重引。
+- superagent 在 `pre-dispatch` 组装每次派发的载荷与基线指针。
+- **当前工作的组合者（composer of the current work）**在 `task-entry`、`task-switch` 与 `stage-boundary` 选择或刷新任务层：它解析为持有该工作项的既有角色（会话或 superagent）——holder 解析而非新角色值。
+- 被派发的执行者（dispatched executor）只完整加载它收到的指针，MUST NOT 重新收集上下文（MUST NOT re-gather context）、MUST NOT 继承兄弟会话记录、MUST NOT 从会话历史组合。
+
+## Dispatch Mapping
+
+派发边上，任务层与基线指针经既有载荷通道承载（owner: `shared/definitions/superagent-definitions.md` § The super↔sub Protocol）；本文件只按指针映射，绝不复述其规则：
+
+role_fields: parent_identity, child_label, role_declaration, dispatch_duty, depth_position, authority_ref, return_channel
+injections: fast-fail clause, concurrency obligation, reporting duty, re-anchoring anchor digest
+
+- 七个既有角色字段（`parent_identity`、`child_label`、`role_declaration`、`dispatch_duty`、`depth_position`、`authority_ref`、`return_channel`）与四项既有注入原样承载载荷。
+- 映射只落位：`authority_ref` 承载基线指针；既有四项注入随载荷按指针同行；`return_channel` 是上行回传通道。
+- 本映射不新增任何东西：it adds no new field, no new injection, no new cap, no new identifier and no new self-check item，也不改变载荷规则。非派发场景下同一组层经同一组声明行组合，不需要任何派发载荷。
+
+## Concept Pointer
+
+概念指针槽位以**不可省略的三元组**承载，只携带指针；定义与解释的含义留在其 owner，绝不复制进任何上下文。槽位成员稳定：增删入口是 owner 修订。
+
+glossary: .specify/glossary.md
+definitions: .specify/shared/definitions/
+explanations: .specify/skills.md, .specify/tools.md
+
+四个受治理结构各自声明载体、指针形态与具名在场面：
+
+| structure | carrier | pointer form | presence surface |
+|-----------|---------|--------------|------------------|
+| root/superagent turn | 基线的三个项目层行（`project-vocabulary`、`concept-definitions`、`concept-explanations`） | pointer 与 bounded-index 行 | the manifest's three project-layer rows |
+| subagent dispatch payload | 既有 `authority_ref` 指针字段加子代理 ambient 的 Documentation Map glossary 行加派发简报的阅读清单 | pointer（既有字段与通道，不新增） | the Documentation Map glossary entry and the brief's reading list |
+| memory-recall projection | 组合会话的基线行随召回投影按指针同行；`memory-utils.py` 不变 | pointer | the memory projection and the manifest's three project-layer rows |
+| recovery/re-anchoring re-entry surface | `reentry` 触发的基线重引加重锚定陈述 | pointer | the re-anchoring statement and the manifest's three project-layer rows |
+
+每个结构的在场 MUST 经机制可读的具名面观测；仅靠声明而无在场面的结构是缺陷。缺席读数：入口的布局行缺失读 `not-evaluated`（原因点名缺失布局行），声明来源缺失、不可读或为空分别读 `absent`、`unreachable`、`empty`；由这些结构导出的一致性声称读 `Unobserved`——永不一致，永不读成 `present`。

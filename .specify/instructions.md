@@ -303,6 +303,10 @@ The `.specify/` layout is a **map, not a manual** — *what* exists and *where* 
 
 Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution): `.specify/shared/definitions/agent-definitions.md`.
 
+## Context Management(上下文管理)
+
+Compose the invariant baseline once per session or line; select the task layer per task; cite sources by pointer instead of copying their content; name every absence with its reason. Owner: `.specify/shared/definitions/context-management-definitions.md`; read-only audit entry: `.specify/scripts/python/context-audit.py`.
+
 ## Super Agent (相对逻辑角色)
 
 Super agent is the parent-side relative logical role on a dispatch edge — not a fourth layer, entity type or runtime; the role model is owned by `.specify/shared/definitions/superagent-definitions.md`. A dispatch granting dispatch duty physically carries the `role-transition` injection list.
