@@ -1,0 +1,12 @@
+# feedback record (tasks stage) — 2026-11-27
+$ python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:create-tasks" --unit-type skill --run-id r20261127T070000Z-110a --feature 110-context-management --review <text> --points <text>
+{
+  "id": "20261127T080418Z-skill-create-tasks",
+  "path": ".specify/feedback/20261127T080418Z-skill-create-tasks.md",
+  "duplicate": false,
+  "count_since_submission": 606,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
+exit=0

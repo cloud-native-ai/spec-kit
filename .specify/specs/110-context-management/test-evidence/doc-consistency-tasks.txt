@@ -1,0 +1,10 @@
+# doc-consistency structure gate (tasks stage) — 2026-11-27
+$ python3 scripts/python/doc-consistency-check.py --action structure --spec-dir .specify/specs/110-context-management
+doc-consistency-check: structure
+checked_at: 2026-11-27T08:03:32Z
+class=execution source=declaration
+status: not-applicable
+two-way: not-run
+files_scanned: 1
+not-applicable: 结构门禁只适用于表达类；已检视 1 个文件，未做结构判定
+exit=0

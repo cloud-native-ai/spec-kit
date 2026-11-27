@@ -1,0 +1,6 @@
+# tasks validator (tasks stage) — 2026-11-27
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/110-context-management/tasks.md
+PASS: .specify/specs/110-context-management/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+
+WARN adjudication: none reported (0 warning(s)); the earlier heuristic parallel-safe hit on the read-only mirror runner was resolved by serializing T004 behind T003, not by deleting a path.

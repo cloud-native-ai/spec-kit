@@ -1,0 +1,28 @@
+# workspace guard (tasks stage) — 2026-11-27
+
+## Comparison against the pre-write snapshot (workspace-tasks.json)
+clean
+rc=0
+
+## Git status (raw, at check time)
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md
+?? .specify/exec-quant/records/20261127T080412159425Z-df5b2a99.json
+?? .specify/feedback/20261127T080418Z-skill-create-tasks.md
+?? .specify/session/20261127T080408Z-run-determination-skill-create-tasks-r20261127t070000z-110a.md
+?? .specify/specs/110-context-management/tasks.md
+?? .specify/specs/110-context-management/test-evidence/decomposition-tasks.json
+?? .specify/specs/110-context-management/test-evidence/decomposition-tasks.txt
+?? .specify/specs/110-context-management/test-evidence/doc-consistency-tasks.txt
+?? .specify/specs/110-context-management/test-evidence/pre-analyze-tasks.json
+?? .specify/specs/110-context-management/test-evidence/pre-analyze-tasks.txt
+?? .specify/specs/110-context-management/test-evidence/tasks-exec-quant.txt
+?? .specify/specs/110-context-management/test-evidence/tasks-feedback-record.txt
+?? .specify/specs/110-context-management/test-evidence/tasks-run-determination.txt
+?? .specify/specs/110-context-management/test-evidence/tasks-validator.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-tasks-check.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-tasks.json
+
+## Attribution
+- `.specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md` (**M**) is the pre-existing modification of another run (the clarify stage's own earlier determination left it uncommitted), disclosed at checkpoint 02. It stays untouched — never committed, never reverted by this stage.
+- Every other entry is this tasks stage's own output: `tasks.md` plus the gate/evidence captures under `.specify/specs/110-context-management/test-evidence/`, and the wrap-up accounting records under `.specify/session/`, `.specify/exec-quant/records/` and `.specify/feedback/` (run determination, exec-quant, feedback for `skill:create-tasks`).
+- No file outside this feature's territory and the accounting stores was written; the main tree was not touched; the state spine is read-only for this stage; no push.
