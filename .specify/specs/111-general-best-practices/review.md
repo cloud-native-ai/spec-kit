@@ -70,7 +70,7 @@ Reconstructed from `git log` scoped to the spec directory plus the stage records
 | Severity | Count | Definition |
 |----------|------:|------------|
 | P0 | 1 | Blocks correct use of spec-kit, or creates silent corruption risk. Fix before next spec. |
-| P1 | 2 | Recurring friction across specs. Fix when convenient — currently every spec writer pays the toll. |
+| P1 | 3 | Recurring friction across specs. Fix when convenient — currently every spec writer pays the toll. |
 | P2 | 5 | Quality-of-life. Compounding gains across many specs. |
 
 | Category | Count |
@@ -78,7 +78,7 @@ Reconstructed from `git log` scoped to the spec directory plus the stage records
 | Template | 0 |
 | Command Prompt | 0 |
 | Automation / Scripts | 1 |
-| Workflow | 5 |
+| Workflow | 6 |
 | Documentation | 2 |
 
 ### 2.1 Code Segment (Verdict and Pointers)
@@ -125,7 +125,7 @@ Readings behind the verdict: FR→task coverage 9/9 and SC→task coverage 7/7 (
 | Smoke command | `env SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_general_best_practices.py` | recorded verbatim; re-run by this review |
 | Smoke exit code | 0 | `6 passed in 6.26s` |
 | Smoke evidence path | `.specify/.tmp/review-111/smoke.log` | exists, non-empty |
-| Scope and regression verdict | scope clean — 138 paths = 113 declared + 2 registry exception + 23 per-entry accounting residuals, 0 violations (re-derived at HEAD); regression none — mirror parity 888 passed (re-run), targeted set 895 passed, full suite 223 failed names byte-identical to the implement-entry baseline (`cmp` exit 0) | — |
+| Scope and regression verdict | scope clean for `base..head` — 138 paths = 113 declared + 2 registry exception + 23 per-entry accounting residuals, 0 violations (re-derived at HEAD); regression none — mirror parity 888 passed (re-run), targeted set 895 passed, full suite 223 failed names byte-identical to the implement-entry baseline (`cmp` exit 0). The feature-level re-read after this review's own close-out commits is F8's subject. | — |
 | Segment verdict | `pass` | one P2 |
 
 | Severity | Diff path | Line | Why the line is absent | Finding |
@@ -277,6 +277,24 @@ Correctness readings: the five module documents match the settled source in subs
 - **Why it's a problem**: two of the six stages before implement ended with their products uncommitted, so the driver had to reconstruct the produced path set twice. The repair worked, but the burden lands on the orchestrator every time a stage executor skips its commit.
 - **Proposed fix**: make a clean worktree (or a stage-owned explicit-path commit) part of the U4 acceptance criterion for stage sentinels; keep the driver's explicit-path commit as the fallback only.
 
+### F8 — The closed containment set omits the framework-mandated close-out receipt and the engine's settle updates
+
+- **Severity**: P1
+- **Category**: Workflow
+- **Location**: `<repo>/.specify/specs/111-general-best-practices/requirements.md` L145 (FR-009) versus `<repo>/.specify/shared/workflow/artifact-commit-step.md` L93–L94 (close-out receipt) and the run-determination `settle` path
+- **Evidence** (verbatim quote):
+
+  ```
+  requirements.md:145  以及 **wrap-up 记账记录**——`.specify/session/`、`.specify/feedback/`、`.specify/exec-quant/` 中由本特性
+                       各阶段运行经既有三个记账引擎产生的 per-entry 文件（判定谓词：记录体内携带特性 key
+                       `111-general-best-practices` 或本线 run id `r20261127T071500Z-111a`）
+  artifact-commit-step.md:93  Each run writes **one receipt** — a new file, never an edit of an existing one — under
+                              `.specify/retention/closeout/`, named by the run and its timestamp, written once.
+  ```
+
+- **Why it's a problem**: FR-009 closes the change-path set over six surfaces plus three accounting stores, but the review stage it mandates cannot satisfy that set. This run's mandated close-out receipt lands under `.specify/retention/closeout/` (outside the set), and the run-determination engine settles the previous same-unit run's records — four `.specify/session/…-108a.md` files whose bodies carry `feature: 108-team-view-degradation`, so they satisfy neither the path set nor the A-20 body predicate. Re-derived at the post-review HEAD (`de9553e23`), the range now holds **5 paths the declared set rejects** (1 receipt + 4 settled records). The containment claim was authored without measuring the framework's own review/close-out behavior, so it cannot survive its own review — the same omission would recur in every feature that copies this FR shape.
+- **Proposed fix**: extend FR-009's declared set with `.specify/retention/closeout/<run>-<stage>.md` and with engine-settled prior-run records under `.specify/session/` (predicate: the record's `settled_by`/body names this line's run id), and mirror the same addition into the A-20 residual procedure; alternatively scope SC-006 to the implement head and declare the review's own accounting outputs in a separate clause.
+
 ## 4. What Worked — Preserve (Brief)
 
 - Red-first guard: 6 errors on the absent module (exit 1) → 6 passed after landing; the capture carries command, output and exit code.
@@ -298,6 +316,7 @@ Correctness readings: the five module documents match the settled source in subs
 - **REC-111-03 — Add a registration step to the driver's stage sequence** — Target: `skills/external/sdd-loop-driver/SKILL.md` (stage sequence) with its stage-brief templates. Change: declare the registration seat (row + detail + status advance) as a stage, or fold it into implement's closure; record the owning seat in the briefing. Source: F2. Expected impact: no more post-closure driver repairs and no U6 reconciliation debt for sibling rows.
 - **REC-111-04 — Freeze the tree before a full-suite measurement** — Target: `skills/internal/implement-feature/SKILL.md` § Step 8 (commit gate). Change: the last task-state write lands before any `run-tests.sh --full`, and the run records the tree state it measured. Source: F5. Expected impact: the one expensive suite execution per feature stops being wasted on an invalid window.
 - **REC-111-05 — Stage-completion criterion includes a clean worktree** — Target: `skills/external/sdd-loop-driver/SKILL.md` (U4 criteria). Change: the sentinel may not be accepted while produced stage artifacts are uncommitted; the driver's explicit-path commit stays as the fallback, not the norm. Source: F7 (below). Expected impact: removes the two repairs this line needed at requirements/clarify.
+- **REC-111-08 — Make the containment declaration cover the review close-out** — Target: the closed-set-claims template (`shared/guidelines/closed-set-claims.md` consumers, e.g. the requirements template's containment row) plus this feature's FR-009. Change: include `.specify/retention/closeout/<run>-<stage>.md` and engine-settled prior-run records in the allowed delta (or scope the claim to the implement head and declare review accounting separately). Source: F8. Expected impact: a feature's containment claim can survive its own review stage.
 
 ### 5.3 Documentation Improvements
 
@@ -313,6 +332,7 @@ Correctness readings: the five module documents match the settled source in subs
 | P0 | Derive `verification.md` and re-run the closure gate | feature's implement close-out / `.specify/templates/verification-log-template.md` | F-ACCEPTANCE |
 | P1 | Name the deriving seat for `verification.md` | `skills/internal/implement-feature/SKILL.md` § Step 9; `skills/internal/create-tasks/SKILL.md` | F1 |
 | P1 | Declare the feature-registration stage | `skills/external/sdd-loop-driver/SKILL.md` | F2 |
+| P1 | Cover the review close-out in the containment declaration | `shared/guidelines/closed-set-claims.md` consumers; this feature's FR-009 | F8 |
 | P2 | Declared-baseline tier in `base` | `skills/internal/code-review/scripts/git-delta-review.sh` | F6 |
 | P2 | Freeze the tree before full-suite runs | `skills/internal/implement-feature/SKILL.md` § Step 8 | F5 |
 | P2 | Clean-worktree stage completion | `skills/external/sdd-loop-driver/SKILL.md` (U4) | F7 |
@@ -334,4 +354,4 @@ Please share the contents of this document with the spec-kit framework developer
 
 ---
 
-**Composed-run verdict**: the four segments conclude independently — process: P1 ×2 (F1, F2) / P2 ×3 (F5, F6, F7); artifact: `blocked` — P0 ×1 (F-ACCEPTANCE) / P2 ×1 (F3); implementation: `pass` — P2 ×1 (F4); code: `blocked`, gate `blocking-unresolved` (findings in `code-review.md`). The Acceptance Reality Check refuses the comparison (checker exit 2 on the absent `verification.md`). **The feature status stays `Implemented`; no flip to `Ready for Review`.**
+**Composed-run verdict**: the four segments conclude independently — process: P1 ×3 (F1, F2, F8) / P2 ×3 (F5, F6, F7); artifact: `blocked` — P0 ×1 (F-ACCEPTANCE) / P2 ×1 (F3); implementation: `pass` — P2 ×1 (F4); code: `blocked`, gate `blocking-unresolved` (findings in `code-review.md`). The Acceptance Reality Check refuses the comparison (checker exit 2 on the absent `verification.md`). **The feature status stays `Implemented`; no flip to `Ready for Review`.**
