@@ -1,0 +1,4 @@
+# workspace snapshot (analyze round 2) — 2026-11-27T08:40Z
+$ python3 .specify/scripts/python/workspace-guard.py --snapshot .specify/specs/110-context-management/test-evidence/workspace-analyze-round2.json --repo .
+recorded .specify/specs/110-context-management/test-evidence/workspace-analyze-round2.json
+exit=0

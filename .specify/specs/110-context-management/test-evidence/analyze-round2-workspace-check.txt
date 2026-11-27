@@ -1,0 +1,24 @@
+# workspace guard (analyze round 2) — 2026-11-27
+
+## Comparison against the pre-write snapshot (workspace-analyze-round2.json)
+clean
+rc=0
+
+## Git status (raw, at check time)
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md
+ M .specify/specs/110-context-management/test-evidence/analyze.jsonl
+?? .specify/retention/closeout/20261127T084243Z-r20261127T070000Z-110a-analyze-r2.md
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-artifact-hashes.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-exec-quant.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-feedback-record.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-findings.jsonl
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-mirror-check.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-pre-analyze-tasks.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-report.md
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-requirements-validator.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-residue-verify.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-run-determination.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-tasks-validator.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-workspace-check.txt
+?? .specify/specs/110-context-management/test-evidence/analyze-round2-workspace-snapshot.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-analyze-round2.json
