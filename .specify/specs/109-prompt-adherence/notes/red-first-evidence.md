@@ -424,3 +424,254 @@ per-store reasons under a socket-blocked interpreter, carries all six blind-spot
 exits 0 — absence is never reported as clean. The probe row reads `Wired` because its registry
 declaration ships with init. The fresh project's prompt-adherence-named inventory is exactly
 the owner document, the five declaration facts and the engine (C-037 inventory-only scope).
+
+## T027 — the longitudinal legs go red before the window exists
+
+The multi-run fixture (`tests/fixtures/prompt-adherence/multi-run/`) seeds four run-determination
+entries across four runs, two exec-quant records, three feedback entries (one `gate:`-family), two
+evidence runs, and the probe registry; two records' timestamps fall exactly on the
+`2026-11-25T00:00:00Z` / `2026-11-26T00:00:00Z` window bounds so the half-open rule is decidable.
+The engine guard gained seven longitudinal legs and the read-only guard gained its longitudinal
+complement; both were authored before the engine carries a window path.
+
+Command (the only test entry) and output:
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+```
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+9 failed, 35 passed in 7.08s
+```
+
+Exit code: `1`. The nine failures are the named red legs — each fails on the missing window path
+(the engine refused with `--since/--until: the longitudinal window reading is not delivered`) or
+the missing source cap (26 sources emitted uncapped), never on an import error:
+
+```text
+FAILED tests/contract/test_prompt_adherence_engine.py::test_window_reading_reports_per_row_state_counts_in_catalog_order
+FAILED tests/contract/test_prompt_adherence_engine.py::test_window_boundary_on_exact_record_timestamps_is_half_open
+FAILED tests/contract/test_prompt_adherence_engine.py::test_omitted_window_bound_prints_the_open_literal_and_both_bounds_appear
+FAILED tests/contract/test_prompt_adherence_engine.py::test_window_accepts_both_declared_bound_forms_and_rejects_invalid_values
+FAILED tests/contract/test_prompt_adherence_engine.py::test_probe_row_evaluates_once_and_is_marked_window_exempt
+FAILED tests/contract/test_prompt_adherence_engine.py::test_window_reading_produces_no_ranking_or_comparison
+FAILED tests/contract/test_prompt_adherence_engine.py::test_window_with_zero_records_emits_no_data_with_all_rows_present
+FAILED tests/contract/test_prompt_adherence_engine.py::test_output_caps_truncate_sources_with_a_shown_total_disclosure
+FAILED tests/contract/test_prompt_adherence_readonly.py::test_longitudinal_reading_leaves_the_store_roots_byte_identical
+```
+
+Representative failure (the window path is absent; the refusal is exit 2, no reading):
+
+```text
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '.../prompt-adherence.py', ...]).returncode
+... stderr='prompt-adherence: --since/--until: the longitudinal window reading is not delivered; --run cannot be combined with --since/--until\n'
+tests/contract/test_prompt_adherence_engine.py:946: AssertionError
+```
+
+## T028 — the longitudinal reading and the output caps close green
+
+Implementation: window parsing/validation (`--since`/`--until` accept `YYYY-MM-DD` or
+`YYYY-MM-DDTHH:MM:SSZ` UTC, an invalid value exits 2, `--run` combined with either is an input
+error), the half-open `[since, until)` comparison on each record's own declared timestamp field,
+the literal `open` for an omitted bound, per-row state counts in catalog order, the
+window-exempt declaration-row note in the scope, and the output caps (per-observation sources 20,
+invalid sources 50, duplicates 20 — each with a shown/total disclosure).
+
+Same command as T027, after the engine change:
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+44 passed in 7.09s
+```
+
+Exit code: `0`. The cap leg's reading over a 26-entry feedback row:
+
+```text
+sources=20 (cap)  truncations=[{"list": "sources", "row": "feedback-entry", "shown": 20, "total": 26}]
+human: truncated sources row=feedback-entry shown=20 total=26
+```
+
+## T029 — the window readings, the overlap, and the unchanged store tree
+
+Command (JSON forms, then the human form, over the multi-run fixture; the manifest hashes every
+file in the same workspace immediately before and after the four readings):
+
+```bash
+python3 scripts/python/prompt-adherence.py --workspace-root tests/fixtures/prompt-adherence/multi-run \
+  --since 2026-11-25 --until 2026-11-26 --json
+python3 scripts/python/prompt-adherence.py --workspace-root tests/fixtures/prompt-adherence/multi-run \
+  --since 2026-11-24 --until 2026-11-26 --json
+python3 scripts/python/prompt-adherence.py --workspace-root tests/fixtures/prompt-adherence/multi-run \
+  --since 2026-11-25T00:00:00Z --until 2026-11-26T00:00:00Z
+python3 scripts/python/prompt-adherence.py --workspace-root tests/fixtures/prompt-adherence/multi-run \
+  --since 2026-11-24
+```
+
+Window A `[2026-11-25, 2026-11-26)` — records whose determined_at/collected_at/created fall in the
+half-open interval; the record at exactly `since` (`multi-b`) is counted, the record at exactly
+`until` (`multi-c`) is not; status `complete`, `coverage.records_in_scope` = 6:
+
+```text
+state-counts run-determination-record Exercised=2
+state-counts exec-quant-record Exercised=1
+state-counts feedback-entry Exercised=1
+state-counts gate-observation-record Exercised=1
+state-counts evidence-finding Exercised=1
+state-counts probe-registry-declaration none
+coverage-records-in-scope: 6
+scope: window [2026-11-25T00:00:00Z, 2026-11-26T00:00:00Z)
+```
+
+The wider window B `[2026-11-24, 2026-11-26)` differs only where its lower bound differs
+(exec-quant 1→2, feedback 1→2, evidence 1→2; the run-determination count stays 2 because no
+run-determination record exists on 2026-11-24), `records_in_scope` = 9.
+
+The until-open window `[2026-11-25, open)` prints both bounds with the literal `open` and counts
+the 2026-11-26T00:00:00Z record (run-determination Exercised=3), `records_in_scope` = 10.
+
+The store tree after all four readings:
+
+```text
+manifest_before_files=14 manifest_after_files=14 identical=True
+```
+
+All four readings exited 0; the ten declared-but-unpopulated store roots stayed absent and no
+file under the fixture changed (allowed delta: none, C-041).
+
+## T030 — the advisory-only legs close (declared regression exception)
+
+T030 guards behavior delivered in US1–US4 (the reading already emits deviation classes and never
+writes), so it is authored after its subject per the migration/regression exception recorded on
+the task line; its red-capability is the seeded negative observation itself (the legs fail if the
+fixture stops yielding a deviation-class observation). The engine guard gained two legs — no
+automatic disposition / threshold / mutation key or token in any reading shape, and the negative
+vocabulary exercised by the fixtures equals exactly the three declared deviation classes plus the
+absence states — and the read-only guard gained the whole-workspace advisory leg.
+
+Command (the only test entry) and output:
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+```
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+47 passed in 7.20s
+```
+
+Exit code: `0`. The exercised negative vocabulary is `{axis-regression, green-unproven,
+evidence-missing}` (the declared classes fact member-for-member); the deviation-bearing readings
+over the seeded fixture (default reading: `classes=evidence-missing`; the deviant run:
+`classes=axis-regression,green-unproven`) leave a full-workspace hash manifest unchanged — no
+aggregate, no new store root, no mutation anywhere (allowed delta: none).
+
+## T031 — the dated baseline reading lands through the existing channel
+
+Default-scope reading and its `--json` form on this repository (both exit 0), executed
+2026-11-27 in the line worktree on branch `109-prompt-adherence`:
+
+```bash
+python3 scripts/python/prompt-adherence.py
+python3 scripts/python/prompt-adherence.py --json
+```
+
+```text
+scope: run r20261127T053750Z-109a-p3
+scope-resolution: most-recent
+scope-basis: store=feedback path=.specify/feedback/20261127T073155Z-speckit-implement.md timestamp=2026-11-27T07:31:55Z
+status: complete
+row run-determination-record layer=host-prompt strength=indirect state=Exercised
+row exec-quant-record layer=project-rules strength=indirect state=Exercised
+row feedback-entry layer=project-rules strength=direct state=Exercised
+row gate-observation-record layer=project-rules strength=direct state=Unobserved reason=no-matching-records source=.specify/feedback
+row evidence-finding layer=project-rules strength=indirect state=Unobserved reason=no-matching-records source=.specify/evidence
+row probe-registry-declaration layer=project-rules strength=indirect state=Wired
+coverage-records-in-scope: 3
+declaration-set: 093e71f226cc7a14f8c5fe83400943305f0e9654a5915a1edd618f7a2d4c5018
+invalid_records=19 (pre-existing repo records, disclosed not skipped)
+```
+
+The baseline record (exactly one) via the existing feedback engine — one ordinary dated entry,
+no aggregate, no new store, the target is the framework itself:
+
+```bash
+python3 scripts/python/feedback-utils.py --action record \
+  --unit-id /speckit.implement --unit-type command \
+  --run-id r20261127T053750Z-109a-p4-baseline \
+  --feature 109-prompt-adherence --feature-id 109 \
+  --review-file .specify/.tmp/p4-baseline-review.md \
+  --points-file .specify/.tmp/p4-baseline-points.md
+```
+
+```text
+{
+  "id": "20261127T074122Z-speckit-implement",
+  "path": ".specify/feedback/20261127T074122Z-speckit-implement.md",
+  "duplicate": false,
+  "count_since_submission": 612,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
+```
+
+Exit code: `0`. The entry's frontmatter carries `feature: "109-prompt-adherence"`,
+`feature_id: "109"`, `created: "2026-11-27T07:41:22Z"`; its body carries the reading's scope,
+status, per-row states, declaration-set digest (`093e71f2…c5018`), the six blind spots, the
+record/invalid counts and the source references (the four cited repo-relative paths), inside the
+fenced `prompt-adherence-baseline-v1` block. No improvement is claimed.
+
+## T032 — the audit replay resolves every citation; the baseline replays
+
+The engine guard gained three audit legs. Every positive observation in the seeded, multi-run,
+project-only and indirect-only fixture readings is reconstructed mechanically from its citation
+alone (`session`: the fenced JSON record's `run_id`; `exec-quant`/`evidence`: the record file's
+declared identity field; `feedback`: the frontmatter entry id plus the named field; `registry`:
+the Objects table's presence). The seeded broken reference surfaces as
+`invalid_sources[.specify/evidence/ev-neg-broken/findings.json] = unparsable` — never skipped —
+and the disclosed count equals the invalid list length.
+
+The dated baseline entry replays by one engine run against its citations:
+
+```bash
+python3 scripts/python/prompt-adherence.py --run r20261127T053750Z-109a-p3   # the recorded scope.run
+```
+
+```text
+scope: run r20261127T053750Z-109a-p3
+status: partial
+row run-determination-record ... state=Exercised
+row exec-quant-record ... state=Exercised
+row feedback-entry ... state=Exercised
+row gate-observation-record ... state=not_evaluated reason=no-matching-records
+row evidence-finding ... state=not_evaluated reason=no-matching-records
+row probe-registry-declaration ... state=not_evaluated reason=no-matching-records
+coverage-records-in-scope: 3
+```
+
+The three positive rows replay exactly (state and deviation classes); the default-scope absence
+rows replay as `not_evaluated` with the same cause — the declared four-way derivation's
+explicit-run shift of `Unobserved`, disclosed in the test; the declaration row's explicit-run
+`not_evaluated` is its documented edge case. The declaration-set digest and the record/invalid
+counts equal the recorded values; all four cited paths resolve.
+
+Guard run (the only test entry) and output:
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+```
+
+```text
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_prompt_adherence_engine.py tests/contract/test_prompt_adherence_readonly.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+50 passed in 7.78s
+```
+
+Exit code: `0`.

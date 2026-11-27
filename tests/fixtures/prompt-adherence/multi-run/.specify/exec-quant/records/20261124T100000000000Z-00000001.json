@@ -1,0 +1,9 @@
+{
+  "kind": "speckit.exec-quant",
+  "schema_version": 2,
+  "unit_id": "/speckit.plan",
+  "unit_type": "command",
+  "run_id": "r20261124T100000Z-multi-e",
+  "run_id_resolution": "explicit",
+  "collected_at": "2026-11-24T10:00:00Z"
+}

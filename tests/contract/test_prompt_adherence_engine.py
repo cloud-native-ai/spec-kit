@@ -24,8 +24,8 @@ Legs and their clauses:
   document by its own copy form (a source-tree copy never reads the installed face).
 
 The ``--check-coverage`` legs (T019/T020) extend this same file below; the longitudinal
-window, advisory and audit-replay legs are later slices' rows (T027, T030, T032) and extend
-this file there; they are not claimed here.
+window, audit-replay and advisory-only legs are later slices' rows (T027, T030, T032) and
+extend this file there.
 """
 from __future__ import annotations
 
@@ -116,6 +116,20 @@ FIXTURE_PATHS = (
     "negative/.specify/evidence/ev-neg-nomanifest/findings.json",
     "negative/.specify/evidence/ev-neg-broken/findings.json",
     "negative/.specify/shared/definitions/probe-definitions.md",
+    "multi-run/.specify/session/20261123T090000Z-run-determination-speckit-plan-multi-a.md",
+    "multi-run/.specify/session/20261125T000000Z-run-determination-speckit-plan-multi-b.md",
+    "multi-run/.specify/session/20261125T060000Z-run-determination-speckit-review-multi-d.md",
+    "multi-run/.specify/session/20261126T000000Z-run-determination-speckit-plan-multi-c.md",
+    "multi-run/.specify/exec-quant/records/20261124T100000000000Z-00000001.json",
+    "multi-run/.specify/exec-quant/records/20261125T100000000000Z-00000002.json",
+    "multi-run/.specify/feedback/20261124T110000Z-multi-plan-a.md",
+    "multi-run/.specify/feedback/20261125T110000Z-multi-plan-b.md",
+    "multi-run/.specify/feedback/20261125T120000Z-multi-gate.md",
+    "multi-run/.specify/evidence/ev-multi-a/findings.json",
+    "multi-run/.specify/evidence/ev-multi-a/manifest.json",
+    "multi-run/.specify/evidence/ev-multi-b/findings.json",
+    "multi-run/.specify/evidence/ev-multi-b/manifest.json",
+    "multi-run/.specify/shared/definitions/probe-definitions.md",
 )
 
 
@@ -827,4 +841,416 @@ def test_source_copy_and_installed_copy_each_read_their_own_owner_document(tmp_p
     )
     assert installed_reading["coverage"]["blind_spots"][0] == "zz-installed-face-trap", (
         "the installed copy did not read its installed owner document"
+    )
+
+# --------------------------------------------------------------------------- #
+# T027 — the longitudinal window legs (C-022, FR-015, FR-016)
+# --------------------------------------------------------------------------- #
+MULTI = "multi-run"
+WINDOW_A = ("2026-11-25T00:00:00Z", "2026-11-26T00:00:00Z")
+WINDOW_A_COUNTS = {
+    "run-determination-record": {"Exercised": 2},
+    "exec-quant-record": {"Exercised": 1},
+    "feedback-entry": {"Exercised": 1},
+    "gate-observation-record": {"Exercised": 1},
+    "evidence-finding": {"Exercised": 1},
+    "probe-registry-declaration": {},
+}
+WINDOW_B_COUNTS = {
+    "run-determination-record": {"Exercised": 2},
+    "exec-quant-record": {"Exercised": 2},
+    "feedback-entry": {"Exercised": 2},
+    "gate-observation-record": {"Exercised": 1},
+    "evidence-finding": {"Exercised": 2},
+    "probe-registry-declaration": {},
+}
+RANKING_TOKENS = re.compile(r"(?i)\b(ranking|ranked|rank|composite|comparison|score)\b")
+
+
+def _window_args(since=None, until=None):
+    args = []
+    if since is not None:
+        args += ["--since", since]
+    if until is not None:
+        args += ["--until", until]
+    return args
+
+
+def test_window_reading_reports_per_row_state_counts_in_catalog_order():
+    reading = _reading(MULTI, *_window_args(*WINDOW_A))
+    scope = reading["scope"]
+    assert scope["kind"] == "window"
+    assert scope["run"] is None
+    assert scope["window"] == {"since": WINDOW_A[0], "until": WINDOW_A[1]}
+    assert scope["resolution"] == "explicit"
+    assert [obs["row"] for obs in reading["observations"]] == list(CATALOG_ORDER)
+    for row, counts in WINDOW_A_COUNTS.items():
+        obs = _observation(reading, row)
+        assert obs["state_counts"] == counts, "row %r counts %r" % (row, obs.get("state_counts"))
+    assert reading["status"] == "complete"
+    assert reading["coverage"]["records_in_scope"] == 6
+    assert reading["coverage"]["blind_spots"] == list(BLIND_SPOTS)
+    assert "generated_at" not in reading
+
+    wider = _reading(MULTI, *_window_args("2026-11-24T00:00:00Z", WINDOW_A[1]))
+    for row, counts in WINDOW_B_COUNTS.items():
+        obs = _observation(wider, row)
+        assert obs["state_counts"] == counts, (
+            "the wider window row %r counts %r" % (row, obs.get("state_counts"))
+        )
+    assert wider["coverage"]["records_in_scope"] == 9
+
+
+def test_window_boundary_on_exact_record_timestamps_is_half_open():
+    reading = _reading(MULTI, *_window_args(*WINDOW_A))
+    run_det = _observation(reading, "run-determination-record")
+    paths = [source["path"] for source in run_det["sources"]]
+    assert any(path.endswith("multi-b.md") for path in paths), (
+        "the record whose determined_at equals --since must be included (half-open, since "
+        "inclusive): %r" % paths
+    )
+    assert not any(path.endswith("multi-c.md") for path in paths), (
+        "the record whose determined_at equals --until must be excluded (half-open, until "
+        "exclusive): %r" % paths
+    )
+    assert run_det["state_counts"] == {"Exercised": 2}
+
+
+def test_omitted_window_bound_prints_the_open_literal_and_both_bounds_appear():
+    since_only = _reading(MULTI, *_window_args("2026-11-25"))
+    assert since_only["scope"]["window"] == {"since": "2026-11-25T00:00:00Z", "until": "open"}
+    assert _observation(since_only, "run-determination-record")["state_counts"] == {
+        "Exercised": 3
+    }, "an open upper bound must include the record at 2026-11-26T00:00:00Z"
+    assert since_only["coverage"]["records_in_scope"] == 7
+
+    until_only = _reading(MULTI, *_window_args(None, "2026-11-26T00:00:00Z"))
+    assert until_only["scope"]["window"] == {"since": "open", "until": "2026-11-26T00:00:00Z"}
+    assert until_only["coverage"]["records_in_scope"] == 10
+
+    stdout = _human(MULTI, *_window_args("2026-11-25"))
+    assert "scope: window [2026-11-25T00:00:00Z, open)" in stdout
+    assert "window-since: 2026-11-25T00:00:00Z" in stdout
+    assert "window-until: open" in stdout
+
+
+def test_window_accepts_both_declared_bound_forms_and_rejects_invalid_values():
+    date_only = _run(
+        "--workspace-root", FIXTURES / MULTI, "--json",
+        "--since", "2026-11-25", "--until", "2026-11-26",
+    )
+    full = _run(
+        "--workspace-root", FIXTURES / MULTI, "--json",
+        "--since", WINDOW_A[0], "--until", WINDOW_A[1],
+    )
+    assert date_only.returncode == 0 and full.returncode == 0
+    assert date_only.stdout == full.stdout, (
+        "the date-only form must resolve to the same UTC midnight window as the full form"
+    )
+    for flag, value in (
+        ("--since", "2026/11/25"),
+        ("--since", "yesterday"),
+        ("--until", "2026-11-25T99:00:00Z"),
+    ):
+        proc = _run("--workspace-root", FIXTURES / MULTI, flag, value)
+        assert proc.returncode == 2, (
+            "an invalid %s value must exit 2; rc=%d stdout=%r stderr=%r"
+            % (flag, proc.returncode, proc.stdout, proc.stderr)
+        )
+        assert proc.stdout.strip() == "", "no reading may be emitted for an invalid bound"
+        assert flag in proc.stderr, "the refusal must name the offending flag: %r" % proc.stderr
+
+
+def test_probe_row_evaluates_once_and_is_marked_window_exempt():
+    reading = _reading(MULTI, *_window_args(*WINDOW_A))
+    notes = reading["scope"].get("notes") or []
+    assert any(
+        "probe-registry-declaration" in note and "window-exempt" in note for note in notes
+    ), "the window-exempt declaration-row note is absent: %r" % notes
+    probe = _observation(reading, "probe-registry-declaration")
+    assert probe["state"] == "Wired"
+    assert probe["state_counts"] == {}, (
+        "the declaration row must not be faked into a timestamped series: %r"
+        % probe["state_counts"]
+    )
+    assert probe["sources"], "the declaration row still cites its registry once"
+    stdout = _human(MULTI, *_window_args(*WINDOW_A))
+    assert "window-exempt" in stdout
+    assert "state-counts probe-registry-declaration none" in stdout
+
+
+def test_window_reading_produces_no_ranking_or_comparison():
+    reading = _reading(MULTI, *_window_args(*WINDOW_A))
+    ranked_keys = [
+        key for key in _keys_deep(reading) if re.search(r"(?i)rank|compar|composite|score", key)
+    ]
+    assert not ranked_keys, "a ranking-shaped key appeared in the window reading: %r" % ranked_keys
+    for output in (_human(MULTI, *_window_args(*WINDOW_A)), json.dumps(reading)):
+        match = RANKING_TOKENS.search(output)
+        assert not match, "ranking token %r appears in the window reading" % (
+            match.group(0) if match else None,
+        )
+
+
+def test_window_with_zero_records_emits_no_data_with_all_rows_present():
+    reading = _reading(MULTI, *_window_args("2027-01-01", "2027-02-01"))
+    assert reading["status"] == "no-data"
+    assert reading["coverage"]["records_in_scope"] == 0
+    assert [obs["row"] for obs in reading["observations"]] == list(CATALOG_ORDER)
+    for row in CATALOG_ORDER:
+        obs = _observation(reading, row)
+        assert obs["state_counts"] == {}
+        if row == "probe-registry-declaration":
+            assert obs["state"] == "Wired"
+        else:
+            assert obs["state"] == "Unobserved", (
+                "a readable source with zero in-window records reads %r on row %r"
+                % (obs["state"], row)
+            )
+            assert obs["reason"]["cause"] == "no-matching-records"
+
+
+# --------------------------------------------------------------------------- #
+# T028 — the output caps (bounds, never thresholds; C-023)
+# --------------------------------------------------------------------------- #
+def test_output_caps_truncate_sources_with_a_shown_total_disclosure(tmp_path):
+    workspace = tmp_path / "ws"
+    shutil.copytree(FIXTURES / "seeded", workspace)
+    for index in range(25):
+        name = "20261126T0006%02dZ-cap-%02d.md" % (index, index)
+        (workspace / ".specify" / "feedback" / name).write_text(
+            "---\n"
+            'id: "%s"\n'
+            'unit_id: "/speckit.plan"\n'
+            'unit_type: "command"\n'
+            'run_id: "%s"\n'
+            'created: "2026-11-26T00:06:%02dZ"\n'
+            "---\n\n## Review\n\nCap-leg fixture entry; metadata only is read.\n"
+            % (name[:-3], RUN_ID, index),
+            encoding="utf-8",
+        )
+    proc = _run("--workspace-root", workspace, "--json")
+    assert proc.returncode == 0, proc.stderr
+    reading = json.loads(proc.stdout)
+    obs = _observation(reading, "feedback-entry")
+    assert len(obs["sources"]) == 20, "per-observation sources must cap at 20"
+    assert reading["truncations"] == [
+        {"list": "sources", "row": "feedback-entry", "shown": 20, "total": 26}
+    ], "each truncation must carry its shown/total disclosure: %r" % reading.get("truncations")
+
+    human = _run("--workspace-root", workspace)
+    assert human.returncode == 0
+    assert "truncated sources row=feedback-entry shown=20 total=26" in human.stdout
+
+
+# --------------------------------------------------------------------------- #
+# T030 — the advisory-only boundary (C-029/C-044, FR-008, FR-025)
+# --------------------------------------------------------------------------- #
+ADVISORY_FORBIDDEN_KEY_RE = re.compile(
+    r"(?i)(disposition|threshold|mutation|remediat|next_action|action_item|verdict)"
+)
+ADVISORY_FORBIDDEN_TEXT_RE = re.compile(
+    r"(?i)\b(disposition|threshold|remediat\w*|mutation|next action|action item)\b"
+)
+
+
+def _advisory_readings():
+    return (
+        ("seeded", _reading("seeded")),
+        ("seeded-deviant", _reading("seeded", "--run", DEVIANT_RUN)),
+        ("negative", _reading("negative")),
+    )
+
+
+def test_a_deviation_bearing_reading_carries_no_disposition_threshold_or_mutation():
+    saw_deviation = False
+    for label, reading in _advisory_readings():
+        for observation in reading["observations"]:
+            if observation["deviation_classes"]:
+                saw_deviation = True
+        shaped = [
+            key for key in _keys_deep(reading) if ADVISORY_FORBIDDEN_KEY_RE.search(key)
+        ]
+        assert not shaped, (
+            "the %r reading carries an automatic-disposition-shaped key %r; a reading is "
+            "advisory-only (FR-008/FR-025)" % (label, shaped)
+        )
+        for output in (_human(label.split("-")[0], *(["--run", DEVIANT_RUN] if label.endswith("deviant") else [])),
+                       json.dumps(reading)):
+            match = ADVISORY_FORBIDDEN_TEXT_RE.search(output)
+            assert not match, (
+                "the %r reading carries the automatic-disposition token %r"
+                % (label, match.group(0) if match else None)
+            )
+    assert saw_deviation, (
+        "the advisory fixtures yielded no deviation-class observation; the negative observation "
+        "this leg exists for is not present"
+    )
+
+
+def test_negative_vocabulary_is_exactly_the_three_deviation_classes_plus_absence_states():
+    facts = _fact_members("prompt-adherence-deviation-classes")
+    assert facts == {"axis-regression", "green-unproven", "evidence-missing"}
+    emitted_classes = set()
+    for _label, reading in _advisory_readings():
+        for observation in reading["observations"]:
+            emitted_classes.update(observation["deviation_classes"])
+            if observation["state"] not in POSITIVE_STATES:
+                assert observation["state"] in {"not_evaluated", "Unobserved"}, (
+                    "row %r states %r outside the negative vocabulary"
+                    % (observation["row"], observation["state"])
+                )
+                assert observation["reason"] and observation["reason"]["cause"], (
+                    "absence reading %r carries no reason" % observation["row"]
+                )
+    assert emitted_classes == facts, (
+        "the exercised negative vocabulary is %r; the declared set is %r"
+        % (sorted(emitted_classes), sorted(facts))
+    )
+
+
+# --------------------------------------------------------------------------- #
+# T032 — audit replay: every observation resolves from its citations alone
+# --------------------------------------------------------------------------- #
+FEEDBACK_DIR = REPO_ROOT / ".specify" / "feedback"
+BASELINE_MARKER = "prompt-adherence-baseline-v1"
+
+
+def _frontmatter(text):
+    chunks = text.split("---", 2)
+    assert len(chunks) >= 3, "the record carries no frontmatter block"
+    meta = {}
+    for line in chunks[1].splitlines():
+        if ":" not in line:
+            continue
+        key, _, value = line.partition(":")
+        meta[key.strip()] = value.strip().strip('"')
+    return meta
+
+
+def _json_block(text):
+    match = re.search(r"```json\n(.*?)\n```", text, re.S)
+    assert match, "the record carries no fenced JSON block"
+    return json.loads(match.group(1))
+
+
+def _resolve_source_reference(source, workspace):
+    """Reconstruct one source reference mechanically from its citations alone (C-024)."""
+    store, rel, record, field = (
+        source["store"], source["path"], source["record"], source["field"],
+    )
+    assert store and rel and record and field, "a citation carries an empty part: %r" % source
+    target = Path(workspace) / rel
+    assert target.is_file(), "citation path %r does not resolve under %r" % (rel, workspace)
+    text = target.read_text(encoding="utf-8")
+    if store == "registry":
+        assert "## Objects" in text, "the registry citation names a file with no Objects table"
+        return
+    if store == "feedback":
+        meta = _frontmatter(text)
+        assert meta.get("id") == record, (
+            "feedback citation record %r does not name the entry id %r" % (record, meta.get("id"))
+        )
+        assert field in meta, "feedback citation field %r is absent" % field
+        return
+    body = _json_block(text) if store == "session" else json.loads(text)
+    assert body.get(field) == record, (
+        "%s citation (record=%r, field=%r) does not reconstruct (value=%r)"
+        % (store, record, field, body.get(field))
+    )
+
+
+def test_every_positive_observation_resolves_from_its_citations_alone():
+    for fixture in ("seeded", "multi-run", "project-only", "indirect-only"):
+        workspace = FIXTURES / fixture
+        reading = _reading(fixture)
+        positives = 0
+        for observation in reading["observations"]:
+            if observation["state"] not in POSITIVE_STATES:
+                continue
+            positives += 1
+            assert observation["sources"], (
+                "positive observation %r in %r cites no source" % (observation["row"], fixture)
+            )
+            for source in observation["sources"]:
+                _resolve_source_reference(source, workspace)
+        assert positives, "fixture %r produced no positive observation to audit" % fixture
+
+
+def test_the_seeded_broken_reference_appears_as_an_invalid_source_never_skipped():
+    reading = _reading("negative")
+    by_path = {entry["path"]: entry["cause"] for entry in reading["invalid_sources"]}
+    assert by_path.get(".specify/evidence/ev-neg-broken/findings.json") == "unparsable", (
+        "the seeded broken reference must surface in invalid_sources as unparsable: %r" % by_path
+    )
+    assert reading["coverage"]["invalid_records"] == len(reading["invalid_sources"]), (
+        "the invalid-record count must equal the disclosed list: %r"
+        % reading["invalid_sources"]
+    )
+
+
+def test_the_dated_baseline_entry_replays_against_its_citations():
+    entries = [
+        path for path in sorted(FEEDBACK_DIR.glob("*.md"))
+        if BASELINE_MARKER in path.read_text(encoding="utf-8")
+    ]
+    assert len(entries) == 1, (
+        "exactly one dated baseline entry must exist under .specify/feedback/; found %r"
+        % [path.name for path in entries]
+    )
+    baseline = _json_block(entries[0].read_text(encoding="utf-8"))
+    assert baseline["feature"] == "109-prompt-adherence"
+    assert baseline["status"] in {"complete", "partial", "no-data", "not-found"}
+    for rel in baseline["sources"]:
+        assert (REPO_ROOT / rel).is_file(), "the baseline cites an unresolvable path %r" % rel
+
+    proc = _run("--json", "--run", baseline["scope"]["run"])
+    assert proc.returncode == 0, (
+        "the replay engine run must exit 0; rc=%d stderr=%r" % (proc.returncode, proc.stderr)
+    )
+    replay = json.loads(proc.stdout)
+    assert replay["declaration_set"]["version"] == baseline["declaration_set_version"], (
+        "the declaration-set digest drifted since the baseline was recorded"
+    )
+    assert replay["coverage"]["invalid_records"] == baseline["coverage"]["invalid_records"]
+    assert replay["coverage"]["records_in_scope"] == baseline["coverage"]["records_in_scope"]
+
+    expected_partial = False
+    for row, recorded in baseline["observations"].items():
+        observation = _observation(replay, row)
+        if row == "probe-registry-declaration":
+            # The declaration row evaluates once against current state under a default scope
+            # (Wired); under the explicit-run replay its documented derivation is
+            # not_evaluated / no-matching-records (the edge case FR-028 records).
+            assert recorded["state"] == "Wired"
+            expected_partial = True
+            assert observation["state"] == "not_evaluated"
+            assert observation["reason"]["cause"] == "no-matching-records"
+            continue
+        if recorded["state"] in POSITIVE_STATES:
+            assert observation["state"] == recorded["state"], (
+                "row %r replayed as %r; the baseline recorded %r"
+                % (row, observation["state"], recorded["state"])
+            )
+            assert observation["deviation_classes"] == recorded["deviation_classes"], (
+                "row %r replayed with classes %r; the baseline recorded %r"
+                % (row, observation["deviation_classes"], recorded["deviation_classes"])
+            )
+        else:
+            # The baseline was a default-scope reading; the replay pins the same identity with
+            # --run, which per the declared four-way derivation shifts an absence from
+            # Unobserved to not_evaluated. Both are absence states carrying a reason.
+            expected_partial = True
+            assert recorded["state"] == "Unobserved", (
+                "a default-scope absence records Unobserved; saw %r on row %r"
+                % (recorded["state"], row)
+            )
+            assert observation["state"] == "not_evaluated", (
+                "under the explicit-run replay row %r reads %r, never a positive state"
+                % (row, observation["state"])
+            )
+            assert observation["reason"]["cause"] == recorded["reason_cause"]
+            assert observation["reason"]["cause"] == "no-matching-records"
+    assert replay["status"] == ("partial" if expected_partial else baseline["status"]), (
+        "the replay status %r does not match the scope-shifted expectation" % replay["status"]
     )

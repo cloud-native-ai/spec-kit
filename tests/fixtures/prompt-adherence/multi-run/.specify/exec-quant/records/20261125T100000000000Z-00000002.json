@@ -1,0 +1,9 @@
+{
+  "kind": "speckit.exec-quant",
+  "schema_version": 2,
+  "unit_id": "/speckit.review",
+  "unit_type": "command",
+  "run_id": "r20261125T100000Z-multi-f",
+  "run_id_resolution": "explicit",
+  "collected_at": "2026-11-25T10:00:00Z"
+}

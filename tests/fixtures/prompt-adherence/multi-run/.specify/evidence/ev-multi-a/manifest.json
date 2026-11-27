@@ -1,0 +1,8 @@
+{
+  "runId": "r20261124T130000Z-multi-i",
+  "target": "/speckit.plan",
+  "created": "2026-11-24T13:00:00Z",
+  "lanes": {},
+  "engine": {},
+  "findingsDigest": "sha256:multi-run-a"
+}

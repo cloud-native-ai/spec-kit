@@ -15,11 +15,11 @@ or lock, makes no network access, and carries no clock field — identical input
 byte-identical reading. It never emits an adherence verdict, composite score or ranking;
 absence is ``not_evaluated`` / ``Unobserved`` with a reason, never clean and never breach.
 
-This package delivers the per-run reading, the interface surface and the ``--check-coverage``
-action over the owner document's assumed-behavior coverage map. The longitudinal window
-reading (``--since`` / ``--until``), the output caps and the audit-replay legs ride later
-slices of the same feature; until then a window request refuses with exit 2 rather than guess
-(contract C-026: no reading can be produced).
+This package delivers the per-run reading, the longitudinal window reading (``--since`` /
+``--until``: half-open ``[since, until)`` on each record's own declared timestamp field, an
+omitted bound printed as the literal ``open``, per-row state counts, the window-exempt
+declaration-row note, and the bounded output lists), the interface surface and the
+``--check-coverage`` action over the owner document's assumed-behavior coverage map.
 
 Exit codes: 0 a reading was emitted (including status ``no-data`` / ``not-found``) or the
 coverage check is clean; 1 the coverage check reported findings; 2 no reading can be produced —
@@ -62,6 +62,18 @@ EXIT_FINDINGS = 1
 EXIT_INPUT = 2
 
 READING_FORMAT = 1
+
+#: The omitted-window-bound literal (FR-015): never resolved to a clock reading.
+OPEN_BOUND = "open"
+
+#: Output caps (owner document § Ordering, tie-breaks, duplicates and caps): bounds, never
+#: judgement thresholds. Each truncation is disclosed with its total count.
+SOURCES_CAP = 20
+INVALID_SOURCES_CAP = 50
+DUPLICATES_CAP = 20
+
+#: The declaration-only row: it evaluates once against current state and is window-exempt.
+WINDOW_EXEMPT_ROW = "probe-registry-declaration"
 
 #: The engine's reason taxonomy (the tokens face of contract C-015; meanings owned by the owner
 #: document's "Reason causes" / "Invalid-source causes" tables, pinned bidirectionally by the
@@ -207,14 +219,15 @@ def _declaration_set_digest(repo):
 
 def _store_names(repo):
     """The declared runtime store roster, read through the declaration layer (FR-030)."""
+    absent = declaration_reader.absent_label(STORE_LAYOUT_FACT)
     try:
         body = declaration_reader.load_fact(str(repo), STORE_LAYOUT_FACT)["body"]
-    except declaration_reader.DeclarationError as error:
-        raise UsageError("runtime store layout unusable: %s" % error)
+    except declaration_reader.DeclarationError:
+        raise UsageError("runtime store layout unusable: %s" % absent)
     statement = body.get("statement")
     stores = statement.get("stores") if isinstance(statement, dict) else None
     if not isinstance(stores, dict) or not stores:
-        raise UsageError("runtime store layout carries no store roster")
+        raise UsageError("runtime store layout carries no store roster: %s" % absent)
     return {str(name) for name in stores}
 
 
@@ -1062,6 +1075,51 @@ def _derive_observation(row, read, scope, state_domain, absent_literal):
     return _absence(row, UNOBSERVED_STATE, "no-matching-records", store_label), []
 
 
+def _in_window(stamp, window):
+    if stamp is None:
+        return False
+    if window["since"] is not None and stamp < window["since"]:
+        return False
+    if window["until"] is not None and stamp >= window["until"]:
+        return False
+    return True
+
+
+def _derive_window_observation(row, read, window, state_domain, absent_literal):
+    """E-6's derivation under a window scope: each record's own timestamp decides membership
+    in the half-open interval. Returns ``(observation, matched)``; the observation carries
+    the per-state counts (``state_counts``) — longitudinal readings only.
+    """
+    store_label = _store_root(row["store"])
+    declaration_row = ROW_WIRING[row["row"]][0] == "probe-registry"
+    if not read["available"]:
+        observation = _absence(row, absent_literal, "source-unavailable", store_label)
+        observation["state_counts"] = {}
+        return observation, []
+    if declaration_row:
+        if read["records"]:
+            observation = _positive(row, read, state_domain)
+        elif read["invalid"]:
+            observation = _absence(row, absent_literal, "invalid-source", store_label)
+        else:
+            observation = _absence(row, UNOBSERVED_STATE, "no-matching-records", store_label)
+        observation["state_counts"] = {}
+        return observation, []
+    matched = [record for record in read["records"] if _in_window(record["stamp"], window)]
+    if matched:
+        scoped = dict(read)
+        scoped["records"] = matched
+        observation = _positive(row, scoped, state_domain)
+        observation["state_counts"] = {row["allowed_states"][0]: len(matched)}
+        return observation, matched
+    if not read["records"] and read["invalid"]:
+        observation = _absence(row, absent_literal, "invalid-source", store_label)
+    else:
+        observation = _absence(row, UNOBSERVED_STATE, "no-matching-records", store_label)
+    observation["state_counts"] = {}
+    return observation, []
+
+
 def _status(explicit_run, records_in_scope, observations, status_members, absent_literal):
     if records_in_scope == 0:
         status = "not-found" if explicit_run else "no-data"
@@ -1096,10 +1154,61 @@ def _duplicates(matched_by_row):
     return duplicates
 
 
+def _window_scope(window):
+    """E-9's window scope; the declaration row is marked window-exempt in the scope notes
+    (C-022), so a declaration-only row is never faked into a timestamped series.
+    """
+    return {
+        "kind": "window",
+        "run": None,
+        "window": {"since": window["since_text"], "until": window["until_text"]},
+        "resolution": "explicit",
+        "basis": None,
+        "notes": [
+            "%s is window-exempt: it evaluates once against current state" % WINDOW_EXEMPT_ROW
+        ],
+    }
+
+
+def _apply_output_caps(observations, invalid_list, duplicates):
+    """The owner document's output caps (20 / 50 / 20): each truncation carries its
+    shown/total disclosure. Caps are output bounds by construction, never thresholds.
+    """
+    truncations = []
+    for observation in observations:
+        sources = observation["sources"]
+        if len(sources) > SOURCES_CAP:
+            observation["sources"] = sources[:SOURCES_CAP]
+            truncations.append({
+                "list": "sources",
+                "row": observation["row"],
+                "shown": SOURCES_CAP,
+                "total": len(sources),
+            })
+    if len(invalid_list) > INVALID_SOURCES_CAP:
+        truncations.append({
+            "list": "invalid_sources",
+            "row": None,
+            "shown": INVALID_SOURCES_CAP,
+            "total": len(invalid_list),
+        })
+        invalid_list = invalid_list[:INVALID_SOURCES_CAP]
+    if len(duplicates) > DUPLICATES_CAP:
+        truncations.append({
+            "list": "duplicates",
+            "row": None,
+            "shown": DUPLICATES_CAP,
+            "total": len(duplicates),
+        })
+        duplicates = duplicates[:DUPLICATES_CAP]
+    truncations.sort(key=lambda item: (item["list"], item["row"] or "", item["total"]))
+    return invalid_list, duplicates, truncations
+
+
 # --------------------------------------------------------------------------- #
 # the reading assembly (C-020/C-023/C-025/C-026/C-027)
 # --------------------------------------------------------------------------- #
-def _build_reading(args, engine_home, repo):
+def _build_reading(args, engine_home, repo, window=None):
     members = _load_fact_members(repo)
     declaration_version, fact_paths = _declaration_set_digest(repo)
     sensors = {
@@ -1170,14 +1279,19 @@ def _build_reading(args, engine_home, repo):
     invalid_list = [{"path": path, "cause": cause} for path, cause in invalid_sources]
     invalid_total = len(invalid_list)
 
-    scope = _resolve_scope(catalog_reads, args.run)
+    scope = _window_scope(window) if window is not None else _resolve_scope(catalog_reads, args.run)
     observations = []
     matched_by_row = {}
     records_in_scope = 0
     for row, read in catalog_reads:
-        observation, matched = _derive_observation(
-            row, read, scope, state_domain, absent_literal
-        )
+        if window is not None:
+            observation, matched = _derive_window_observation(
+                row, read, window, state_domain, absent_literal
+            )
+        else:
+            observation, matched = _derive_observation(
+                row, read, scope, state_domain, absent_literal
+            )
         observations.append(observation)
         records_in_scope += len(matched)
         if matched and ROW_WIRING[row["row"]][0] != "probe-registry":
@@ -1191,10 +1305,13 @@ def _build_reading(args, engine_home, repo):
 
     status_members = set(members["prompt-adherence-reading-status"])
     status = _status(
-        scope["resolution"] == "explicit", records_in_scope,
+        window is None and scope["resolution"] == "explicit", records_in_scope,
         observations, status_members, absent_literal,
     )
     duplicates = _duplicates(matched_by_row)
+    invalid_list, duplicates, truncations = _apply_output_caps(
+        observations, invalid_list, duplicates
+    )
     observable = [
         observation["row"]
         for observation, row in zip(observations, catalog)
@@ -1213,7 +1330,7 @@ def _build_reading(args, engine_home, repo):
         "invalid_records": invalid_total,
     }
     engine_relative = _relative(repo, engine_home)
-    return {
+    reading = {
         "reading_format": READING_FORMAT,
         "engine": {
             "path": engine_relative,
@@ -1230,6 +1347,9 @@ def _build_reading(args, engine_home, repo):
         "invalid_sources": invalid_list,
         "duplicates": duplicates,
     }
+    if truncations:
+        reading["truncations"] = truncations
+    return reading
 
 
 def _workspace_from_cwd():
@@ -1256,14 +1376,24 @@ def _render_human(reading):
         "facts: %s" % ", ".join(reading["declaration_set"]["facts"]),
     ]
     scope = reading["scope"]
-    lines.append("scope: run %s" % (scope["run"] if scope["run"] is not None else "none"))
-    lines.append("scope-resolution: %s" % scope["resolution"])
-    if scope["basis"]:
-        lines.append(
-            "scope-basis: store=%s path=%s timestamp=%s"
-            % (scope["basis"]["store"], scope["basis"]["path"], scope["basis"]["timestamp"])
-        )
+    if scope["kind"] == "window":
+        window = scope["window"]
+        lines.append("scope: window [%s, %s)" % (window["since"], window["until"]))
+        lines.append("scope-resolution: %s" % scope["resolution"])
+        lines.append("window-since: %s" % window["since"])
+        lines.append("window-until: %s" % window["until"])
+        for note in scope.get("notes") or []:
+            lines.append("scope-note: %s" % note)
+    else:
+        lines.append("scope: run %s" % (scope["run"] if scope["run"] is not None else "none"))
+        lines.append("scope-resolution: %s" % scope["resolution"])
+        if scope["basis"]:
+            lines.append(
+                "scope-basis: store=%s path=%s timestamp=%s"
+                % (scope["basis"]["store"], scope["basis"]["path"], scope["basis"]["timestamp"])
+            )
     lines.append("status: %s" % reading["status"])
+    longitudinal = scope["kind"] == "window"
     for observation in reading["observations"]:
         line = "row %s layer=%s strength=%s state=%s" % (
             observation["row"],
@@ -1278,7 +1408,13 @@ def _render_human(reading):
                 observation["reason"]["cause"],
                 observation["reason"]["source"],
             )
+        if longitudinal and observation["row"] == WINDOW_EXEMPT_ROW:
+            line += " window-exempt"
         lines.append(line)
+        if "state_counts" in observation:
+            counts = observation["state_counts"]
+            body = ",".join("%s=%d" % (state, counts[state]) for state in sorted(counts))
+            lines.append("state-counts %s %s" % (observation["row"], body or "none"))
         for source in observation["sources"]:
             lines.append(
                 "source %s store=%s path=%s record=%s field=%s"
@@ -1312,6 +1448,13 @@ def _render_human(reading):
                 ",".join(duplicate["paths"]),
             )
         )
+    for truncation in reading.get("truncations") or []:
+        prefix = "truncated %s" % truncation["list"]
+        if truncation["row"] is not None:
+            prefix += " row=%s" % truncation["row"]
+        lines.append(
+            "%s shown=%d total=%d" % (prefix, truncation["shown"], truncation["total"])
+        )
     return "\n".join(lines)
 
 
@@ -1334,8 +1477,8 @@ def build_parser():
         description=(
             "Read-only prompt-adherence reading over the existing runtime stores "
             "(feature 109). One documented invocation prints the human-readable per-run "
-            "reading for the default scope; --run pins one run identity; --json emits the "
-            "machine-readable form."
+            "reading for the default scope; --run pins one run identity; --since / --until "
+            "request the longitudinal window reading; --json emits the machine-readable form."
         ),
     )
     _configure_parser(
@@ -1357,7 +1500,7 @@ def build_parser():
     parser.add_argument(
         "--since", default=None, metavar="BOUND",
         help="window start, inclusive (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ, UTC); requests "
-             "the longitudinal reading",
+             "the longitudinal reading; omitted for an --until-only window",
     )
     parser.add_argument(
         "--until", default=None, metavar="BOUND",
@@ -1378,26 +1521,48 @@ def build_parser():
     return parser
 
 
+def _bound(value, flag):
+    """One window bound: the two declared forms only (PA-13); an omitted bound is ``open``."""
+    if value is None:
+        return None, OPEN_BOUND
+    text = value.strip()
+    for fmt in _TIMESTAMP_FORMATS:
+        try:
+            stamp = datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+        return stamp, stamp.strftime("%Y-%m-%dT%H:%M:%SZ")
+    raise UsageError(
+        "invalid %s value: %r (expected YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)" % (flag, value)
+    )
+
+
 def _window_request(args):
-    """The longitudinal window is a later slice of this feature; until it lands, a window
-    request (and --run combined with a bound) refuses with exit 2 rather than emit a reading
-    that silently ignores the bounds (C-021: the ambiguous combination is an input error).
+    """The window scope request, or None for the per-run path: half-open [since, until) on
+    each record's own timestamp field; an omitted bound is the literal ``open``; --run
+    combined with either bound is an input error (C-021/C-022).
     """
     if args.since is None and args.until is None:
         return None
-    raise UsageError(
-        "--since/--until: the longitudinal window reading is not delivered; "
-        "--run cannot be combined with --since/--until"
-    )
+    if args.run is not None:
+        raise UsageError("--run cannot be combined with --since/--until (input error)")
+    since, since_text = _bound(args.since, "--since")
+    until, until_text = _bound(args.until, "--until")
+    return {
+        "since": since,
+        "until": until,
+        "since_text": since_text,
+        "until_text": until_text,
+    }
 
 
 def main(argv=None):
     _guard_argv(argv, declared=_DECLARED_FLAGS)
     args = build_parser().parse_args(argv)
     try:
-        _window_request(args)
+        window = _window_request(args)
         repo = Path(declaration_reader.find_repo(_ENGINE_HOME))
-        reading = _build_reading(args, _ENGINE_HOME, repo)
+        reading = _build_reading(args, _ENGINE_HOME, repo, window)
     except UsageError as error:
         print("prompt-adherence: %s" % error, file=sys.stderr)
         return EXIT_INPUT

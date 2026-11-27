@@ -114,6 +114,7 @@ statement:
     - draft
 consumers:
   - scripts/python/concurrency-check.py
+  - scripts/python/prompt-adherence.py
   - scripts/python/renumber-utils.py
   - scripts/python/sanitize-utils.py
   - scripts/python/seal-utils.py

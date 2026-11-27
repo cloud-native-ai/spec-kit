@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "speckit.evidence-findings",
+  "target": "/speckit.review",
+  "runId": "r20261125T130000Z-multi-j",
+  "window": {"since": null, "until": null},
+  "platforms": [],
+  "lanes": {},
+  "evidence": [
+    {
+      "id": "ev-001",
+      "lane": "feedback",
+      "evidenceState": "Present",
+      "summary": "multi-run fixture evidence inside both longitudinal windows",
+      "signals": {}
+    }
+  ],
+  "findingsDigest": "sha256:multi-run-b"
+}

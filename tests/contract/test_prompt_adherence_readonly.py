@@ -17,7 +17,8 @@ its contract states it:
 - **Declared exclusion**: interpreter bytecode caches (``__pycache__/``, ``*.pyc``/``*.pyo``)
   are excluded by name; the exclusion is named here, not left implicit.
 - **Complement assertions**: after a per-run reading, every root is byte-identical to the
-  baseline and no new file appears. The longitudinal leg lands red-first with T027 (US4).
+  baseline and no new file appears. The longitudinal complement (T027) runs the same comparison
+  around a window reading over the multi-run fixture.
 - **Determinism is a separate claim** (C-023): it is judged by run-A/run-B equality in its own
   leg and is never cited here as containment evidence.
 
@@ -207,6 +208,33 @@ def test_per_run_reading_leaves_the_store_roots_byte_identical(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# C-041 — the complement assertions after a longitudinal reading (T027)
+# --------------------------------------------------------------------------- #
+LONGITUDINAL_ARGS = (
+    ("--since", "2026-11-25T00:00:00Z", "--until", "2026-11-26T00:00:00Z"),
+    ("--since", "2026-11-24", "--json"),
+    ("--until", "2026-11-26T00:00:00Z"),
+)
+
+
+def test_longitudinal_reading_leaves_the_store_roots_byte_identical(tmp_path):
+    workspace = tmp_path / "ws"
+    shutil.copytree(FIXTURES / "multi-run", workspace)
+    manifest = _manifest(workspace, _store_roots())
+    assert len(manifest["files"]) >= 8, (
+        "the multi-run fixture seeds %d store files; the containment claim needs a populated "
+        "comparison unit" % len(manifest["files"])
+    )
+    for args in LONGITUDINAL_ARGS:
+        proc = _contained_run(workspace, *args)
+        assert proc.returncode == 0, (
+            "the longitudinal reading %r exited %d before containment could be read; stderr=%r"
+            % (args, proc.returncode, proc.stderr)
+        )
+        assert proc.stdout.strip(), "the longitudinal reading %r emitted nothing" % (args,)
+
+
+# --------------------------------------------------------------------------- #
 # T025's static half — the engine source carries zero write points
 # --------------------------------------------------------------------------- #
 def test_engine_source_has_zero_write_points():
@@ -259,6 +287,51 @@ def test_manifest_comparison_would_detect_a_store_write(tmp_path):
     )
     assert ".specify/session/injected-note.md" in set(after["files"]) - set(baseline["files"]), (
         "the injected file is not the reported difference"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-029 — the advisory-only boundary: a deviation-bearing reading changes nothing
+# --------------------------------------------------------------------------- #
+def _tree_manifest(workspace):
+    """Every file in the workspace (path, SHA-256, size) — so a new aggregate anywhere, not
+    only under a declared store root, is caught; bytecode caches are excluded by name."""
+    files = {}
+    for path in sorted(Path(workspace).rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(Path(workspace))
+        if CACHE_DIR_NAME in rel.parts or path.suffix in CACHE_SUFFIXES:
+            continue
+        payload = path.read_bytes()
+        files[rel.as_posix()] = (hashlib.sha256(payload).hexdigest(), len(payload))
+    return files
+
+
+def test_advisory_reading_of_deviation_bearing_fixtures_changes_nothing(tmp_path):
+    workspace = tmp_path / "ws"
+    shutil.copytree(FIXTURES / "seeded", workspace)
+    before = _tree_manifest(workspace)
+    expected_class = {
+        (): "classes=evidence-missing",
+        ("--json",): '"evidence-missing"',
+        ("--run", "r20261126T000030Z-deviant"): "classes=axis-regression,green-unproven",
+        ("--run", "gate:fixture-gate:2026-11-26T00:04:00Z"): "state=Exercised",
+    }
+    for args, marker in expected_class.items():
+        proc = _contained_run(workspace, *args)
+        assert proc.returncode == 0, (
+            "the advisory reading %r exited %d; stderr=%r" % (args, proc.returncode, proc.stderr)
+        )
+        assert marker in proc.stdout, (
+            "the advisory fixture did not surface %r for %r; the negative observation this leg "
+            "exists for is absent" % (marker, args)
+        )
+    after = _tree_manifest(workspace)
+    assert after == before, (
+        "a deviation-bearing reading changed the workspace tree (no aggregate, no new store "
+        "root, no mutation may appear): %r"
+        % (sorted(set(before) ^ set(after)),)
     )
 
 
