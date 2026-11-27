@@ -1,0 +1,27 @@
+# clarify roster measurement — 2026-11-27 (stage clarify, base 6d8003f9f)
+# predicate: id cell (emphasis stripped) begins OI- or D-; status cell (emphasis/space stripped) begins open on a word boundary
+## command
+awk -F'|' '/^\|/ {id=$2; st=$5; gsub(/^[[:space:]]+|[[:space:]]+$/,"",id); gsub(/^[[:space:]]+|[[:space:]]+$/,"",st); gsub(/\*\*/,"",id); gsub(/\*\*/,"",st); if ((id ~ /^OI-/ || id ~ /^D-/) && st ~ /^open([^A-Za-z0-9_-]|$)/) print id" :: "st}' .specify/register.md
+## output
+OI-3 :: open,不阻塞(decider:用户经 /speckit.goal modify)
+OI-4 :: open,不阻塞
+OI-7 :: open,阻塞 S5 检查单
+OI-9 :: open,与 S3 落地相关
+OI-069b-01 :: open（owner = 后续修订 FR-008 的特性，尚未立项；解除条件 = 为该检查指定 owner 与仪器，或明确豁免）
+OI-073-01 :: open（owner = 后续仓库卫生切片；解除条件 = 逐项修复或明确豁免并更新冻结基线）
+D-001 :: open（承接方 = `/speckit.review` 评审面；重开条件 = `--action obligation` 的 `no-trace-record` 计数显著下降，或评审面连续两次报出机械绿但图文语义不一致）
+D-001-a :: open（承接方 = `/speckit.review` 评审面；修复面 = 该文档的 alt 文本，属内容工作、不属本特性）
+OI-082-01 :: open（owner = 后续 `/speckit.improve` 改进项；解除条件 = 接线落地并由契约测试断言）
+D-1 (092) :: open（实现期落地）
+D-2 (092) :: open（实现期落地；是否补原则由 OI-4 另行裁定）
+D-3 (092) :: open（实现期落地）
+D-4 (092) :: open（实现期落地）
+D-5 (092) :: open（实现期落地）
+D-6 (092) :: open（实现期落地）
+D-7 (092) :: open（实现期落地）
+D-8 (092) :: open（档 I 由 P6 修复、档 II 由 P7 移交）
+## count
+17
+## authored pending blocks in the four roots
+grep -rn '^### PENDING —' .specify/specs .specify/goals .specify/anchoring .specify/teams | wc -l
+0

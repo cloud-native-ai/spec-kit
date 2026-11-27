@@ -41,7 +41,7 @@
 6. **可审计可重放**：批次记录 + 可解析指针即可重放整批（项集、完整性、默认值、异议、处置、记录），不依赖对话记忆。
 7. **边界**：只服务人持有的决策；`ai-autonomous` 决策保持其谓词驱动路径，永不被呈现或静默转换；无人值守运行不得记录「沉默接受」；零网络、零自动传输。
 
-**实测基线（2026-11-27，base `c3489e52c`，本 worktree 可复现）**：`.specify/register.md` 含状态为 open 的 OI- / D- 族行八条（OI-3、OI-4、OI-7、OI-9、OI-069b-01、OI-073-01、OI-082-01、D-2 (092)）；四个扫描根（`.specify/specs/`、`.specify/goals/`、`.specify/anchoring/`、`.specify/teams/`）中 `### PENDING —` 块为零；107 所有者页的生产者清单止于 P-12，无批次生产者；`templates/commands/` 与技能树中没有 decide 入口。这些读数在实现期可复测；首轮批次的真实形态因此是「八条 open 行为 `incomplete`、零项可批量结案」，这正是完整信息披露的诚实起点（A-16）。
+**实测基线（2026-11-27，base `c3489e52c`，本 worktree 可复现）**：`.specify/register.md` 含状态为 open 的 OI- / D- 族行**十七条**（OI-3、OI-4、OI-7、OI-9、OI-069b-01、OI-073-01、OI-082-01、D-001、D-001-a、D-1 (092)、D-2 (092)、D-3 (092)、D-4 (092)、D-5 (092)、D-6 (092)、D-7 (092)、D-8 (092)）；四个扫描根（`.specify/specs/`、`.specify/goals/`、`.specify/anchoring/`、`.specify/teams/`）中 `### PENDING —` 块为零；107 所有者页的生产者清单止于 P-12，无批次生产者；`templates/commands/` 与技能树中没有 decide 入口。这些读数在实现期可复测；首轮批次的真实形态因此是「十七条 open 行为 `incomplete`、零项可批量结案」，这正是完整信息披露的诚实起点（A-16、A-21）。**读数更正（clarify 2026-11-27）**：requirements 阶段的手列清单记八条，漏计 D-001、D-001-a 与 D-1/D-3…D-8 (092)、仅列 D-2 (092)；按 § Pending-Source Roster 的谓词机械派生为十七条，以本条逐行清单为准。
 
 **不做什么**：不新建第二套决策登记、队列、存储或调度器；不新增共享可变聚合；不把决策记录迁出既有载体；不发明缺失的选项或默认值；不替生产者撰写待决策项（A-16）；不对 `ai-autonomous` 决策做批量接受；不做调度、通知、守护进程或仪表盘；不做任何跨仓对齐或自动传输。
 
@@ -56,32 +56,41 @@
 | **A-5** | **入口面 = 新命令 `/speckit.decide`（歧义 #2）**：薄入口模板 `templates/commands/decide.md` + 内部技能 `skills/internal/decide-batch/SKILL.md` + 确定性引擎 `scripts/python/decision-batch.py`（封闭动作 `scan` / `record` / `replay`）。命名依据：既有命令族以单词动词/名词为入口（`clarify`、`review`、`analyze`、`status`、`measure`），无任何既有命令承担「决策裁决」；技能名沿用 `<动词>-<对象>` 兄弟形（`clarify-artifact`、`review-feature-quality`）。 | Grounded Naming + 同型兄弟模仿；把交互留给技能、把固定规则判断交给引擎（Program-First）。 |
 | **A-6** | **默认值与接地（歧义 #3）**：建议默认值 = 项自身声明的**唯一**默认选项（107 选项集契约），面板 MUST NOT 发明默认值或选项。接地 = 对封闭既往证据集的**确定性联接**：①默认选项的 `evidence` 指针中可解析到既往经验载体者；②既往决策记录中 `context` 值**逐字包含**项主体全名字符串者；③这些记录引用的 `T-NNN`。既往经验载体闭集：决策记录载体（四个扫描根 + 批次记录）、`T-NNN` 张力记录、`.specify/history/` 条目、`.specify/feedback/` 条目、`.specify/knowledge/` 条目。至少一条可解析的既往经验指针 → `grounded`；否则 `no-evidence`（明示）。`basis` 是作者撰写的一行理由，本身不是证据，依据必须落到可解析指针。面板不得在呈现期用 LLM 语义检索补造接地。 | 「根据之前的经验」必须可追溯；确定性字面联接避免编造，同时保留一个诚实的 `no-evidence` 出口。 |
 | **A-7** | **重决走既有取代规则（歧义 #4）**：异议若推翻一条既往决策，MUST 走 107 的取代规则——新增一条记录，旧记录以 `superseded_by` 指向新记录并**保留**，MUST NOT 删除或改写旧记录；旧记录载体不可写时拒绝重决，不得降级为「全新决策」。异议前，主体命中的既往记录若选择了不同选项，该项标 `prior-decision-conflict`，不得经沉默结案。 | 单一定义点与审计链：重决是新记录，不是覆盖。 |
-| **A-8** | **批次完备性（歧义 #5）**：完备性是封闭清单断言——来源清单、每来源候选计数、逐候选处置分类与「扫描 = 呈现 + 合并引用 + 具名排除」的记账恒等式；断言形状遵循 `shared/guidelines/closed-set-claims.md`（参照物 = 本次扫描；比较单元 = 逐候选处置；允许差集恒为空）。任一载体**存在但不可读/不可解析** → 拒绝（不呈现、不记录、具名退出）；来源**缺席**（文件/目录不存在）→ 记为带原因的缺席空来源，不拒绝；批次绝不把部分结果标为完备。零待决策项 → 显式 `nothing-pending`。 | 完备性必须可判定；「静默漏掉一项」是批量决策最危险的失效。 |
+| **A-8** | **批次完备性（歧义 #5）**：完备性是封闭清单断言——来源清单、每来源候选计数、逐候选处置分类与「扫描 = 呈现 + 合并引用 + 具名排除」的记账恒等式；断言形状遵循 `shared/guidelines/closed-set-claims.md`（参照物 = 本次扫描；比较单元 = 逐候选处置；允许差集恒为空）。任一载体**存在但不可读/不可解析** → 拒绝（不呈现、不记录、具名退出）；来源**缺席**（文件/目录不存在）→ 记为带原因的缺席空来源，不拒绝；批次绝不把部分结果标为完备。零待决策项 → 显式 `nothing-pending`。**层级分界（clarify 2026-11-27）**：拒绝只针对载体级不可读/不可枚举；块级文法缺陷按 `incomplete` 呈现并点名（A-21）。 | 完备性必须可判定；「静默漏掉一项」是批量决策最危险的失效。 |
 | **A-9** | **常设默认值 = 无（歧义 #6）**：默认值只在**单次批次**内有效；MUST NOT 预授权未来同类项、MUST NOT 记忆用户偏好并自动套用；每次批次重新呈现并等待用户应答。 | 预授权会跨时间静默自动裁决，并制造第二份决策记忆；用户始终是裁决者。 |
 | **A-10** | **沉默语义（承重决策，按 `shared/guidelines/decision-tension.md` 形态记录）**：**decision**：允许「沉默 = 接受默认」，但仅限交互式批次中、用户已作出应答、且默认选项可逆的合格项。**antithesis**：逐项显式确认——每项都必须被回答；当用户只对少数项有异议且信任建议时它更优（零误接受风险，且不需要「沉默」语义）。**binding_constraints**：pole_a 用户只愿处理异议，否则批量失去意义；pole_b 破坏性/不可逆动作必须显式确认（`shared/guidelines/confirmation-gates.md` 的两级判据）。**discriminating_evidence**：对一批同时含可逆默认与不可逆默认的夹具作零异议应答，观察是否只有可逆项记为 `accepted-default`、不可逆项保持待定；结果二值。**expected_sacrifice**：用户少读文本的代价是一项被误建议且未被细看即被接受；缓解 = 接地指针可解析 + 无证据明示 + 可逆性限制 + 事后重决留痕；反指标 = 被用户事后推翻的 `accepted-default` 项数（可由批次记录与后续取代记录读出）。**revision_trigger**：出现一例「沉默接受后用户明确否定且无法经重决修复」→ 重开，收紧为逐项确认或取消沉默规则。 | 用户原话要求「只针对有异议的选项提出」；把这条要求落成可判定规则必须同时守住既有确认门对不可逆动作的显式确认义务。 |
 | **A-11** | **批次记录载体 = knowledge 存储中的一条日期化记录**（经既有记忆引擎写入，一文件一批次，标题携带批次编号，永不覆盖）：不是 feedback 存储（反馈计数与阈值提示会被污染），不是 session 存储（可遗忘层，不承载终态审计），不是 register 本身（register 只是编号索引）；不新建存储根。该选择复用记忆系统「lasting decisions（持久决策）」的既有定位与一文件一记录的并发安全布局。 | 「落进既有载体」且「无第二存储」；在既有存储中选语义最贴近、并发最安全的一个。 |
 | **A-12** | **批次族记录字段 = 所有者页条件层加法**：仅当记录由批次产生时，追加 `batch_id` / `batch_disposition` / `recommendation_grounding` 三个条件层字段；既有记录（含本特性落地前的记录）语法不变、零改写、继续按 legacy/现行规则读取。字段闭集只能在所有者页修订，MUST NOT 在引擎常量或文档里另开第二套字段表。 | 审计需要区分「批次隐式接受」与「显式选择」；加法式条件层是 107 已声明字段闭集的唯一修订路径。 |
-| **A-13** | **人工 / 自主边界**：面板只呈现 `human-interactive` 项；`ai-autonomous` 项（含类缺失项）永不呈现、永不转换、永不被默认值授权；无人值守调用可以扫描但 MUST NOT 记录接受，必须给出具名拒绝。 | 用户仍在场才存在「沉默」；把自主决策混入人类默认会静默改变其持有者。 |
+| **A-13** | **人工 / 自主边界（clarify 2026-11-27 收窄，A-23）**：面板只**结案**已声明 `human-interactive` 的项；已声明 `ai-autonomous` 项永不呈现、永不转换、永不被默认值授权；类别未知项（无块、权威路径不可解析、缺 `decision_class`）以 `incomplete` 呈现并点名 `class-missing`，永不结案、永不被读作自主；同一身份多来源类别声明冲突时按存疑从严排除（`not-human-held`）并在记账中具名披露；无人值守调用可以扫描但 MUST NOT 记录接受，必须给出具名拒绝。 | 用户仍在场才存在「沉默」；把自主决策混入人类默认会静默改变其持有者；把类别未知项静默排除则会静默漏掉一个人持有的决策——两种失效都必须关掉。 |
 | **A-14** | **语言与读者**：正文以中文为主、核心概念带双语定义（与 109/107 一致）；所有面向用户的呈现沿用全局读者基准与行话白名单（`shared/guidelines/user-facing-comprehension.md`），不新建读者层。 | 最新合并规格的语言惯例 + 用户可理解性纪律。 |
 | **A-15** | **落地与分发**：所有者页扩展、命令模板、技能、引擎全部落在框架源（`shared/`、`templates/`、`skills/`、`scripts/`），经既有镜像对投影并由 `specify init` 分发；每工具命令副本经既有再生成器更新；**冻结的命令/技能名基线测试同批扩表**（新增命令与技能必须与基线同批移动）；框架地图的决策治理行更新为含批次能力与 P-13、consumer 增补；**不改** `.specify/instructions.md` 的 `## Decision Items` 段（实测 1,276 B / 声明上限 1,500 B，余量不用于新句；发现性由命令模板、命令文档与框架地图承载）；**不改** `.specify/.gitignore` 与运行期存储布局（无新运行期目录）。 | publish → install → init 是唯一分发路径；冻结基线同批移动是既有库存封闭纪律；指令段预算不挪用。 |
-| **A-16** | **存量未决项不自动补全**：现有 open OI 行大多没有待决策项块，它们以 `incomplete` 呈现并逐项点名缺失要素；撰写缺失要素是生产者/用户的义务，不是面板的职责——面板发明选项或默认值就等于制造它本应中立呈现的决策内容。`incomplete` 是合法的呈现状态，不是缺陷。 | 完整信息的诚实边界：宁可不结案，也不编造。 |
+| **A-16** | **存量未决项不自动补全**：现有 open OI/D 行（本工作树 17 条，见 Overview 更正读数）大多没有待决策项块，它们以 `incomplete` 呈现并逐项点名缺失要素；撰写缺失要素是生产者/用户的义务，不是面板的职责——面板发明选项或默认值就等于制造它本应中立呈现的决策内容。`incomplete` 是合法的呈现状态，不是缺陷。 | 完整信息的诚实边界：宁可不结案，也不编造。 |
 | **A-17** | **排除范围**：调度器、提醒/通知、常驻扫描、UI/仪表盘、自动撰写待决策项、`ai-autonomous` 批量裁决、跨批次常设默认、任何第二存储/schema、与 ai-harness 091 的对齐、任何网络或自动传输——全部不属于本特性（详见 § Out of Scope）。 | 宪法 IX（框架不是运行平台）与 brief 的约束。 |
 | **A-18** | **词汇表提案只提议不写入**：本特性引入的新词（Decision Batch、Batch Record、Pending Decision Item、Recommended Default、Recommendation Grounding、Acceptance by Silence）按其 owner 页定义并带双语形态；`.specify/glossary.md` 的实际写入遵循既有 glossary 协议（`origin=auto`、`status=proposed`），未获用户确认前不直接写入。 | glossary 冲突与用户优先规则；无人值守运行不因等待确认而阻塞。 |
 | **A-19** | **脚手架偏差（披露）**：当前工作树已在分支 `112-decision-batch-panel`；`create-new-requirements.sh` 会把该分支计入编号空间并派生 113 且新建分支，与本线「停留在既有分支、编号 112」冲突。按 107/109/110 先例，本阶段**手工**从 `.specify/templates/requirements-template.md` 脚手架到本目录，脚本的模板拷贝步骤等价复刻，仅跳过其编号派生与建分支步骤。 | 工作树拓扑与脚本编号派生假设不兼容；照抄会制造第二分支并改号。 |
 | **A-20** | **本阶段边界**：只提交本特性产物；不 push；不编辑状态脊与 `.specify/register.md`；不触碰主树；最后动作是提交本阶段全部产物（制品提交 + 记录提交）。 | 无人值守纪律与本阶段 brief；提交纪律沿用 110 的 close-out 形态。 |
+| **A-21** | **候选与资格分层 + 块级/载体级分界（clarify 裁决）**：候选存在仅由 § Pending-Source Roster 的机器可检谓词判定；字段齐备性、块级文法缺陷（未知/重复/畸形字段、声明计数与条目数不符）与类别判定属于资格（`incomplete`）或具名排除，MUST NOT 成为候选存在条件。载体级不可读/不可解析才触发 FR-016 拒绝；块级缺陷按 `incomplete` 呈现并逐项点名。Overview 的 register open 行基线由谓词机械派生为**十七条**（requirements 阶段手列八条漏计 D-001、D-001-a 与 D-1/D-3…D-8 (092)，仅列 D-2 (092)），以更正读数为准。 | 若块不完整即不成为候选，A-16 的 `incomplete` 呈现与记账恒等式都无法成立——不完整块会被静默丢弃，正是本特性最危险的失效。 |
+| **A-22** | **行↔块确定性联接与字面身份（clarify 裁决）**：register 来源的联接键 = 块 `origin` 中逐字出现的 register 行 id（独立 token），且该行单元格的显式仓库相对路径上恰有一个匹配块；0 个或 >1 个匹配 → `incomplete`（`authority-unresolved` / `ambiguous-link`）；相对表述（`同上`、`Open items § …`）不解析、不作路径候选。去重身份 = `subject` 去首尾空白后**逐字节**相等 +（同名时）`resource_locator` 值相等；无大小写折叠、无 Unicode 归一、无模糊匹配；缺定位与有定位的同拼写主体不合并。无块的 register 行以行 id 为单独身份呈现 `incomplete`，不并入任何块身份。 | 批量结案要求归属可机器判定；宁可不合并也不误合并，且不允许任选一块。 |
+| **A-23** | **类别门收窄（clarify 裁决，修订 FR-011/A-13）**：已声明 `ai-autonomous` → `not-human-held` 排除，永不呈现、永不转换；类别未知（无块、路径不可解析、缺 `decision_class` 或取值域外）→ `incomplete` 呈现并点名 `class-missing`，永不结案、永不读作自主；同一身份多来源类别冲突 → 按存疑从严排除（`not-human-held`）并在记账中具名披露。 | 原 FR-011「类缺失即排除」与 A-16/FR-010「无块行以 `incomplete` 呈现」直接冲突；本裁定取「未知 ≠ 自主、宁呈现不静默丢弃」，同时守住已声明自主项的永不呈现。 |
+| **A-24** | **记录动作前置校验与批次号铸造（clarify 裁决）**：`record` MUST 在写任何文件前重扫全部来源，并断言候选身份集、每个被处置项的内容指纹（主体、选项集、默认、接地、资格、来源引用集）与本次呈现一致且无新增候选；任一不符 → 拒绝并列出差异，且不写批次记录/决策记录、不更新来源、不登记编号。批次编号只在全部前置校验通过后铸造；被拒尝试不铸造编号、不登记、不留本特性记录。被拒应答（身份/成员校验失败）同样零记录，可在同一呈现上更正后重试。交互授权级别 MUST 由调用方显式声明；缺失或无人值守 → 拒绝记录。 | 扫描与记录之间来源可被其他批次或人工改动；不设漂移校验会让过期呈现写出「看起来完备」的记录。批次号晚铸造使「被拒 = 零痕迹」可判定。 |
+| **A-25** | **应答定义与原文留痕（clarify 裁决）**：应答 = 用户对本次呈现的**显式回复**（含「无异议」、点名异议或暂缓）；对呈现内容的追问不构成应答，技能回答后继续等待；中止/关闭会话零记录。批次记录 MUST 逐字保存应答原文（引用块），107 决策记录 `rationale` 保存要点；原文层是重放与审计的真源。 | 消除 US3「异议原话」与 FR-033「要点」的二读；「沉默接受」只有在「应答」可判定时才成立。 |
 
 ## Pending-Source Roster (closed; dated declaration)
 
 本表是 requirements 阶段的**日期化声明**；实现后含义与清单归所有者页（FR-001），本表不构成第二定义点。
 
-| 来源 id | 既有载体 | 机器可检谓词 | 类别 | 判定为待决策项的条件 |
-|---------|----------|--------------|------|----------------------|
-| `register-open-decision-row` | `.specify/register.md`（表格行） | 行 id 族为 OI- 或 D-，且状态单元格去掉 markdown 强调与前导空白后以 `open` 为起始词 | 由权威路径上的待决策项块声明 | 权威路径为**显式**仓库路径，且其载体中存在与主体一致的 `### PENDING —` 块并声明 `human-interactive` |
-| `authored-pending-item` | 四个封闭扫描根下的 tracked Markdown 载体：`.specify/specs/`、`.specify/goals/`、`.specify/anchoring/`、`.specify/teams/` | 存在标题前缀为 `### PENDING —` 的块（围栏代码块内不计） | 块内 `decision_class` 字段 | 块字段齐备且 `decision_class: human-interactive` |
+**候选与资格分层（clarify 2026-11-27，A-21）**：「候选存在」由机器可检谓词判定；「资格」决定呈现状态（§ Batch States）或具名排除。字段齐备性、块级文法缺陷与类别判定 MUST NOT 被当作候选存在条件——否则不完整块会被静默丢弃，违反记账恒等式。
+
+| 来源 id | 既有载体 | 候选存在条件（机器可检） | 资格与排除判定 |
+|---------|----------|--------------------------|----------------|
+| `register-open-decision-row` | `.specify/register.md`（表格行） | 行 id 单元格去 markdown 强调后以 `OI-` 或 `D-` 起头，且状态单元格去强调与前导空白后以**词边界** `open` 为起始词（`resolved-for-v1` 等前缀不为 `open`） | 该行单元格中的**显式仓库相对路径**上恰有一个 `### PENDING —` 块的 `origin` 逐字点名该 register 行 id → 按块内容判资格；无显式路径、0 个匹配或 >1 个匹配 → `incomplete`（`authority-unresolved` / `ambiguous-link`）；块声明 `ai-autonomous` → 排除 `not-human-held` |
+| `authored-pending-item` | 四个封闭扫描根下的 tracked Markdown 载体：`.specify/specs/`、`.specify/goals/`、`.specify/anchoring/`、`.specify/teams/` | 存在标题前缀为 `### PENDING —` 的块（围栏代码块内不计） | 字段闭集齐备且无块级文法缺陷 → 按内容判资格；缺字段/畸形字段/未知字段/重复字段/声明计数不符 → `incomplete`（逐项点名）；`decision_class: ai-autonomous` → 排除 `not-human-held`；`decision_class` 缺失 → `incomplete`（`class-missing`，A-23） |
+
+**确定性联接（clarify 2026-11-27，A-22）**：待决策项块的必填 `origin` 字段是 register 行的回指——对 register 来源，`origin` MUST 逐字包含该行 id 作为独立 token；联接只在行单元格给出的显式仓库相对路径上发生，`同上`、`Open items § …` 一类相对表述不解析，也不作为路径候选。身份比较（去重与联接）取 `subject` 去首尾空白后的**逐字节**相等（同名族再比较 `resource_locator` 值），不做大小写折叠、Unicode 归一或模糊匹配；缺定位与有定位的两个同拼写主体不合并。register 行未能解析到块时，以行 id 为单独身份呈现 `incomplete`，不并入任何块身份。
 
 **排除族（具名理由，计入记账）**：已触发的交互门（当场问答，不跨调用挂起）；澄清标记（`/speckit.clarify` 拥有）；parked idea（`.specify/todo/`，想法队列不是决策项）；`ai-autonomous` 检查点裁决（不属人持有）；`REC-` 行（建议是决策的输入，不是决策项）；已在先前批次解决的身份（FR-012）。
 
-**来源在场读数**：`read`（成功读取）/ `absent`（载体不存在，记为带原因的缺席空来源）/ `unreadable`（存在但不可读或不可解析 → 触发拒绝，FR-016）。
+**来源在场读数**：`read`（成功读取）/ `absent`（载体不存在，记为带原因的缺席空来源）/ `unreadable`（**载体级**存在但不可读或不可解析 → 触发拒绝，FR-016）。**层级分界（clarify 2026-11-27，A-21）**：块级文法缺陷（未知/重复/畸形字段、声明计数不符）不属 `unreadable`，按 `incomplete` 呈现并点名；只有文件 I/O 失败、register 表结构无法按列解析、或候选无法被枚举时才拒绝整批。
 
 ## Pending Item Block (closed; dated declaration)
 
@@ -93,21 +102,23 @@
 
 | 字段 | 层级 | 含义 |
 |------|------|------|
-| `decision_class` | 必填 | 闭集 `human-interactive` / `ai-autonomous`；批量面板只呈现前者 |
+| `decision_class` | 必填 | 闭集 `human-interactive` / `ai-autonomous`；批量面板只**结案**前者；缺失记 `incomplete`（`class-missing`，A-23） |
 | `subject` | 必填 | 决策主体的完整名称（107 文本契约 R1） |
 | `same_name_conflict` / `resource_locator` | 条件（同名族） | 同名冲突风险存在时必须成对在场；定位维度下限沿用 107 规则 |
 | `context` | 必填 | 决策所处情境与约束（含为何此刻要选） |
 | `options` | 必填 | 声明计数开头；每个选项五要素（label / consequences / reversibility / default / evidence）；恰一个 `default: yes`；`other` 的 `path` 与单可行项的 `forced` 规则沿用 107 选项集契约 |
 | `basis` | 必填 | 建议默认值的一行理由；本身不是证据，依据必须由可解析指针承载 |
-| `origin` | 必填 | 该待决策项的产出身份（生产者/载体/行或锚），用于审计与去重回指 |
+| `origin` | 必填 | 该待决策项的产出身份（生产者/载体/行或锚）；register 来源 MUST 逐字包含该 register 行 id 作为独立 token（A-22），用于审计、去重回指与行↔块联接 |
 | `created_at` | 必填 | ISO-8601 UTC 创建时点 |
 | `resolution` | 条件（解决族） | 解决后追加：`<batch_id> -> <D-NNN>`；块内容不因解决而改写 |
 
-**不完整判定**：任一必填字段缺失、选项五要素缺失、默认项不是恰一个、`evidence` 指针不可解析、`subject` 不是完整名称形态可判部分——记为 `incomplete` 并逐项点名缺失要素；不完整项不进入「沉默接受」资格，但仍被完整呈现其现有内容与缺失清单。
+**块级文法缺陷（clarify 2026-11-27，A-21）**：字段行不匹配上述文法、字段名不在闭集内、同一字段出现两次、`options` 声明计数与条目数不符——这些是**块级**缺陷：候选仍被枚举，以 `incomplete` 呈现并逐项点名缺陷；MUST NOT 因此拒绝整批，MUST NOT 静默忽略缺陷行。
+
+**不完整判定**：任一必填字段缺失、选项五要素缺失、默认项不是恰一个、`evidence` 指针不可解析、`subject` 不是完整名称形态可判部分、或存在上款块级文法缺陷——记为 `incomplete` 并逐项点名缺失或畸形要素；不完整项不进入「沉默接受」资格，但仍被完整呈现其现有内容与缺失清单。
 
 ## Batch States and Batch Family Fields (closed; dated declaration)
 
-**呈现行的资格状态（闭集）**：`eligible` / `incomplete` / `no-default` / `irreversible-default` / `source-conflict` / `prior-decision-conflict`。只有 `eligible` 项可经沉默结案。
+**呈现行的资格状态（闭集）**：`eligible` / `incomplete` / `no-default` / `irreversible-default` / `source-conflict` / `prior-decision-conflict`。只有 `eligible` 项可经沉默结案。资格原因 MUST 具名（如 `authority-unresolved` / `ambiguous-link` / `class-missing` / `malformed-field` / `unknown-field` / `duplicate-field` / `option-count-mismatch`）；原因词表随本节修订增长，MUST NOT 新增状态。
 
 **排除状态（不呈现，计入记账）**：`not-human-held` / `already-resolved` / `duplicate-merged`。
 
@@ -123,7 +134,7 @@
 | `batch_disposition` | 该记录对应的处置：`accepted-default` / `objected-alternative` |
 | `recommendation_grounding` | 该记录采用的默认值接地：`grounded` / `no-evidence` |
 
-**批次编号**：`B-<YYYYMMDDTHHMMSSZ>-<8 位小写十六进制>`；时间戳为 UTC，后缀保证两个并发批次不共享路径；批次编号在诞生时登记于 register（与决策编号同批）。
+**批次编号**：`B-<YYYYMMDDTHHMMSSZ>-<8 位小写十六进制>`；时间戳为 UTC，后缀保证两个并发批次不共享路径；批次编号在**全部记录前置校验通过之后、首条写入之前**铸造，并在诞生时登记于 register（与决策编号同批）。被拒绝的扫描—应答组合 MUST NOT 铸造编号、登记或写入本特性的任何记录/状态文件（A-24）。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -159,11 +170,13 @@
 2. **Given** 默认选项为不可逆的项，**When** 用户未点名它，**Then** 它不被结案，呈现中明确要求显式选择（确认门对不可逆动作的显式确认义务不被批量规则绕过）。
 3. **Given** 用户回复「无异议」，**When** 批次记录，**Then** 全部 `eligible` 项记 `accepted-default`；不合格项仍保持待定。
 4. **Given** 用户中止会话（无可记录的应答），**When** 结束，**Then** 不写任何决策记录，批次不成立；下次批次重新呈现。
-5. **Given** 异议点名的选项不是该选项集的具名成员，**When** 校验应答，**Then** 拒绝该应答并给出行名不匹配的错误；不猜、不近似匹配。
+5. **Given** 异议点名的选项不是该选项集的具名成员，**When** 校验应答，**Then** 拒绝该应答并给出行名不匹配的错误；不猜、不近似匹配，且不写任何记录（A-24）。
 
 ---
 
 ### User Story 3 - 处置落进既有载体，整批可只凭记录重放 (Priority: P1)
+
+（clarify 2026-11-27 补充原文层：批次记录头 MUST 以逐字引用块保存用户应答原文，`rationale` 只存要点——见 A-25。）
 
 一次批次结束后，审计者不打开对话历史，也能从记录重建：本批的来源清单与逐来源计数、每个待决策项的身份与来源、建议默认值与接地指针、用户的异议原话与处置、每个已决项的 `D-NNN` 记录与批次族字段、register 的批次与编号登记、以及被解决项的来源状态更新。用重放动作可以得到同一份项集与处置；任一指针不可解析即被报告，绝不静默跳过。
 
@@ -173,7 +186,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 一次完成的批次，**When** 审计，**Then** 批次记录含批次头（编号、时点、来源清单与逐来源计数、完备性判定）、逐项行表与每个已决项的 `D-NNN` 记录；记录含 `batch_id`、`batch_disposition`、`recommendation_grounding`、`rationale`、`evidence`、`actor` 与 `created_at`。
+1. **Given** 一次完成的批次，**When** 审计，**Then** 批次记录含批次头（编号、时点、来源清单与逐来源计数、完备性判定、**用户应答原文引用块**）、逐项行表与每个已决项的 `D-NNN` 记录；记录含 `batch_id`、`batch_disposition`、`recommendation_grounding`、`rationale`、`evidence`、`actor` 与 `created_at`。
 2. **Given** 一次解决的 register open 行，**Then** 该行状态被更新为点名批次与决策编号（行不删除），register 增加批次编号行与决策编号（按载体+区间）行；待决策项块追加 `resolution` 字段。
 3. **Given** 批次记录落盘后某来源状态更新失败，**Then** 失败被披露，且再次扫描不会重新呈现该身份（读时联接已决批次记录）。
 4. **Given** 一条被改坏的证据指针，**When** 重放，**Then** 重放报告该指针不可解析并以非零退出；不跳过、不降级为「干净」。
@@ -234,6 +247,12 @@
 - **重放时来源载体已归档或迁移**：指针不可解析 → 重放报错；不得以「历史记录」为由跳过。
 - **扫描根中出现本特性批次记录之外的 `decision-batch-` 知识条目**：只按批次编号/标题前缀识别；未知形态条目报为不可解析候选（拒绝），不猜测。
 - **register 中 `open` 行与 `resolved` 行混排、状态带加粗/标点**：去强调后按起始词判定；`resolved-for-v1` 等前缀词不是 `open`（按词边界判定）。
+- **待决策项块含未知字段、重复字段或畸形字段行**：该候选为 `incomplete`，逐项点名缺陷；不拒绝整批、不静默忽略（A-21）。
+- **register 行在显式路径上匹配 0 个或多个块**：`incomplete`（`authority-unresolved` / `ambiguous-link`），不任选一块（A-22）。
+- **同一身份的多来源 `decision_class` 声明冲突**：按存疑从严排除（`not-human-held`）并在记账中具名披露类别冲突（A-23）。
+- **扫描后、记录前来源发生变化（候选新增/消失、默认/接地/资格改变）**：`record` 拒绝并逐项列出差异，零写入；重新扫描呈现后作为新批次（A-24）。
+- **用户对呈现内容追问而未表态**：不构成应答；技能回答后继续等待，零记录（A-25）。
+- **调用方未声明交互授权级别**：按无人值守处理，拒绝记录（A-24）。
 
 ## Requirements *(mandatory)*
 
@@ -251,10 +270,10 @@
 
 - **FR-006**: 待决策项来源 MUST 是封闭清单（§ Pending-Source Roster）：`register-open-decision-row`（[[STR-003]]）与 `authored-pending-item`（[[STR-004]]）。第二来源的扫描根封闭为 `.specify/specs/`、`.specify/goals/`、`.specify/anchoring/`、`.specify/teams/`；来源或扫描根的增删 MUST 以所有者页修订进行。
 - **FR-007**: 排除族 MUST 具名并计入记账：已触发的交互门、澄清标记、parked idea、`ai-autonomous` 检查点裁决、`REC-` 行。MUST NOT 静默丢弃任何候选；MUST NOT 把排除族改写成「不存在」。
-- **FR-008**: 待决策项 MUST 以独立块语法承载，标题前缀为 [[STR-002]]；字段闭集见 § Pending Item Block 的封闭字段表（含同名族与解决族两条条件字段）；待决策项块 MUST NOT 被记录文法判为记录，记录 MUST NOT 被判为待决策项块。选项集 MUST 沿用 107 的五要素、声明计数、唯一默认、`other` 路径与 `forced` 规则。
-- **FR-009**: 去重 MUST 按身份进行：主体完整名称 +（同名时的）定位信息；重复引用合并为一行并列出全部来源；同身份而选项标签集不同时 MUST 标 `source-conflict` 并要求显式选择；MUST NOT 按标题相似度或语义相似度合并。
-- **FR-010**: register 行的完整信息 MUST 在其权威路径上的待决策项块中解析；`同上` 一类相对表述 MUST NOT 被解析为路径；解析失败的行 MUST 以 `incomplete` 呈现并点名缺失要素（含 `authority-unresolved`），MUST NOT 由面板补全。
-- **FR-011**: 类别门 MUST 生效：批次只呈现 `human-interactive` 项；`ai-autonomous` 或类缺失的候选 MUST 以 `not-human-held` 排除并计数；MUST NOT 转换类别。
+- **FR-008**: 待决策项 MUST 以独立块语法承载，标题前缀为 [[STR-002]]；字段闭集见 § Pending Item Block 的封闭字段表（含同名族与解决族两条条件字段）；待决策项块 MUST NOT 被记录文法判为记录，记录 MUST NOT 被判为待决策项块。选项集 MUST 沿用 107 的五要素、声明计数、唯一默认、`other` 路径与 `forced` 规则。块级文法缺陷（未知字段、重复字段、畸形字段行、声明计数与条目数不符）MUST 记为该候选的 `incomplete` 缺失/畸形要素并逐项点名，MUST NOT 触发整批拒绝，MUST NOT 被静默忽略（A-21）。
+- **FR-009**: 去重 MUST 按身份进行：主体完整名称 +（同名时的）定位信息；重复引用合并为一行并列出全部来源；同身份而选项标签集不同时 MUST 标 `source-conflict` 并要求显式选择；MUST NOT 按标题相似度或语义相似度合并。身份比较 MUST 取 `subject` 去首尾空白后的**逐字节**相等（同名族再比较 `resource_locator` 值），MUST NOT 做大小写折叠、Unicode 归一或模糊匹配；缺定位与有定位的同拼写主体 MUST NOT 合并（A-22）。
+- **FR-010**: register 行的完整信息 MUST 在其权威路径上的待决策项块中解析；联接键 MUST 为块 `origin` 中逐字出现的 register 行 id（独立 token），且该行单元格中的显式仓库相对路径上 MUST 恰有一个匹配块；`同上`、`Open items § …` 一类相对表述 MUST NOT 被解析为路径；解析失败的行（无显式路径、0 个匹配或 >1 个匹配）MUST 以 `incomplete` 呈现并点名缺失要素（含 `authority-unresolved` / `ambiguous-link`），MUST NOT 由面板补全或任选一块（A-22）。
+- **FR-011**: 类别门 MUST 生效：批次只**结案**已声明 `human-interactive` 的项；已声明 `ai-autonomous` 的候选 MUST 以 `not-human-held` 排除并计数，MUST NOT 呈现、MUST NOT 转换；类别未知（无块、权威路径不可解析、块缺 `decision_class` 或取值域外）的候选 MUST 以 `incomplete` 呈现并点名 `class-missing`，MUST NOT 结案、MUST NOT 被读作 `ai-autonomous`；同一身份的多来源类别声明不一致时 MUST 按存疑从严以 `not-human-held` 排除并在记账中具名披露类别冲突。类别 MUST NOT 被面板转换（A-23）。
 - **FR-012**: 已解决项 MUST 被排除（`already-resolved`）：来源带 `resolution` 字段，或读时联接在既往批次记录中发现同身份已决项；来源状态与已决记录不一致时 MUST 披露（MUST NOT 沉默）。
 - **FR-013**: 扫描 MUST 只读：在用户应答被记录之前，MUST NOT 写任何记录、状态或登记。
 
@@ -262,13 +281,13 @@
 
 - **FR-014**: 一次调用 MUST 扫描全部来源并产出**一次**呈现；顺序 MUST 确定（来源清单顺序 → 载体仓库相对路径 → 块在文件内的出现序）；相同输入重复扫描 MUST 得到相同项集与顺序（扫描时间戳除外）。
 - **FR-015**: 完备性 MUST 以封闭清单断言表达（owner: `shared/guidelines/closed-set-claims.md`）：参照物 = 本次扫描的来源清单与候选集；比较单元 = 每个候选的处置分类；允许差集 MUST 为空；记账恒等式「扫描候选 = 呈现行来源 + 合并引用 + 具名排除」MUST 成立；批次记录 MUST 携带逐来源计数与判定。
-- **FR-016**: 任一来源或候选载体**存在但不可读/不可解析** MUST 触发**拒绝**：不呈现、不记录任何处置、给具名原因与文档化退出码；MUST NOT 呈现半批并称完备。
+- **FR-016**: 任一来源或候选**载体**存在但不可读/不可解析（文件 I/O 失败、register 表结构无法按列解析、候选无法枚举）MUST 触发**拒绝**：不呈现、不记录任何处置、给具名原因与文档化退出码；MUST NOT 呈现半批并称完备。**块级**文法缺陷不触发拒绝，按 FR-008/FR-019 的 `incomplete` 处理（A-21）。
 - **FR-017**: 来源**缺席**（文件/目录不存在）MUST 记为带原因的缺席空来源，MUST NOT 使整批拒绝，MUST NOT 被读成「干净」；完备性判定 MUST 如实标注该缺席。
 - **FR-018**: 零待决策项 MUST 产出显式 `nothing-pending` 成功结果，MUST NOT 是空输出、MUST NOT 创建批次记录。
 
 **D. 呈现与建议默认值（FR-019…FR-025）**
 
-- **FR-019**: 每项呈现 MUST 携带：107 `human-interactive` 模板的全部要素（平实语言的问题、上下文、每选项后果与可逆性、唯一默认、完整名称与同名定位、选项证据）、来源指针、`decision_class`、`basis`、接地状态与指针、资格状态与原因、以及异议方式。
+- **FR-019**: 每项呈现 MUST 携带：107 `human-interactive` 模板的全部要素（平实语言的问题、上下文、每选项后果与可逆性、唯一默认、完整名称与同名定位、选项证据）、来源指针、`decision_class`、`basis`、接地状态与指针、资格状态与原因、以及异议方式。模板要素以**槽位**计：缺值项仍呈现其**全部现有内容**与缺失清单（`incomplete`，FR-008、A-21），MUST NOT 以补造值填满槽位。
 - **FR-020**: 批次呈现 MUST 承载批次级上下文下限：为何此刻出现、沉默将意味着什么、如何提出异议或暂缓、哪些项保持待定及原因、完备性披露（含缺席来源）。面向用户的措辞 MUST 遵循 `shared/guidelines/user-facing-comprehension.md` 的白名单与上下文规则；MUST NOT 把内部标识符（字段名、脚本名、状态码）写入面向用户的正文。
 - **FR-021**: 建议默认值 MUST 是该选项集声明的唯一默认成员；MUST NOT 由面板发明默认值或选项；`no-default` 项 MUST 呈现并不得经沉默结案。
 - **FR-022**: 接地 MUST 按 A-6 的确定性联接计算，输出 [[STR-011]] 或 [[STR-012]]；`grounded` 时 MUST 至少给出一条可解析的既往经验指针，且每条发出的指针 MUST 可解析；`no-evidence` MUST 明示且不得暗示经验支持；`basis` MUST NOT 单独充当证据。
@@ -279,7 +298,7 @@
 **E. 交互与处置（FR-026…FR-031）**
 
 - **FR-026**: 异议 MUST 按项身份绑定，MUST NOT 按位置或顺序猜测；每条异议 MUST 指向该选项集的具名成员（完整标签）或暂缓；新选项只有在该项声明了带 `path` 的 `other` 时按路径处理，否则 MUST 被拒绝并给出路径规则；应答校验 MUST 在写任何记录之前完成。
-- **FR-027**: 沉默语义 MUST 受限：仅在**已获用户应答**的交互式批次内，未被点名的 `eligible` 项记为 [[STR-008]]；零应答/中止会话 MUST 记零条记录；无人值守调用 MUST NOT 记录接受（FR-040）。
+- **FR-027**: 沉默语义 MUST 受限：仅在**已获用户应答**的交互式批次内，未被点名的 `eligible` 项记为 [[STR-008]]；应答 MUST 是用户对本次呈现的**显式回复**（含「无异议」、点名异议或暂缓），对呈现内容的追问不构成应答（技能回答后继续等待，零记录）；零应答/中止会话 MUST 记零条记录；无人值守调用 MUST NOT 记录接受（FR-040、A-24、A-25）。
 - **FR-028**: 处置 MUST 取闭集：[[STR-008]]、[[STR-009]]、[[STR-010]]。`objected-parked` MUST NOT 产生决策记录，项保持待定，并在批次记录中留下暂缓行；后续批次重新呈现该项。
 - **FR-029**: 重决 MUST 走 107 取代规则（A-7）：新记录 + 旧记录追加 `superseded_by` 且内容零改写；旧记录载体不可写/不可解析时 MUST 拒绝重决；MUST NOT 覆盖、删除或静默改写旧记录。
 - **FR-030**: 人的选择信号 MUST 复用既有门控观察词表（指针 `shared/guidelines/confirmation-gates.md`；`accepted-default` 映射 `approved-as-is`，`objected-alternative` 映射 `modified`），MUST NOT 另立第二套信号词表；`objected-parked` 不产生选择信号。
@@ -287,18 +306,18 @@
 
 **F. 记录与审计（FR-032…FR-038）**
 
-- **FR-032**: 每批次 MUST 产出一份**批次记录**：既有 knowledge 存储中的一条日期化记录，一文件一批次、批次编号唯一、永不覆盖、经既有记忆引擎的写入面落盘（记录头含批次编号、时点、工具版本、来源扫描计数与完备性判定；逐项行表含项身份、来源、资格、接地、处置与决策编号；随后是已决项的记录块）；MUST NOT 写共享可变聚合。
-- **FR-033**: 已决项 MUST 各产出一条 107 决策记录，文法与分层闭集不变，并按 A-12 携带条件层批次族字段 [[STR-005]]、[[STR-006]]、[[STR-007]]；`rationale` MUST 陈述建议依据与用户应答（沉默或异议原话要点）；`actor` MUST 按既有身份形态在场；`transmission_status` MUST 从 `not-transmitted` 起；`evidence` MUST 含接地指针与来源项指针。
+- **FR-032**: 每批次 MUST 产出一份**批次记录**：既有 knowledge 存储中的一条日期化记录，一文件一批次、批次编号唯一、永不覆盖、经既有记忆引擎的写入面落盘（记录头含批次编号、时点、工具版本、来源扫描计数与完备性判定、**用户应答原文的逐字引用块**；逐项行表含项身份、来源、资格、接地、处置与决策编号；随后是已决项的记录块）；MUST NOT 写共享可变聚合。应答原文是重放与审计的原文层，MUST NOT 只存摘要（A-25）。
+- **FR-033**: 已决项 MUST 各产出一条 107 决策记录，文法与分层闭集不变，并按 A-12 携带条件层批次族字段 [[STR-005]]、[[STR-006]]、[[STR-007]]；`rationale` MUST 陈述建议依据与用户应答要点（沉默，或对批次记录中原文的要点转述；原文层归 FR-032）；`actor` MUST 按既有身份形态在场；`transmission_status` MUST 从 `not-transmitted` 起；`evidence` MUST 含接地指针、来源项指针与批次记录指针。
 - **FR-034**: register MUST 反映批次：[[STR-005]] 的取值（批次编号 `B-…`）与各决策编号在诞生时登记（可按载体+区间分组）；已决 register 来源行的状态 MUST 更新为点名批次与决策编号，行 MUST NOT 被删除；暂缓行保持 open 并标注批次；除状态单元格与追加行外 MUST NOT 改写 register。register 缺席时 MUST 先按既有头部形态创建再登记。
 - **FR-035**: 已决来源状态 MUST 同步：register 行状态更新；待决策项块追加条件字段 `resolution`（值含批次编号与决策编号），块内容 MUST NOT 因解决而改写或删除；来源更新失败 MUST 披露，且读时联接（FR-012）MUST 阻止重复呈现。
 - **FR-036**: 重放 MUST 只凭已记录载体重建整批：批次记录 + 可解析指针给出项集、完备性记账、默认值与接地、异议与处置、决策记录；重放 MUST 只读、确定（同输入同输出）；任一不可解析指针 MUST 被报告并以非零退出，MUST NOT 跳过或用对话记忆补足。
-- **FR-037**: 幂等与并发 MUST 成立：同一批次编号的第二次记录 MUST 被拒绝；不同批次编号 MUST 写不同路径且互不读写对方记录；MUST NOT 修改他批记录。
+- **FR-037**: 幂等与并发 MUST 成立：同一批次编号的第二次记录 MUST 被拒绝；不同批次编号 MUST 写不同路径且互不读写对方记录；MUST NOT 修改他批记录。批次编号 MUST 只在前置校验全部通过后铸造；被拒绝的尝试 MUST NOT 留下编号、登记或本特性记录/状态文件（A-24）。
 - **FR-038**: 批次决策被传递实施时 MUST 沿用 107 的审计链三段（记录 → 派发尝试 → 实施回执）与传递义务；批次 MUST NOT 生成第二条记录或第二条传输路径。
 
 **G. 入口、边界与落地（FR-039…FR-045）**
 
 - **FR-039**: 交付面 MUST 是：薄入口命令模板 [[STR-013]]、内部技能 [[STR-014]]、确定性引擎 [[STR-015]]（封闭动作 `scan` / `record` / `replay`；`-h` / `--help` / `--version`；拒绝未声明选项；只读/写入面与退出码有文档，形态遵循 `shared/definitions/script-interface-definitions.md`）；固定规则判断（扫描、接地联接、成员校验、记账、成员集合与指针解析）MUST 由引擎判定，MUST NOT 由 LLM 复算。
-- **FR-040**: 面板 MUST 只在交互式会话记录处置：无人值守调用 MAY 扫描（只读），但 MUST 拒绝记录接受并给出具名原因；MUST NOT 把无人应答读作沉默。
+- **FR-040**: 面板 MUST 只在交互式会话记录处置：无人值守调用 MAY 扫描（只读），但 MUST 拒绝记录接受并给出具名原因；MUST NOT 把无人应答读作沉默。交互授权级别 MUST 由调用方显式声明并传入 `record` 动作；级别缺失 MUST 按无人值守处理并拒绝记录，MUST NOT 从终端形态、环境或沉默推断（A-24）。
 - **FR-041**: `ai-autonomous` 决策 MUST 保持其谓词驱动路径：批次 MUST NOT 呈现、转换或授权它们；人类默认值 MUST NOT 流入 `ai-autonomous` 记录。
 - **FR-042**: 落地 MUST 在同一变更内完成：所有者页 [[STR-001]] 扩展（含 P-13 与本特性规则）、命令模板 [[STR-013]]、技能 [[STR-014]]、引擎 [[STR-015]]；镜像经 `sync-mirrors.py` 生成；每工具命令副本经既有再生成器更新；**冻结的命令与技能名基线测试同批扩表**；框架地图的决策治理行更新（P-13、批次能力、consumer 增补）；MUST NOT 手改镜像；MUST NOT 修改 `.specify/.gitignore` 或运行期存储布局（无新运行期目录）。
 - **FR-043**: 命令文档 MUST 在 `docs/reference/commands/decide.md` 登记入口、动作集与退出语义，并以指针抵达所有者页；文档 MUST NOT 复述所有者页的判据表。
@@ -334,7 +353,7 @@
 ### Measurable Outcomes
 
 - **SC-001**: 对一个同时覆盖两个来源、重复引用、不完整项与 `ai-autonomous` 项的 fixture，扫描记账恒等式成立（扫描候选 = 呈现行来源 + 合并引用 + 具名排除），每项恰一行；把 register 改为存在但不可解析后，面板拒绝并点名来源、零呈现零记录；空 fixture 返回 `nothing-pending` **Path**: final
-- **SC-002**: 对每个已呈现项，机器检查断言 107 `human-interactive` 模板要素齐备（主体全名、上下文、选项五要素与唯一默认、来源指针、接地状态、资格与原因）；不完整项逐项点名缺失要素且不进入沉默资格；`ai-autonomous` 项呈现数为零 **Path**: final
+- **SC-002**: 对每个已呈现项，机器检查断言 107 `human-interactive` 模板**要素槽位**齐备（主体全名、上下文、选项五要素与唯一默认、来源指针、接地状态、资格与原因）：有值项的值在位，缺值项逐项点名缺失要素且不进入沉默资格；`ai-autonomous` 项呈现数为零 **Path**: final
 - **SC-003**: 在含既往证据的 fixture 上，每个 `grounded` 项至少一条既往经验指针可解析，且指针命中封闭载体集；在无证据 fixture 上，项标 `no-evidence`；两套 fixture 上发出的指针 100% 可解析，零编造指针 **Path**: final
 - **SC-004**: 「仅异议一项」的应答产出恰一条 `objected-alternative` 与其余 `eligible` 项的 `accepted-default`；不可逆默认、无默认与前例冲突项保持待定且各有具名原因；零异议应答使全部 `eligible` 项结案；中止会话产出零记录；不在选项集内的异议被拒绝 **Path**: final
 - **SC-005**: 一次完成的批次只凭批次记录与可解析指针即可重放项集、完备性、默认值、异议与处置；所有记录含批次族字段且通过文法检查；register 有批次与决策登记且已决 OI 行状态已更新；把任一指针改坏后重放非零退出并点名该指针 **Path**: final
@@ -394,6 +413,16 @@
 - Q: 特性绑定与注册？→ A: 新独立 Feature 112；所有者页只做加法式扩展；本阶段登记 `.specify/features.md` 行与 `.specify/features/112-decision-batch-panel.md`（`Draft`），不编辑 `.specify/register.md` 与状态脊（A-2、FR-001、FR-003）。
 - Q: 存量 open 行没有待决策项块怎么办？→ A: 以 `incomplete` 呈现并点名缺失要素；不补造、不代写；作者补全后才可批量结案（A-16、FR-010、FR-019）。
 - Q: 脚手架偏差？→ A: 当前分支已存在时脚本会派生新编号与分支；按 107/109/110 先例手工从模板脚手架，停留在 112 分支（A-19）。
+
+### Session 2026-11-27（clarify 阶段，无人值守；无提问，五条裁决记于 Assumptions A-21…A-25）
+
+- Q: roster 的「判定为待决策项的条件」是否兼作候选存在条件？没有块、块字段缺失或畸形、未知字段分别如何分类？→ A: 候选存在只由机器可检谓词判定；字段齐备/块级文法缺陷/类别属于资格（`incomplete`）或具名排除；块级缺陷逐项点名、不拒绝整批，只有载体级不可读/不可枚举才拒绝；roster 表按「候选存在条件 / 资格与排除判定」分列（A-21）。
+- Q: register 的 open 行如何确定权威路径上哪一个待决策项块属于它？身份如何比较？→ A: 联接键为块 `origin` 中逐字出现的 register 行 id，且显式仓库相对路径上恰有一个匹配块；0 个或多匹配 → `incomplete`（`authority-unresolved` / `ambiguous-link`）；身份比较为去首尾空白后逐字节相等加同名定位值，不做大小写折叠、Unicode 归一或模糊匹配（A-22）。
+- Q: A-13/FR-011 说「`ai-autonomous` 或类缺失的候选排除」，A-16/FR-010 说无块行以 `incomplete` 呈现，何者优先？→ A: 已声明 `ai-autonomous` 排除且永不呈现/转换；类别未知（含无块、缺 `decision_class`）以 `incomplete` 呈现并点名 `class-missing`，永不结案；同一身份类别声明冲突按存疑从严排除并具名披露（A-23，修订 A-13/FR-011）。
+- Q: 扫描到记录之间来源漂移怎么办？批次编号何时铸造？被拒应答与无人值守如何处置？→ A: `record` 先重扫并断言候选身份集与逐项内容指纹未变，漂移即拒绝且零写入；批次编号在全部前置校验通过后、首条写入前铸造；被拒应答零写入且可在同一呈现上重试；交互授权级别由调用方显式声明，缺失或无人值守即拒绝记录（A-24）。
+- Q: 什么构成「用户已作出应答」？批次记录保存原话还是要点？→ A: 应答 = 对本次呈现的显式回复（含「无异议」、点名异议或暂缓），追问不构成应答；批次记录逐字保存应答原文，107 决策记录 `rationale` 保存要点；中止/关闭会话零记录（A-25）。
+- Coverage 复核: brief 的另外两区已由既有裁决定谳——建议默认值只取项声明的唯一默认、接地仅对封闭既往经验载体做确定性联接、无证据明写 `no-evidence`（A-6、FR-021…FR-023）；默认值仅单批次有效、不记忆偏好、不跨批次预授权（A-9、FR-031）。本阶段未新增第二处定义。
+- 读数更正: Overview 的 register open 行基线由 requirements 阶段手列的八条更正为谓词派生的十七条（漏计 D-001、D-001-a 与 D-1/D-3…D-8 (092)）；`checklists/requirements.md` 同步更正；requirements 阶段的 dated 证据文件保持原样不改写（A-21）。
 
 ## Out of Scope
 
