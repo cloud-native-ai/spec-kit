@@ -110,11 +110,25 @@ set -u
 
 set -euo pipefail
 
-PLANTUML_SERVER="${PLANTUML_SERVER:-http://xuanji-plantuml.aliyun-inc.com:9696/plantuml}"
+PLANTUML_SERVER="${PLANTUML_SERVER:-http://xuanji-render.aliyun-inc.com:9696/plantuml}"
 # Extra servers tried in order when PLANTUML_SERVER is unreachable (server/auto mode).
-# plantuml.com is the public fallback; note it rejects default urllib UAs (403).
-# Empty string DISABLES the public fallback (`-` not `:-`: unset → default, empty → none).
-PLANTUML_SERVER_FALLBACKS="${PLANTUML_SERVER_FALLBACKS-https://www.plantuml.com/plantuml}"
+# Default is EMPTY, and every entry must be an internal host: public render backends are
+# forbidden by policy (图源不得外发). Non-internal entries abort the script (exit 2).
+PLANTUML_SERVER_FALLBACKS="${PLANTUML_SERVER_FALLBACKS-}"
+
+# Hard rule (user ruling 2026-11-27): no public render backend, ever.
+# Allowed: localhost / private addresses / *.aliyun-inc.com; anything else exits 2.
+_assert_internal_render_server() {
+  local url="$1" host
+  host="$(printf '%s' "$url" | sed -E 's#^[A-Za-z][A-Za-z0-9+.-]*://##; s#[/:?#].*$##')"
+  case "$host" in
+    ""|localhost|127.*|10.*|192.168.*|172.1[6-9].*|172.2[0-9].*|172.3[01].*) return 0 ;;
+    *.aliyun-inc.com) return 0 ;;
+    *) printf 'REFUSED: public render backend is forbidden by policy: %s\n' "$url" >&2; exit 2 ;;
+  esac
+}
+_assert_internal_render_server "$PLANTUML_SERVER"
+for _fb in ${PLANTUML_SERVER_FALLBACKS}; do _assert_internal_render_server "$_fb"; done
 PLANTUML_BACKEND="${PLANTUML_BACKEND:-server}"   # server | local | auto (remote-first)
 HTTP_UA="render-plantuml.sh/1.0 (spec-kit plantuml)"
 SVG_SCALE=4        # SVG: maximum quality (vector, no size limit)

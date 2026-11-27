@@ -11,7 +11,7 @@
 
 | 变量 | 默认 | 说明 |
 |------|------|------|
-| `EXCALIDRAW_SERVER` | `http://127.0.0.1:8383` | 渲染服务地址 |
+| `EXCALIDRAW_SERVER` | `http://xuanji-render.aliyun-inc.com:9698` | 渲染服务地址（共享渲染服务；单引擎自建服务默认 8383，见 `guide/server-deployment.md`） |
 | `EXCALIDRAW_BACKEND` | `server` | `server`=远端；`local`=本机临时起服务（须用户确认） |
 | `EXCALIDRAW_SCALE` | `2` | PNG 缩放倍数 |
 | `EXCALIDRAW_PADDING` | `16` | 导出内边距 px |

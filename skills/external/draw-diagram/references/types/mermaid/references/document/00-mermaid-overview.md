@@ -25,21 +25,13 @@
 
 | 方式 | 用途 |
 |------|------|
-| 浏览器（mermaid.js CDN） | 网页内嵌 |
+| 浏览器（本地 mermaid.js bundle） | 网页内嵌 |
 | mermaid-cli（mmdc） | 本地渲染 SVG/PNG/PDF（需 Chrome） |
-| mermaid.ink 服务器 | URL 即渲染（本技能服务器后端） |
+| 服务器后端（mermaid.ink 兼容协议） | URL 即渲染（本技能默认后端：内网共享服务） |
 | 编辑器插件（VS Code Markdown Preview Mermaid） | 预览调试 |
 
 ## 4. 本技能使用的工具链
 
-- 渲染：`scripts/render-mermaid.sh`（服务器 mermaid.ink + 本地 mmdc 双后端）；
+- 渲染：`scripts/render-mermaid.sh`（服务器后端（mermaid.ink 兼容）+ 本地 mmdc）；
 - 量测：`scripts/measure-svg-layout.py`（WBS/甘特版面三判据）；
 - 兜底：`scripts/svg-to-png-cjk.cjs`（SVG→PNG，CJK 字体与内容裁剪）；
-- 输出：HTML 文档 + PNG/SVG + `.mmd` 源文件。
-
-## 5. 版本注意
-
-- C4 系列原生支持需 v10.9+；
-- `kanban`/`block` 实验性（v11.x）；
-- gantt `progress` 任务属性 v11.7+；
-- 交付时注明所用 Mermaid 版本（本地 mmdc 默认 npx 拉最新）。

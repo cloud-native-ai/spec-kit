@@ -100,32 +100,29 @@ set -u
 set -euo pipefail
 
 DIR="${1:?usage: vendor-echarts.sh <target-dir> [version]}"
-VERSION="${2:-5.6.0}"
+VERSION="${2:-5.6.1}"
 VENDOR_DIR="$DIR/vendor"
 OUT="$VENDOR_DIR/echarts.min.js"
-URL="https://cdn.jsdelivr.net/npm/echarts@${VERSION}/dist/echarts.min.js"
+ENGINE_HOME="$(cd "$(dirname "$0")/.." && pwd)"
+ASSET="$ENGINE_HOME/assets/vendor/echarts-${VERSION}.min.js"
 
 mkdir -p "$VENDOR_DIR"
 
-echo "==> Downloading echarts@${VERSION} into $OUT"
-if command -v curl >/dev/null 2>&1; then
-  if ! curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 2 -o "$OUT" "$URL"; then
-    echo "ERROR: curl failed to download $URL (network unreachable?)" >&2
-    echo "       Place the file manually: download $URL and save it as $OUT" >&2
-    rm -f "$OUT"
-    exit 1
-  fi
-elif command -v wget >/dev/null 2>&1; then
-  if ! wget -q -O "$OUT" "$URL"; then
-    echo "ERROR: wget failed to download $URL (network unreachable?)" >&2
-    echo "       Place the file manually: download $URL and save it as $OUT" >&2
-    rm -f "$OUT"
-    exit 1
-  fi
-else
-  echo "ERROR: neither curl nor wget is available — download $URL manually to $OUT" >&2
+# LOCAL-ONLY: public downloads are forbidden (资源不得外发). Source ladder:
+#   ① $ECHARTS_LIB (explicit local file)  ② bundled skill asset  ③ fail closed.
+SRC=""
+if [ -n "${ECHARTS_LIB:-}" ] && [ -f "${ECHARTS_LIB}" ]; then SRC="$ECHARTS_LIB"
+elif [ -f "$ASSET" ]; then SRC="$ASSET"
+fi
+if [ -z "$SRC" ]; then
+  echo "ERROR: no local echarts source found." >&2
+  echo "       Expected bundled asset: $ASSET" >&2
+  echo "       Or set ECHARTS_LIB=/path/to/echarts.min.js (internal copy)." >&2
+  echo "       Public downloads are forbidden by policy." >&2
   exit 1
 fi
+echo "==> Vendoring echarts@${VERSION} from $SRC"
+cp -f "$SRC" "$OUT"
 
 # --- verification: the file must be real and non-empty --------------
 if [ ! -s "$OUT" ]; then
@@ -138,12 +135,12 @@ SIZE=$(wc -c < "$OUT")
 echo "==> vendor/echarts.min.js present: $SIZE bytes"
 
 # Version marker check: echarts.min.js starts with a banner comment.
-HEADER=$(head -c 300 "$OUT" | tr -d '\n')
-if printf '%s' "$HEADER" | grep -q "v${VERSION}"; then
-  echo "==> version marker v${VERSION} found in banner"
+if grep -q "version:\"${VERSION}\"" "$OUT"; then
+  echo "==> version marker ${VERSION} confirmed"
 else
-  echo "WARN: could not confirm version marker 'v${VERSION}' in the file header" >&2
-  echo "      (header: ${HEADER:0:120})" >&2
+  echo "ERROR: echarts version marker ${VERSION} not found in $OUT" >&2
+  rm -f "$OUT"
+  exit 1
 fi
 
 # JS syntax check when node is available (deterministic, no browser needed).
@@ -158,4 +155,4 @@ else
   echo "WARN: node not found, skipped JS syntax check" >&2
 fi
 
-echo "==> Done. HTML loader references vendor/echarts.min.js first; CDN is only a fallback."
+echo "==> Done. HTML loader loads vendor/echarts.min.js only (no CDN fallback)."

@@ -169,7 +169,7 @@ Package everything into a self-contained HTML file using the base template struc
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>[Chart Title]</title>
   <script>
-    // ECharts loader: vendored local copy first (offline-capable), pinned CDN fallback.
+    // ECharts loader: LOCAL ONLY — public CDNs are forbidden (图源不得外发).
     // The local copy MUST exist — run: bash scripts/vendor-echarts.sh <deliverable-dir>
     // Never use document.write for this loader.
     (function () {
@@ -177,10 +177,10 @@ Package everything into a self-contained HTML file using the base template struc
       s.src = 'vendor/echarts.min.js';
       s.async = false;
       s.onerror = function () {
-        var c = document.createElement('script');
-        c.src = 'https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js';
-        c.async = false;
-        document.head.appendChild(c);
+        var d = document.createElement('div');
+        d.setAttribute('data-echarts-missing', '1');
+        d.textContent = 'ECharts 本地库缺失：请先运行 vendor-echarts.sh <交付目录>（禁止从公网加载）';
+        (document.body || document.documentElement).appendChild(d);
       };
       document.head.appendChild(s);
     })();
@@ -199,9 +199,9 @@ Package everything into a self-contained HTML file using the base template struc
 ```
 
 Key requirements:
-- ECharts loaded from **pinned** CDN: `https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js` (never a floating `echarts@5` tag); keep the version in a code comment. Where practical, add `integrity`/`crossorigin` (SRI) attributes for the pinned script
-- **Offline-critical deliverables MUST ship a real `vendor/echarts.min.js`** (download + verify with `scripts/vendor-echarts.sh <dir>`); the loader references the local copy first and only falls back to CDN — no `document.write`
-- For quick online-only charts, the CDN-primary order is acceptable, but never reference `vendor/` unless the file actually exists (an empty `vendor/` stub renders a blank canvas offline)
+- ECharts loaded from the **bundled local file** `vendor/echarts.min.js`（5.6.1；源资产 `assets/vendor/echarts-5.6.1.min.js`）——**禁止任何公网 CDN**；keep the version in a code comment. Where practical, add `integrity`/`crossorigin` (SRI) attributes
+- **Every deliverable MUST ship a real `vendor/echarts.min.js`** (populated + verified with `scripts/vendor-echarts.sh <dir>`); the loader loads only that file — no CDN fallback, no `document.write`
+- Never reference `vendor/` unless the file actually exists — an empty stub renders a blank canvas and now shows a visible error banner (no network fallback)
 - All CSS inline in `<style>` block
 - All JavaScript inline in `<script>` block
 - Data embedded directly in the script (no external file loading) — **except** complex/regenerable deliverables, where data and the `option` config live in a separate `config.json` (canonical) with a generated `config.js` wrapper so regeneration edits only the config file, not the page scaffold
@@ -241,9 +241,9 @@ For dark theme:
 
 - **Delivery contract (read first; rules owned by the front door)**: [../draw-diagram/references/delivery-contract.md](../../delivery-contract.md) — D1/D2 delivery form, D3–D5 user-facing text rules (**in-chart labels and the HTML prose obey the same rules**), D6 pre-delivery self-check. **The rule text and its examples live only in the contract; they are not restated here.** The items below are this engine's **mechanics**; the contract wins on conflict.
 - **最短可运行链路**：写 `option/config.json`（`sync-config.mjs` 保 js/json 一致）→ `normalize-edge-series.py --check|--write` 归一化箭头旋转/线端/标签锚点 → `POST` 到共享渲染服务的 echarts 端口换取自包含 HTML → 浏览器实际渲染后用 `getOption`/导出 SVG 回读 → `node scripts/verify-deliverable.mjs` + `check-layout.mjs` 做结构检查 → `python3 -B scripts/native-readback.py --source <config> --semantics <semantics> --svg <rendered.svg> --output <new-report>` 做原生 + 渲染回读。服务无图像端点，PNG 由浏览器导出；端口与请求 shape 的 owner 是 [self-deploy-render-service.md](../../self-deploy-render-service.md)，此处不复述。
-- Output as a **single `.html` file** (self-contained, no external dependencies except the pinned ECharts script; offline-critical output ships a REAL local `vendor/echarts.min.js`, never an empty stub)
+- Output as a **single `.html` file**（自包含、**零外网依赖**：ECharts 一律走本地 `vendor/echarts.min.js`，never an empty stub）
 - **Offline-critical / review-facing deliverables**: `vendor/echarts.min.js` present and non-empty (verified by `scripts/vendor-echarts.sh` / `scripts/verify-deliverable.mjs`) AND a static PNG/SVG snapshot of each chart delivered alongside the HTML as render evidence
-- ECharts version: **pinned 5.x** (e.g. `https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js`), never a floating `@5` tag
+- ECharts version: **pinned 5.6.1**（bundled `assets/vendor/echarts-5.6.1.min.js`），never a floating `@5` tag
 - Canvas-based rendering by default (use SVG renderer only if requested)
 - Responsive: works on both desktop and mobile viewports
 - Clean, readable code with comments explaining key sections

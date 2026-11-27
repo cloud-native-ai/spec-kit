@@ -1,6 +1,6 @@
 # 架构图绘制技能（Mermaid）
 
-使用 Mermaid 语法和标准 UML 语义绘制系统架构图，通过 mermaid.ink 渲染服务器或本地 mermaid-cli 渲染为 SVG/PNG，并输出为包含渲染图表和说明文字的完整 HTML 文档。
+使用 Mermaid 语法和标准 UML 语义绘制系统架构图，通过内网共享渲染服务（mermaid.ink 兼容协议）或本地 mermaid-cli 渲染为 SVG/PNG，并输出为包含渲染图表和说明文字的完整 HTML 文档。
 
 ## 核心原则
 
@@ -8,7 +8,7 @@
 - **UML 语义，而非随意方框**：UML 类图表必须遵循标准 UML 图表类型，使用正确的 UML 元素和关系（Mermaid 的 classDiagram / sequenceDiagram / stateDiagram-v2 / erDiagram / flowchart 各司其职）
 - **架构优先的叙事**：图和文字互补——文字解释*为什么*，图展示*什么*
 - **统一样式**：用 `%%{init: {themeVariables}}%%` / `classDef` 保持统一样式，UML 图每张核心元素 ≤7 个（硬上限 ≤15）
-- **远端渲染优先**：默认只使用 mermaid.ink 渲染服务器（`render-mermaid.sh` 默认 `MERMAID_BACKEND=server`），**不下载、不配置本地渲染工具链**（mermaid-cli / Chrome / puppeteer）；远端不可用时，必须先询问用户是否改用本地渲染（`MERMAID_BACKEND=local`），**未获用户确认不得本地渲染**
+- **远端渲染优先**：默认只使用内网共享渲染服务 `xuanji-render.aliyun-inc.com:9697`（`render-mermaid.sh` 默认 `MERMAID_BACKEND=server`，**禁止公网**），**不下载、不配置本地渲染工具链**（mermaid-cli / Chrome / puppeteer）；远端不可用时，必须先询问用户是否改用本地渲染（`MERMAID_BACKEND=local`），**未获用户确认不得本地渲染**
 - **专项图表遵循其原生语义**：Gantt / MindMap（含 WBS）/ ER / C4 使用各自原生语法与原生配色，不套用 flowchart 的通用样式规则；Use Case / JSON / YAML / Salt 在 Mermaid 无原生图表类型，用 flowchart 语义化近似并明示近似关系
 
 ### 方法论总纲（贯穿全流程，先「对」与「达意」再「好看」）
@@ -156,7 +156,7 @@ Mermaid 为**自动布局引擎**（dagre，无绝对坐标 API）→ SDS Geomet
 | **C4 架构图** | 上下文/容器/组件/动态/部署视图 | `C4Context` 等五类 | [20-c4-diagram.md](references/howto/20-c4-diagram.md) |
 | **Use Case / JSON / YAML / Salt** | 用例视图、数据结构展示、UI 线框 | `flowchart`（近似） | [07-usecase-diagram.md](references/howto/07-usecase-diagram.md) / [16-json-diagram.md](references/howto/16-json-diagram.md) / [17-yaml-diagram.md](references/howto/17-yaml-diagram.md) / [19-salt-diagram.md](references/howto/19-salt-diagram.md) |
 
-> 专项图表的渲染同样走 Step 8 的渲染脚本（`render-mermaid.sh`），服务器后端（mermaid.ink）与本地后端（mermaid-cli）对全部类型一视同仁，无需 Graphviz。
+> 专项图表的渲染同样走 Step 8 的渲染脚本（`render-mermaid.sh`），服务器后端（内网共享渲染服务，mermaid.ink 兼容协议）与本地后端（mermaid-cli）对全部类型一视同仁，无需 Graphviz。
 >
 > **WBS / 甘特图交付前必做量测自检**：这两类图的"清晰度、版面、日期定位"都不能靠肉眼判断，用 [measure-svg-layout.py](scripts/measure-svg-layout.py) 量三条判据——**正文有效字号 ≥12px**（`= font-size × 显示宽度 ÷ viewBox 宽`；放大 zoom 无效）、**长宽比 1.2~1.8:1**、**标签不越过时间轴右边界**；判断某个写法（依赖箭头、资源分配、标题字号）有没有改写排期，用 `--compare` 做 A/B 并看 `scheduleChanged`。详见 [13-wbs-diagram.md](references/howto/13-wbs-diagram.md)、[14-gantt-diagram.md](references/howto/14-gantt-diagram.md)。
 

@@ -570,7 +570,7 @@ database "Database" {
 ## 推荐资源
 
 - 官方网站: https://plantuml.com/zh/
-- 在线服务器: https://www.plantuml.com/plantuml/uml/
+- 在线服务：**禁止使用公网**；统一走内网共享渲染服务（`xuanji-render.aliyun-inc.com:9696`）。
 - 语言参考指南(PDF): https://plantuml.com/zh/guide
 - 快速入门: https://plantuml.com/zh/starting
 - 常见问题: https://plantuml.com/zh/faq
