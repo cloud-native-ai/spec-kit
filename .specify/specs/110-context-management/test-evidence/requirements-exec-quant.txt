@@ -1,0 +1,1 @@
+exec-quant: recorded skill:create-requirements run=r20261127T070000Z-110a resolution=explicit -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records/20261127T072628355872Z-543c4294.json
