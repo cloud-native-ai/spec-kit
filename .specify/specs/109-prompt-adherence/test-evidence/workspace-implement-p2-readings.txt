@@ -38,3 +38,20 @@ silently re-snapshotted away.
 $ python3 scripts/python/workspace-guard.py --snapshot .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2-post.json --repo .
 recorded .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2-post.json
 snapshot rc=0
+
+## Post-commit checks (after 009e28b37)
+
+```
+$ python3 scripts/python/workspace-guard.py --check .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p2-post.json --repo .
+clean
+exit 0
+
+$ python3 scripts/python/script-interface-check.py --files scripts/python/prompt-adherence.py --json
+  "applicable": 1,
+  "violations": 0
+exit 0
+```
+
+The pre-commit exit-1 reading of the script-interface screen (candidate-not-collected for
+the then-untracked engine and test paths) is resolved by tracking; the tracked engine
+classifies as an applicable candidate with zero violations.
