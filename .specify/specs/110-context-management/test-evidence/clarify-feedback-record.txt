@@ -1,0 +1,9 @@
+{
+  "id": "20261127T073341Z-skill-clarify-artifact",
+  "path": ".specify/feedback/20261127T073341Z-skill-clarify-artifact.md",
+  "duplicate": false,
+  "count_since_submission": 604,
+  "threshold": 10,
+  "should_prompt": true,
+  "migrated": false
+}
