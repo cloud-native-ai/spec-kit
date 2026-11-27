@@ -1,0 +1,116 @@
+# Wrap-up accounting — /speckit.implement, feature 111 (P2 package, 2026-11-27)
+
+Run: `r20261127T071500Z-111a`, unit `/speckit.implement` (command), complexity
+`complex`, qualification `qualified`.
+
+## Run Determination — attempted, engine verdict `duplicate`
+
+```bash
+python3 .specify/scripts/python/run-determination.py --action determine \
+  --unit-id "/speckit.implement" --unit-type command \
+  --run-id r20261127T071500Z-111a --complexity complex --qualification qualified \
+  --feature 111-general-best-practices --feature-id 111 \
+  --names-current .specify/specs/111-general-best-practices/test-evidence/full-names.txt \
+  --names-baseline .specify/specs/111-general-best-practices/baseline-failed.txt \
+  --declared-check test_module_document_set_and_closed_category_table \
+  --declared-check test_owner_files_placeholders_and_entry_shape \
+  --declared-check test_seed_entry_three_facts_and_ssh_extension \
+  --declared-check test_accumulation_pointer_chain_and_no_second_engine \
+  --declared-check test_framework_map_registration_rows_source_and_mirror \
+  --declared-check test_relative_links_resolve \
+  --green-check test_module_document_set_and_closed_category_table \
+  --green-check test_owner_files_placeholders_and_entry_shape \
+  --green-check test_seed_entry_three_facts_and_ssh_extension \
+  --green-check test_accumulation_pointer_chain_and_no_second_engine \
+  --green-check test_framework_map_registration_rows_source_and_mirror \
+  --green-check test_relative_links_resolve \
+  --red-first-refs .specify/specs/111-general-best-practices/notes/red-first-evidence.md \
+  --collected 6 --elapsed-ms 960000 \
+  --elapsed-note "P2 package span: workspace snapshot 08:48:22Z to wrap-up 09:04Z (executor wall clock)" \
+  --prev-user-turn-class no_user_input --unresolved-red false --red-source none
+```
+
+First attempt with `--user-turn-class` was rejected (exit 2): that flag belongs to
+`settle`, not `determine` — the engine's message names `--prev-user-turn-class` /
+`--action settle` as the sanctioned forms. Retried as above:
+
+```
+duplicate: /speckit.implement r20261127T071500Z-111a was already determined
+```
+
+Engine behavior by design (source: `run-determination.py` line 1480–1483): one
+determination per `(unit_id, run_id)`; the P1 package already wrote it
+(`.specify/session/20261127T084422Z-run-determination-speckit-implement-r20261127t071500z-111a.md`).
+That record's `artifact_correctness=regressed` carried the then-pending A-24 mirror
+transient, which P2 converged — the final evidence for that axis is this package's
+frozen-tree full-suite reading (`full-suite.txt`: 223 names, byte-identical to the
+baseline). The record is not rewritten (records are append-only per run); P1's
+satisfaction axis remains `pending_next_turn`, to be settled by the driver-owned loop.
+
+## Exec Quant — engine verdict `duplicate`
+
+```bash
+python3 .specify/scripts/python/exec-quant.py --action collect \
+  --unit-id "/speckit.implement" --unit-type command --run-id r20261127T071500Z-111a
+```
+
+```
+exec-quant: duplicate record for (/speckit.implement, r20261127T071500Z-111a); no second row written
+```
+
+The P1 row (`records/20261127T084428666545Z-8f2106d0.json`) stands; one row per
+(unit, run) is the engine's declared shape.
+
+## Feedback Record — engine verdict `duplicate` + threshold notice
+
+```bash
+python3 .specify/scripts/python/feedback-utils.py --action record \
+  --unit-id "/speckit.implement" --unit-type command \
+  --run-id r20261127T071500Z-111a --review "…" --points "…"
+```
+
+The store already holds the run's entry
+(`.specify/feedback/20261127T084443Z-speckit-implement.md`); the engine dedupes by
+`(unit_id, run_id)` and wrote no second entry. Threshold probe returned
+`count=10 threshold=10 should_prompt=true` — surfaced as the non-blocking notice in the
+package report (three choices via `/speckit.feedback`; never auto-transmitted).
+
+The optimization points prepared for this attempt are preserved below so the
+improvement flow can still reach them (the engine offers no edit action):
+
+- The full-suite gate ("failure-name set ⊆ entry baseline") has no representation for a
+  measurement-window confound: a test comparing `git status --porcelain` before/after an
+  engine run goes red whenever the executor writes the tree mid-run, and a pre-existing
+  wall-clock test (`age_seconds` between two renders) is flaky under 192-worker load —
+  both forced a frozen-tree re-run. A quiet-window declaration (or serial-marking
+  clock-dependent tests) would keep the first reading valid at no extra suite cost.
+- run-determination / exec-quant / feedback key records by `(unit_id, run_id)`, so a
+  multi-package implement stage sharing one line run id cannot record its final reading:
+  P1's `artifact_correctness=regressed` survives even though P2 converged the transient.
+  A package component in the key, or a sanctioned re-open for the artifact axis, would
+  let the final reading land where reviewers look.
+- `sync-mirrors.py` write mode and `--check` both print `DIFF`, so "converged on write"
+  and "still diverged on check" read alike; distinct words (or a converged marker) would
+  make the two states distinguishable at a glance.
+
+## Token Reflection
+
+Token counts are not exposed to the executor — `token_consumption=not_evaluated`
+(source unavailable), no fabricated numbers. Self-check of the three questions: no
+machine-managed data file was injected whole (digests, `--names-out` lists and line
+ranges only); deterministic judgments (containment classification, name-set diffs,
+counts) were delegated to programs/grep; file reads were mostly single-pass. One finding
+carries the stable marker: `token-efficiency` — `workspace-guard.py --check --json`
+prints the complete current and stored signatures twice (≈4k tokens for a clean
+verdict); a compact or `--quiet` verdict form on a clean check would cut that spend.
+
+## Close-out report
+
+| Field | Content |
+|-------|---------|
+| receipt | `none` — FR-009's closed set enumerates the writable stores (`.specify/session/`, `.specify/feedback/`, `.specify/exec-quant/` per-entry files only); a receipt under `.specify/retention/closeout/` would break SC-006/containment. This line's earlier stage close-outs wrote none either; the omission is recorded here, not silent. |
+| records commit | `not-created` for P2 — no new engine records (three `duplicate` verdicts by design). The run's records were committed in P1 as `63fdca3f7`; this package's artifacts are committed as `f985cca92` (content) and `16c40ee7d` (closure). |
+| merge | `not-run` — single worktree, no merge in this package; inherited merge is driver-owned (stage plan U6). |
+| push targets | `skipped` — push is forbidden until U6 per the line's U0 declaration. |
+| deviations | `none` — workspace guard check against `workspace-implement-p2.json`: `status=clean`, `changed=[]` (no refs/specs drift from the concurrent lines 109/110/112). |
+| failure | `none`. |
