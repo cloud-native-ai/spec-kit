@@ -93,3 +93,15 @@ under T009 carries the equivalent leg as `test_composition_protocol_declares_bas
 - **C-027 carrier**: `test_decidable_duplication_shapes_are_reported` is authored in the engine guard (the clause's named carrier). Because the engine's `check` rule set is closed at nine (C-032/PA-7), the two decidable shapes are judged by the guard's own layout reading; the test stays red until the owner document declares the shapes (T021/T031).
 - **`check` action state**: T018 implements the foundation and `--action manifest` only; `--action check` refuses loudly (exit 2, stderr, no verdict) until its own row (T022) lands the closed nine-rule set. Its guard legs, the declarations guard's mutation leg and the init guard's `check` leg therefore remain red by design; their green points are T022/T024/T027/T032.
 - **Clause-table pinning-test names**: the § Clause Coverage table names some carriers differently from the guard files authored under T009/T010 (e.g. C-020's `test_baseline_composes_once_per_session_or_line` is `test_composition_protocol_declares_baseline_once_and_task_selection`; C-005's `test_form_legality_matrix_matches_the_owner_document` is `test_forms_matrix_matches_the_contract`). The behavioral legs are pinned and green; the name column is a prospective label, recorded here rather than edited in tasks.md.
+
+## Script-interface check (C-031 supporting evidence, post-commit)
+
+Command: `python3 scripts/python/script-interface-check.py --files scripts/python/context-audit.py --json`
+Result: `applicable=1`, `violations=0`; the engine's row reads
+`basis=marker-fired`, `-h exit=0 --help exit=0 same_body=True labels=exit-codes,options,side-effects,usage`,
+`--version exit=0 lines=1 observed='0.0.22' framework='0.0.22'`,
+`unknown exit=2 known-first exit=2 after-'--' exit=2 rescue=rejected`,
+`zero_side_effect=true`. The process exit code was 1, driven by two pre-existing
+`probe-inconclusive` exceptions in `skills/external/document-utils/scripts/…` (optional
+third-party modules absent on this host); no violation row names this feature. The engine
+row itself is compliant.
