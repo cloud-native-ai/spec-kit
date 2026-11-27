@@ -1,0 +1,1 @@
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 30, "task_count": 39, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-27T06:23:41Z"}
