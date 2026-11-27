@@ -3,7 +3,8 @@
 #
 # Two rendering backends (REMOTE-FIRST policy):
 #   • server — a mermaid.ink-compatible render server (MERMAID_SERVER, default
-#              https://mermaid.ink). The source plus a default config is
+#              the shared render service xuanji-render.aliyun-inc.com:9697;
+#              public endpoints are forbidden by policy). The source plus a default config is
 #              zlib-compressed + base64-encoded (the official "pako:" state
 #              protocol) and fetched from /svg/{enc} (SVG) and /img/{enc} (PNG).
 #              THE DEFAULT — no local tooling needed.
@@ -108,7 +109,20 @@ set -u
 
 set -euo pipefail
 
-MERMAID_SERVER="${MERMAID_SERVER:-https://mermaid.ink}"
+MERMAID_SERVER="${MERMAID_SERVER:-http://xuanji-render.aliyun-inc.com:9697}"
+
+# Hard rule (user ruling 2026-11-27): no public render backend, ever.
+# Allowed: localhost / private addresses / *.aliyun-inc.com; anything else exits 2.
+_assert_internal_render_server() {
+  local url="$1" host
+  host="$(printf '%s' "$url" | sed -E 's#^[A-Za-z][A-Za-z0-9+.-]*://##; s#[/:?#].*$##')"
+  case "$host" in
+    ""|localhost|127.*|10.*|192.168.*|172.1[6-9].*|172.2[0-9].*|172.3[01].*) return 0 ;;
+    *.aliyun-inc.com) return 0 ;;
+    *) printf 'REFUSED: public render backend is forbidden by policy: %s\n' "$url" >&2; exit 2 ;;
+  esac
+}
+_assert_internal_render_server "$MERMAID_SERVER"
 MERMAID_BACKEND="${MERMAID_BACKEND:-server}"   # server | local | auto (remote-first)
 MERMAID_THEME="${MERMAID_THEME:-default}"    # default | neutral | dark | forest | base
 MERMAID_FONT="${MERMAID_FONT:-Noto Sans CJK SC, PingFang SC, Microsoft YaHei, sans-serif}"

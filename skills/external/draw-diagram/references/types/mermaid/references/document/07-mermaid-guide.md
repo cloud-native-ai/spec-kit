@@ -11,7 +11,7 @@
 | 工具 | 用途 | 何时用 |
 |------|------|--------|
 | render-mermaid.sh | 本技能标准渲染 | 每次交付 |
-| mermaid.ink | 服务器渲染（URL 即图） | 脚本默认后端 |
+| 服务器后端（mermaid.ink 兼容协议） | 服务器渲染（URL 即图） | 脚本默认后端：内网共享渲染服务 |
 | mermaid-cli (mmdc) | 本地渲染（Chrome） | 离线/大图/字体问题 |
 | VS Code Markdown Preview Mermaid | 快速预览 | 开发调试 |
 | mermaid.live | 在线编辑器 | 手工实验 |
@@ -26,8 +26,8 @@ export PUPPETEER_EXECUTABLE_PATH=/path/to/chrome
 ```
 
 **服务器后端**：
-- 默认 `https://mermaid.ink`（公共）；
-- 内网部署 mermaid.ink 兼容服务时：`MERMAID_SERVER=http://内网地址`。
+- 默认共享渲染服务 `http://xuanji-render.aliyun-inc.com:9697`（mermaid.ink 兼容协议）；
+- **禁止公网**：`MERMAID_SERVER` 只允许内网地址（共享服务或自建 mermaid.ink 兼容服务）。
 
 ## 4. 校验手段
 

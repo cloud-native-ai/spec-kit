@@ -70,9 +70,9 @@ print(urllib.request.urlopen(f"http://<host>:9696/svg/pako:{state}").status)
 EOF
 ```
 
-## 6. 备选方案：社区自托管镜像
+## 6. 备选方案
 
-- **ghcr.io/jihchi/mermaid.ink**（mermaid.ink 社区自托管版，端口 3000）：`docker run --cap-add=SYS_ADMIN -p 3000:3000 ghcr.io/jihchi/mermaid.ink`。**部署前先验证其协议与本技能一致**（用 §5 第 3 步的 pako 请求测 `/svg/` 与 `/img/`）；若一致即可直接 `export MERMAID_SERVER=http://<host>:3000`，否则用本目录的自研镜像。
+- **只允许内网部署**：第三方社区镜像（含 `ghcr.io` 等公网 registry）不得作为本技能的渲染后端——来源不可审计、构建不可复现，且违反「图源不得外发」硬规则。需要多实例时，把本目录镜像复制到内网 registry 后部署。
 
 ## 7. 生产注意
 

@@ -44,7 +44,7 @@ java -jar plantuml.jar diagram.puml
 - **优势**：无长度限制，适合复杂图，支持多种图表格式
 
 ### PlantUML 官方
-- **地址**：https://www.plantuml.com/plantuml/png/{encoded}
+- **地址**：`<内网渲染服务>/plantuml/png/{encoded}`（禁止使用公网服务）
 - **请求方式**：GET（需要 Deflate+Base64 编码）
 - **限制**：URL 长度有限，适合简单小图
 

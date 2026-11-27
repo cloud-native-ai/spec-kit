@@ -109,6 +109,35 @@ def require(condition, message):
         raise UsageError(message)
 
 
+_INTERNAL_HOST_SUFFIX = ".aliyun-inc.com"
+_PRIVATE_PATTERNS = (
+    re.compile(r"127(?:\.\d{1,3}){3}"),
+    re.compile(r"10(?:\.\d{1,3}){3}"),
+    re.compile(r"192\.168(?:\.\d{1,3}){2}"),
+    re.compile(r"172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}"),
+)
+
+
+def require_internal_host(host):
+    """Hard rule (user ruling 2026-11-27): public render backends are forbidden.
+
+    Allowed: localhost, loopback/private IPv4 and *.aliyun-inc.com. Anything else
+    is a data-egress path for diagram sources, so it fails as a usage error.
+    """
+    h = (host or "").lower().rstrip(".")
+    if h in ("localhost", "::1"):
+        return
+    if any(p.fullmatch(h) for p in _PRIVATE_PATTERNS):
+        return
+    if h.endswith(_INTERNAL_HOST_SUFFIX) and h != _INTERNAL_HOST_SUFFIX:
+        return
+    raise UsageError(
+        f"--service-url host is not internal: {host!r} "
+        "(public render backends are forbidden; use xuanji-render.aliyun-inc.com, "
+        "a private address or localhost)"
+    )
+
+
 def validate_service_url(value):
     require(text(value), "--service-url is required")
     require(value.isascii(), "--service-url must be ASCII (use an IDNA/punycode host)")
@@ -119,6 +148,7 @@ def validate_service_url(value):
     require(parts.query == "" and parts.fragment == "", "--service-url must not carry a query or fragment")
     require("@" not in parts.netloc, "--service-url must not embed credentials")
     require(parts.hostname is not None, "--service-url must include a hostname")
+    require_internal_host(parts.hostname)
     try:
         port = parts.port
     except ValueError as exc:
@@ -316,7 +346,7 @@ def main(argv=None):
         allow_abbrev=False,
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
-    parser.add_argument("--service-url", required=True, help="http(s)://host[:port] only; supplied by the caller")
+    parser.add_argument("--service-url", required=True, help="http(s)://host[:port] only; internal hosts only (xuanji-render.aliyun-inc.com / private / localhost)")
     parser.add_argument("--route", default=None, help="request path starting with '/', from the engine doc")
     parser.add_argument("--method", choices=("GET", "POST"), default="GET", help="HTTP method (default GET)")
     parser.add_argument("--body", default=None, help="raw request body file (POST only; sent verbatim)")

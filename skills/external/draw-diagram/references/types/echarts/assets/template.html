@@ -4,14 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ECharts Visualization</title>
-  <!-- ECharts version PINNED to 5.6.0 (never use a floating echarts@5 tag).
-       Offline-first loader: the vendored local copy is the primary source, the
-       pinned CDN is only a fallback. The local copy MUST actually exist —
-       fetch it with: bash scripts/vendor-echarts.sh <deliverable-dir>
-       (downloads https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js
-       into vendor/echarts.min.js and verifies it).
-       Never ship a loader that references vendor/ without the file, and never
-       use document.write for this loader (deprecated/blocking/CSP-hostile).
+  <!-- ECharts version PINNED to 5.6.1 (never use a floating echarts@5 tag).
+       LOCAL-ONLY loader: the page loads vendor/echarts.min.js and NOTHING else.
+       Public CDNs are forbidden (图源不得外发) — there is no network fallback.
+       Populate the vendor file before delivery:
+         bash <skill>/references/types/echarts/scripts/vendor-echarts.sh <deliverable-dir>
+       Missing vendor file ⇒ visible error banner, never a CDN fetch.
+       Never use document.write for this loader (deprecated/blocking/CSP-hostile).
        Where practical, add integrity/crossorigin (SRI) attributes. -->
   <script>
     (function () {
@@ -19,10 +18,11 @@
       s.src = 'vendor/echarts.min.js';
       s.async = false;
       s.onerror = function () {
-        var c = document.createElement('script');
-        c.src = 'https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js';
-        c.async = false;
-        document.head.appendChild(c);
+        var d = document.createElement('div');
+        d.setAttribute('data-echarts-missing', '1');
+        d.style.cssText = 'margin:24px;padding:16px;border:1px solid #d33;background:#fff3f3;color:#a00;font:14px/1.6 sans-serif';
+        d.textContent = 'ECharts 本地库缺失：请先运行 vendor-echarts.sh <交付目录>（禁止从公网加载）';
+        (document.body || document.documentElement).appendChild(d);
       };
       document.head.appendChild(s);
     })();

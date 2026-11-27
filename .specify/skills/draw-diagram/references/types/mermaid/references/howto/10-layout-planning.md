@@ -45,7 +45,7 @@ flowchart TD
 
 ## 4. CJK 渲染问题
 
-- 服务器后端（mermaid.ink）CJK 正常；出现方块字 → 本地 mmdc 后端；
+- 服务器后端（内网共享渲染服务）CJK 正常；出现方块字 → 本地 mmdc 后端；
 - init 中显式 `fontFamily: "Noto Sans CJK SC, PingFang SC, Microsoft YaHei"`；
 - 中文标签过长（>10 字符）是 CJK 版面问题的头号来源——精简或换行 `\n`。
 

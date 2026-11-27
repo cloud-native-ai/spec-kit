@@ -44,7 +44,7 @@
 2. 调渲染服务转换为场景并保存（bash 片段，`${EXCALIDRAW_SERVER:-...}` 为 shell 变量展开）：
 
 ```bash
-curl -s -X POST "${EXCALIDRAW_SERVER:-http://127.0.0.1:8383}/mermaid-to-scene" \
+curl -s -X POST "${EXCALIDRAW_SERVER:-http://xuanji-render.aliyun-inc.com:9698}/mermaid-to-scene" \
   -H 'Content-Type: application/json' \
   -d "$(python3 -c 'import json,sys; print(json.dumps({"mermaid": open(sys.argv[1]).read()}))' 名称.mmd)" \
   > 名称.excalidraw

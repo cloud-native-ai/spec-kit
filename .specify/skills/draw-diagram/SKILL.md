@@ -100,6 +100,11 @@ classification: external
 > `/etc/hosts` 映射与 docker 主机。完整契约、部署形态分析与逐步自部署流程的 owner：
 > [./references/self-deploy-render-service.md](./references/self-deploy-render-service.md)，本节不复述。
 
+> **硬规则（用户裁定 2026-11-27）：禁止公网渲染。** 任何引擎不得把图源、渲染请求或交付页资源发往公网：
+> 渲染后端只允许 `xuanji-render.aliyun-inc.com`、私有地址或 localhost——三个渲染脚本与 `scripts/render-client.py`
+> 对非内网地址直接拒绝（exit 2 / usage error）；echarts 交付页只加载本地 `vendor/echarts.min.js`，缺失即报错，
+> **不得回退 CDN**。共享后端不可达时唯一出路是第 3 步的自部署。
+
 1. 委派引擎渲染前探测（单条命令，不经复合 shell）：`python3 "${SKILL_HOME}/scripts/render-client.py" --service-url http://xuanji-render.aliyun-inc.com:9697 --preflight-route /healthz --preflight-only --timeout 5`（任一 Node 引擎端口 `/healthz` 即代表后端可用；退出 0 可用、3 不可用）；比较模式对每个引擎分别 preflight；**纯 HTML 交互交付不经此后端**（解耦 owner：交付契约 § D7.2）。
 2. **可用** → 进入 Step 3，不做任何部署动作。**不可用**（DNS 不解析/超时/非 200）→ 提示「该地址环境特定、当前不可达」并中断渲染委派；**不得**静默降级或即兴本地自渲染绕过；提示末尾附「要不要考虑自部署?」。
 3. 用户选择自部署 → 按 owner 文件先分析运行环境形态（docker/podman/k8s/裸机）连同推荐项交用户拍板，执行前再次确认；完成后把域名映射写入执行环境 `/etc/hosts`，此后从第 1 步 preflight 直接命中。

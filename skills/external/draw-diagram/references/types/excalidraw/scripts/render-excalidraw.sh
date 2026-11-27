@@ -19,7 +19,7 @@
 # Usage: render-excalidraw.sh <input.excalidraw|.json> [output_dir] [output_prefix]
 #
 # Env:
-#   EXCALIDRAW_SERVER      base URL of the render service (default http://127.0.0.1:8383)
+#   EXCALIDRAW_SERVER      base URL of the render service (default http://xuanji-render.aliyun-inc.com:9698)
 #   EXCALIDRAW_BACKEND     server | local (default server)
 #   EXCALIDRAW_SCALE       PNG scale factor (default 2)
 #   EXCALIDRAW_PADDING     export padding px (default 16)
@@ -119,7 +119,20 @@ set -u
 
 set -euo pipefail
 
-EXCALIDRAW_SERVER="${EXCALIDRAW_SERVER:-http://127.0.0.1:8383}"
+EXCALIDRAW_SERVER="${EXCALIDRAW_SERVER:-http://xuanji-render.aliyun-inc.com:9698}"
+
+# Hard rule (user ruling 2026-11-27): no public render backend, ever.
+# Allowed: localhost / private addresses / *.aliyun-inc.com; anything else exits 2.
+_assert_internal_render_server() {
+  local url="$1" host
+  host="$(printf '%s' "$url" | sed -E 's#^[A-Za-z][A-Za-z0-9+.-]*://##; s#[/:?#].*$##')"
+  case "$host" in
+    ""|localhost|127.*|10.*|192.168.*|172.1[6-9].*|172.2[0-9].*|172.3[01].*) return 0 ;;
+    *.aliyun-inc.com) return 0 ;;
+    *) printf 'REFUSED: public render backend is forbidden by policy: %s\n' "$url" >&2; exit 2 ;;
+  esac
+}
+_assert_internal_render_server "$EXCALIDRAW_SERVER"
 EXCALIDRAW_BACKEND="${EXCALIDRAW_BACKEND:-server}"   # server | local (remote-first)
 EXCALIDRAW_SCALE="${EXCALIDRAW_SCALE:-2}"
 EXCALIDRAW_PADDING="${EXCALIDRAW_PADDING:-16}"

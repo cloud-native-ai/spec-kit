@@ -18,12 +18,14 @@
 // Checks per HTML file:
 //   1. VENDOR — if the file references vendor/echarts.min.js, the
 //      file must exist next to the HTML and be non-empty
-//   2. LOADER — document.write must not be used for the ECharts
+//   2. PUBLIC_EGRESS — the HTML must not reference known public render/CDN
+//      hosts (图源不得外发; local-only delivery is a hard rule)
+//   3. LOADER — document.write must not be used for the ECharts
 //      loader (blocking, deprecated, CSP-hostile)
-//   3. CONFIG_SYNC — for every *.config.js next to the HTML that has
+//   4. CONFIG_SYNC — for every *.config.js next to the HTML that has
 //      a *.config.json counterpart, both must be in sync
 //      (see scripts/sync-config.mjs --check)
-//   4. LAYOUT — every graph config found is checked for
+//   5. LAYOUT — every graph config found is checked for
 //      out-of-bounds / overlapping nodes (see scripts/check-layout.mjs)
 //
 // Exit code: 0 = all checks pass, 1 = problems found, 2 = usage error.
@@ -70,12 +72,20 @@ function checkHtml(file) {
     }
   }
 
-  // 2. LOADER must not use document.write
+  // 2. PUBLIC_EGRESS — no public render/CDN hosts in the deliverable
+  const PUBLIC_HOSTS = ['cdn.jsdelivr.net','unpkg.com','cdnjs.cloudflare.com','mermaid.ink','www.plantuml.com','fonts.googleapis.com','fonts.gstatic.com'];
+  for (const h of PUBLIC_HOSTS) {
+    if (html.includes(h)) {
+      problems.push(`PUBLIC_EGRESS ${base}: references public host "${h}" — public egress is forbidden; vendor the asset locally`);
+    }
+  }
+
+  // 3. LOADER must not use document.write
   if (/document\.write\s*\(/.test(html)) {
     problems.push(`LOADER ${base}: uses document.write (deprecated/blocking/CSP-hostile) — use the onerror dynamic loader from the template`);
   }
 
-  // 3. CONFIG_SYNC for js/json pairs next to the HTML
+  // 4. CONFIG_SYNC for js/json pairs next to the HTML
   for (const [jsPath, jsonPath] of configPairs(file)) {
     try {
       // loadConfig() already JSON.parse()s; normalize both to compact JSON
@@ -89,7 +99,7 @@ function checkHtml(file) {
     }
   }
 
-  // 4. LAYOUT for every config next to the HTML
+  // 5. LAYOUT for every config next to the HTML
   for (const name of fs.readdirSync(dir)) {
     if (!/\.config\.(json|js)$/.test(name)) continue;
     const cfgPath = path.join(dir, name);

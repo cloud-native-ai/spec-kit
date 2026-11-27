@@ -7,10 +7,10 @@ skills/external/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh 
 ```
 
 - 同时产出 `figure-01-order-flow.svg` 与 `.png`（源 `.mmd` 一并保存）；
-- **远端渲染优先（默认）**：后端默认 `MERMAID_BACKEND=server`（mermaid.ink）——无需下载/配置任何本地渲染工具；
+- **远端渲染优先（默认）**：后端默认 `MERMAID_BACKEND=server`（共享渲染服务 `xuanji-render.aliyun-inc.com:9697`，mermaid.ink 兼容协议）——无需下载/配置任何本地渲染工具；
 - 本地渲染（mermaid-cli）**必须先在用户确认后**以 `MERMAID_BACKEND=local` 显式启用；远端不可用时脚本会询问（TTY）或打印指引退出（非 TTY）——agent 必须先询问用户，获确认后再以 `MERMAID_BACKEND=local` 重试，**绝不静默下载/安装本地工具链**；
 - 服务器地址可用 `MERMAID_SERVER=...` 指定（兼容 mermaid.ink 协议的内网服务）；
-- **内网自建渲染服务器**：仿照 plantuml-server 容器模式，技能内自带完整部署包 `../server/`（Dockerfile + server.js + docker-run.sh + README）——构建镜像、`-p 9696:9696` 运行、`export MERMAID_SERVER=http://<内网主机>:9696` 即接入；协议为 mermaid.ink 兼容的 `pako:` state（`/svg/pako:{b64}`、`/img/pako:{b64}?type=png`）；详见 `../server/README.md`；
+- **内网自建渲染服务器**：仿照 plantuml-server 容器模式，技能内自带完整部署包 `../server/`（Dockerfile + server.js + docker-run.sh + README）——构建镜像、运行后 `export MERMAID_SERVER=http://<内网主机>:9697` 即接入（单引擎回退服务自身默认端口为 9696，与共享拓扑的 plantuml 端口冲突，接入共享拓扑时必须用 `PORT=9697` 启动，见 `../../../../self-deploy-render-service.md` §0.1）；协议为 mermaid.ink 兼容的 `pako:` state（`/svg/pako:{b64}`、`/img/pako:{b64}?type=png`）；详见 `../server/README.md`；
 - 本地后端需 Chrome（puppeteer）：`PUPPETEER_EXECUTABLE_PATH=...` 指定；
 - PNG 失败时用 `svg-to-png-cjk.cjs` 从 SVG 转：`node svg-to-png-cjk.cjs x.svg x.png 2`；
 - **已知服务端限制**：sequence 图的子配置（`actorFontSize` / `messageFontSize` / `noteFontSize` 等）会被 mermaid.ink 服务器忽略，统一按默认值（约 16px）渲染——不要在远端后端上反复调试这些字号；需要精确控制时经用户同意切本地后端，或在 HTML 层缩放显示。

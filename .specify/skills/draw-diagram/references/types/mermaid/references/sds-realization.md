@@ -42,7 +42,7 @@ SDS 的 relation anchor（edge-midpoint 直线）与 mermaid 默认贝塞尔曲�
 ## 3. 渲染复现与回退链
 
 - **版本 pin**：dagre 布局行为随 mermaid 版本漂移——同一脚手架在不同版本可能排出不同版面，使偏离声明失效。复刻/验收关键图必须固定版本（记录 mermaid.ink API 版本，或用固定版本的本地 mmdc），并把版本写入产物「可复现信息」块。
-- **回退链（remote-first）**：远端 mermaid.ink（默认，`MERMAID_BACKEND=server`）→ 自建 mermaid.ink 兼容服务器（[../server/README.md](../server/README.md)，**本地 bundle**：镜像内置 mermaid + Chromium + Noto CJK 字体，渲染不依赖外网下载）→ 本地 mmdc（`MERMAID_BACKEND=local`，**必须先获用户确认**，脚本有 consent gate，绝不静默回退）。本地 bundle 保证远端不可用时布局引擎不变，偏离声明无需因后端切换重做；切换后端后仍应抽查版面未漂移。
+- **回退链（remote-first）**：远端内网共享渲染服务（默认，`MERMAID_BACKEND=server`，禁止公网）→ 自建 mermaid.ink 兼容服务器（[../server/README.md](../server/README.md)，**本地 bundle**：镜像内置 mermaid + Chromium + Noto CJK 字体，渲染不依赖外网下载）→ 本地 mmdc（`MERMAID_BACKEND=local`，**必须先获用户确认**，脚本有 consent gate，绝不静默回退）。本地 bundle 保证远端不可用时布局引擎不变，偏离声明无需因后端切换重做；切换后端后仍应抽查版面未漂移。
 
 ## 4. weight_plan 档位 → stroke-width 映射依据
 

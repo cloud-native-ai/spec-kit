@@ -15,17 +15,17 @@
 | **server** | 默认 | 一个 PlantUML 服务器 + `python3` | **首选且默认**；脚本将源码做 Deflate+Base64 编码后 GET `/svg/{enc}`、`/png/{enc}`（官方 PlantUML server 协议），**无需下载/配置任何本地渲染工具** |
 | **local** | 仅用户明确确认后（`PLANTUML_BACKEND=local`） | `java` + PlantUML jar（+ CJK 字体；UML 类图还需 graphviz） | 完全离线；**本地渲染必须先在用户确认后显式启用**，脚本绝不静默回退 |
 
-**远端优先与用户确认**：`server`（默认）与 `auto` 均先探测 `PLANTUML_SERVER` → `PLANTUML_SERVER_FALLBACKS`（空格分隔的备选服务器列表，默认 `https://www.plantuml.com/plantuml` 公共实例——均为远端，不涉及本地工具）。**仅当全部服务器不可达时**，脚本才会询问用户是否改用本地渲染：交互终端直接提示 `[y/N]`；在 agent 驱动的 Bash（非 TTY）中则打印指引并退出（exit 1）——agent 必须先询问用户、获确认后以 `PLANTUML_BACKEND=local` 重试。**禁止静默下载 jar / 配置本地渲染工具链。** 所有 HTTP 请求携带显式 UA（`render-plantuml.sh/1.0`）——plantuml.com 会以 403 拦截 urllib 等默认 UA。
+**远端优先与用户确认**：`server`（默认）与 `auto` 均先探测 `PLANTUML_SERVER` → `PLANTUML_SERVER_FALLBACKS`（空格分隔的备选服务器列表，**默认为空**——禁止公网渲染；备选只允许内网地址，脚本对非内网地址直接拒绝，exit 2）。**仅当全部服务器不可达时**，脚本才会询问用户是否改用本地渲染：交互终端直接提示 `[y/N]`；在 agent 驱动的 Bash（非 TTY）中则打印指引并退出（exit 1）——agent 必须先询问用户、获确认后以 `PLANTUML_BACKEND=local` 重试。**禁止静默下载 jar / 配置本地渲染工具链。** 所有 HTTP 请求携带显式 UA（`render-plantuml.sh/1.0`）。
 
 **默认远程服务器**——脚本默认使用自建的 PlantUML server 渲染表图：
 
 ```
-http://xuanji-plantuml.aliyun-inc.com:9696/plantuml
+http://xuanji-render.aliyun-inc.com:9696/plantuml
 ```
 
-如需指向其他服务器，设置 `PLANTUML_SERVER=<url>`（URL 以上下文路径结尾，不含 `/svg` 等后缀）。自建服务器在家庭网络等环境不可达时，脚本自动回退到 `PLANTUML_SERVER_FALLBACKS`（默认含 plantuml.com；设为空字符串可禁用公网回退）。
+如需指向其他服务器，设置 `PLANTUML_SERVER=<url>`（URL 以上下文路径结尾，不含 `/svg` 等后缀）。自建服务器在家庭网络等环境不可达时，脚本回退到 `PLANTUML_SERVER_FALLBACKS`（**默认空**；备选只允许内网地址）。
 
-**自建远程服务器（Docker）**——上述默认服务器由以下 Docker 镜像在主机 `xuanji-plantuml.aliyun-inc.com` 上运行；如需自行部署，可复用相同命令：
+**自建远程服务器（Docker）**——上述默认服务器由以下 Docker 镜像在主机 `xuanji-render.aliyun-inc.com` 上运行；如需自行部署，可复用相同命令：
 
 ```bash
 img="reg.docker.alibaba-inc.com/xuanji-images/observability-plantuml:deploy-2026-07-13"
