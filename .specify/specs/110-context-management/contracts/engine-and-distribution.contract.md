@@ -40,7 +40,8 @@ reaches an action or exits `0`; a usage-error case exits `1`.
 
 ## C-032 — `check` verifies the layout and reports findings deterministically
 
-**Statement**: `--action check` parses the owner document's layout table and the four facts. Its closed
+**Statement**: `--action check` parses the owner document's layout table and the four facts — the engine's
+declared input reads (C-012); every layout row's declared sources remain metadata-only (C-034, C-035). Its closed
 rule set: `roster-mismatch` (a layer's class set differs from the roster), `roster-order` (membership equal
 but in-layer order differs), `unknown-layer`, `unknown-form`, `layer-form-illegal` (the matrix),
 `duplicate-class`, `empty-layer` (the finding names the side — roster or layout — and the layer),
@@ -84,12 +85,14 @@ missing/empty/unreadable fixture and the all-present fixture);
 
 ## C-034 — The audit is honest and never substitutes for composition
 
-**Statement**: the engine performs no semantic task selection, no relevance ranking and no content
-reading; relevance stays with the composing agent. A broken source appears as a presence reading with a
+**Statement**: the engine performs no semantic task selection, no relevance ranking and no content reading
+of **audited sources** — the sources the layout rows declare; its only content reads are the declared
+inputs (the owner document's layout table and the four facts, C-012/C-032) plus the `--version` identity
+source (C-031). Relevance stays with the composing agent. A broken source appears as a presence reading with a
 reason, never as a skipped row. The engine never reports `present` for a source it did not evaluate and
 never claims agreement beyond pointer presence and resolvability.
-**Red when**: the engine ranks, selects or reads content; a broken source vanishes; an unevaluated row
-reads `present`.
+**Red when**: the engine ranks, selects or reads an audited source's content; a broken source vanishes; an
+unevaluated row reads `present`.
 **Test carrier**: `tests/contract/test_context_management_engine.py` (honesty legs);
 review of the engine source against this clause.
 
@@ -98,10 +101,11 @@ review of the engine source against this clause.
 ## C-035 — Read-only, offline and private
 
 **Statement**: no audit action writes any file, creates a directory or cache, or opens a network socket;
-the reading consumes paths, metadata and presence states only, and never raw user text or conversation
-content. The existing feedback red lines and confirmation gates stay unchanged and unreferenced by any new
+the reading consumes only audited sources' paths, metadata and presence states, and never raw user text or
+conversation content; the only content reads are the declared inputs of C-012/C-032 and the `--version`
+identity source of C-031. The existing feedback red lines and confirmation gates stay unchanged and unreferenced by any new
 gate.
-**Red when**: any action writes; a socket is opened; a reading consumes content; a new gate or red line
+**Red when**: any action writes; a socket is opened; an audited source's content is consumed; a new gate or red line
 appears.
 **Test carrier**: `tests/contract/test_context_management_readonly.py` (hash-manifest containment,
 zero-new-files and socket-guard legs); `tests/integration/test_context_management_init.py`

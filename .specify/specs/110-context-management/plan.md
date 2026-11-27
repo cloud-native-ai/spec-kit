@@ -66,8 +66,10 @@ are answered here so later stages can proceed):
 
 - **PA-1 — Presence is a path/metadata reading, never a content reading**: a row's presence is computed
   from source resolvability, readability and emptiness, plus bounded read-only probes on the system layer;
-  the audit never reads document content, never prints discovered host values, and never performs
-  relevance selection (FR-022, FR-024). All five presence tokens (`present`, `absent`, `unreachable`,
+  the audit never reads an audited source's content — its content reads are exactly the declared inputs
+  (the owner document's layout table, the four facts through the reader, and the `--version` identity
+  source) — never prints discovered host values, and never performs relevance selection (FR-022, FR-024,
+  A-19). All five presence tokens (`present`, `absent`, `unreachable`,
   `empty`, `not-evaluated`) are defined once in the new owner document because this repository has no
   prior owner for them (A-8); `Unobserved` still reaches its evidence-state owner by pointer.
 - **PA-2 — Every layout row names at least one standing resolvable source**: the two `inline-digest` task
@@ -201,12 +203,12 @@ Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole
 - **expected_sacrifice**: SC-001 Source ↓ 相比纯声明层方案，每次布局修订都要同时触碰 owner 文档表格与花名册，并多付一条表形守卫的维护成本。
 - **revision_trigger**: 若连续两次布局修订都因表格形态改动导致引擎解析失败，或花名册核对两次因纯排版调整误红 → 重开，把逐行数据迁入声明事实并在 owner 文档只留含义。
 
-### T-002 — 审计只读路径与在场状态，从不读取内容，也不打印发现到的宿主值
+### T-002 — 审计只读路径与在场状态，从不读取被审计来源的内容，也不打印发现到的宿主值
 
-- **decision**: manifest 的在场判定只依据来源路径的可解析、可读与空/非空，加上系统层的只读探针；引擎不读取文档内容、不作相关性选择、不打印探针观察到的值。
+- **decision**: manifest 的在场判定只依据来源路径的可解析、可读与空/非空，加上系统层的只读探针；引擎不读取被审计来源的内容（内容读取仅限声明层输入与 `--version` 身份源）、不作相关性选择、不打印探针观察到的值。
 - **antithesis**: 内容级校验的审计——读取治理文档与索引内容并校验其形态与关键条目；当使用者更想要语义层面的保证、并接受原文读取时它更优。
 - **binding_constraints**:
-  - pole_a: FR-024 规定任何 reading 不消费原始用户文本或会话内容，审计只消费路径、元数据与在场状态；FR-022 禁止引擎做语义选择。
+  - pole_a: FR-024 规定任何 reading 不消费原始用户文本或会话内容，对被审计来源审计只消费路径、元数据与在场状态；FR-022 禁止引擎做语义选择，并把内容读取限定为声明输入（A-19）。
   - pole_b: 语义保证能发现「指针仍在但内容已失效」，比只在场判定提供更强的可信度。
 - **discriminating_evidence**: 一位复核者把某一 row 的 source 指向一个路径可解析但内容与职责无关的文件并运行 `manifest`：该行是否仍读 `present`、`check` 是否仍 exit 0；结果二值：是 / 否。
 - **expected_sacrifice**: SC-010 Source ↓ 一致性声明只覆盖指针在场与可解析，内容陈旧由复审或其它 owner 报告，不由审计声称。

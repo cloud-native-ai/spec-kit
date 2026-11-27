@@ -85,7 +85,7 @@ Forbidden combinations, named and outside every layout row: `invariant` × `task
 | Field | Content | Rule |
 |-------|---------|------|
 | trigger id | one of the closed seven: `session-entry`, `task-entry`, `task-switch`, `pre-dispatch`, `stage-boundary`, `source-drift`, `reentry` | closed set; adding or removing is an owner revision |
-| composer | the composer role (E-8) that acts at this trigger | root session for baseline-scope triggers; superagent for dispatch edges |
+| composer | the composer role (E-8) that acts at this trigger | root session for `session-entry` and `source-drift`; the resumed session (root-session role) for `reentry`; the composer of the current work for `task-entry`, `task-switch` and `stage-boundary`; superagent for `pre-dispatch` |
 | scope | `baseline` or `task` (the `task-delta` refresh for `stage-boundary`) | never widens a form |
 | evidence | the dispatch brief on a dispatch edge; the manifest otherwise; the re-anchoring statement for `reentry` | recorded, not inferred |
 
@@ -100,6 +100,7 @@ declared trigger point. No watcher, daemon or background check exists (FR-016).
 |------|-------------------|----------|
 | root session | the invariant baseline at `session-entry`; baseline refresh at `source-drift`; re-citation at `reentry` | the relative role model is owned by `shared/definitions/superagent-definitions.md`; this table adds no role value |
 | superagent | each dispatch's task layer as the dispatch brief plus the baseline pointers | the seven-field / four-injection payload stays the carrier (FR-017); no field, injection, cap, identifier or self-check item is added |
+| the composer of the current work | the task layer at `task-entry`, `task-switch` and `stage-boundary` | whichever existing role holds the work item — a holder resolution under the relative role model, never a new role value, depth rule or grant (A-18) |
 | dispatched executor | none — complete-loads the pointers it receives | MUST NOT re-gather context, inherit from sibling transcripts or compose from conversation history (FR-015) |
 
 ## E-9 — Concept-pointer slot (概念指针槽位)
@@ -156,7 +157,8 @@ never a reason to omit a manifest row — the two readings are separate and may 
 | `not-evaluated` | no standing source is available to read: the row's only source is ephemeral/use-time, the roster class has no layout row (the reason names the missing layout row), or a runtime-discovery probe failed (the reason names the probe) | same owner document |
 
 Presence is judged by the source's actual type — a regular file by size, a directory by entry count —
-using metadata only; the audit never opens a file's content. Multi-source rows report the first failing
+using metadata only; the audit never opens a declared source's content (its only content reads are the
+declared inputs of C-012/C-032 and the `--version` identity source, A-19). Multi-source rows report the first failing
 source in the declared source order; a single failing source makes the row's token that failure's token.
 Absence always carries a reason naming the source — or, for a roster class with no layout row, the
 missing row; a silent omission and an invented default are both defects (FR-020).
@@ -200,7 +202,7 @@ resolves on the framework source tree and on client projects alike.
 - **I-8 — No invariant content in the task layer**: a task row touching an invariant source cites it by `pointer`; it never carries the source's text, its read-in-full form or an inline digest of it.
 - **I-9 — Presence tokens are honest**: every row reports `present` or exactly one of the four absence tokens with a reason; no row is silently omitted and no absent source is filled with a default.
 - **I-10 — Determinism**: two runs over an unchanged tree are byte-identical; rows print in roster order; no timestamps or discovered host values enter the output.
-- **I-11 — Read-only containment**: no audit action writes a file, creates a cache or opens a network socket; only paths, metadata and presence states are consumed.
+- **I-11 — Read-only containment**: no audit action writes a file, creates a cache or opens a network socket; only audited sources' paths, metadata and presence states are consumed — the declaration layer (owner document and four facts) and the `--version` identity source are the engine's declared input reads (C-012/C-031/C-032, A-19).
 - **I-12 — Concept-pointer triple**: the three project-layer rows exist in the layout; their absence reads an absence token and a derived consistency claim reads `Unobserved`, never agreement.
 - **I-13 — Exit-code discipline**: `check` exits `0` clean / `1` findings / `2` usage, unreadable input or an unknown/missing declaration member; `manifest` exits `0` whenever a manifest is emitted (absence rows included) and `2` on usage or declaration failure.
 - **I-14 — No persistence**: compositions and manifests are ephemeral; the only durable artifacts are the owner document, the four facts, the engine, the guards and the ambient section.

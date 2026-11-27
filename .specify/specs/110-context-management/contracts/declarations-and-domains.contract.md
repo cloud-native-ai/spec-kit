@@ -46,7 +46,9 @@ domains' orders disagree between the faces.
 ## C-012 — Every read goes through the shared declaration reader
 
 **Statement**: the engine reads the four facts through `declaration_reader.load_fact` in process; it
-implements no second YAML parser and carries no copy of a domain member. The layer root is the audited
+implements no second YAML parser and carries no copy of a domain member. The owner document and these four
+facts are the engine's declared input reads; the no-content boundary of C-034/C-035 binds the audited
+sources, not this declaration layer. The layer root is the audited
 workspace's own declaration layer: `<workspace-root>/shared/` when that framework-source layer (the owner
 document plus the four `context-*.yaml` facts) is present, else `<workspace-root>/.specify/shared/`
 (installed shape), where the workspace root is `--workspace-root` or the nearest ancestor holding

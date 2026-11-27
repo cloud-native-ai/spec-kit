@@ -41,10 +41,12 @@ selection exceeds its owner's cap; a task switch touches the baseline.
 **Statement**: the owner document declares exactly these triggers, each naming its composer, its scope and
 its evidence: `session-entry` (root session; compose baseline; the manifest or the session's composition
 record), `task-entry` (the composer of the current work; compose the task layer; the manifest's task
-rows), `task-switch` (recompose the task layer only), `pre-dispatch` (superagent; compose the per-dispatch
-task layer plus the baseline pointers; the dispatch brief), `stage-boundary` (refresh `task-delta`; the
-manifest's task rows), `source-drift` (root session; recompose the baseline exactly once; the manifest's
-source reading), and `reentry` (a resumed session after a compaction, a handoff or a stall re-read; re-cite
+rows), `task-switch` (the composer of the current work; recompose the task layer only; the manifest's task rows),
+`pre-dispatch` (superagent; compose the per-dispatch
+task layer plus the baseline pointers; the dispatch brief), `stage-boundary` (the composer of the current
+work; refresh `task-delta`; the manifest's task rows), `source-drift` (root session; recompose the baseline
+exactly once; the manifest's source reading), and `reentry` (a resumed session acting in the root-session
+role after a compaction, a handoff or a stall re-read; re-cite
 the baseline by pointer, refresh `task-delta`, record the re-anchoring statement as evidence). Adding or
 removing a trigger is an owner revision.
 **Red when**: a trigger outside the seven fires; a trigger names no composer, scope or evidence; the
@@ -56,10 +58,12 @@ removing a trigger is an owner revision.
 ## C-023 — Composer roles resolve through the existing relative role model
 
 **Statement**: the root session composes the baseline; the superagent composes each dispatch's task layer
-as the dispatch brief plus the baseline pointers; a dispatched executor complete-loads the pointers it
-receives and MUST NOT re-gather context, inherit from sibling transcripts or compose from conversation
-history. The role model is owned by `shared/definitions/superagent-definitions.md`; this contract adds no
-role value, no depth rule and no grant.
+as the dispatch brief plus the baseline pointers; the composer of the current work — whichever existing
+role holds the work item — selects or refreshes the task layer at `task-entry`, `task-switch` and
+`stage-boundary`, a holder resolution rather than a new role value; a dispatched executor complete-loads
+the pointers it receives and MUST NOT re-gather context, inherit from sibling transcripts or compose from
+conversation history. The role model is owned by `shared/definitions/superagent-definitions.md`; this
+contract adds no role value, no depth rule and no grant.
 **Red when**: a composer role outside the model appears; a dispatched executor re-gathers context; a
 second role enumeration is introduced.
 **Test carrier**: `tests/contract/test_context_management_owner.py` (role-legs).

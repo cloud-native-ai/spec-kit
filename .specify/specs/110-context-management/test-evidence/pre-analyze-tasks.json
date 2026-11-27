@@ -5,57 +5,71 @@
     {
       "check": "external-clause",
       "severity": "advisory",
+      "path": "requirements.md",
+      "line": 51,
+      "message": "references contract clause AN-01 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 52,
+      "message": "references contract clause AN-04 from an external namespace"
+    },
+    {
+      "check": "external-clause",
+      "severity": "advisory",
       "path": "plan.md",
-      "line": 120,
+      "line": 122,
       "message": "references contract clause PA-10 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 123,
+      "line": 125,
       "message": "references contract clause PA-11 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 126,
+      "line": 128,
       "message": "references contract clause PA-12 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 130,
+      "line": 132,
       "message": "references contract clause PA-13 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 134,
+      "line": 136,
       "message": "references contract clause PA-14 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 178,
+      "line": 180,
       "message": "references contract clause PA-11 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 269,
+      "line": 271,
       "message": "references contract clause PA-13 from an external namespace"
     },
     {
       "check": "external-clause",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 353,
+      "line": 355,
       "message": "references contract clause PA-11 from an external namespace"
     },
     {
@@ -104,35 +118,35 @@
       "check": "missing-path",
       "severity": "advisory",
       "path": "requirements.md",
-      "line": 153,
+      "line": 155,
       "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "requirements.md",
-      "line": 153,
+      "line": 155,
       "message": "path does not exist under the repo: .specify/shared/definitions/context-management-definitions.md"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "requirements.md",
-      "line": 160,
+      "line": 162,
       "message": "path does not exist under the repo: .specify/state/"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "requirements.md",
-      "line": 173,
+      "line": 175,
       "message": "path does not exist under the repo: .specify/scripts/python/context-audit.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "requirements.md",
-      "line": 268,
+      "line": 270,
       "message": "path does not exist under the repo: tests/fixtures/context-management/"
     },
     {
@@ -146,49 +160,49 @@
       "check": "missing-path",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 90,
+      "line": 92,
       "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
-    },
-    {
-      "check": "missing-path",
-      "severity": "advisory",
-      "path": "plan.md",
-      "line": 281,
-      "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
-    },
-    {
-      "check": "missing-path",
-      "severity": "advisory",
-      "path": "plan.md",
-      "line": 281,
-      "message": "path does not exist under the repo: .specify/shared/definitions/context-management-definitions.md"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "plan.md",
       "line": 283,
-      "message": "path does not exist under the repo: shared/declarations/facts/context-categories.yaml"
+      "message": "path does not exist under the repo: shared/definitions/context-management-definitions.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 283,
+      "message": "path does not exist under the repo: .specify/shared/definitions/context-management-definitions.md"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "plan.md",
       "line": 285,
+      "message": "path does not exist under the repo: shared/declarations/facts/context-categories.yaml"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 287,
       "message": "path does not exist under the repo: .specify/scripts/python/context-audit.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 301,
+      "line": 303,
       "message": "path does not exist under the repo: .specify/state/"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "plan.md",
-      "line": 364,
+      "line": 366,
       "message": "path does not exist under the repo: .specify/features/110-context-management.md"
     },
     {
@@ -433,7 +447,7 @@
       "check": "missing-path",
       "severity": "advisory",
       "path": "data-model.md",
-      "line": 189,
+      "line": 191,
       "message": "path does not exist under the repo: .specify/state/"
     },
     {
@@ -523,13 +537,6 @@
     {
       "check": "missing-path",
       "severity": "advisory",
-      "path": "quickstart.md",
-      "line": 159,
-      "message": "path does not exist under the repo: .specify/.tmp/"
-    },
-    {
-      "check": "missing-path",
-      "severity": "advisory",
       "path": "research.md",
       "line": 158,
       "message": "path does not exist under the repo: .specify/.tmp/plan-init-probe/"
@@ -594,70 +601,70 @@
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 59,
+      "line": 61,
       "message": "path does not exist under the repo: tests/contract/test_context_management_declarations.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 60,
+      "line": 62,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 73,
+      "line": 75,
       "message": "path does not exist under the repo: tests/contract/test_context_management_declarations.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 74,
+      "line": 76,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 89,
+      "line": 91,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 90,
+      "line": 92,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 104,
+      "line": 106,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 105,
+      "line": 107,
       "message": "path does not exist under the repo: tests/contract/test_context_management_declarations.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 121,
+      "line": 123,
       "message": "path does not exist under the repo: tests/contract/test_context_management_declarations.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/declarations-and-domains.contract.md",
-      "line": 122,
+      "line": 124,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
@@ -692,56 +699,56 @@
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 56,
+      "line": 57,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 79,
+      "line": 80,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 81,
+      "line": 82,
       "message": "path does not exist under the repo: tests/integration/test_context_management_init.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 93,
+      "line": 96,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 106,
+      "line": 110,
       "message": "path does not exist under the repo: tests/contract/test_context_management_readonly.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 107,
+      "line": 111,
       "message": "path does not exist under the repo: tests/integration/test_context_management_init.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 123,
+      "line": 127,
       "message": "path does not exist under the repo: tests/integration/test_context_management_init.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/engine-and-distribution.contract.md",
-      "line": 142,
+      "line": 146,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
@@ -888,77 +895,77 @@
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 52,
+      "line": 54,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 65,
+      "line": 69,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 79,
+      "line": 83,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 80,
+      "line": 84,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 96,
+      "line": 100,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 115,
+      "line": 119,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 116,
+      "line": 120,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 129,
+      "line": 133,
       "message": "path does not exist under the repo: tests/contract/test_context_management_engine.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 143,
+      "line": 147,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 156,
+      "line": 160,
       "message": "path does not exist under the repo: tests/contract/test_context_management_readonly.py"
     },
     {
       "check": "missing-path",
       "severity": "advisory",
       "path": "contracts/matrix-and-triggers.contract.md",
-      "line": 157,
+      "line": 161,
       "message": "path does not exist under the repo: tests/contract/test_context_management_owner.py"
     },
     {
@@ -1111,13 +1118,13 @@
   ],
   "summary": {
     "errors": 0,
-    "advisories": 158,
+    "advisories": 159,
     "waived": 0,
     "fr": 29,
     "sc": 11,
     "tasks": 39,
     "clauses": 39,
-    "files": 13
+    "files": 14
   },
-  "checked_at": "2026-11-27T08:03:23Z"
+  "checked_at": "2026-11-27T08:34:59Z"
 }
