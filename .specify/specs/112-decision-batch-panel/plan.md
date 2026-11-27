@@ -2,7 +2,7 @@
 
 **Branch**: `112-decision-batch-panel` | **Date**: 2026-11-27 | **Spec**: `.specify/specs/112-decision-batch-panel/requirements.md`
 **Requirement → Feature**: `112-decision-batch-panel` → Feature 112 Batch Decision Panel（批量决策面板）
-**Input**: Specification from `.specify/specs/112-decision-batch-panel/requirements.md` (45 FR / 10 SC; Assumptions A-1…A-25; 13 clarification rows), the 107 owner page `shared/definitions/decision-definitions.md`, and the adjacent owners named by pointer (confirmation gates, decision tension, closed-set claims, user-facing comprehension, script interface, memory engine, ID Register).
+**Input**: Specification from `.specify/specs/112-decision-batch-panel/requirements.md` (45 FR / 10 SC; Assumptions A-1…A-27; 13 clarification rows), the 107 owner page `shared/definitions/decision-definitions.md`, and the adjacent owners named by pointer (confirmation gates, decision tension, closed-set claims, user-facing comprehension, script interface, memory engine, ID Register).
 
 ## Summary
 
@@ -29,7 +29,7 @@ Plan-stage adjudications under the unattended assignment (not user questions):
 - **PA1 — Same-author scoring fallback**: the Constitution Check and the Post-Generation Quality Gate would ideally be delegated to fresh-context read-only subagents, but this executor carries no dispatch capability and the role forbids dispatching. Both are a disclosed direct self-read against the landed artifacts (the objective-analysis gate's fallback path), recorded here rather than silently claimed as independent review.
 - **PA2 — Qualification precedence**: the spec's closed presentation states are made deterministic by the precedence `incomplete` → `source-conflict` → `no-default` → `irreversible-default` → `prior-decision-conflict` → `eligible` (research D-4). No new state is invented; every candidate gets exactly one classification and every reason is named.
 - **PA3 — Explicit settlement boundary**: alternatives for ineligible items are accepted where a valid 107 record can be formed (`no-default`, `irreversible-default`, `source-conflict`, `prior-decision-conflict`); an `incomplete` item accepts an alternative only when its option set is grammatically complete and `subject`/`context` resolve — otherwise the engine refuses with a named reason (research D-9). This is the only reading consistent with FR-033's unchanged record grammar and the spec's edge case.
-- **PA4 — Batch-record identity and create-only semantics**: batch records are recognised in the knowledge store by the title prefix `decision-batch-<batch_id>`; the memory engine's knowledge scope is upsert-by-slug, so create-only is enforced by the batch engine pre-checking the target path and refusing a duplicate batch id (research D-2/M-6). An entry matching the prefix but unparseable is a named refusal, never a guess.
+- **PA4 — Batch-record identity and create-only semantics**: batch records are recognised in the knowledge store by the title prefix `decision-batch-<batch_id>`; the memory engine's knowledge scope is upsert-by-slug, so create-only is enforced by the batch engine pre-checking the target path and refusing a duplicate batch id (research D-2/M-6); the sole exception is the single-field `superseded_by` append on an existing prior record (A-27). An entry matching the prefix but unparseable is a named refusal, never a guess.
 - **PA5 — Docs-only stage**: no executable artifact changes at this stage; the applicable deterministic gates are the validators and the workspace guard. The test entry is additionally unavailable in this worktree (no pytest interpreter) — the measured runner error is recorded.
 - **PA6 — Stale reading correction**: the Feature 112 detail still quotes the requirements-stage "eight open rows"; the clarify ruling (A-21) corrected it to the predicate-derived 17. The Feature Integration edit corrects the detail and discloses the correction.
 
@@ -81,7 +81,7 @@ N/A
 
 - 不可逆：本计划的全部改动都是版本控制中的增量文本、只读引擎动作与单写记录路径；没有数据迁移、没有既有记录 schema 变更，回滚即 revert 本特性提交，运行期只追加新记录。
 - 跨团队：本计划没有新增他人依赖的契约变更；所有者页扩展、批次族字段与 P-13 生产者行已在 requirements A-2/A-12 裁定并固定在 FR-001…FR-045，本计划只把它们落成设计条款，未另造接口。
-- 高爆炸半径：批次机制按需运行，写入面限于本批次自己的记录、具名 register 行与来源状态单元格；一次失败只影响本次调用，不触及他批记录或运行时服务。
+- 高爆炸半径：批次机制按需运行，写入面限于本批次自己的记录、具名 register 行、来源状态单元格与 A-27 的受许取代追加（仅一个条件字段）；一次失败只影响本次调用，不触及他批记录或运行时服务。
 - 与宪法原则相关：宪法检查逐条核对 23 条原则均为 Pass，本计划不在两种宪法读法之间取舍，也不修改任何 MUST 条款。
 
 The requirements-stage load-bearing decision on silence semantics (A-10, recorded in the owner's decision-tension shape) is inherited by pointer — its six fields live in `requirements.md`, are not restated here, and its `expected_sacrifice` measurement source is SC-005 in that file.

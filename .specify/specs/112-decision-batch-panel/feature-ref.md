@@ -2,7 +2,7 @@
 
 **Requirement → Feature**: `112-decision-batch-panel` → **Feature 112** Batch Decision Panel（批量决策面板）
 **Status**: Planned (advanced by this plan from Draft; ceiling `Planned`)
-**Spec**: `.specify/specs/112-decision-batch-panel/requirements.md` (45 FR / 10 SC, A-1…A-25, 13 clarification rows)
+**Spec**: `.specify/specs/112-decision-batch-panel/requirements.md` (45 FR / 10 SC, A-1…A-27, 13 clarification rows)
 **Plan**: `.specify/specs/112-decision-batch-panel/plan.md`
 **Extended owner**: `shared/definitions/decision-definitions.md` (Feature 107) — additive batch extension only
 

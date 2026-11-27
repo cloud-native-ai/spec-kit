@@ -110,7 +110,7 @@ Grounding join (deterministic, no semantic search): (a) the default option's `ev
 
 ### E-9 Batch Record
 
-One dated entry in `.specify/knowledge/`, written through the memory engine; recognised by the title prefix `decision-batch-<batch_id>`; never overwritten (a same-batch-id second write is refused before the write surface is called).
+One dated entry in `.specify/knowledge/`, written through the memory engine; recognised by the title prefix `decision-batch-<batch_id>`; never overwritten (a same-batch-id second write is refused before the write surface is called) — the sole exception to whole-file immutability is the I-16 `superseded_by` append (append-only; every pre-existing byte unchanged). A later batch reads a settled batch record only for the declared read-only purposes (already-resolved exclusion, grounding, prior-decision conflict, replay pointer resolution) and never writes another batch's record except through that single append.
 
 | Section | Content |
 |---------|---------|
@@ -187,7 +187,7 @@ Decision Batch (E-8) 1 ─── 1 Completeness Bookkeeping (E-13)
 ## 4. Operations as state transitions
 
 - **scan** (read-only): sources → candidates → classification/qualification → E-8 presentation payload (items + bookkeeping + digest). Refuses on `unreadable`; `nothing-pending` is a successful terminal state with no batch.
-- **record**: re-scan → compare identity set + per-item content fingerprints against the presented payload (drift → refuse, zero writes, no id) → validate the reply (structure + membership; refusal leaves the presentation valid for retry) → mint `batch_id` → write batch record → register rows/status cells → block `resolution` annotations → disclose any post-write failure.
+- **record**: re-scan → compare identity set + per-item content fingerprints against the presented payload (drift → refuse, zero writes, no id) → validate the reply (structure + membership; refusal leaves the presentation valid for retry) → mint `batch_id` → write batch record → append `superseded_by` to each overturned prior record (the sole sanctioned post-write mutation when that record sits inside a prior batch record; an unreadable/unwritable prior carrier refuses that item) → register rows/status cells → block `resolution` annotations → disclose any post-write failure.
 - **replay** (read-only): batch record + resolvable pointers → item set, completeness, defaults/grounding, objections/dispositions, decision records; any unresolvable pointer is reported and the exit is non-zero; no skipping, no memory completion.
 
 ## 5. Invariants
@@ -209,9 +209,9 @@ Decision Batch (E-8) 1 ─── 1 Completeness Bookkeeping (E-13)
 | I-13 | The recommended default is the item's declared default; the panel never invents a default or an option |
 | I-14 | `grounded` carries at least one resolvable prior-experience pointer; `no-evidence` is explicit; `basis` is never evidence |
 | I-15 | Prior-decision conflict is detected by verbatim subject containment in a prior record's `context` and a different prior chosen option; such a row is never settled by silence |
-| I-16 | Redecision adds a new record and appends `superseded_by` (with the carrier pointer) to the old record; the old content is never rewritten; an unwritable/unreadable old carrier refuses the redecision |
+| I-16 | Redecision adds a new record and appends `superseded_by` (with the carrier pointer) to the old record; the old content is never rewritten — every pre-existing byte stays unchanged; when the old record sits inside a batch record, this append is that batch record's sole sanctioned post-write mutation (the I-18 exception); an unwritable/unreadable old carrier refuses the redecision |
 | I-17 | The three batch-family fields appear together on batch-produced records only, with values from their domains; existing records are untouched and keep passing |
-| I-18 | The batch record is one file per batch, never overwritten; the same batch id is refused before the write surface runs |
+| I-18 | The batch record is one file per batch, never overwritten; the same batch id is refused before the write surface runs; the sole exception to whole-file immutability is the I-16 `superseded_by` append (append-only, no other byte changes) |
 | I-19 | `record` refuses on any candidate-set or per-item content drift between presentation and write, with zero writes and no minted id |
 | I-20 | Register updates are limited to appended rows and status cells; settled rows are never deleted; parked rows stay `open`-prefixed and annotated |
 | I-21 | Replay reconstructs the batch from the record and resolvable pointers only; any unresolvable pointer is reported with a non-zero exit |
