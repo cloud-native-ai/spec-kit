@@ -3,7 +3,7 @@
 **Feature ID**: 109
 **Name**: Prompt Adherence Evaluation（提示遵从度评价）
 **Description**: 只读、确定、可离线的提示遵从度评价机制：只消费既有传感器（feedback 条目与门控观察族、exec-quant 记录、run-determination 四轴记录、evidence findings、probe 注册表声明），读时派生按运行与纵向两种读取，双层模型 + 六行信号目录 + 六类盲区 + 机器可检的假定行为覆盖图，零新增存储/采集点/评分，经既有 init 分发。
-**Status**: Implemented
+**Status**: Ready for Review
 **Created**: 2026-11-27
 **Last Updated**: 2026-11-27
 
@@ -15,6 +15,7 @@ Scope: one owner document `shared/definitions/prompt-adherence-definitions.md` (
 
 ## Latest Review
 
+- **2026-11-27 — review stage**: four segments + ARC in one consolidation pass. Process pass (0 P0 / 1 P1 / 2 P2); artifact pass (11/11 expected set; 0 P0 / 0 P1 / 1 P2); implementation pass (smoke re-run exit 0 — 77 passed; mirrors and command copies byte-identical; zero NEW failed names vs the 222-name baseline); code segment `not-evaluated` with 0 coverage gaps and 0 blocking entries (receipt 182 changed / 19 judged / 163 legal skips; gate `allow`; capture skipped — framework hat); ARC `accept` — `final_path` 8/8 pass, four completion conditions true. Reports: `review.md`, `code-review.md`.
 - **2026-11-27 — implement stage**: tasks T001–T039 closed across four packages; the owner document, five declaration facts and the read-only engine landed in framework sources and ride the single mirror projection byte-identically; the five guard files (owner / declarations / engine / read-only / init) run green through `scripts/bash/run-tests.sh`; the longitudinal window, output caps, audit replay and the dated baseline entry through the existing feedback channel landed in the final package; the closure judgement returned `accept` (final_path pass 8/8, four conditions true) before the `Planned → Implemented` flip. Verification: `.specify/specs/109-prompt-adherence/verification.md`; evidence: `test-evidence/implementation-gates.txt`, `notes/red-first-evidence.md`, `notes/quickstart-run.md`.
 - **2026-11-27 — plan stage**: plan set landed (`plan.md` with the dynamically derived 23-row Constitution Check and 8 verified execution premises, `research.md` R-1…R-11, `data-model.md` E-1…E-11 + I-1…I-14, six contract files / 39 clauses keeping the source ids C-001…C-046, `quickstart.md` 6 scenarios, `feature-ref.md`); Feature 109 advanced `Draft → Planned` with no add / merge / split. Integration decisions of the plan: store roots derive from `runtime-store-layout.yaml#/statement` through `declaration_reader.py` (no ported `store_layout.py`, no second root table); five closed-set facts, no sixth; reason taxonomy owner/engine split pinned by a bidirectional test; two framework-map rows; no `.gitignore` rule and no store-layout change; decision tensions recorded as N/A with the three design-shape records consumed by reference from the source plan. Gates: `pre-analyze-check --stage plan` pass (0 errors; deliverable-path advisories only), `validate-decision-tensions` ok, plan integrity (no placeholders, single H1, stamp present) ok, mirror and command-copy baselines rc 0.
 - **2026-11-27 — clarify stage**: `Related Feature` bound to Feature 109 and this detail registered `Draft`; the six-area scan (sensor mapping, reading semantics, coverage map, engine contract, distribution, tests) adjudicated in the spec's `## Clarifications` Session 2026-11-27, with in-place refinements to the Overview, Related Feature, FR-004, FR-005, FR-011, FR-014, FR-015, FR-023, FR-024, FR-026, A-6 and the Edge Cases; live counts unchanged (FR-001…FR-030 / SC-001…SC-009); validator `status: ok` (0 error / 0 warning).
@@ -57,9 +58,9 @@ Scope: one owner document `shared/definitions/prompt-adherence-definitions.md` (
 
 - **Draft**: requirements 109 is bound and `/speckit.clarify` completed. (historical — 2026-11-27; superseded the same day)
 - **Planned**: plan/design artifacts exist for the bound spec and the Constitution Check has no unjustified Fail rows. (historical — plan landed 2026-11-27; superseded by Implemented the same day)
-- **Implemented**: tasks are closed and the guard roster lands green. (current — 2026-11-27: T001–T039 closed; five guards green through scripts/bash/run-tests.sh; closure-acceptance-check `accept`, final_path pass=8 total=8, all four completion conditions true; F-1 full-suite zero NEW failed names against the 222-name implement-entry baseline)
+- **Implemented**: tasks are closed and the guard roster lands green. (historical — 2026-11-27; superseded by `Ready for Review` the same day: T001–T039 closed; five guards green through scripts/bash/run-tests.sh; closure-acceptance-check `accept`, final_path pass=8 total=8, all four completion conditions true; F-1 full-suite zero NEW failed names against the 222-name implement-entry baseline)
 - **Blocked**: tasks are closed and at least one final-path criterion is not `pass`.
-- **Ready for Review**: review evidence exists and the current code-review record has no blocking entry.
+- **Ready for Review**: review evidence exists and the current code-review record has no blocking entry. (current — 2026-11-27: four segments + ARC `accept`; `code-review.md` 0 blocking, gate `allow`; Feature 109 `Implemented → Ready for Review`)
 - **Sealed**: review concluded with zero unhandled P0, acceptance records complete, and merge-back done when slices exist.
 - **Completed** (legacy — closed for new work): historical terminal record only; not used for this feature.
 
