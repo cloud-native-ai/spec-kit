@@ -1,0 +1,40 @@
+# Workspace guard — implement P3
+
+## Snapshot (before gates)
+
+```
+$ python3 scripts/python/workspace-guard.py --snapshot .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p3.json --repo .
+recorded .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p3.json
+exit 0
+```
+
+## Check (after the feat commit 12c281ad9) — clean
+
+```
+$ python3 scripts/python/workspace-guard.py --check .specify/specs/109-prompt-adherence/test-evidence/workspace-implement-p3.json --repo .
+clean
+exit 0
+```
+
+Changed field: none. The branch (`109-prompt-adherence`) and the `.specify/specs` listing are
+unchanged; the refs set already carried the concurrent sibling branches
+(`110-context-management`, `111-general-best-practices`) at snapshot time, so this slice
+created no git ref and observed no drift. The concurrent lines 110/111 share the repository:
+had a sibling branch landed between snapshot and check, a `refs` delta would have been
+attributed to that sibling, re-baselined, and never suppressed or reverted; product-tree drift
+would still have failed this check.
+
+## Script-interface screen (post-commit)
+
+```
+$ python3 scripts/python/script-interface-check.py --files scripts/python/prompt-adherence.py --json
+{
+  "applicable": 1,
+  "violations": 0,
+  "violation_rows": []
+}
+exit 0
+```
+
+The tracked engine is an applicable interface candidate with zero violations; no flag, help or
+exit-code surface moved when the `--check-coverage` action landed.
