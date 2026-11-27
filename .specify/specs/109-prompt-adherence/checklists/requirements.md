@@ -68,4 +68,12 @@
   source Feature ID is not reused, and every sensor path, record kind token, CLI form and
   mirror pair is adapted to and verified against this tree (A-3/A-4; evidence in
   `test-evidence/requirements-stage-2026-11-27.md` § R-1).
+- Clarify stage (2026-11-27): six-area scan adjudicated in the spec's `## Clarifications`
+  Session 2026-11-27 (sensor mapping incl. measure-as-projection, absence-state and
+  reading-status derivations, catalog add/retire procedure, workspace resolution / Two Hats,
+  distribution none-list, source-contract-to-test roster); write-back touched Overview,
+  Related Feature, FR-004/005/011/014/015/023/024/026, A-6 and the Edge Cases; live counts
+  unchanged (30 FR / 9 SC / 2 STR). Post-write validator reading (dated history; supersedes
+  the requirements-stage line count only): `status: ok`, 0 error / 0 warning, 310 lines /
+  39 definition rows / 2 shared strings — `test-evidence/clarify-validator.txt`.
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`.

@@ -77,3 +77,4 @@ Historical review — requirement `027-feedback-mechanism` drafted via `/speckit
 - Specification: .specify/specs/047-feedback-introspection/requirements.md (Feedback 自省流程，Implemented 2026-08-28)
 - Cross-reference: Feature 046 Confirmation Gate Governance(requirement 044)——达阈值反馈提交提示将改为非阻塞一次性提示(绝不阻塞收尾、绝不自动传输),本 Feature 的"zero automated transmission"红线不变。
 - Cross-reference: Feature 056 Probe-Handler 体系（Implemented 2026-10-14）——把本 Feature 建立的 Probe Class×Object 注册表扩格为全框架伞形真源；probe 查询、注入、Handler 与 Wrap-up 编译由共享 `probe-utils.py` 承担。
+- Cross-reference: Feature 109 Prompt Adherence Evaluation（Draft 2026-11-27）——只读消费本 Feature 的 feedback 条目与门控观察族（经 `feedback-utils.py scan_entries` 的 frontmatter 元数据面，正文不进入任何输出），按 `run_id` 的 `gate:` 前缀把两族分入 `feedback-entry` / `gate-observation-record` 两条目录行；本 Feature 的存储、红线与记录 schema 不变。
