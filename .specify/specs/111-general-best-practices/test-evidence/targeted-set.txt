@@ -1,0 +1,36 @@
+# Targeted set — 111-general-best-practices (T017, 2026-11-27)
+
+Single entry only; interpreter per tasks § Environment Prerequisites
+(`SPECKIT_PYTHON=/usr/local/bin/python3`, pytest 8.4.2).
+
+## Command
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  --names-out .specify/specs/111-general-best-practices/test-evidence/targeted-names.txt \
+  tests/contract/test_general_best_practices.py \
+  tests/contract/test_mirror_parity_suite.py \
+  tests/integration/test_init_new_layout.py
+```
+
+## Readings
+
+- Exit code: `0`
+- Result line: `895 passed in 8.09s`
+- Names line: `# failed-name list written: .specify/specs/111-general-best-practices/test-evidence/targeted-names.txt (0 entries) passes=1`
+
+## Comparison against the implement pre-flight baseline
+
+Owner of the comparison form: `/speckit.implement` § Test runs —
+`comm -13 <baseline> <current>`; zero lines = zero new failures.
+
+| Quantity | Value |
+|----------|-------|
+| Baseline file | `.specify/specs/111-general-best-practices/baseline-failed.txt` (223 names, frozen at implement entry 2026-11-27T08:38Z over `--full`) |
+| Current failing names | `.specify/specs/111-general-best-practices/test-evidence/targeted-names.txt` (0 entries) |
+| `comm -13` line count | **0** |
+| New failure names | none |
+
+**Verdict**: zero new failures in the targeted set. The three adjudicators in this set
+(the six-leg guard, the derived mirror-parity suite, the existing init integration test)
+are all green in one execution.
