@@ -169,6 +169,7 @@
 
 - **同名族**：`same_name_conflict` + `resource_locator`——同名冲突风险存在时成对在场（§ 决策文本契约 R2）。
 - **取代族**：`superseded_by`——记录被取代时必填；它的在场即 `superseded` 标记。
+- **批次族**：`batch_id` / `batch_disposition` / `recommendation_grounding`——仅当记录由决策批次产生时**三者同批在场**（§ 批次记录契约；非批次记录 MUST NOT 携带）；取值域归 § 批次记录契约。
 - **传递族**：`dispatched_at` / `acknowledged_at` / `implemented_at`——仅当决策被传递，按 `transmission_status` 相位追加：到 `dispatched` 必填 `dispatched_at`，到 `acknowledged` 必填 `acknowledged_at`，`implemented` / `diverged` 必填 `implemented_at`；事件发生时才追加，**未到相位不设占位**；`blocked` 按已达相位判。确认(acknowledgement)与 `implementation_receipt` 是回传项，不是记录字段——它们驱动这些时点与状态相位（§ 传递与实施）。
 
 ### 状态与时间戳(state and timepoints)
@@ -272,6 +273,202 @@
 
 - 每个来源记一个在场读数：`read`（成功读取）/ `absent`（载体不存在：记为带原因的缺席空来源，不拒绝，也不读作「干净」）/ `unreadable`（载体级存在但不可读或不可解析 → 触发整批拒绝）。
 - **层级分界**：块级文法缺陷不是 `unreadable`；文件 I/O 失败、register 表结构无法按列解析、或候选无法枚举才是载体级。
+
+## 待决策项块（Pending Item Block）
+
+本节拥有待决策项块（Pending Item Block）的语法与块级缺陷规则。待决策项块是待决策项的既定载体形态，**不是决策记录**（Decision Record）：它没有 `chosen_option`，不按 § 决策记录 的文法判定；记录文法 MUST NOT 把待决策项块判为不完整记录，待决策项块检查 MUST NOT 判 `### D-NNN` 记录。两侧的标题前缀不同（`### PENDING —` 与 `### D-NNN`），互不判定。
+
+### 标题与字段行(heading and field lines)
+
+- 标题行：`### PENDING — <主体完整名称>`；主体 MUST 使用完整名称（§ 决策文本契约 R1）。围栏代码块内的同名行 MUST NOT 被计为待决策项块。
+- 每行字段：`- **<小写字段名>**: <值>`；续行 MUST 缩进 ≥2 空格（`options` 的选项子行同此）。
+- 字段闭集（closed field set）：
+
+| 字段 | 层级 | 含义 |
+|------|------|------|
+| `decision_class` | 必填 | `human-interactive` / `ai-autonomous`；缺失或值域外记 `incomplete`（`class-missing`） |
+| `subject` | 必填 | 决策主体的完整名称 |
+| `same_name_conflict` / `resource_locator` | 条件（同名族） | 同名冲突风险存在时成对在场；维度下限沿用 § 决策文本契约 R2 |
+| `context` | 必填 | 决策所处情境与约束（含为何此刻要选） |
+| `options` | 必填 | 声明计数开头；每选项五要素；恰一个 `default: yes`；`other` 的 `path` 与单可行项的 `forced` 规则沿用 § 选项集契约 |
+| `basis` | 必填 | 建议默认值的一行理由；本身不是证据（§ 建议默认值与依据） |
+| `origin` | 必填 | 该块的产出身份；register 来源的块 MUST 逐字包含该 register 行 id 作为独立 token（§ 待决策项来源清单） |
+| `created_at` | 必填 | ISO-8601 UTC 创建时点 |
+| `resolution` | 条件（解决族） | 解决后追加：`<batch_id> -> <D-NNN>`；块内容不因解决而改写 |
+
+新增或删除字段 MUST 先修订本节；字段闭集之外的名字是块级缺陷，不是扩展点。
+
+### 块级文法缺陷(block-level grammar defects)
+
+下列缺陷属于**块级**（该候选仍被枚举，以 `incomplete` 呈现并逐项点名），MUST NOT 触发整批拒绝，MUST NOT 被静默忽略：
+
+- `unknown-field`：字段名不在上表闭集内。
+- `duplicate-field`：同一字段在本块内出现多于一次。
+- `malformed-field`：顶格 `- ` 行不匹配字段行文法，或 `options` 值不是声明计数形态，或选项标签重复。
+- `option-count-mismatch`：`options` 声明计数与选项条目数不一致。
+- `option-element-missing`：某选项缺五要素之一；`other` 无 `path`；单可行项未声明 `forced`。
+
+### 不完整判定(incompleteness)
+
+任一必填字段缺失、选项五要素缺失、存在上条块级缺陷、或某选项的 `evidence` 指针不可解析（路径不存在，或给出的锚不可寻）——该候选记 `incomplete` 并逐项点名缺失或畸形要素；它 MUST NOT 进入沉默接受资格，但其**全部现有内容** MUST 照实呈现（§ 批次呈现契约）。`incomplete` 是合法的呈现状态，不是缺陷；面板 MUST NOT 补写缺失字段或发明选项。
+
+## 批次状态（Batch States）
+
+本节拥有批次呈现行的状态闭集及判定顺序。每个来源候选 MUST 被恰好分类一次（闭集：`presented` / `duplicate-merged` / `not-human-held` / `already-resolved`）；每个被呈现的身份（identity）恰好获得一个资格状态。状态与原因由引擎确定性判定，MUST NOT 由呈现层改写。
+
+### 资格状态与优先序(qualification states and precedence)
+
+闭集：`incomplete` / `source-conflict` / `no-default` / `irreversible-default` / `prior-decision-conflict` / `eligible`，按从左到右的优先序取**第一个**命中的状态（每条呈现行恰一个状态）：
+
+1. `incomplete` —— 必填字段缺失、块级文法缺陷、类别未知（`class-missing`）、来源行未能联接到唯一块（`authority-unresolved` / `ambiguous-link`），或选项证据指针不可解析（`evidence-unresolvable`）。
+2. `source-conflict` —— 同一身份的多来源块给出的选项标签集不一致；MUST 要求显式选择，MUST NOT 任选一侧默认。
+3. `no-default` —— 默认标记数不是恰一个（`default-missing` / `multiple-defaults`）。
+4. `irreversible-default` —— 唯一默认选项的 `reversibility` 以 `irreversible` 起头（`default-irreversible`）；不可逆/破坏性动作的显式确认义务归 `shared/guidelines/confirmation-gates.md`（指针，不复述）。
+5. `prior-decision-conflict` —— 主体全名逐字命中既往决策记录的 `context`，且既往选中项与当前建议默认不同（§ 建议默认值与依据）。
+6. `eligible` —— 以上皆不命中。
+
+只有 `eligible` 项可经沉默结案（§ 批次处置与沉默接受默认）。`no-default`、`irreversible-default`、`source-conflict`、`prior-decision-conflict` 与 `incomplete` 项 MUST 保持待定，除非用户显式点选。`incomplete` 的原因词表是闭集：`authority-unresolved` / `ambiguous-link` / `class-missing` / `malformed-field` / `unknown-field` / `duplicate-field` / `option-count-mismatch` / `missing-field` / `option-element-missing` / `evidence-unresolvable`；其余状态的原因词表随本节修订增长，MUST NOT 新增状态。
+
+### 排除状态(exclusion states)
+
+`not-human-held`（已声明 `ai-autonomous`，或同一身份的多来源类别声明冲突——按存疑从严）、`already-resolved`（块带 `resolution`，或读时联接到既往批次记录中的已决身份）、`duplicate-merged`（同一身份的重复引用并入一行）。排除项 MUST NOT 被呈现、转换或授权；每一项 MUST 以具名理由计入记账（§ 完备性与拒绝）。
+
+### 接地状态(grounding states)
+
+闭集 `grounded` / `no-evidence`；判定规则归 § 建议默认值与依据。接地状态不影响资格状态，但 `grounded` 的每条指针 MUST 可解析。
+
+## 批次呈现契约（Batch Presentation Contract）
+
+本节拥有「一次呈现必须携带什么、按什么顺序、哪些内容不许补造」的规则。一次调用 MUST 产出**一次**呈现，覆盖本次扫描的全部呈现行；可读性判断（读者是否读得懂）归评审承接面，机器只判槽位在场与结构。
+
+### 确定顺序(deterministic order)
+
+呈现顺序 MUST 为：来源清单顺序（`register-open-decision-row` 先于 `authored-pending-item`）→ 载体仓库相对路径 → 载体内的出现位置（register 行序；块起始行）。同一呈现行的来源引用 MUST 按同一顺序列出。相同输入重复扫描 MUST 得到相同项集、相同顺序与相同逐字段内容，仅扫描时间戳不同；呈现摘要 MUST 对去除时间戳后的投影计算。
+
+### 逐项槽位(per-item slots)
+
+每行 MUST 携带 107 `human-interactive` 呈现模板的全部要素——平实语言的问题、上下文、每个选项的后果与可逆性、唯一默认、完整名称与同名定位（适用时）、选项证据——加上：来源指针集、`decision_class`、`basis`、接地状态与指针、资格状态与具名原因、以及本项的异议/暂缓方式。缺值项 MUST 展示其**全部现有内容**并逐项点名缺失要素；MUST NOT 用补造值填满槽位，MUST NOT 以摘要替代本项。
+
+### 批次级上下文下限(batch-level context floor)
+
+呈现 MUST 一次性回答五个问题，使读者无需打开其他工件：为何这些事项此刻出现；沉默将意味着什么；如何提出异议或暂缓；哪些事项保持待定及各自的具名原因；完备性披露（含缺席来源）。面向用户的措辞 MUST 遵循 `shared/guidelines/user-facing-comprehension.md`（指针）。
+
+### 用户面标识边界(identifier boundary)
+
+面向用户的正文 MUST NOT 出现内部标识符——字段名、脚本名、状态词与原因词；结构化 payload 可携带这些标识符，它是机器通道。正文用平实语言转述状态与原因。
+
+### 不截断与不自称完备(no truncation, no partial claims)
+
+每个呈现项 MUST 完整呈现，长度 MUST NOT 被人为封顶；任何省略 MUST 是整批拒绝，而不是缩短的批次。`ai-autonomous` 项的呈现数恒为零（§ 待决策项来源清单 的类别门）。呈现是否易懂、后果陈述是否真实、建议理由是否充分是行为类判断，由 B-03 / B-08 / B-09 评审承接，MUST NOT 被任何文档或测试声称机器覆盖。
+
+## 建议默认值与依据（Recommended Default & Grounding）
+
+本节拥有建议默认值（Recommended Default）与建议依据（Recommendation Grounding）的生成规则。建议默认值 MUST 是该选项集声明的**唯一**默认成员；面板 MUST NOT 发明默认值、选项、选项后果、可逆性或证据。`no-default` 项照常呈现且 MUST NOT 经沉默结案。
+
+### 确定性接地联接(deterministic grounding join)
+
+接地 MUST 由引擎对下列**封闭输入**做确定性联接，联接结果只有 `grounded` 与 `no-evidence` 两个取值：
+
+- (a) 默认选项的 `evidence` 指针中，可解析且落在既往经验载体上的那些；
+- (b) 主体全名**逐字**出现在其 `context` 中的既往决策记录（含既往批次记录内的记录块）；
+- (c) 这些记录引用的 `T-NNN` 标识符（其张力记录可解析时）。
+
+既往经验载体是闭集：四个扫描根下的决策记录载体、knowledge 存储中的批次记录、`T-NNN` 张力记录、`.specify/history/` 条目、`.specify/feedback/` 条目与 `.specify/knowledge/` 条目。指针解析的读法与 M-09 一致：路径存在，且给出锚时锚可在载体中找到。`basis` 是作者撰写的一行理由，MUST NOT 被计为证据。
+
+- **`grounded`**：至少一条可解析的既往经验指针；发出的每条指针 MUST 可解析。一条不可解析的候选指针 MUST NOT 被发出。
+- **`no-evidence`**：没有可解析的既往经验指针；呈现 MUST 明示这一点，且 MUST NOT 暗示经验支持。
+
+### 前例冲突(prior-decision conflict)
+
+当一条既往决策记录的 `context` 逐字包含主体全名、且其 `chosen_option` 与当前建议默认的标签不同时，该行 MUST 呈现 `prior-decision-conflict`，给出该既往记录的载体指针与其选中标签，并 MUST NOT 经沉默结案。用户显式推翻既往决策时走既有取代规则（§ 传递与实施 的取代规则；批次记录的写后追加边界见 § 批次记录契约）。
+
+### 引擎判定边界(engine judges)
+
+联接、指针解析与前例冲突检出 MUST 由确定性引擎计算；技能 MAY 转述引擎判定，MUST NOT 做语义检索、推断额外证据或在呈现期改写已判定状态。建议是否合理是行为类判断，归 B-09 评审承接，MUST NOT 被机器声称覆盖。
+
+## 决策批次与应答（Decision Batch & Reply）
+
+本节拥有一次决策批次（Decision Batch）的应答语义：什么算一次应答、授权级别从哪里来、异议如何绑定与校验、原文与要点各落在哪里。
+
+### 应答的定义(reply definition)
+
+应答 MUST 是对**本次呈现**的显式回复：无异议、点名异议或暂缓。对呈现内容的追问不构成应答——承接方回答后继续等待。中止会话、关闭会话或只有追问的对话 MUST 产出**零条记录**。一次批次 MUST 只绑定一次呈现；呈现之外的内容不构成本次批次的应答。
+
+### 授权级别(authorization)
+
+交互授权级别 MUST 由调用方在记录动作上显式声明并传入，取值闭集 `interactive` / `unattended`；级别缺失 MUST 按 `unattended` 处理。无人值守调用 MAY 只读扫描，但 MUST 在记录动作处被具名拒绝——无人应答 MUST NOT 被读作沉默接受。授权级别 MUST NOT 被从终端形态、环境或沉默推断。
+
+### 按身份绑定(binding by identity)
+
+每条异议 MUST 绑定到一项的**身份**（`subject` 去首尾空白后逐字节相等；同名族另比较 `resource_locator` 值），MUST NOT 按位置、顺序或相似度猜测。同一身份在一次应答中重复出现、身份无法匹配到本次呈现的任何一项、或同名族未给定位而无法唯一匹配，都是具名拒绝。
+
+### 写入前校验(validation before any write)
+
+全部应答校验 MUST 在写任何载体之前完成：每条改选 MUST 指向该选项集的具名成员（完整标签）；点名新选项只有在该项声明了带 `path` 的 `other` 选项时才按该路径处理，否则 MUST 以路径规则具名拒绝；暂缓 MUST 由该项声明。任一校验失败 → 整次记录被拒绝、零写入、不铸造批次编号；同一呈现可在更正应答后重试。
+
+### 原文层与要点层(verbatim layer and key points)
+
+批次记录 MUST 以**逐字引用块**保存用户应答原文；107 决策记录的 `rationale` MUST 只保存要点（建议依据 + 沉默或改选的要点转述），MUST NOT 复述原文层。原文层是重放与审计的真源。
+
+## 批次处置与沉默接受默认（Batch Disposition & Acceptance by Silence）
+
+本节拥有批次处置（Batch Disposition）的闭集与沉默接受默认（Acceptance by Silence）的适用边界。机器只判处置结构与成员集合；「人是否已回答」由承接方判断并逐字留痕。
+
+### 处置闭集(closed dispositions)
+
+处置 MUST 取闭集：`accepted-default`（按建议默认值结案）、`objected-alternative`（按用户点名的具名选项结案）、`objected-parked`（暂缓）。「保持待定」是**没有处置**，不是第四个取值。
+
+### 沉默接受资格(eligibility for silence)
+
+未被点名的项 MUST 只在**一次已获用户应答的交互式批次**内、且同时满足下列全部条件时记为 `accepted-default`：类别为 `human-interactive`；块完整；恰一个默认选项；默认选项可逆；无来源冲突；无前例冲突；未被先前批次解决。任一条件不满足 → 该项保持待定，并以对应的资格状态与具名原因呈现（§ 批次状态）。
+
+### 不合格项的显式结案(explicit settlement)
+
+用户对 `no-default`、`irreversible-default`、`source-conflict` 或 `prior-decision-conflict` 项显式点名具名选项时，该项 MUST 以 `objected-alternative` 结案并记录，其资格状态与原因 MUST 保留在批次行中。对 `incomplete` 项，只有呈现的选项集文法完整（声明计数、五要素、唯一标签齐备）且 `subject` / `context` 可解析时才接受改选；否则 MUST 具名拒绝——由此形成的记录会违反 107 文法。
+
+### 暂缓(park)
+
+`objected-parked` MUST NOT 产生决策记录；项保持待定，批次记录 MUST 保留该暂缓行，下一次批次 MUST 重新呈现该项。暂缓不是拒绝，也不是接受。
+
+### 无未处置结案、无跨批次预授权(no unhandled settlement)
+
+面板 MUST NOT 结案用户未处置的项（沉默规则除外），MUST NOT 从「无用户回合」推断接受，MUST NOT 预授权未来同类项，MUST NOT 记忆用户偏好并自动套用——每次批次重新呈现并等待应答。
+
+### 选择信号(choice signal)
+
+人的选择信号 MUST 复用既有门控观察词表，按下列映射以指针抵达 `shared/guidelines/confirmation-gates.md`（该所有者拥有信号取值域，本节不复述）：`accepted-default` → `approved-as-is`；`objected-alternative` → `modified`；`objected-parked` 不产生选择信号。MUST NOT 另立第二套信号词表。
+
+## 批次记录契约（Batch Record Contract）
+
+本节拥有批次记录（Batch Record）的载体、写前前置与内容契约，以及批次的跨批次读写边界。
+
+### 载体与创建语义(carrier and create-only)
+
+- 批次记录 MUST 是既有 `.specify/knowledge/` 存储中的**一条日期化记录**，经既有记忆引擎的写入面落盘；一文件一批次，标题为 `decision-batch-<batch_id>`；批次编号形态为 `B-<YYYYMMDDTHHMMSSZ>-<8 位小写十六进制>`。
+- 批次编号 MUST 在全部记录前置校验通过之后、首条写入之前铸造；被拒绝的尝试 MUST NOT 铸造编号、登记或留下本特性的任何记录/状态文件。
+- 批次记录是**create-only**：同一批次编号的第二次写入 MUST 在写入面运行之前被拒绝，MUST NOT 覆盖或 upsert 既有记录（记忆引擎按 slug upsert，故创建性前置由批次引擎自己判定）。
+- 批次记录 MUST NOT 是第二存储或共享可变聚合。其唯一受许的写后变更是既有取代规则要求的 `superseded_by` 单字段追加（A-27）：仅追加该字段，既有字节逐字节不变；追加形态与条件随重决规则面（§ 重决与取代）同页声明。
+
+### 批次头(batch head)
+
+批次头 MUST 携带：批次编号；扫描时点；工具版本；来源清单与逐来源在场读数及候选计数（含缺席来源与原因）；完备性判定（记账恒等式与判定结果）；授权级别；以及**用户应答原文的逐字引用块**。
+
+### 逐项行表(item rows)
+
+批次记录 MUST 携带逐项行表，每呈现行一行：项身份（主体 + 适用时的定位）；来源引用集；资格状态与具名原因；接地状态与指针；建议默认值标签；处置（§ 批次处置；无处置记 `pending`）；决策编号（已决项）或空。
+
+### 决策记录(decision records)
+
+- 每个已决项 MUST 恰产生一条 107 决策记录，文法与分层闭集不变；记录块位于批次记录之内（P-13 的既有载体），id 在该载体内稠密。
+- 每条记录 MUST 同时携带批次族条件字段 `batch_id` / `batch_disposition` / `recommendation_grounding`（三者同批在场，仅批次产生的记录携带）；`batch_disposition` 取 `accepted-default` / `objected-alternative`，`recommendation_grounding` 取 `grounded` / `no-evidence`。
+- `rationale` MUST 陈述建议依据与应答要点；`actor` MUST 按既有身份形态在场；`transmission_status` MUST 从 `not-transmitted` 起；`evidence` MUST 含接地指针、来源项指针与批次记录指针。
+- 选择信号 MUST NOT 被写进 `chosen_option`（其值 MUST 保持为选项集中具名成员的精确标签）。
+
+### 跨批次读写边界(cross-batch boundary, A-26)
+
+- **写侧**：不同批次编号 MUST 写不同知识路径；一个批次 MUST NOT 写入、修改或删除他批记录（唯一例外 = 上款 `superseded_by` 追加），且 MUST NOT 依赖他批的**在途**状态。
+- **读侧**：对他批**已落盘**批次记录的读取只允许服务于声明的只读用途——已解决排除（§ 重放契约 之外的读时联接规则见 § 批次状态）、接地联结（§ 建议默认值与依据）、前例冲突检出（同上）与重放指针解析（§ 重放契约）——且 MUST 只读。
+- `.specify/register.md` 保持持久编号的唯一索引；编号冲突按既有 renumber 机制修复，MUST NOT 静默改号。
 
 ## 传递与实施(Transmission and Implementation)
 

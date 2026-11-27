@@ -18,48 +18,48 @@ All 21 unit tests + 3 contract tests were executed as one red run (command in §
 
 | Slot | Test (`tests/unit/test_decision_batch_engine.py::`) | Fixture under `tests/fixtures/decision-batch/` | Run @ 2026-11-27 | rc |
 |------|------------------------------------------------------|-----------------------------------------------|------------------|----|
-| R-S01 | `test_roster_closed_and_predicates` | `two-source` | red — scan unimplemented | 1 |
-| R-S02 | `test_incomplete_block_still_candidate` | `incomplete-block` | red — scan unimplemented | 1 |
-| R-S03 | `test_identity_byte_equal_and_merge` | `two-source` | red — scan unimplemented | 1 |
-| R-S04 | `test_origin_linkage_states` | `two-source`, `incomplete-block` | red — scan unimplemented | 1 |
-| R-S05 | `test_class_gate_states` | `autonomous`, `class-conflict` | red — scan unimplemented | 1 |
-| R-S06 | `test_already_resolved_read_time_join` | `resolution-join` | red — scan unimplemented | 1 |
-| R-S07 | `test_named_exclusions_counted` | `two-source` | red — scan unimplemented | 1 |
-| R-S08 | `test_source_presence_levels` | `absent-root`, `unreadable-register` | red — scan unimplemented | 1 |
-| R-S09 | `test_scan_zero_write` | `two-source` | red — scan unimplemented | 1 |
-| R-S10 | `test_presentation_order_deterministic` | `two-source` | red — scan unimplemented | 1 |
-| R-S11 | `test_row_slots_incomplete_named` | `incomplete-block` | red — scan unimplemented | 1 |
-| R-S12 | `test_batch_context_floor` | `two-source` | red — scan unimplemented | 1 |
-| R-S13 | `test_no_truncation_all_rows` | `two-source` | red — scan unimplemented | 1 |
-| R-S14 | `test_scan_twice_field_identical` | `two-source` | red — scan unimplemented | 1 |
-| R-S15 | `test_autonomous_presented_zero` | `autonomous` | red — scan unimplemented | 1 |
-| R-S16 | `test_default_is_declared_member` | `two-source` | red — scan unimplemented | 1 |
-| R-S17 | `test_no_default_presented_not_settled` | `incomplete-block` | red — scan unimplemented | 1 |
-| R-S18 | `test_grounding_join_closed_inputs` | `grounding-grounded` | red — scan unimplemented | 1 |
-| R-S19 | `test_grounded_pointers_all_resolve` | `grounding-grounded` | red — scan unimplemented | 1 |
-| R-S20 | `test_no_evidence_explicit` | `grounding-none` | red — scan unimplemented | 1 |
-| R-S21 | `test_prior_conflict_detected` | `prior-conflict` | red — scan unimplemented | 1 |
-| R-C103 | `tests/contract/test_decision_batch_contract.py::test_block_grammar_owner_extension` | owner page § 待决策项块 (T016) | red — the owner section does not exist yet | 1 |
-| R-C204 | `tests/contract/test_decision_batch_contract.py::test_presentation_identifier_boundary` | `two-source` | red — `scan --format text` exits 2 (unimplemented) | 1 |
+| R-S01 | `test_roster_closed_and_predicates` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S02 | `test_incomplete_block_still_candidate` | `incomplete-block` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S03 | `test_identity_byte_equal_and_merge` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S04 | `test_origin_linkage_states` | `two-source`, `incomplete-block` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S05 | `test_class_gate_states` | `autonomous`, `class-conflict` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S06 | `test_already_resolved_read_time_join` | `resolution-join` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S07 | `test_named_exclusions_counted` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S08 | `test_source_presence_levels` | `absent-root`, `unreadable-register` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S09 | `test_scan_zero_write` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S10 | `test_presentation_order_deterministic` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S11 | `test_row_slots_incomplete_named` | `incomplete-block` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S12 | `test_batch_context_floor` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S13 | `test_no_truncation_all_rows` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S14 | `test_scan_twice_field_identical` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S15 | `test_autonomous_presented_zero` | `autonomous` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S16 | `test_default_is_declared_member` | `two-source` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S17 | `test_no_default_presented_not_settled` | `incomplete-block` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S18 | `test_grounding_join_closed_inputs` | `grounding-grounded` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S19 | `test_grounded_pointers_all_resolve` | `grounding-grounded` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S20 | `test_no_evidence_explicit` | `grounding-none` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-S21 | `test_prior_conflict_detected` | `prior-conflict` | red at T013 (`scan exited 2`, unimplemented) → **green at T023** | 1 → 0 |
+| R-C103 | `tests/contract/test_decision_batch_contract.py::test_block_grammar_owner_extension` | owner page § 待决策项块 (T016) | red at T014 (owner section absent) → **green at T023** (section landed in T016) | 1 → 0 |
+| R-C204 | `tests/contract/test_decision_batch_contract.py::test_presentation_identifier_boundary` | `two-source` | red at T014 (`scan --format text` exit 2) → **green at T023** | 1 → 0 |
 | R-C307 | `tests/contract/test_decision_batch_contract.py::test_skill_does_not_recompute` | `skills/internal/decide-batch/SKILL.md` (T009) | **green at authoring** — the skill predates this row in package order; disclosed, not claimed as red-first | 0 |
 
 ## S3 — US2 record legs (T024, 12 tests; green at T032) and contract (T025)
 
 | Slot | Test | Fixture | Run @ 2026-11-27 | rc |
 |------|------|---------|------------------|----|
-| R-R01 | `test_reply_forms_and_abort_zero_records` | `reply-shapes` | pending — package P2 | — |
-| R-R02 | `test_objection_binds_identity_verbatim` | `reply-shapes` | pending — package P2 | — |
-| R-R03 | `test_reply_membership_refusals` | `reply-shapes` | pending — package P2 | — |
-| R-R04 | `test_silence_eligibility_matrix` | `eligibility-matrix` | pending — package P2 | — |
-| R-R05 | `test_park_no_record_stays_pending` | `eligibility-matrix` | pending — package P2 | — |
-| R-R06 | `test_unattended_and_missing_authorization_refused` | `eligibility-matrix` | pending — package P2 | — |
-| R-R07 | `test_ineligible_explicit_settlement` | `eligibility-matrix` | pending — package P2 | — |
-| R-R08 | `test_no_cross_batch_preauthorization` | `drift` | pending — package P2 | — |
-| R-R09 | `test_record_drift_refused_zero_write` | `drift` | pending — package P2 | — |
-| R-R10 | `test_batch_id_shape_and_duplicate_refusal` | `batch-family` | pending — package P2 | — |
-| R-R11 | `test_batch_record_layout_via_memory_engine` | `batch-family` | pending — package P2 | — |
-| R-R12 | `test_decision_record_batch_family` | `batch-family` | pending — package P2 | — |
-| R-C408 | `tests/contract/test_decision_batch_contract.py::test_signal_mapping_pointer_only` | owner page + confirmation-gates pointer | pending — package P2 | — |
+| R-R01 | `test_reply_forms_and_abort_zero_records` | `reply-shapes` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R02 | `test_objection_binds_identity_verbatim` | `reply-shapes` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R03 | `test_reply_membership_refusals` | `reply-shapes` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R04 | `test_silence_eligibility_matrix` | `eligibility-matrix` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R05 | `test_park_no_record_stays_pending` | `eligibility-matrix` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R06 | `test_unattended_and_missing_authorization_refused` | `eligibility-matrix` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R07 | `test_ineligible_explicit_settlement` | `eligibility-matrix` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R08 | `test_no_cross_batch_preauthorization` | `drift` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R09 | `test_record_drift_refused_zero_write` | `drift` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R10 | `test_batch_id_shape_and_duplicate_refusal` | `batch-family` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R11 | `test_batch_record_layout_via_memory_engine` | `batch-family` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-R12 | `test_decision_record_batch_family` | `batch-family` | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
+| R-C408 | `tests/contract/test_decision_batch_contract.py::test_signal_mapping_pointer_only` | owner page + confirmation-gates pointer | red at T024 (record unimplemented, exit 2) → **green after T029/T030** (formal green claim at T032) | 1 → 0 |
 
 ## S4 — US3 replay legs (T033, 5 tests + absent-register case; green at T039)
 
@@ -158,3 +158,64 @@ The 23 failing ids are recorded in `notes/red-first-names.txt` (the list owner n
 ### T015 owner-page roster — verification (2026-11-27)
 
 Not a test row; the roster section is verified by its presence and by the governance suites staying green: `tests/contract/test_decision_governance_contracts.py` + `test_decision_governance_guards.py` → `34 passed in 9.46s` (rc 0), gate scanner still `30 blocking / 0 violations`, mirrors `--check` rc 0.
+
+### T016–T018 owner-page sections + T019–T021 scan core — verification (2026-11-27)
+
+Not separate test rows; verified through the S2/T023 green run below plus the 107 governance suites: `tests/contract/test_decision_governance_contracts.py` + `test_decision_governance_guards.py` → `34 passed` (rc 0), gate scanner still `30 blocking / 0 violations`.
+
+### S2 — US1 green run at T023 (2026-11-27)
+
+Command (exact):
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py -q
+```
+Exit status: **0**. Decisive output:
+```text
+25 passed in 7.30s
+```
+Full evidence: `notes/us1-green.txt` (mirror pair readings, two-scan equality, grounding/prior-conflict payloads, bookkeeping identity, the 17-row real-tree reading). No anomaly in the run.
+
+### T022 — mirror pairs (2026-11-27)
+
+`sync-mirrors.py --write` projected `shared/definitions/decision-definitions.md` and `scripts/python/decision-batch.py`; `--check` → `ok shared/ == .specify/shared/ (123 files, byte-identical)` rc 0; both `cmp` pairs byte-identical.
+
+### S3 — US2 red run at T024/T025 (2026-11-27)
+
+Command (exact):
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py -q \
+  --names-out .specify/specs/112-decision-batch-panel/notes/red-first-names-us2.txt
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/contract/test_decision_batch_contract.py -q \
+  --names-out .specify/specs/112-decision-batch-panel/notes/red-first-names-us2-contract.txt
+```
+Exit status: **1 / 1**. Decisive output:
+```text
+12 failed, 21 passed        # the 12 US2 unit tests failed on the unimplemented record action
+1 failed, 4 passed          # test_signal_mapping_pointer_only: the § 批次处置 section was absent
+```
+Failure signatures are behaviour assertions (`an empty reply exited 2, expected 1`, `missing H2
+section carrying ('批次处置', 'Batch Disposition')`), never import errors. The failing ids are
+recorded in `notes/red-first-names-us2.txt` and `notes/red-first-names-us2-contract.txt`.
+
+### US2 implementation — post-implementation run (2026-11-27; formal green claim at T032)
+
+After T026–T030 landed (owner-page reply/disposition/record sections, the record action, and the
+validator's batch-family closure):
+
+```bash
+SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+  tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py \
+  tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py \
+  tests/unit/test_validate_decisions.py -q
+→ 44 passed (rc 0)
+```
+This run is recorded as package evidence; the clause green points for C-401…C-409 and C-501…C-504 stay
+with T032's verification row.
+
+### T022/T031 boundary — mirror projections (2026-11-27)
+
+US1 pairs synced and compared at T022 (see § S2). After the US2 edits the same projection ran again
+(`sync-mirrors.py --write` → `sync scripts/ -> .specify/scripts/ (2 files)`, `sync shared/ -> .specify/shared/ (1 files)`; `--check` rc 0; `cmp` byte-identical for the owner page, the batch engine and the validator). The formal T031 verification row (cmp set + validator-over-fixture run) remains open for package P3.

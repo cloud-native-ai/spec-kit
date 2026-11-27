@@ -388,3 +388,474 @@ def test_prior_conflict_detected(tmp_path: Path) -> None:
     prior = item["qualification"].get("prior_decision") or {}
     assert "history-records.md" in str(prior.get("pointer", "")), prior
     assert prior.get("chosen_label") == "保留 90 天", prior
+
+# =====================================================================================
+# US2 — objection reply, silence, settlement and the batch record (T024 red-first;
+# green claimed at T032). The record action is unimplemented until T029/T030, so every
+# test below fails on its own missing behaviour, never on an import error.
+# =====================================================================================
+
+def write_presentation(root: Path, target: Path) -> Path:
+    proc = scan(root, "json")
+    assert proc.returncode == 0, f"scan exited {proc.returncode}: {proc.stderr[-600:]}"
+    target.write_text(proc.stdout, encoding="utf-8")
+    return target
+
+
+def write_reply(target: Path, text: str) -> Path:
+    target.write_text(text, encoding="utf-8")
+    return target
+
+
+def record(root: Path, presentation: Path, reply: Path | None = None,
+           authorization: str | None = "interactive",
+           fmt: str = "json") -> subprocess.CompletedProcess:
+    args = ["record", "--workspace-root", str(root), "--presentation", str(presentation)]
+    if reply is not None:
+        args += ["--reply", str(reply)]
+    if authorization is not None:
+        args += ["--authorization", authorization]
+    args += ["--format", fmt]
+    return run_engine(*args)
+
+
+def record_payload(proc: subprocess.CompletedProcess) -> dict:
+    assert proc.returncode == 0, (
+        f"record exited {proc.returncode}: {proc.stdout[-800:]} {proc.stderr[-800:]}"
+    )
+    return json.loads(proc.stdout)
+
+
+def knowledge_files(root: Path) -> list[Path]:
+    directory = root / ".specify" / "knowledge"
+    return sorted(directory.glob("*.md")) if directory.is_dir() else []
+
+
+def single_record_text(root: Path) -> str:
+    files = knowledge_files(root)
+    assert len(files) == 1, f"expected exactly one batch record, found {files}"
+    return files[0].read_text(encoding="utf-8")
+
+
+def row_line(record_text: str, subject: str) -> str:
+    matches = [line for line in record_text.splitlines()
+               if line.startswith("|") and f"| {subject} |" in line]
+    assert len(matches) == 1, f"expected one item row for {subject!r}: {matches}"
+    return matches[0]
+
+
+def frontmatter(record_text: str) -> dict:
+    head = record_text.split("---", 2)[1]
+    meta: dict = {}
+    for line in head.splitlines():
+        match = re.match(r"^([a-z_]+):\s*(.*)$", line)
+        if match:
+            meta[match.group(1)] = match.group(2).strip().strip('"')
+    return meta
+
+
+def decision_blocks(record_text: str) -> list[str]:
+    blocks: list[str] = []
+    current: list[str] | None = None
+    for line in record_text.splitlines():
+        if line.startswith("### D-"):
+            if current:
+                blocks.append("\n".join(current))
+            current = [line]
+        elif line.startswith("#"):
+            if current:
+                blocks.append("\n".join(current))
+                current = None
+        elif current is not None:
+            current.append(line)
+    if current:
+        blocks.append("\n".join(current))
+    return blocks
+
+
+NO_OBJECTIONS_REPLY = """reply_verbatim: |
+  没有异议，按建议默认值处理。
+no_objections: true
+"""
+
+
+def test_reply_forms_and_abort_zero_records(tmp_path: Path) -> None:
+    """C-401: an abort / a follow-up-only file / an empty reply write zero records."""
+    root = copy_fixture("reply-shapes", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+
+    missing = record(root, presentation, reply=None)
+    assert missing.returncode != 0, "record accepted a missing reply file"
+    assert knowledge_files(root) == []
+
+    empty = write_reply(tmp_path / "empty.md", "   \n\n")
+    refused_empty = record(root, presentation, reply=empty)
+    assert refused_empty.returncode == 1, (
+        f"an empty reply exited {refused_empty.returncode}, expected 1: {refused_empty.stdout}"
+    )
+    assert knowledge_files(root) == []
+
+    follow_up_only = write_reply(
+        tmp_path / "follow-up.md",
+        "reply_verbatim: |\n  这一项为什么建议保留 30 天？\n",
+    )
+    refused_follow_up = record(root, presentation, reply=follow_up_only)
+    assert refused_follow_up.returncode == 1, (
+        "a follow-up-only file without structured entries or a no-objections "
+        f"declaration was treated as a reply: {refused_follow_up.stdout}"
+    )
+    assert knowledge_files(root) == []
+
+
+def test_objection_binds_identity_verbatim(tmp_path: Path) -> None:
+    """C-402: objections bind by identity; the verbatim reply is preserved in a blockquote."""
+    root = copy_fixture("reply-shapes", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    verbatim_line = "只改「演示应答甲」为「保留 90 天」，其余没意见。"
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n"
+        f"  {verbatim_line}\n"
+        "objections:\n"
+        "  - subject: 演示应答甲\n"
+        "    action: alternative\n"
+        "    option_label: 保留 90 天\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    text = single_record_text(root)
+
+    assert f"> {verbatim_line}" in text, "the verbatim reply is not preserved in a blockquote"
+    first = row_line(text, "演示应答甲")
+    second = row_line(text, "演示应答乙")
+    assert "objected-alternative" in first, first
+    assert "accepted-default" in second, second
+    decisions = decision_blocks(text)
+    assert len(decisions) == 2, decisions
+    chosen = [block for block in decisions if "保留 90 天" in block]
+    assert len(chosen) == 1, decisions
+    chosen_block = chosen[0]
+    assert "- **chosen_option**: 保留 90 天" in chosen_block
+    assert "- **rationale**:" in chosen_block
+    rationale = next(line for line in chosen_block.splitlines()
+                     if line.startswith("- **rationale**:"))
+    assert "改选" in rationale, rationale
+    assert verbatim_line not in rationale, (
+        "the rationale restates the verbatim reply instead of key points only")
+    assert payload["settled"] == 2 and payload["parked"] == 0
+
+
+def test_reply_membership_refusals(tmp_path: Path) -> None:
+    """C-403: unknown identity, duplicate entries and non-member labels are refused, zero writes."""
+    root = copy_fixture("reply-shapes", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+
+    non_member = write_reply(tmp_path / "non-member.md", (
+        "reply_verbatim: |\n  我想改成「保留 365 天」。\n"
+        "objections:\n"
+        "  - subject: 演示应答甲\n"
+        "    action: alternative\n"
+        "    option_label: 保留 365 天\n"
+        "no_objections: false\n"
+    ))
+    refused = record(root, presentation, reply=non_member)
+    assert refused.returncode == 1, refused.stdout
+    combined = refused.stdout + refused.stderr
+    assert "保留 365 天" in combined and "other" in combined.lower() and "path" in combined.lower(), (
+        f"the refusal does not state the membership / other-path rule: {combined}"
+    )
+    assert knowledge_files(root) == []
+
+    unknown = write_reply(tmp_path / "unknown.md", (
+        "reply_verbatim: |\n  改一下那个别的事项。\n"
+        "objections:\n"
+        "  - subject: 不存在的项\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    refused = record(root, presentation, reply=unknown)
+    assert refused.returncode == 1, refused.stdout
+    assert knowledge_files(root) == []
+
+    duplicate = write_reply(tmp_path / "duplicate.md", (
+        "reply_verbatim: |\n  两项都要改。\n"
+        "objections:\n"
+        "  - subject: 演示应答甲\n"
+        "    action: park\n"
+        "  - subject: 演示应答甲\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    refused = record(root, presentation, reply=duplicate)
+    assert refused.returncode == 1, refused.stdout
+    assert knowledge_files(root) == []
+
+
+def test_silence_eligibility_matrix(tmp_path: Path) -> None:
+    """C-404: a zero-objection reply settles only the eligible item; the rest stay pending."""
+    root = copy_fixture("eligibility-matrix", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    payload = record_payload(record(root, presentation, reply=reply))
+    text = single_record_text(root)
+
+    assert payload["settled"] == 1 and payload["pending"] == 4, payload
+    assert payload["decisions"] == [
+        {"subject": "演示矩阵合格项", "disposition": "accepted-default", "decision_id": "D-001"}
+    ], payload["decisions"]
+    assert "accepted-default" in row_line(text, "演示矩阵合格项")
+    assert "irreversible-default" in row_line(text, "演示矩阵不可逆项")
+    assert "no-default" in row_line(text, "演示矩阵无默认项")
+    assert "prior-decision-conflict" in row_line(text, "演示矩阵前例冲突项")
+    assert "incomplete" in row_line(text, "演示矩阵不完整项")
+    for subject in ("演示矩阵不可逆项", "演示矩阵无默认项", "演示矩阵前例冲突项", "演示矩阵不完整项"):
+        assert "pending" in row_line(text, subject), subject
+    assert len(decision_blocks(text)) == 1
+
+
+def test_park_no_record_stays_pending(tmp_path: Path) -> None:
+    """C-405: a park produces no decision record, the row is carried and the item re-presents."""
+    root = copy_fixture("eligibility-matrix", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n  先放下「演示矩阵合格项」。\n"
+        "objections:\n"
+        "  - subject: 演示矩阵合格项\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    text = single_record_text(root)
+
+    assert payload["parked"] == 1 and payload["settled"] == 0, payload
+    assert "objected-parked" in row_line(text, "演示矩阵合格项")
+    assert decision_blocks(text) == []
+    again = scan_payload(root)
+    assert "演示矩阵合格项" in {item["identity"]["subject"] for item in again["items"]}, (
+        "a parked item was not presented again by the next scan"
+    )
+
+
+def test_unattended_and_missing_authorization_refused(tmp_path: Path) -> None:
+    """C-406: unattended and undeclared authorization are refused at record, zero writes."""
+    root = copy_fixture("eligibility-matrix", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+
+    unattended = record(root, presentation, reply=reply, authorization="unattended")
+    assert unattended.returncode == 1, (
+        f"an unattended record exited {unattended.returncode}, expected 1: {unattended.stdout}"
+    )
+    assert "authorization" in (unattended.stdout + unattended.stderr).lower()
+    assert knowledge_files(root) == []
+
+    undeclared = record(root, presentation, reply=reply, authorization=None)
+    assert undeclared.returncode == 1, undeclared.stdout
+    assert knowledge_files(root) == []
+
+    read_only = run_engine("scan", "--workspace-root", str(root), "--format", "json",
+                           "--authorization", "unattended")
+    assert read_only.returncode == 0, read_only.stderr
+
+
+def test_ineligible_explicit_settlement(tmp_path: Path) -> None:
+    """C-407: explicit alternatives settle ineligible items; an unresolvable record refuses."""
+    root = copy_fixture("eligibility-matrix", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n  不可逆项改成「方案乙」，无默认项选「方案甲」。\n"
+        "objections:\n"
+        "  - subject: 演示矩阵不可逆项\n"
+        "    action: alternative\n"
+        "    option_label: 方案乙\n"
+        "  - subject: 演示矩阵无默认项\n"
+        "    action: alternative\n"
+        "    option_label: 方案甲\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    text = single_record_text(root)
+
+    assert payload["settled"] == 3, payload  # the eligible silence row plus the two objections
+    irreversible = row_line(text, "演示矩阵不可逆项")
+    no_default = row_line(text, "演示矩阵无默认项")
+    assert "irreversible-default" in irreversible and "objected-alternative" in irreversible
+    assert "no-default" in no_default and "objected-alternative" in no_default
+
+    broken = copy_fixture("eligibility-matrix", tmp_path / "broken")
+    broken_presentation = write_presentation(broken, tmp_path / "broken-scan.json")
+    broken_reply = write_reply(tmp_path / "broken-reply.md", (
+        "reply_verbatim: |\n  不完整项选「方案甲」。\n"
+        "objections:\n"
+        "  - subject: 演示矩阵不完整项\n"
+        "    action: alternative\n"
+        "    option_label: 方案甲\n"
+        "no_objections: false\n"
+    ))
+    refused = record(broken, broken_presentation, reply=broken_reply)
+    assert refused.returncode == 1, refused.stdout
+    assert "incomplete" in (refused.stdout + refused.stderr).lower()
+    assert knowledge_files(broken) == []
+
+
+def test_no_cross_batch_preauthorization(tmp_path: Path) -> None:
+    """C-409: batch two neither re-settles batch one's identity nor reuses its records."""
+    root = copy_fixture("drift", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan1.json")
+    reply = write_reply(tmp_path / "reply1.md", (
+        "reply_verbatim: |\n  「演示漂移乙」先放着，其余按建议。\n"
+        "objections:\n"
+        "  - subject: 演示漂移乙\n"
+        "    action: park\n"
+        "no_objections: false\n"
+    ))
+    first = record_payload(record(root, presentation, reply=reply))
+    assert first["settled"] == 1 and first["parked"] == 1, first
+
+    second_scan = scan_payload(root)
+    subjects = [item["identity"]["subject"] for item in second_scan["items"]]
+    assert subjects == ["演示漂移乙"], subjects
+    exclusions = second_scan["bookkeeping"]["named_exclusions"]
+    assert any(entry["reason"] == "already-resolved" and entry.get("via") == "prior-batch"
+               for entry in exclusions), exclusions
+
+    second_presentation = write_presentation(root, tmp_path / "scan2.json")
+    second_reply = write_reply(tmp_path / "reply2.md", NO_OBJECTIONS_REPLY)
+    second = record_payload(record(root, second_presentation, reply=second_reply))
+    assert second["batch_id"] != first["batch_id"]
+    assert second["record_path"] != first["record_path"]
+    assert [decision["subject"] for decision in second["decisions"]] == ["演示漂移乙"]
+    second_text = (root / second["record_path"]).read_text(encoding="utf-8")
+    assert "演示漂移甲" not in second_text, "a settled identity was re-recorded in batch two"
+
+
+def test_record_drift_refused_zero_write(tmp_path: Path) -> None:
+    """C-501: a source change between scan and record refuses with zero writes and no id."""
+    root = copy_fixture("drift", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    source = root / ".specify" / "specs" / "demo" / "two.md"
+    before_source = source.read_bytes()
+    register_before = (root / ".specify" / "register.md").read_bytes()
+    with source.open("a", encoding="utf-8") as handle:
+        handle.write(
+            "\n### PENDING — 演示漂移新增项\n\n"
+            "- **decision_class**: human-interactive\n"
+            "- **subject**: 演示漂移新增项\n"
+            "- **context**: 扫描之后新增的候选。\n"
+            "- **options**: 1\n"
+            "  - label: 唯一方案\n"
+            "    consequences: 保持现状\n"
+            "    reversibility: reversible\n"
+            "    default: yes\n"
+            "    evidence: .specify/specs/demo/ref.md\n"
+            "  forced: 只有一种可行做法\n"
+            "- **basis**: 无\n"
+            "- **origin**: demo-producer\n"
+            "- **created_at**: 2026-11-20T00:00:00Z\n")
+    refused = record(root, presentation, reply=reply)
+    assert refused.returncode == 1, refused.stdout
+    combined = (refused.stdout + refused.stderr).lower()
+    assert "drift" in combined or "changed" in combined, combined
+    assert knowledge_files(root) == [], "a refused record left a batch record behind"
+    assert source.read_bytes() != before_source  # our own mutation, not the engine's
+    assert (root / ".specify" / "register.md").read_bytes() == register_before
+
+
+def test_batch_id_shape_and_duplicate_refusal(tmp_path: Path) -> None:
+    """C-502: the minted id carries the closed shape; a same-id second write is refused."""
+    root = copy_fixture("batch-family", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", NO_OBJECTIONS_REPLY)
+    first = record_payload(record(root, presentation, reply=reply))
+    batch_id = first["batch_id"]
+    assert re.match(r"^B-\d{8}T\d{6}Z-[0-9a-f]{8}$", batch_id), batch_id
+    record_path = root / first["record_path"]
+    assert record_path.is_file()
+    record_text = record_path.read_text(encoding="utf-8")
+    assert frontmatter(record_text).get("title") == f"decision-batch-{batch_id}"
+    before = record_path.read_bytes()
+    assert len(knowledge_files(root)) == 1
+
+    duplicate = record(root, presentation, reply=reply)
+    assert duplicate.returncode == 1, (
+        f"a same-id second record exited {duplicate.returncode}, expected 1: {duplicate.stdout}"
+    )
+    assert batch_id in (duplicate.stdout + duplicate.stderr)
+    assert record_path.read_bytes() == before, "a duplicate record rewrote the existing batch record"
+    assert len(knowledge_files(root)) == 1
+
+
+def test_batch_record_layout_via_memory_engine(tmp_path: Path) -> None:
+    """C-503: one dated knowledge entry with the batch head, item rows and decision records."""
+    root = copy_fixture("batch-family", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n  把「演示家庭项乙」改为「方案甲」。\n"
+        "objections:\n"
+        "  - subject: 演示家庭项乙\n"
+        "    action: alternative\n"
+        "    option_label: 方案甲\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    text = (root / payload["record_path"]).read_text(encoding="utf-8")
+    batch_id = payload["batch_id"]
+
+    head = frontmatter(text)
+    assert head.get("scope") == "knowledge", head
+    assert head.get("source") == "/speckit.decide", head
+    assert head.get("title") == f"decision-batch-{batch_id}", head
+    for key in ("id", "tags", "created", "session_id", "summary"):
+        assert key in head, f"memory-engine frontmatter lacks {key!r}: {head}"
+    for needle in (f"# 决策批次记录 {batch_id}", "## 批次头", f"- batch_id: {batch_id}",
+                   "- 扫描时点:", "- 工具版本:", "- 来源与候选计数", "- 完备性",
+                   "- 授权: interactive", "> 把「演示家庭项乙」改为「方案甲」。",
+                   "## 逐项行表", "## 决策记录", "## 收尾"):
+        assert needle in text, f"batch record lacks {needle!r}"
+    header = "| 主体 | 来源 | 资格 | 接地 | 建议默认 | 处置 | 决策 |"
+    assert header in text, "the item-row table header is missing"
+    assert "| 演示家庭项甲 |" in text and "| 演示家庭项乙 |" in text
+    assert "### D-001 — 演示家庭项甲" in text
+    assert "### D-002 — 演示家庭项乙" in text
+
+
+def test_decision_record_batch_family(tmp_path: Path) -> None:
+    """C-504: settled records carry the three batch-family fields together, values in domain."""
+    root = copy_fixture("batch-family", tmp_path)
+    presentation = write_presentation(root, tmp_path / "scan.json")
+    reply = write_reply(tmp_path / "reply.md", (
+        "reply_verbatim: |\n  把「演示家庭项乙」改为「方案甲」。\n"
+        "objections:\n"
+        "  - subject: 演示家庭项乙\n"
+        "    action: alternative\n"
+        "    option_label: 方案甲\n"
+        "no_objections: false\n"
+    ))
+    payload = record_payload(record(root, presentation, reply=reply))
+    text = (root / payload["record_path"]).read_text(encoding="utf-8")
+    blocks = decision_blocks(text)
+    assert len(blocks) == 2, blocks
+    record_path = payload["record_path"]
+
+    assert text.count("- **batch_id**:") == 2
+    assert text.count("- **batch_disposition**:") == 2
+    assert text.count("- **recommendation_grounding**:") == 2
+    for block in blocks:
+        for field in ("batch_id", "batch_disposition", "recommendation_grounding"):
+            assert f"- **{field}**: " in block, (field, block)
+        grounding = next(line for line in block.splitlines()
+                         if line.startswith("- **recommendation_grounding**:"))
+        assert grounding.split(":", 1)[1].strip() in ("grounded", "no-evidence")
+        assert "- **evidence**: " in block and record_path in block
+        assert ".specify/specs/demo/household.md" in block
+        assert "- **actor**: user" in block
+        assert "- **transmission_status**: not-transmitted" in block
+
+    first = next(block for block in blocks if "演示家庭项甲" in block)
+    second = next(block for block in blocks if "演示家庭项乙" in block)
+    assert "- **batch_disposition**: accepted-default" in first
+    assert "- **chosen_option**: 方案甲" in first
+    assert "未对本项提出异议" in first
+    assert "- **batch_disposition**: objected-alternative" in second
+    assert "- **chosen_option**: 方案甲" in second
+    assert "改选" in second

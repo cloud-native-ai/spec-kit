@@ -1,0 +1,67 @@
+# US1 green — Batch Decision Panel（批量决策面板）
+
+**Feature**: 112-decision-batch-panel · **Package**: P2（T016–T023） · **Date**: 2026-11-27
+**Test entry (only entry)**: `bash scripts/bash/run-tests.sh` with `SPECKIT_PYTHON=/usr/local/bin/python3`
+
+## 1. T022 — mirror pairs
+
+Command / reading (2026-11-27):
+```text
+$ python3 scripts/python/sync-mirrors.py --write   # projected shared/ and scripts/ after the US1 edits
+$ python3 scripts/python/sync-mirrors.py --check
+ok    shared/ == .specify/shared/ (123 files, byte-identical)  → rc 0
+$ cmp shared/definitions/decision-definitions.md .specify/shared/definitions/decision-definitions.md
+$ cmp scripts/python/decision-batch.py .specify/scripts/python/decision-batch.py
+CMP OK (both pairs byte-identical)
+```
+
+## 2. T023 — US1 phase tests (green)
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/unit/test_decision_batch_engine.py tests/contract/test_decision_batch_contract.py -q
+25 passed in 7.30s   (rc 0; 21 unit + 4 contract)
+```
+
+The 24 US1 clause green points (C-101…C-110, C-201…C-207, C-301…C-307) are pinned by the named tests in tasks.md § Clause Coverage; test_engine_interface_contract (C-608 formal green at T045) and test_skill_does_not_recompute (C-307) are part of the same 25.
+
+## 3. SC-002 / SC-003 evidence (two-source fixture, copied to a scratch root)
+
+```text
+$ python3 scripts/python/decision-batch.py scan --workspace-root <scratch>/two-source --format json
+result: presentation
+sources: register-open-decision-row=read candidates=3; authored-pending-item=read candidates=2
+bookkeeping: candidates 5 = presented_rows 2 + duplicate_merged 3 + named_exclusions 0; verdict complete
+order: 演示数据保留期, 演示日志级别
+presented slots per row: identity / sources (3 and 2 refs) / decision_class / context / options(5 elements) /
+  recommended_default{label,status,pointers,basis} / qualification{state,reasons,missing_fields} / objection_instructions
+```
+
+Two scans of the same tree (scan_time removed): identical payload — True; digest 6ff20b208388b4efa672ceabd18828cc3d4c88226c61735e862e0fe8bb5f9182.
+
+Grounding fixtures:
+```text
+grounding-grounded  演示接地项   status=grounded   pointers=[".specify/specs/demo/prior-records.md"]  (pointer resolves: path exists)
+grounding-none      演示无证据项 status=no-evidence pointers=[]                                     (explicit, no soft claim)
+prior-conflict      演示前例冲突项 state=prior-decision-conflict prior_decision={pointer: .specify/specs/demo/history-records.md, chosen_label: 保留 90 天}
+```
+
+## 4. Real-tree reading (the first true batch shape, A-16/EP-007)
+
+```text
+$ python3 scripts/python/decision-batch.py scan --workspace-root . --format json
+result: presentation
+sources: register-open-decision-row=read candidates=17; authored-pending-item=read candidates=0
+candidates 17 = presented 17 + merged 0 + exclusions 0; every row incomplete (authority-unresolved, class-missing)
+zero ai-autonomous presentations; zero writes (scan is read-only by construction and by test_scan_zero_write)
+```
+
+## 5. Regression surface
+
+```text
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_decision_governance_contracts.py tests/contract/test_decision_governance_guards.py -q
+34 passed in 9.27s   (rc 0)
+$ python3 .specify/scripts/python/scan-confirmation-gates.py --summary
+30 blocking (22 destructive / 7 governance-kept / 1 reversible), 0 violations — baseline unchanged
+```

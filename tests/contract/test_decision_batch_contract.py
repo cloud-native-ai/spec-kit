@@ -269,3 +269,33 @@ def test_skill_does_not_recompute() -> None:
     assert "docs/reference/commands/decide.md" in text, (
         "the skill does not point at the command reference for the exit semantics"
     )
+
+# --------------------------------------------------------------------------- #
+# US2 — signal mapping by pointer (C-408, T025 red-first; green at T032)
+# --------------------------------------------------------------------------- #
+
+def test_signal_mapping_pointer_only() -> None:
+    """C-408: the disposition→choice-signal mapping reaches the gates owner by pointer;
+    the signal value domain is not restated and a park emits no signal."""
+    assert OWNER.is_file()
+    section = _h2_section(OWNER.read_text(encoding="utf-8"), "批次处置", "Batch Disposition")
+    flat = " ".join(section.split())
+    assert "shared/guidelines/confirmation-gates.md" in section, (
+        "the disposition section does not reach the gates owner by pointer"
+    )
+    assert "accepted-default" in flat and "approved-as-is" in flat, (
+        "the accepted-default signal mapping is not stated"
+    )
+    assert "objected-alternative" in flat and "modified" in flat, (
+        "the objected-alternative signal mapping is not stated"
+    )
+    assert "objected-parked" in flat and "不产生选择信号" in flat, (
+        "the parked disposition does not state that it emits no choice signal"
+    )
+    # The gates value domain stays with its owner: the section must not restate it.
+    for token in ("asked-questions", "denied"):
+        assert token not in flat, f"the gates value domain token {token!r} is restated here"
+    # The engine computes dispositions only; it carries no second signal vocabulary.
+    engine = ENGINE.read_text(encoding="utf-8")
+    for token in ("approved-as-is", "asked-questions", "denied"):
+        assert token not in engine, f"the engine defines a signal token {token!r}"
