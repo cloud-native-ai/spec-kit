@@ -1,0 +1,41 @@
+# workspace guard (implement P2) — 2026-11-27T09:19Z
+
+## Comparison against the P2-start snapshot (workspace-implement-p2.json)
+clean
+rc=0
+
+## Comparison against the analyze round-2 snapshot (workspace-analyze-round2.json; stage-entry proxy)
+clean
+rc=0
+
+## Git status (raw, at check time; P2 evidence files listed before the closing commit)
+ M .specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md
+ M .specify/shared/declarations/contract.yaml
+ M .specify/specs/110-context-management/notes/red-first-evidence.md
+ M .specify/specs/110-context-management/tasks.md
+ M shared/declarations/contract.yaml
+ D tests/fixtures/context-management/absence-mixed/docs/constraints.md
+?? .specify/scripts/python/context-audit.py
+?? .specify/shared/declarations/facts/context-categories.yaml
+?? .specify/shared/declarations/facts/context-classes.yaml
+?? .specify/shared/declarations/facts/context-forms.yaml
+?? .specify/shared/declarations/facts/context-layers.yaml
+?? .specify/shared/definitions/context-management-definitions.md
+?? .specify/specs/110-context-management/test-evidence/red-engine.txt
+?? .specify/specs/110-context-management/test-evidence/red-init.txt
+?? .specify/specs/110-context-management/test-evidence/red-readonly.txt
+?? .specify/specs/110-context-management/test-evidence/us1-green.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-implement-p2-check.txt
+?? .specify/specs/110-context-management/test-evidence/workspace-implement-p2.json
+?? scripts/python/context-audit.py
+?? shared/declarations/facts/context-categories.yaml
+?? shared/declarations/facts/context-classes.yaml
+?? shared/declarations/facts/context-forms.yaml
+?? shared/declarations/facts/context-layers.yaml
+?? shared/definitions/context-management-definitions.md
+?? tests/contract/test_context_management_engine.py
+?? tests/contract/test_context_management_readonly.py
+?? tests/integration/test_context_management_init.py
+
+branch: 110-context-management | HEAD: 3822d1c0475c2f523b3aeab2dc8fce20e8b123ac
+specs listing count: 92

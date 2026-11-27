@@ -1,0 +1,125 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_readonly.py
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [4 items]
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________ test_containment_claims_are_decidable _____________________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20314/popen-gw0/test_containment_claims_are_de0')
+
+    def test_containment_claims_are_decidable(tmp_path: Path):
+>       assert ENGINE.is_file(), f"audit engine missing: {ENGINE}"
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py').is_file
+
+tests/contract/test_context_management_readonly.py:103: AssertionError
+_______________________ test_no_composition_is_persisted _______________________
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_no_composition_is_persisted():
+>       source, tree = _engine_tree()
+                       ^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_readonly.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _engine_tree():
+>       assert ENGINE.is_file(), f"audit engine missing: {ENGINE}"
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py').is_file
+
+tests/contract/test_context_management_readonly.py:148: AssertionError
+___________________ test_no_action_writes_or_opens_a_socket ____________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20314/popen-gw1/test_no_action_writes_or_opens0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcf606a17d0>
+
+    def test_no_action_writes_or_opens_a_socket(tmp_path: Path, monkeypatch):
+        attempts = []
+    
+        def blocked(*args, **kwargs):
+            attempts.append((args, kwargs))
+            raise AssertionError("the audit opened a network socket")
+    
+        monkeypatch.setattr(socket, "socket", blocked)
+        monkeypatch.setattr(socket, "create_connection", blocked)
+        monkeypatch.setattr(socket, "getaddrinfo", blocked)
+    
+        for case in FIXTURE_CASES:
+            root = copy_case_to(tmp_path / case, case)
+            for action in ACTIONS:
+                before = tree_manifest(root)
+>               result = run_engine_in_process(ENGINE, (*action, "--workspace-root", str(root)))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_readonly.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/script_api.py:98: in run_engine_in_process
+    module = load_engine_module(engine_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/script_api.py:84: in load_engine_module
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:936: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7fcf60706fd0>
+path = '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py'
+
+<frozen importlib._bootstrap_external>:1131: FileNotFoundError
+_______________ test_no_new_command_skill_gate_store_or_network ________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20314/popen-gw3/test_no_new_command_skill_gate0')
+
+    def test_no_new_command_skill_gate_store_or_network(tmp_path: Path):
+        commands_dir = REPO_ROOT / "templates" / "commands"
+        if commands_dir.is_dir():
+            naming = [path.name for path in sorted(commands_dir.glob("*.md"))
+                      if "context-audit" in path.read_text(encoding="utf-8", errors="ignore")]
+            assert naming == [], f"the feature ships a command wrapper: {naming}"
+        skills_root = REPO_ROOT / "skills"
+        if skills_root.is_dir():
+            naming = [str(path.relative_to(REPO_ROOT)) for path in sorted(skills_root.rglob("SKILL.md"))
+                      if "context-audit" in path.read_text(encoding="utf-8", errors="ignore")]
+            assert naming == [], f"the feature ships a skill wrapper: {naming}"
+    
+>       _source, tree = _engine_tree()
+                        ^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_readonly.py:206: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _engine_tree():
+>       assert ENGINE.is_file(), f"audit engine missing: {ENGINE}"
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py').is_file
+
+tests/contract/test_context_management_readonly.py:148: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_context_management_readonly.py::test_containment_claims_are_decidable
+FAILED tests/contract/test_context_management_readonly.py::test_no_composition_is_persisted
+FAILED tests/contract/test_context_management_readonly.py::test_no_action_writes_or_opens_a_socket
+FAILED tests/contract/test_context_management_readonly.py::test_no_new_command_skill_gate_store_or_network
+============================== 4 failed in 6.55s ===============================

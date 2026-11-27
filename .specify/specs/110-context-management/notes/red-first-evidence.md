@@ -24,27 +24,27 @@
 
 ### A-3 `tests/contract/test_context_management_engine.py` (T011)
 
-- status: open
+- status: red (observed 2026-11-27, before any engine/fact/owner-document edit)
 - red sink: `test-evidence/red-engine.txt`
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_engine.py > .specify/specs/110-context-management/test-evidence/red-engine.txt 2>&1`
-- real output: —
-- exit status: —
+- real output (decisive excerpt): `FAILED …::test_single_documented_entry_two_actions_no_wrapper` — `AssertionError: audit engine missing: …/scripts/python/context-audit.py`; `============================== 23 failed in 6.29s ==============================`
+- exit status: 1
 
 ### A-4 `tests/contract/test_context_management_readonly.py` (T012)
 
-- status: open
+- status: red (observed 2026-11-27, before any engine edit)
 - red sink: `test-evidence/red-readonly.txt`
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_readonly.py > .specify/specs/110-context-management/test-evidence/red-readonly.txt 2>&1`
-- real output: —
-- exit status: —
+- real output (decisive excerpt): `FAILED …::test_containment_claims_are_decidable` — `AssertionError: audit engine missing: …/scripts/python/context-audit.py`; `============================== 4 failed in 6.55s ===============================`
+- exit status: 1
 
 ### A-5 `tests/integration/test_context_management_init.py` (T013)
 
-- status: open
+- status: red (observed 2026-11-27, before any distribution edit)
 - red sink: `test-evidence/red-init.txt`
 - command: `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_context_management_init.py > .specify/specs/110-context-management/test-evidence/red-init.txt 2>&1`
-- real output: —
-- exit status: —
+- real output (decisive excerpt): `FAILED …::test_fresh_init_distributes_and_audits_offline` — `AssertionError: fresh init did not distribute .specify/shared/definitions/context-management-definitions.md`; `============================== 2 failed in 9.25s ===============================`
+- exit status: 1
 
 ## B. Per-`check`-rule slots (mutation drill, T034)
 
@@ -68,3 +68,6 @@ Filled slots append one record each in the form `slot | command | real output (d
 
 - A-1 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_owner.py` | 18 failed; first failure `owner document missing` | exit 1 | 2026-11-27
 - A-2 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_declarations.py` | 12 failed; first failure `declaration fact missing: context-categories.yaml` | exit 1 | 2026-11-27
+- A-3 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_engine.py` | 23 failed; first failure `audit engine missing` | exit 1 | 2026-11-27
+- A-4 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_readonly.py` | 4 failed; first failure `audit engine missing` | exit 1 | 2026-11-27
+- A-5 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_context_management_init.py` | 2 failed; first failure `fresh init did not distribute …context-management-definitions.md` | exit 1 | 2026-11-27

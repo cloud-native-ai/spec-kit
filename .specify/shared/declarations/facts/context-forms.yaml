@@ -1,0 +1,12 @@
+fact: context-forms
+kind: closed-set
+statement:
+  - pointer
+  - read-in-full
+  - bounded-index
+  - runtime-discovery
+  - inline-digest
+consumers:
+  - scripts/python/context-audit.py
+  - tests/contract/test_context_management_declarations.py
+former_carriers: []

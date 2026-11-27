@@ -1,0 +1,4 @@
+# run determination (implement P2) — 2026-11-27T09:19Z
+$ python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:implement-feature" --unit-type skill --run-id r20261127T070000Z-110a --complexity complex --qualification qualified --feature 110-context-management --token-note "no AI-tool session transcript or proxy reading is available to this worker" --elapsed-ms 1210000 --elapsed-note "measured from the state spine stage_started_at (1795769980) to this determination call" --collected 33
+duplicate: skill:implement-feature r20261127T070000Z-110a was already determined
+exit=0

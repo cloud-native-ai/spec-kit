@@ -1,0 +1,698 @@
+# test runner: /usr/local/bin/python3 -m pytest -n auto --dist load -m "not slow" tests/contract/test_context_management_engine.py
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 192/192 workers
+192 workers [23 items]
+
+FFFFFFFFFFFFFFFFFFFFFFF                                                  [100%]
+=================================== FAILURES ===================================
+_____________ test_single_documented_entry_two_actions_no_wrapper ______________
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_single_documented_entry_two_actions_no_wrapper():
+>       assert ENGINE.is_file(), f"audit engine missing: {ENGINE}"
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py').is_file
+
+tests/contract/test_context_management_engine.py:112: AssertionError
+________________ test_decidable_duplication_shapes_are_reported ________________
+[gw22] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw22/test_decidable_duplication_sha0')
+
+    def test_decidable_duplication_shapes_are_reported(tmp_path: Path):
+>       lowered = _owner_text().lower()
+                  ^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:585: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _owner_text() -> str:
+>       assert OWNER_DOC.is_file(), f"owner document missing: {OWNER_DOC}"
+E       AssertionError: owner document missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/definitions/context-management-definitions.md').is_file
+
+tests/contract/test_context_management_engine.py:540: AssertionError
+____________________ test_check_is_clean_on_this_repository ____________________
+[gw13] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_check_is_clean_on_this_repository():
+>       completed, payload = run_engine_json(REPO_ROOT, "--action", "check")
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+_______________ test_unparsable_owner_document_is_an_input_error _______________
+[gw15] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw15/test_unparsable_owner_document0')
+
+    def test_unparsable_owner_document_is_an_input_error(tmp_path: Path):
+        pristine = copy_case_to(tmp_path / "pristine", "all-present")
+        mutations = {
+            "missing-layout": lambda text: text.replace("## Layout", "## Layout-Moved"),
+            "missing-forms": lambda text: text.replace("## Forms", "## Forms-Moved"),
+            "short-row": lambda text: text.replace(
+                "| `reality-constraints` | system | `pointer` | docs/constraints.md | fixture owner | — |",
+                "| `reality-constraints` | system | `pointer` |"),
+        }
+        for case, mutation in mutations.items():
+            root = tmp_path / case
+            root.mkdir()
+            target = shutil.copytree(pristine, root / "case", symlinks=True)
+            doc = target / "shared" / "definitions" / "context-management-definitions.md"
+            before = doc.read_text(encoding="utf-8")
+            after = mutation(before)
+            assert after != before, f"{case}: mutation did not apply"
+            doc.write_text(after, encoding="utf-8")
+            for args in (("--action", "check"), ("--action", "manifest", "--layer", "project")):
+>               completed = run_engine(target, *args)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:348: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw15/test_unparsable_owner_document0/missing-layout/case')
+timeout = 120, args = ('--action', 'check')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+___________ test_rule_layer_form_fixture_yields_exactly_two_findings ___________
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw7/test_rule_layer_form_fixture_y0')
+
+    def test_rule_layer_form_fixture_yields_exactly_two_findings(tmp_path: Path):
+        root = copy_case_to(tmp_path, "violation-layer-form")
+>       payload, findings = _findings(root)
+                            ^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw7/test_rule_layer_form_fixture_y0/violation-layer-form')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+_________________ test_script_interface_contract_is_satisfied __________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_script_interface_contract_is_satisfied():
+>       short_help = run_engine(REPO_ROOT, "-h")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management')
+timeout = 120, args = ('-h',)
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+_______________ test_audit_does_not_select_rank_or_read_content ________________
+[gw21] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw21/test_audit_does_not_select_ran0')
+
+    def test_audit_does_not_select_rank_or_read_content(tmp_path: Path):
+        root = copy_case_to(tmp_path, "all-present")
+>       baseline = run_engine(root, "--action", "manifest", "--layer", "project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:508: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw21/test_audit_does_not_select_ran0/all-present')
+timeout = 120, args = ('--action', 'manifest', '--layer', 'project')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+_______ test_declaration_error_fixtures_exit_two_without_partial_verdict _______
+[gw14] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw14/test_declaration_error_fixture0')
+
+    def test_declaration_error_fixtures_exit_two_without_partial_verdict(tmp_path: Path):
+        for case in ("declaration-unknown-member", "declaration-missing"):
+            root = copy_case_to(tmp_path / case, case)
+            for args in (("--action", "check"), ("--action", "manifest", "--layer", "project")):
+>               completed = run_engine(root, *args)
+                            ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw14/test_declaration_error_fixture0/declaration-unknown-member/declaration-unknown-member')
+timeout = 120, args = ('--action', 'check')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+_____________________ test_seeded_rule_fixtures_are_exact ______________________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw12/test_seeded_rule_fixtures_are_0')
+
+    def test_seeded_rule_fixtures_are_exact(tmp_path: Path):
+        cases = (
+            "violation-unknown-layer",
+            "violation-unknown-form",
+            "violation-roster-mismatch",
+            "violation-roster-order",
+            "violation-layer-form",
+            "violation-duplicate-class",
+            "violation-empty-layer",
+            "violation-cap-missing",
+            "violation-category-column",
+        )
+        observed = []
+        for case in cases:
+            root = copy_case_to(tmp_path / case, case)
+>           completed, payload = run_engine_json(root, "--action", "check")
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw12/test_seeded_rule_fixtures_are_0/violation-unknown-layer/violation-unknown-layer')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+______ test_missing_owner_document_or_declaration_layer_is_an_input_error ______
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw2/test_missing_owner_document_or0')
+
+    def test_missing_owner_document_or_declaration_layer_is_an_input_error(tmp_path: Path):
+        empty = tmp_path / "empty"
+        empty.mkdir()
+        for args in (("--action", "manifest", "--layer", "project"), ("--action", "check")):
+>           completed = run_engine(empty, *args)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw2/test_missing_owner_document_or0/empty')
+timeout = 120, args = ('--action', 'manifest', '--layer', 'project')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+__________________ test_rule_duplicate_class_fixture_is_exact __________________
+[gw8] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw8/test_rule_duplicate_class_fixt0')
+
+    def test_rule_duplicate_class_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-duplicate-class", "duplicate-class", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw8/test_rule_duplicate_class_fixt0/violation-duplicate-class')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+__________________ test_rule_roster_mismatch_fixture_is_exact __________________
+[gw5] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw5/test_rule_roster_mismatch_fixt0')
+
+    def test_rule_roster_mismatch_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-roster-mismatch", "roster-mismatch", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw5/test_rule_roster_mismatch_fixt0/violation-roster-mismatch')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+____________________ test_rule_empty_layer_fixture_is_exact ____________________
+[gw9] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw9/test_rule_empty_layer_fixture_0')
+
+    def test_rule_empty_layer_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-empty-layer", "empty-layer", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw9/test_rule_empty_layer_fixture_0/violation-empty-layer')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+___________ test_manifest_json_and_text_faces_carry_the_same_content ___________
+[gw19] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw19/test_manifest_json_and_text_fa0')
+
+    def test_manifest_json_and_text_faces_carry_the_same_content(tmp_path: Path):
+        root = copy_case_to(tmp_path, "all-present")
+>       for layer in _declared_layers():
+                     ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:470: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:91: in _declared_layers
+    statement = _fact("context-layers")["statement"]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:87: in _fact
+    return fact_body(slug)
+           ^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:119: in fact_body
+    body = declaration_reader().parse_subset(fact_text(slug), str(fact_path(slug)))
+                                             ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+slug = 'context-layers'
+
+    def fact_text(slug: str) -> str:
+        path = fact_path(slug)
+>       assert path.is_file(), f"declaration fact missing: {path}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-layers.yaml
+
+tests/fixtures/context_management_support.py:114: AssertionError
+______________ test_manifest_reads_genuine_absences_with_reasons _______________
+[gw17] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw17/test_manifest_reads_genuine_ab0')
+
+    def test_manifest_reads_genuine_absences_with_reasons(tmp_path: Path):
+        root = copy_case_to(tmp_path, "absence-mixed")
+>       _payload, rows = _manifest_rows(root, "project")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:410: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:358: in _manifest_rows
+    completed, payload = run_engine_json(root, "--action", "manifest", "--layer", layer)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw17/test_manifest_reads_genuine_ab0/absence-mixed')
+timeout = 120, args = ('--action', 'manifest', '--layer', 'project', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+____________ test_manifest_prints_roster_rows_with_presence_and_cap ____________
+[gw16] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw16/test_manifest_prints_roster_ro0')
+
+    def test_manifest_prints_roster_rows_with_presence_and_cap(tmp_path: Path):
+        root = copy_case_to(tmp_path, "all-present")
+>       for layer in _declared_layers():
+                     ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:91: in _declared_layers
+    statement = _fact("context-layers")["statement"]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:87: in _fact
+    return fact_body(slug)
+           ^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:119: in fact_body
+    body = declaration_reader().parse_subset(fact_text(slug), str(fact_path(slug)))
+                                             ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+slug = 'context-layers'
+
+    def fact_text(slug: str) -> str:
+        path = fact_path(slug)
+>       assert path.is_file(), f"declaration fact missing: {path}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: declaration fact missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/shared/declarations/facts/context-layers.yaml
+
+tests/fixtures/context_management_support.py:114: AssertionError
+___________________ test_rule_roster_order_fixture_is_exact ____________________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw6/test_rule_roster_order_fixture0')
+
+    def test_rule_roster_order_fixture_is_exact(tmp_path: Path):
+>       _assert_single_rule("violation-roster-order", "roster-order", tmp_path)
+
+tests/contract/test_context_management_engine.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw6/test_rule_roster_order_fixture0/violation-roster-order')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+____________________ test_rule_cap_missing_fixture_is_exact ____________________
+[gw10] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw10/test_rule_cap_missing_fixture_0')
+
+    def test_rule_cap_missing_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-cap-missing", "cap-missing", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw10/test_rule_cap_missing_fixture_0/violation-cap-missing')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+___________________ test_rule_unknown_layer_fixture_is_exact ___________________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw3/test_rule_unknown_layer_fixtur0')
+
+    def test_rule_unknown_layer_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-unknown-layer", "unknown-layer", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw3/test_rule_unknown_layer_fixtur0/violation-unknown-layer')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+____________ test_manifest_row_set_is_the_roster_on_concept_missing ____________
+[gw18] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw18/test_manifest_row_set_is_the_r0')
+
+    def test_manifest_row_set_is_the_roster_on_concept_missing(tmp_path: Path):
+        root = copy_case_to(tmp_path, "concept-missing")
+>       payload, rows = _manifest_rows(root, "project")
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:358: in _manifest_rows
+    completed, payload = run_engine_json(root, "--action", "manifest", "--layer", layer)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw18/test_manifest_row_set_is_the_r0/concept-missing')
+timeout = 120, args = ('--action', 'manifest', '--layer', 'project', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+__________________ test_rule_category_column_fixture_is_exact __________________
+[gw11] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw11/test_rule_category_column_fixt0')
+
+    def test_rule_category_column_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-category-column", "category-column", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw11/test_rule_category_column_fixt0/violation-category-column')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+___________________ test_rule_unknown_form_fixture_is_exact ____________________
+[gw4] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw4/test_rule_unknown_form_fixture0')
+
+    def test_rule_unknown_form_fixture_is_exact(tmp_path: Path):
+>       payload = _assert_single_rule("violation-unknown-form", "unknown-form", tmp_path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_context_management_engine.py:217: in _assert_single_rule
+    payload, findings = _findings(root)
+                        ^^^^^^^^^^^^^^^
+tests/contract/test_context_management_engine.py:193: in _findings
+    completed, payload = run_engine_json(root, "--action", "check")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/fixtures/context_management_support.py:232: in run_engine_json
+    completed = run_engine(workspace_root, *args, "--json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw4/test_rule_unknown_form_fixture0/violation-unknown-form')
+timeout = 120, args = ('--action', 'check', '--json')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+___________ test_source_reading_digest_is_stable_and_tracks_metadata ___________
+[gw20] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw20/test_source_reading_digest_is_0')
+
+    def test_source_reading_digest_is_stable_and_tracks_metadata(tmp_path: Path):
+        root = copy_case_to(tmp_path, "all-present")
+>       first = run_engine(root, "--action", "manifest", "--layer", "project")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_context_management_engine.py:488: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workspace_root = PosixPath('/tmp/pytest-of-agent/pytest-20313/popen-gw20/test_source_reading_digest_is_0/all-present')
+timeout = 120, args = ('--action', 'manifest', '--layer', 'project')
+
+    def run_engine(workspace_root: Path, *args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+>       assert ENGINE.is_file(), (
+               ^^^^^^^^^^^^^^^^
+            f"audit engine missing: {ENGINE} — a red guard that names its missing subject")
+E       AssertionError: audit engine missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/scripts/python/context-audit.py — a red guard that names its missing subject
+
+tests/fixtures/context_management_support.py:224: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_context_management_engine.py::test_single_documented_entry_two_actions_no_wrapper
+FAILED tests/contract/test_context_management_engine.py::test_decidable_duplication_shapes_are_reported
+FAILED tests/contract/test_context_management_engine.py::test_check_is_clean_on_this_repository
+FAILED tests/contract/test_context_management_engine.py::test_unparsable_owner_document_is_an_input_error
+FAILED tests/contract/test_context_management_engine.py::test_rule_layer_form_fixture_yields_exactly_two_findings
+FAILED tests/contract/test_context_management_engine.py::test_script_interface_contract_is_satisfied
+FAILED tests/contract/test_context_management_engine.py::test_audit_does_not_select_rank_or_read_content
+FAILED tests/contract/test_context_management_engine.py::test_declaration_error_fixtures_exit_two_without_partial_verdict
+FAILED tests/contract/test_context_management_engine.py::test_seeded_rule_fixtures_are_exact
+FAILED tests/contract/test_context_management_engine.py::test_missing_owner_document_or_declaration_layer_is_an_input_error
+FAILED tests/contract/test_context_management_engine.py::test_rule_duplicate_class_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_rule_roster_mismatch_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_rule_empty_layer_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_manifest_json_and_text_faces_carry_the_same_content
+FAILED tests/contract/test_context_management_engine.py::test_manifest_reads_genuine_absences_with_reasons
+FAILED tests/contract/test_context_management_engine.py::test_manifest_prints_roster_rows_with_presence_and_cap
+FAILED tests/contract/test_context_management_engine.py::test_rule_roster_order_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_rule_cap_missing_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_rule_unknown_layer_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_manifest_row_set_is_the_roster_on_concept_missing
+FAILED tests/contract/test_context_management_engine.py::test_rule_category_column_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_rule_unknown_form_fixture_is_exact
+FAILED tests/contract/test_context_management_engine.py::test_source_reading_digest_is_stable_and_tracks_metadata
+============================== 23 failed in 6.29s ==============================

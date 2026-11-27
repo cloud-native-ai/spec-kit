@@ -99,3 +99,12 @@ registered_facts:
       - boundary
       - on_direct
       - on_handoff
+
+# Feature 110 (context management), contract `contracts/declarations-and-domains.contract.md`
+# C-010: the four context value-domain facts are registered before any consumer reads them.
+# Append-only flat block, same shape as the 093 / 105 blocks above; every existing key stays
+# untouched. The owner document owns the meanings; these facts own the machine domains.
+context-categories: shared/declarations/facts/context-categories.yaml
+context-layers: shared/declarations/facts/context-layers.yaml
+context-forms: shared/declarations/facts/context-forms.yaml
+context-classes: shared/declarations/facts/context-classes.yaml
