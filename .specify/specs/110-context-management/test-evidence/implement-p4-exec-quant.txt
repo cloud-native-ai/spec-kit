@@ -1,0 +1,4 @@
+# exec quant (implement P4) — 2026-11-27T10:09Z
+$ python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:implement-feature" --unit-type skill --run-id r20261127T070000Z-110a
+exec-quant: duplicate record for (skill:implement-feature, r20261127T070000Z-110a); no second row written -> /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/context-management/.specify/exec-quant/records
+exit=0

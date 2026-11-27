@@ -1,0 +1,78 @@
+# Changed-set audit — 110-context-management — T036 — 2026-11-27T10:22Z
+
+Scope: the final changed-path-set audit — every path this feature changed since the
+implement-entry baseline `2cbbb3c8a`, classified against the declared fan-out (DoD-2 /
+T036), with the complement named path by path. Method: `git diff --name-status 2cbbb3c8a`
+(committed and working-tree changes, tracked files) plus `git status --porcelain` untracked
+files; statuses are `A` (272) and `M` (12) — **zero deletions**.
+
+## Buckets (feature-source paths — the declared fan-out)
+
+| Fan-out member | Paths | Notes |
+|----------------|-------|-------|
+| Owner document + mirror | 2 | `shared/definitions/context-management-definitions.md` + `.specify/shared/…` |
+| Four facts + mirrors | 8 | `shared/declarations/facts/context-{categories,layers,forms,classes}.yaml` + four mirrors |
+| Four registration keys + mirror | 2 | `shared/declarations/contract.yaml` + `.specify/shared/…` |
+| Engine + mirror | 2 | `scripts/python/context-audit.py` + `.specify/scripts/python/…` |
+| Five guard files + fixture family | 228 | four contract guards, one integration guard, the support module and every fixture tree file |
+| Ambient section + generated copies | 3 | `templates/instructions-template.md`, its mirror, `.specify/instructions.md` (generated) |
+| Three framework-map rows + mirror | 2 | `shared/definitions/framework-map.md` + `.specify/shared/…` |
+| This spec's records | 37 | `.specify/specs/110-context-management/**` (stage artifacts and evidence) |
+
+## Complement (outside the literal fan-out list, named path by path)
+
+1. **Same-commit pin updates — 2 paths** (the fan-out's own landing obligations, per their
+   test contracts and the repository precedent):
+   - `tests/contract/test_declaration_facts.py` — `POST_110_FACT_KEYS` added with a dated
+     comment; the 084-era guard pins the exact post-registration `contract.yaml` key set,
+     and 093/105 landed the same allow-list update for their keys (its failure message and
+     history show the same-commit pattern).
+   - `tests/contract/test_fast_fail_discipline.py` — `TPL_EXPECTED` 39 → 40,
+     `LIVE_EXPECTED` 40 → 41 with a dated note; its own contract states the pin is raised
+     in the commit that adds the section, and plan § PA-8 / research § RU-3 name this
+     re-measure-and-re-pin as an implement obligation.
+2. **Implement wrap-up records — 3 paths** (the implement command's close-out lifecycle
+   writes one per-entry record per run; not feature content, never hand-written):
+   `.specify/exec-quant/records/20261127T085800623850Z-9f6a62ee.json`,
+   `.specify/feedback/20261127T085805Z-skill-implement-feature.md`,
+   `.specify/session/20261127T085746Z-run-determination-skill-implement-feature-r20261127t070000z.md`.
+   The P4 wrap-up adds the same class of records after this audit.
+3. **Attributed concurrent state — 2 paths** (pre-existing, never touched by this line):
+   `.specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md`
+   (an other-run record) and `.specify/trigger/index.json` (machine-managed index).
+
+No other path exists outside the fan-out and those named classes — the complement is closed.
+
+## Surface containment
+
+- `templates/commands/`, `skills/`, `.specify/skills/`, `.specify/gate.yaml`,
+  `.specify/workflow/`, `.specify/tools/`, `.specify/register.md`, `.specify/glossary.md`,
+  `.specify/features.md`, `.specify/features/`: **zero changes** since `2cbbb3c8a`.
+- No new `/speckit.*` command or skill wrapper (readonly guard
+  `test_no_new_command_skill_gate_store_or_network`, green); no new gate, red line, cache or
+  network path; the engine opens no socket and writes nothing (readonly guard, green).
+- The runtime-store roster declaration (`runtime-store-layout`) is unchanged and carries no
+  `context-store` / `context-cache` / `context-index` root; the only new records under
+  existing stores are the per-entry wrap-up files named above (per-entry files, the
+  concurrent-writer-safe shape).
+
+## Verdict
+
+The changed-path set is the declared fan-out plus the three named complement classes; there
+is no unclassified path and no deletion.
+
+[green: contracts/matrix-and-triggers.contract.md#C-029]
+[green: contracts/guards-and-boundaries.contract.md#C-042]
+[green: contracts/guards-and-boundaries.contract.md#C-043]
+[green: contracts/guards-and-boundaries.contract.md#C-044]
+[green: contracts/guards-and-boundaries.contract.md#C-045]
+[green: contracts/guards-and-boundaries.contract.md#C-046]
+## Final re-run after T037–T039 (pre-commit tree)
+
+Re-ran the same classifier over the finished tree (tracked diff since `2cbbb3c8a` + untracked
+files): 303 paths, zero unclassified. Buckets: owner doc 2, four facts 8, registration keys
+2, engine 2, guards + fixtures 228, ambient section 3, framework map 2, spec records **49**
+(the audit-time count was 37; T037–T039's quickstart record and US5 evidence extend the same
+bucket), implement wrap-up records 3, same-commit pin updates 2, attributed-concurrent 2.
+The complement classes are unchanged and fully named above; no deletion appears (statuses
+remain `A`/`M` only).

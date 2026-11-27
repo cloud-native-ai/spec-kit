@@ -1,0 +1,55 @@
+# Mirror closure — 110-context-management — T038 — 2026-11-27T10:36Z
+
+Scope: FR-023 — no NEW drift against the plan-time mirror baseline; the feature's source
+files are byte-identical to their projected copies; the generated live face carries the
+ambient section.
+
+## The check
+
+```
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (23 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (439 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (20 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (134 files, byte-identical)
+projected[bash-version-guard] … run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] … sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (122 files, byte-identical)
+exit=0
+```
+
+Against the plan-time baseline (templates 23, skills/external 439, skills/internal 139,
+agents 20, scripts 133, shared 117): the growth is exactly the feature's declared additions —
+scripts +1 (`context-audit.py`), shared +5 (owner document + four facts) — and the two edited
+files (`contract.yaml`, `framework-map.md`) remain within the same pairs. No NEW drift.
+
+## Feature pairs — byte identity (`cmp`)
+
+```
+identical  shared/definitions/context-management-definitions.md == .specify/shared/…
+identical  shared/declarations/facts/context-categories.yaml   == .specify/shared/…
+identical  shared/declarations/facts/context-layers.yaml       == .specify/shared/…
+identical  shared/declarations/facts/context-forms.yaml        == .specify/shared/…
+identical  shared/declarations/facts/context-classes.yaml      == .specify/shared/…
+identical  shared/declarations/contract.yaml                   == .specify/shared/…
+identical  shared/definitions/framework-map.md                 == .specify/shared/…
+identical  scripts/python/context-audit.py                     == .specify/scripts/python/…
+identical  templates/instructions-template.md                  == .specify/templates/…
+```
+
+## Generated live face
+
+```
+templates/instructions-template.md:289:## Context Management(上下文管理)
+.specify/templates/instructions-template.md:289:## Context Management(上下文管理)
+.specify/instructions.md:306:## Context Management(上下文管理)
+```
+
+The section heading appears verbatim in the template, its mirror and the regenerated live
+file (and therefore in the symlinked tool files). The generator's budget verdict (`within`,
+40,533 B of 40,960) is recorded at T030/us4-green.txt; the ambient guard pins the
+summary-plus-pointer shape.
+
+Raw capture: `.specify/.tmp/p4/t038/mirror-raw.txt` (scratch).

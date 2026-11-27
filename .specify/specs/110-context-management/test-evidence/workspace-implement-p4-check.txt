@@ -1,0 +1,30 @@
+# workspace guard (implement P4) — 2026-11-27T10:10Z
+
+## Snapshot
+$ python3 .specify/scripts/python/workspace-guard.py --snapshot .specify/specs/110-context-management/test-evidence/workspace-implement-p4.json
+recorded .specify/specs/110-context-management/test-evidence/workspace-implement-p4.json
+rc=0
+
+## Comparison against the P3 snapshot (workspace-implement-p3.json)
+$ python3 .specify/scripts/python/workspace-guard.py --check .specify/specs/110-context-management/test-evidence/workspace-implement-p3.json
+clean
+rc=0
+
+## Comparison against the analyze round-2 snapshot (stage-entry proxy)
+DRIFT: refs
+  refs: one delta — refs/heads/111-general-best-practices present before, absent now
+rc=1
+
+## Attribution and verdict
+
+- **P3 → P4 window is clean (rc 0)**: branch, refs and the `.specify/specs` listing are
+  unchanged across this package's execution; no probe or command in this package resolved a
+  foreign repository root.
+- **Analyze round-2 → P4**: one refs delta — `refs/heads/111-general-best-practices` was
+  present then and is absent now. That branch belongs to the concurrently running sibling
+  line 111 (its own stash/branch lifecycle); this package created and deleted no branch and
+  wrote no spec directory. The delta is **attributed to the concurrent line**, never
+  committed or reverted here.
+- Raw git status at check time (before the P4 closing commit): the two known dirty files are
+  the other-run session record `.specify/session/20261125T140702Z-run-determination-skill-clarify-artifact-r20261125t134500z-1.md`
+  and the machine-managed `.specify/trigger/index.json` — both attributed, never touched.

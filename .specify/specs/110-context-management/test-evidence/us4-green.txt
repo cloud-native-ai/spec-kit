@@ -100,3 +100,68 @@ exit=0
   neither needed nor done.
 - The mirror write ordering above is the mechanically correct sequence for the generator's
   installed-template input; recorded here rather than silently reordered.
+## T031 — US4 verification slice (P4) — 2026-11-27T09:44Z
+
+This section is the complete US4 record the interim note above promised. Every run went
+through `scripts/bash/run-tests.sh`; `SPECKIT_PYTHON=/usr/local/bin/python3` per the task
+file's Environment Prerequisites.
+
+### Full owner guard (trigger set, composer roles, reentry, source-drift, dispatch mapping, concept-pointer slot and structure legs, protocol-boundary leg, ambient template and live and pointer-shape legs)
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py -v
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+[gw0]  PASSED tests/contract/test_context_management_owner.py::test_owner_document_is_the_single_model_home
+[gw2]  PASSED tests/contract/test_context_management_owner.py::test_bilingual_definition_sites_carry_the_fixed_literals
+[gw11] PASSED tests/contract/test_context_management_owner.py::test_composition_protocol_declares_baseline_once_and_task_selection
+[gw16] PASSED tests/contract/test_context_management_owner.py::test_ambient_section_cap_literal_and_roster_mutations_trip_the_checker
+[gw13] PASSED tests/contract/test_context_management_owner.py::test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline
+[gw7]  PASSED tests/contract/test_context_management_owner.py::test_presence_vocabulary_defined_once_with_unobserved_pointer
+[gw9]  PASSED tests/contract/test_context_management_owner.py::test_trigger_set_is_closed_at_seven_with_composer_scope_and_evidence
+[gw12] PASSED tests/contract/test_context_management_owner.py::test_source_drift_and_reentry_semantics
+[gw17] PASSED tests/contract/test_context_management_owner.py::test_red_lines_declare_no_new_surface
+[gw10] PASSED tests/contract/test_context_management_owner.py::test_composer_roles_resolve_through_the_existing_model
+[gw3]  PASSED tests/contract/test_context_management_owner.py::test_terminology_boundary_table_names_four_neighbours_by_pointer
+[gw15] PASSED tests/contract/test_context_management_owner.py::test_ambient_section_mutation_leg_fires_on_the_template_side
+[gw8]  PASSED tests/contract/test_context_management_owner.py::test_concept_pointer_slot_carries_the_triple_and_four_structures
+[gw5]  PASSED tests/contract/test_context_management_owner.py::test_layout_table_is_the_single_row_data_home
+[gw6]  PASSED tests/contract/test_context_management_owner.py::test_landing_contract_declares_three_cells_and_three_forbidden_pairs
+[gw14] PASSED tests/contract/test_context_management_owner.py::test_ambient_section_is_present_in_template_and_live_and_pointer_shaped
+[gw4]  PASSED tests/contract/test_context_management_owner.py::test_forms_matrix_matches_the_contract
+[gw1]  PASSED tests/contract/test_context_management_owner.py::test_no_second_layout_home_exists
+============================== 18 passed in 6.27s ==============================
+exit=0
+```
+
+### Engine guard — source-reading drift leg
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_engine.py::test_source_reading_digest_is_stable_and_tracks_metadata -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+1 passed in 6.29s
+exit=0
+```
+
+### Init guard — ambient section in a fresh project's instructions
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/integration/test_context_management_init.py::test_fresh_init_instructions_carry_the_ambient_section -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+1 passed in 9.25s
+exit=0
+```
+
+### Green claims (US4 subset of § Clause Coverage & Green Partition)
+
+[green: contracts/owner-and-layout.contract.md#C-007]
+[green: contracts/matrix-and-triggers.contract.md#C-022]
+[green: contracts/matrix-and-triggers.contract.md#C-023]
+[green: contracts/matrix-and-triggers.contract.md#C-024]
+[green: contracts/matrix-and-triggers.contract.md#C-025]
+[green: contracts/matrix-and-triggers.contract.md#C-026]
+[green: contracts/matrix-and-triggers.contract.md#C-027]
+[green: contracts/matrix-and-triggers.contract.md#C-028]
+[green: contracts/engine-and-distribution.contract.md#C-037]

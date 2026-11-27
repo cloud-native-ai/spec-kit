@@ -1,0 +1,76 @@
+# Determinism and face-equality legs — 110-context-management — T032 — 2026-11-27T09:48Z
+
+Scope: FR-022 (deterministic, machine-checkable readings), SC-001's byte-identical rerun leg,
+and the JSON key-order / text-vs-JSON content-equality legs named by T032.
+
+## 1. Byte-identical reruns on unchanged trees
+
+Command shape (two consecutive runs per tree, outputs captured, then `cmp`):
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action check [--workspace-root <fixture>]
+$ python3 .specify/scripts/python/context-audit.py --action check [--workspace-root <fixture>]
+$ cmp <run-a> <run-b>
+```
+
+Observed (all `cmp` exit 0, byte-identical):
+
+```
+repo (this tree)                  byte-identical
+violation-unknown-layer           byte-identical
+violation-unknown-form            byte-identical
+violation-roster-mismatch         byte-identical
+violation-roster-order            byte-identical
+violation-layer-form              byte-identical
+violation-duplicate-class         byte-identical
+violation-empty-layer             byte-identical
+violation-cap-missing             byte-identical
+violation-category-column         byte-identical
+```
+
+No timestamps or host values enter either face: the engine's `check` face carries only
+`finding:` lines and one `summary:` line, and the guard
+`test_audit_does_not_select_rank_or_read_content` pins the timestamp/host-value absence on the
+manifest face (green in the engine guard run of T036).
+
+## 2. JSON key order (ordered keys on every face)
+
+Machine assertion over the nine fixture captures printed:
+
+```
+violation-unknown-layer:   key_order=True finding_keys=True summary_keys=True
+violation-unknown-form:    key_order=True finding_keys=True summary_keys=True
+violation-roster-mismatch: key_order=True finding_keys=True summary_keys=True
+violation-roster-order:    key_order=True finding_keys=True summary_keys=True
+violation-layer-form:      key_order=True finding_keys=True summary_keys=True
+violation-duplicate-class: key_order=True finding_keys=True summary_keys=True
+violation-empty-layer:     key_order=True finding_keys=True summary_keys=True
+violation-cap-missing:     key_order=True finding_keys=True summary_keys=True
+violation-category-column: key_order=True finding_keys=True summary_keys=True
+```
+
+Ordered top-level keys: `action`, `findings`, `summary`; finding keys: `rule`, `file`, `row`,
+`line`, `detail`; summary keys: `total`, `by_rule`, `findings` (the manifest face's ordered
+keys `action`, `layer`, `rows`, `counts`, `source_reading` and row keys `class`, `layer`,
+`form`, `sources`, `token`, `reason`, `cap` are pinned green by the engine guard in T036).
+
+## 3. Text face vs JSON face — same content
+
+Assertion: for every seeded case, the text face's `finding:` sequence parsed back to
+`(rule, file, row, line)` equals the JSON face's finding sequence, and both totals equal the
+text `summary: total=`:
+
+```
+violation-unknown-layer:    json_findings=1 text_findings=1 same_content=True
+violation-unknown-form:     json_findings=1 text_findings=1 same_content=True
+violation-roster-mismatch:  json_findings=1 text_findings=1 same_content=True
+violation-roster-order:     json_findings=1 text_findings=1 same_content=True
+violation-layer-form:       json_findings=2 text_findings=2 same_content=True
+violation-duplicate-class:  json_findings=1 text_findings=1 same_content=True
+violation-empty-layer:      json_findings=1 text_findings=1 same_content=True
+violation-cap-missing:      json_findings=1 text_findings=1 same_content=True
+violation-category-column:  json_findings=1 text_findings=1 same_content=True
+content-equality: all cases hold
+```
+
+Full captures: `.specify/.tmp/p4/t032/` (git-ignored scratch root).

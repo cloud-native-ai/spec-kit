@@ -52,15 +52,15 @@ Each slot's observable is the **guard test's verdict** under the rule's own muta
 
 | # | Rule | Seeded fixture | Guard-test carrier (authored in T011) | Status |
 |---|------|----------------|---------------------------------------|--------|
-| 1 | `roster-mismatch` | `tests/fixtures/context-management/violation-roster-mismatch/` | `test_context_management_engine.py` | open |
-| 2 | `roster-order` | `tests/fixtures/context-management/violation-roster-order/` | `test_context_management_engine.py` | open |
-| 3 | `unknown-layer` | `tests/fixtures/context-management/violation-unknown-layer/` | `test_context_management_engine.py` | open |
-| 4 | `unknown-form` | `tests/fixtures/context-management/violation-unknown-form/` | `test_context_management_engine.py` | open |
-| 5 | `layer-form-illegal` | `tests/fixtures/context-management/violation-layer-form/` | `test_context_management_engine.py` | open |
-| 6 | `duplicate-class` | `tests/fixtures/context-management/violation-duplicate-class/` | `test_context_management_engine.py` | open |
-| 7 | `empty-layer` | `tests/fixtures/context-management/violation-empty-layer/` | `test_context_management_engine.py` | open |
-| 8 | `cap-missing` | `tests/fixtures/context-management/violation-cap-missing/` | `test_context_management_engine.py` | open |
-| 9 | `category-column` | `tests/fixtures/context-management/violation-category-column/` | `test_context_management_engine.py` | open |
+| 1 | `roster-mismatch` | `tests/fixtures/context-management/violation-roster-mismatch/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 2 | `roster-order` | `tests/fixtures/context-management/violation-roster-order/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 3 | `unknown-layer` | `tests/fixtures/context-management/violation-unknown-layer/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 4 | `unknown-form` | `tests/fixtures/context-management/violation-unknown-form/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 5 | `layer-form-illegal` | `tests/fixtures/context-management/violation-layer-form/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 6 | `duplicate-class` | `tests/fixtures/context-management/violation-duplicate-class/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 7 | `empty-layer` | `tests/fixtures/context-management/violation-empty-layer/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 8 | `cap-missing` | `tests/fixtures/context-management/violation-cap-missing/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
+| 9 | `category-column` | `tests/fixtures/context-management/violation-category-column/` | `test_context_management_engine.py` | closed — red under its own mutation, restored byte-exact, guard green (T034, `test-evidence/mutation-drill.txt`) |
 
 ## C. Record of filled slots
 
@@ -71,3 +71,20 @@ Filled slots append one record each in the form `slot | command | real output (d
 - A-3 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_engine.py` | 23 failed; first failure `audit engine missing` | exit 1 | 2026-11-27
 - A-4 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/contract/test_context_management_readonly.py` | 4 failed; first failure `audit engine missing` | exit 1 | 2026-11-27
 - A-5 | `SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh tests/integration/test_context_management_init.py` | 2 failed; first failure `fresh init did not distribute …context-management-definitions.md` | exit 1 | 2026-11-27
+
+## D. Consolidation (T039) — every slot closed
+
+All five guard files were observed red before implementation (A-1…A-5) and are green now; all
+nine rule slots were drilled at T034 (red under each rule's own mutation, byte-exact restore,
+guard green again). The convergence run and its per-file counts live in
+`test-evidence/guard-convergence.txt` (59 passed across the five files, exit 0). Story-level
+green sinks, each captured through `scripts/bash/run-tests.sh`:
+
+- US1 — `test-evidence/us1-green.txt`
+- US2 — `test-evidence/us2-green.txt`
+- US3 — `test-evidence/us3-green.txt`
+- US4 — `test-evidence/us4-green.txt` (T031 full slice appended)
+- US5 — `test-evidence/audit-fixtures.txt`, `determinism.txt`, `concept-presence.txt`,
+  `mutation-drill.txt`, `full-suite.txt`, `guard-convergence.txt`, `changed-set.txt`
+
+No guard was skipped, muted or excluded at any point.

@@ -1,0 +1,60 @@
+# Guard convergence — 110-context-management — T036 — 2026-11-27T10:20Z
+
+Scope: re-run all five guard files green and demonstrate the named legs from the same run
+(concept-pointer and protocol-boundary guard, layer-landing guard, member-exercise legs).
+
+## The run
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_owner.py \
+    tests/contract/test_context_management_declarations.py \
+    tests/contract/test_context_management_engine.py \
+    tests/contract/test_context_management_readonly.py \
+    tests/integration/test_context_management_init.py -v
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+============================== 59 passed in 9.45s ==============================
+exit=0
+```
+
+All 59 tests across the five guard files passed; full name-level output in
+`.specify/.tmp/p4/t036-guards.txt` (scratch). Per-file counts: owner 18, declarations 12,
+engine 23, readonly 4, init 2 — sum 59.
+
+## Named demonstrations (from the same run)
+
+- **Concept-pointer and protocol-boundary guard**:
+  - `test_concept_pointer_slot_carries_the_triple_and_four_structures` — the glossary /
+    definitions / explanations triple and the four governed structures with per-structure
+    carrier and named presence surface.
+  - `test_dispatch_mapping_adds_nothing_and_matches_the_protocol_baseline` — parses the
+    owner's seven role fields plus four injections and asserts set equality with the
+    `<!-- protocol-baseline -->` block of `notes/pre-change-measurements.md`; adds no field,
+    injection, cap, identifier or self-check.
+- **Layer-landing guard**:
+  `test_landing_contract_declares_three_cells_and_three_forbidden_pairs` (three legal
+  landing cells with carriers / forms / content-vs-pointer rule; the three forbidden
+  combinations named outside every row), together with
+  `test_layout_table_is_the_single_row_data_home`, `test_forms_matrix_matches_the_contract`
+  and `test_no_second_layout_home_exists`.
+- **Member-exercise legs**:
+  `test_every_declared_member_is_exercised` and
+  `test_layer_and_form_mutations_change_the_engine_output` — mutating a declared
+  category / layer / form member changes an observable engine output; no member is inert.
+- **No-persist and no-new-surface legs** (carriers of C-029/C-045):
+  `test_no_composition_is_persisted` (AST: no write-shaped call, no write-mode open, no
+  network module) and `test_no_new_command_skill_gate_store_or_network` (no command or skill
+  wrapper naming `context-audit`; the runtime-store roster declaration stays readable and
+  carries no context store root).
+
+## Verdict
+
+All five guard files converge green in one run; the clause carriers named by T036 are
+green in that same run.
+
+[green: contracts/matrix-and-triggers.contract.md#C-029]
+[green: contracts/guards-and-boundaries.contract.md#C-042]
+[green: contracts/guards-and-boundaries.contract.md#C-043]
+[green: contracts/guards-and-boundaries.contract.md#C-044]
+[green: contracts/guards-and-boundaries.contract.md#C-045]
+[green: contracts/guards-and-boundaries.contract.md#C-046]

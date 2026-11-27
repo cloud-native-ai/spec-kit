@@ -1,0 +1,66 @@
+# Concept-pointer presence battery — 110-context-management — T033 — 2026-11-27T09:49Z
+
+Scope: FR-020 / FR-028 (concept-pointer presence and honest absence readings), SC-010's
+manifest leg. Engine: `.specify/scripts/python/context-audit.py` (installed mirror, `cmp`-identical
+to its source).
+
+## 1. This repository — all three concept-pointer rows `present`
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action manifest --layer project
+row: project-vocabulary | layer=project | form=pointer | source=.specify/glossary.md | token=present | cap=—
+row: concept-definitions | layer=project | form=bounded-index | source=.specify/shared/definitions/ | token=present | cap=.specify/shared/guidelines/token-efficiency.md § 摘要优先(Summary-First)
+row: concept-explanations | layer=project | form=pointer | source=.specify/skills.md, .specify/tools.md | token=present | cap=—
+counts: present=7 absent=0 unreachable=0 empty=0 not-evaluated=0
+source-reading: 0b30804e51d19bf33e338504b70f71cf9488ba8446a1c0a1cb3c9f5ad05d3e2f
+exit=0
+```
+
+All seven project-layer rows read `present`; each named source resolves on this tree. The JSON
+face carries the same rows (`--json` capture in `.specify/.tmp/p4/t033/`).
+
+## 2. The concept-missing fixture — row set stays the roster, absences are honest
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action manifest --layer project \
+    --workspace-root tests/fixtures/context-management/concept-missing
+row: governance-baseline | layer=project | form=read-in-full | source=.specify/constitution.md, .specify/instructions.md | token=present | cap=...
+row: project-vocabulary | layer=project | form=pointer | source=.specify/glossary.md | token=unreachable | reason=unreachable: .specify/glossary.md is a dangling symlink | cap=—
+row: concept-definitions | layer=project | form=— | source=— | token=not-evaluated | reason=missing layout row: concept-definitions | cap=—
+row: concept-explanations | layer=project | form=pointer | source=.specify/skills.md, .specify/tools.md | token=present | cap=—
+counts: present=2 absent=0 unreachable=1 empty=0 not-evaluated=1
+source-reading: 3008b439ef8fbab080df7099075f1c99c8a54fb0d80aafc0337f9f74259b3278
+exit=0
+```
+
+- The deleted layout row is **still printed** (the row set is the roster) reading
+  `not-evaluated` with the reason naming the missing layout row.
+- The unreadable source row reads `unreachable` with the dangling-symlink reason.
+- Affected-structure consistency reading: the three concept rows include two non-`present`
+  carriers, so the derived reading is **`Unobserved`** (one non-present carrier → Unobserved,
+  per the guard's derivation; pinned green by
+  `test_manifest_row_set_is_the_roster_on_concept_missing` — run below).
+- No output claims agreement: `grep -iE 'agreement|consistent|agrees'` over both manifest
+  captures exits 1 (no match); no row of the affected structure reads `present` other than the
+  genuinely present `concept-explanations`.
+
+## 3. Co-occurring roster-mismatch reading on the same fixture
+
+```
+$ python3 .specify/scripts/python/context-audit.py --action check \
+    --workspace-root tests/fixtures/context-management/concept-missing --json
+"rule": "roster-mismatch", "detail": "layer 'project': layout class set differs from the roster (missing=['concept-definitions'] extra=[])"
+exit=1        # the manifest above still exits 0 — the two readings co-occur and neither masks the other
+```
+
+## 4. Guard leg (the machine pin for the derivation above)
+
+```
+$ SPECKIT_PYTHON=/usr/local/bin/python3 bash scripts/bash/run-tests.sh \
+    tests/contract/test_context_management_engine.py::test_manifest_row_set_is_the_roster_on_concept_missing -q
+# test runner: mode=parallel workers=auto dist=load passes=1 tier=fast excluded_slow=0
+1 passed in 6.26s
+exit=0
+```
+
+Full captures: `.specify/.tmp/p4/t033/` (git-ignored scratch root).
